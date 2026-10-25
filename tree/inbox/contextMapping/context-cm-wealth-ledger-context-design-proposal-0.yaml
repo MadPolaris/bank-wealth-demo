@@ -1,0 +1,74 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: context
+name: WealthLedgerContextDesignProposal
+origin:
+  stage: contextMapping
+  board: wealth-source-design-v1
+  seq: 0
+payload:
+  {
+    "type": "context",
+    "name": "WealthLedgerContextDesignProposal",
+    "stage": "contextMapping",
+    "description": "Proposed 账户记账 bounded context; local ownership does not extend to an external system.",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "context.ledger",
+        "category": "context",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "aggregate",
+            "id": "CreditBalance"
+          },
+          {
+            "kind": "artifact",
+            "id": "subdomain.ledger"
+          },
+          {
+            "kind": "artifact",
+            "id": "context-map.wealth"
+          },
+          {
+            "kind": "artifact",
+            "id": "aggregate-boundary.credit-balance"
+          }
+        ],
+        "body": {
+          "label": "账户记账",
+          "aggregates": [
+            "CreditBalance"
+          ],
+          "subdomainId": "subdomain.ledger",
+          "owns": "Local account money and ledger phase evidence.",
+          "contractBoundary": "Proposed logical ownership, not separate deployment/service/transaction guarantees.",
+          "entities": [],
+          "edges": [
+            {
+              "from": "context.ledger",
+              "to": "subdomain.ledger",
+              "label": "proposed problem-space mapping",
+              "status": "demo-proposal"
+            }
+          ],
+          "nonGoals": [
+            "Owning external bank ledger",
+            "Claiming certified remote TCC"
+          ]
+        }
+      }
+    },
+    "links": []
+  }

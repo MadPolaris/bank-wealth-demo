@@ -1,0 +1,109 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: question
+name: ExternalBankCapabilityDecisionProposal
+origin:
+  stage: refining
+  board: wealth-source-design-v1
+  seq: 2
+payload:
+  {
+    "type": "question",
+    "name": "ExternalBankCapabilityDecisionProposal",
+    "stage": "refining",
+    "description": "Which external bank APIs, settlement evidence, idempotency and reconciliation capabilities actually exist, and what local-only behavior must remain a design assumption?",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "decision.external-bank",
+        "category": "decision",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "external-system",
+            "id": "InterbankClearingGateway"
+          },
+          {
+            "kind": "aggregate",
+            "id": "ExternalTransferOrder"
+          },
+          {
+            "kind": "aggregate",
+            "id": "CreditBalance"
+          },
+          {
+            "kind": "artifact",
+            "id": "context.payments"
+          },
+          {
+            "kind": "artifact",
+            "id": "context-map.wealth"
+          },
+          {
+            "kind": "event",
+            "id": "ExternalTransferOrder.ExternalDebitCommitted"
+          }
+        ],
+        "body": {
+          "entities": [],
+          "question": "外部银行实际支持哪些扣款、查单、撤销及结算证据？",
+          "decisionStatus": "open",
+          "knownEvidence": [
+            "Existing local ExternalTransferOrder prepare/commit/compensate command and journal declarations.",
+            "Imported InterbankClearingGateway external-system note."
+          ],
+          "unknowns": [
+            "Whether remote prepare/commit/compensate APIs exist at all",
+            "Remote idempotency/correlation and durable query semantics",
+            "Timeout, ambiguous debit, reversal and settlement evidence",
+            "Allowed source account verification and authorization"
+          ],
+          "options": [
+            {
+              "label": "Keep source preview only",
+              "status": "demo-proposal"
+            },
+            {
+              "label": "Define a real adapter after capability evidence and explicit approval",
+              "status": "deferred"
+            }
+          ],
+          "requiredEvidence": [
+            "Actual external API contract and capabilities",
+            "Permission and account verification model",
+            "Reconciliation and settlement identifiers"
+          ],
+          "constraints": [
+            "No remote TCC claim from local command names",
+            "No external bank mock is authorized",
+            "No production compliance/settlement guarantee"
+          ],
+          "edges": [
+            {
+              "from": "decision.external-bank",
+              "to": "context.payments",
+              "label": "blocks real external-bank adapter",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "decision.external-bank",
+              "to": "context.ledger",
+              "label": "defines evidence required before account-credit interpretation",
+              "status": "demo-proposal"
+            }
+          ]
+        }
+      }
+    },
+    "links": []
+  }

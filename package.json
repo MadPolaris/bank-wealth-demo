@@ -1,0 +1,14 @@
+{
+  "name": "bank-wealth-truth-preview",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "validate": "node tools/validate.mjs",
+    "verify": "node tools/validate.mjs --roundtrip --check-projections",
+    "project": "node tools/project.mjs --write",
+    "project:check": "node tools/project.mjs --check"
+  }
+}

@@ -5,7 +5,7 @@ type: role
 name: WealthOpsOfficer
 origin:
   stage: commandStorming
-  board: board1
+  board: imported-roles
   seq: 2
 payload:
   {
@@ -18,5 +18,31 @@ payload:
       "command:GetFundOrderState"
     ],
     "author": "facilitator",
-    "createdAt": "2026-10-24"
+    "createdAt": "2026-10-24",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "inbox/commandStorming/role-cs-wealth-ops-officer-2.yaml",
+      "atom": {
+        "kind": "note",
+        "type": "role",
+        "name": "WealthOpsOfficer",
+        "origin": {
+          "stage": "commandStorming",
+          "board": "board1",
+          "seq": 2
+        },
+        "payload": {
+          "type": "role",
+          "name": "WealthOpsOfficer",
+          "stage": "commandStorming",
+          "description": "Operations specialist who reviews recovery-required and outcome-unknown cross-bank or TA exceptions with authorized reconciliation evidence.",
+          "links": [
+            "command:GetBalance",
+            "command:GetFundOrderState"
+          ],
+          "author": "facilitator",
+          "createdAt": "2026-10-24"
+        }
+      }
+    }
   }

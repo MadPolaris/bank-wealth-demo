@@ -1,0 +1,187 @@
+{
+  "sourceCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+  "canonicalSha256": "2833c08a16673680c44dcb154d6e83c20a25ec3003293f981a02ef6fbade2cfc",
+  "tool": {
+    "head": "cb2d23342619af3f5d27e5df2361e88fe6d54fb3",
+    "sha256": "0cc14220fac58bde3d4f860bea347259f042814857574a875ba3a6b8d520c1c1",
+    "sources": [
+      {
+        "file": "lib/compile.mjs",
+        "sha256": "f07d66330cfed23b7c0394208c73f27850ee197f679b9d938c4f372136f2a939"
+      },
+      {
+        "file": "lib/decompose.mjs",
+        "sha256": "8761949205ada61b23a1474ec8268736c24d9838c477c8f0f3406f4524171a83"
+      },
+      {
+        "file": "lib/execution/compile.mjs",
+        "sha256": "1b3ce854694aab37211c58d5ab4635d882438f81766cd5340ffb910edc03eca6"
+      },
+      {
+        "file": "lib/saga/compile.mjs",
+        "sha256": "3ed660a3eaedfbbcb3e27f139170656154bc4700dee546fd5650c6a6ceb8f083"
+      },
+      {
+        "file": "lib/shared.mjs",
+        "sha256": "2dbe8089157cd43859e50daa8e1bbf918fbd4b17fa89d883df36f96af87b2539"
+      },
+      {
+        "file": "lib/validate.mjs",
+        "sha256": "b9d89bddc842bbc1a9d7580da2a5b05bd9cd744fda6b62203c91bf0a6e5c311b"
+      },
+      {
+        "file": "schema/execution-ir-v1.schema.json",
+        "sha256": "950a9c7b4b13e2eb158789d0bbcbadee268575f07e0e20ec4c612c096d08b5b9"
+      },
+      {
+        "file": "schema/saga-ir-v1.schema.json",
+        "sha256": "f94eeead3a956f4ce54b002d942e6b2a1f3fe49008cf738b15da10e0ad8ea46c"
+      }
+    ]
+  },
+  "gates": {
+    "structure": {
+      "hard": [
+        "[V2] commandStorming|board1: seq 0 collision — inbox/commandStorming/role-cs-investor-0.yaml vs command-cs-start-external-top-up-0.yaml",
+        "[V2] eventStorming|board1: seq 1 collision — inbox/eventStorming/question-es-what-if-fund-ta-nav-confirmation-is-t-plus-1-1.yaml vs event-es-commit-incoming-credits-confirmed-1.yaml",
+        "[V2] eventStorming|board1: seq 2 collision — inbox/eventStorming/question-es-what-happens-when-sip-installment-balance-is-insufficient-2.yaml vs event-es-deduct-funds-confirmed-2.yaml",
+        "[V2] eventStorming|board1: seq 0 collision — inbox/eventStorming/question-es-how-is-interbank-clearing-timeout-reconciled-0.yaml vs event-es-external-top-up-requested-0.yaml",
+        "[V2] commandStorming|board1: seq 1 collision — inbox/commandStorming/role-cs-sip-scheduler-1.yaml vs command-cs-prepare-external-debit-0.yaml",
+        "[V2] eventStorming|board1: seq 4 collision — inbox/eventStorming/question-es-is-minimum-subscription-amount-enforced-in-aggregate-4.yaml vs event-es-external-debit-committed-1.yaml",
+        "[V2] eventStorming|board1: seq 3 collision — inbox/eventStorming/question-es-how-to-prevent-duplicate-sip-cron-triggers-3.yaml vs event-es-external-debit-prepared-0.yaml",
+        "[V2] commandStorming|board1: seq 3 collision — inbox/commandStorming/externalSystem-cs-interbank-clearing-gateway-3.yaml vs command-cs-record-ta-share-confirmation-1.yaml",
+        "[V2] commandStorming|board1: seq 2 collision — inbox/commandStorming/role-cs-wealth-ops-officer-2.yaml vs command-cs-request-fund-purchase-0.yaml",
+        "[V2] commandStorming|board1: seq 4 collision — inbox/commandStorming/externalSystem-cs-fund-ta-registry-4.yaml vs command-cs-create-sip-plan-0.yaml"
+      ],
+      "notices": [
+        "[RF5] command \"GetBalance\" declares no parameters (explicit parameterless? confirm)",
+        "[RF5] command \"GetExternalTransferState\" declares no parameters (explicit parameterless? confirm)",
+        "[RF5] command \"GetFundOrderState\" declares no parameters (explicit parameterless? confirm)",
+        "[CS7] inbox/eventStorming/question-es-how-is-interbank-clearing-timeout-reconciled-0.yaml: dangling link \"event:IncomingCreditsCommitted\" — no ingested note with type event name \"IncomingCreditsCommitted\"",
+        "[SA0] sagas/external-bank-transfer.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+        "[SA0] sagas/fund-subscription-pay.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+        "[ES4] possible solution language: \"SipPlanCreated\" — confirm this is a business fact, not an implementation",
+        "[CS1] event \"CommitIncomingCreditsConfirmed\" has no trigger source (command/timer/externalSystem/event link): event-es-commit-incoming-credits-confirmed-1.yaml",
+        "[CS1] event \"DeductFundsConfirmed\" has no trigger source (command/timer/externalSystem/event link): event-es-deduct-funds-confirmed-2.yaml",
+        "[CS3] command \"PrepareExternalDebit\" has no initiating role and no policy invocation: command-cs-prepare-external-debit-0.yaml",
+        "[CS3] command \"RecordTAShareConfirmation\" has no initiating role and no policy invocation: command-cs-record-ta-share-confirmation-1.yaml"
+      ]
+    },
+    "saga": {
+      "ok": true,
+      "diagnostics": []
+    },
+    "execution": {
+      "ok": true,
+      "diagnostics": []
+    }
+  },
+  "roundtrip": {
+    "ok": false,
+    "stage": "paths",
+    "missing": [
+      "aggregates/external-transfer-order/notes/command-cs-prepare-external-debit-0.yaml",
+      "aggregates/external-transfer-order/notes/event-es-external-debit-committed-1.yaml",
+      "aggregates/external-transfer-order/notes/event-es-external-debit-prepared-0.yaml",
+      "aggregates/fund-order/notes/command-cs-record-ta-share-confirmation-1.yaml",
+      "aggregates/fund-order/notes/command-cs-request-fund-purchase-0.yaml",
+      "aggregates/fund-order/notes/event-es-fund-purchase-requested-0.yaml",
+      "aggregates/fund-order/notes/event-es-fund-shares-confirmed-2.yaml",
+      "aggregates/fund-order/notes/event-es-fund-subscription-payment-confirmed-1.yaml",
+      "aggregates/sip-plan/notes/command-cs-create-sip-plan-0.yaml",
+      "aggregates/sip-plan/notes/command-cs-trigger-sip-installment-1.yaml",
+      "aggregates/sip-plan/notes/event-es-sip-installment-failed-2.yaml",
+      "aggregates/sip-plan/notes/event-es-sip-installment-triggered-1.yaml",
+      "aggregates/sip-plan/notes/event-es-sip-plan-created-0.yaml",
+      "inbox/eventStorming/question-es-how-is-interbank-clearing-timeout-reconciled-0.yaml",
+      "inbox/eventStorming/question-es-how-to-prevent-duplicate-sip-cron-triggers-3.yaml",
+      "inbox/eventStorming/question-es-is-minimum-subscription-amount-enforced-in-aggregate-4.yaml",
+      "inbox/eventStorming/question-es-what-happens-when-sip-installment-balance-is-insufficient-2.yaml",
+      "inbox/eventStorming/question-es-what-if-fund-ta-nav-confirmation-is-t-plus-1-1.yaml",
+      "read-models/investor-wealth-overview.rm.yaml",
+      "read-models/sip-plan-execution-view.rm.yaml",
+      "stories/create-and-run-sip-plan.story.yaml",
+      "stories/purchase-fund.story.yaml",
+      "stories/top-up-from-external-bank.story.yaml"
+    ],
+    "added": [
+      "aggregates/external-transfer-order/notes/command-cs-prepare-external-debit-1.yaml",
+      "aggregates/external-transfer-order/notes/event-es-external-debit-committed-4.yaml",
+      "aggregates/external-transfer-order/notes/event-es-external-debit-prepared-3.yaml",
+      "aggregates/fund-order/notes/command-cs-record-ta-share-confirmation-3.yaml",
+      "aggregates/fund-order/notes/command-cs-request-fund-purchase-2.yaml",
+      "aggregates/fund-order/notes/event-es-fund-purchase-requested-5.yaml",
+      "aggregates/fund-order/notes/event-es-fund-shares-confirmed-7.yaml",
+      "aggregates/fund-order/notes/event-es-fund-subscription-payment-confirmed-6.yaml",
+      "aggregates/sip-plan/notes/command-cs-create-sip-plan-4.yaml",
+      "aggregates/sip-plan/notes/command-cs-trigger-sip-installment-5.yaml",
+      "aggregates/sip-plan/notes/event-es-sip-installment-failed-10.yaml",
+      "aggregates/sip-plan/notes/event-es-sip-installment-triggered-9.yaml",
+      "aggregates/sip-plan/notes/event-es-sip-plan-created-8.yaml",
+      "inbox/eventStorming/question-es-how-is-an-interbank-clearing-timeout-reconciled--0.yaml",
+      "inbox/eventStorming/question-es-how-to-prevent-duplicate-sip-cron-triggers-for-the-same-cycle--3.yaml",
+      "inbox/eventStorming/question-es-is-the-minimum-fund-subscription-amount-enforced-in-the-aggregate--4.yaml",
+      "inbox/eventStorming/question-es-what-happens-when-a-sip-installment-encounters-insufficient-balance--2.yaml",
+      "inbox/eventStorming/question-es-what-if-fund-ta-share-confirmation-is-asynchronous--t-1---1.yaml",
+      "read-models/read-model-investor-wealth-overview.rm.yaml",
+      "read-models/read-model-sip-plan-execution-view.rm.yaml",
+      "stories/story-create-and-run-sip-plan.story.yaml",
+      "stories/story-purchase-fund.story.yaml",
+      "stories/story-top-up-from-external-bank.story.yaml"
+    ]
+  },
+  "protectedFiles": [
+    {
+      "file": "bindings.json",
+      "sha256": "c5a3f342b2ef77714f287d17305067e2cd165e262dd697161b51b6264fa95853"
+    },
+    {
+      "file": "compiled/execution-ir.json",
+      "sha256": "e6762547b98eacb92b536714a0696c85a2bdd791d7a5189c4e64629f0b6dec1e"
+    },
+    {
+      "file": "compiled/saga-ir.json",
+      "sha256": "22a2ef1c3e6ad4783b89655d265effb75e5ae85edb7297fae00f8ee5b4a3b396"
+    },
+    {
+      "file": "execution-bindings.json",
+      "sha256": "f092d665bde69aaa666fbbae1db7c61da7f449dde690fbadbb92eef48d4de044"
+    },
+    {
+      "file": "isolation-zone/generated-scaffold/FundOrderGeneratedContract.scala",
+      "sha256": "6be4d460fcf28ba61e5d4586b1394d90f87df5aabaac6c0532a089eb6d47320e"
+    },
+    {
+      "file": "isolation-zone/handwritten-adapter/FundOrderIsolationAdapter.scala",
+      "sha256": "a545dce9d9304c8ecbc844e8f2d30046bbe9649d70a38e60d4b07dae5867821e"
+    },
+    {
+      "file": "runtime-binding.json",
+      "sha256": "9ad06930de5a8eb1af16188844b39d2f18e84dd32512f8a4853c0f8dc39e7a07"
+    },
+    {
+      "file": "tree/pipelines/fund-purchase-invoke.pipeline.yaml",
+      "sha256": "a0cfa2540b86c8a3e91244ed1b4d8b43b8f51b33ca224847a08fb89af7799810"
+    },
+    {
+      "file": "tree/pipelines/fund-ta-settlement.pipeline.yaml",
+      "sha256": "74b53c73bc8a27db0033f519dba18b29676fc3d6f18ab257118f6b7e4edf48f0"
+    },
+    {
+      "file": "tree/pipelines/sip-cross-bank-design-boundary.pipeline.yaml",
+      "sha256": "209bc8f47c20b0453734a84417fb2c5f28a3d4670707c4d8cc3a376eee0f1105"
+    },
+    {
+      "file": "tree/pipelines/sip-installment-execution.pipeline.yaml",
+      "sha256": "7b89bda9b3c63b7a6ee953985ca385c36e43d1a3e045445726742d961be78090"
+    },
+    {
+      "file": "tree/sagas/external-bank-transfer.saga.yaml",
+      "sha256": "b52872b8d43253dcd1b32b861530d6c6010a31b4b285b2976444783fa3e1f549"
+    },
+    {
+      "file": "tree/sagas/fund-subscription-pay.saga.yaml",
+      "sha256": "51e4508d37f2aa4669e6e280e95eeb366986ca3c42b0b1313bc1452c17efe49f"
+    }
+  ]
+}

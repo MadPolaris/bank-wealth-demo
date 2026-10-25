@@ -4,8 +4,8 @@ kind: aggregate
 name: FundOrder
 seq: 2
 order:
-  commands: ["RequestFundPurchase", "ReserveFundSubscription", "ConfirmFundSubscriptionPayment", "CancelFundSubscription", "RecordTAShareConfirmation", "GetFundOrderState", "RecordResultSucceeded", "RecordResultRejectedBeforeEffects", "RecordResultCompensated", "RecordResultRecoveryRequired", "RecordResultOutcomeUnknown"]
-  events: ["FundPurchaseRequested", "ReserveFundSubscriptionConfirmed", "FundSubscriptionPaymentConfirmed", "FundSubscriptionCanceled", "FundSharesConfirmed", "result-succeeded", "result-rejected-before-effects", "result-compensated", "result-recovery-required", "result-outcome-unknown"]
+  commands: ["RequestFundPurchase","ReserveFundSubscription","ConfirmFundSubscriptionPayment","CancelFundSubscription","RecordTAShareConfirmation","GetFundOrderState","RecordResultSucceeded","RecordResultRejectedBeforeEffects","RecordResultCompensated","RecordResultRecoveryRequired","RecordResultOutcomeUnknown"]
+  events: ["FundPurchaseRequested","ReserveFundSubscriptionConfirmed","FundSubscriptionPaymentConfirmed","FundSubscriptionCanceled","FundSharesConfirmed","result-succeeded","result-rejected-before-effects","result-compensated","result-recovery-required","result-outcome-unknown"]
 payload:
   {
     "name": "FundOrder",
@@ -35,6 +35,46 @@ payload:
           "FundSubscriptionPaymentConfirmed",
           "FundSharesConfirmed",
           "FundSubscriptionCanceled"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "operationId",
+        "dataType": "OperationId",
+        "description": "Operation identity retained from the submitted fund purchase request.",
+        "origin": "BUSINESS_INPUT",
+        "writtenBy": [
+          "FundPurchaseRequested.operationId"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "investorAccountId",
+        "dataType": "AccountId",
+        "description": "Investor account retained from the submitted fund purchase request.",
+        "origin": "BUSINESS_INPUT",
+        "writtenBy": [
+          "FundPurchaseRequested.investorAccountId"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "fundCode",
+        "dataType": "String",
+        "description": "Requested fund code retained from the submitted fund purchase request.",
+        "origin": "BUSINESS_INPUT",
+        "writtenBy": [
+          "FundPurchaseRequested.fundCode"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "description": "Requested subscription amount retained from the submitted fund purchase request.",
+        "origin": "BUSINESS_INPUT",
+        "writtenBy": [
+          "FundPurchaseRequested.amount"
         ],
         "role": "State"
       },
@@ -99,7 +139,7 @@ payload:
       {
         "ruleId": "IR-FO-RESERVE-002",
         "errCode": "62004",
-        "desc": "Subscription amount must be positive and meet fund minimum threshold (back-anchored rule)."
+        "desc": "Subscription amount must be positive. A genuine fund/product minimum threshold is not enforced by this rule and remains pending."
       },
       {
         "ruleId": "IR-FO-COMMIT-001",
@@ -115,6 +155,166 @@ payload:
         "ruleId": "IR-FO-RESULT-001",
         "errCode": "62010",
         "desc": "Result already recorded for this transaction: idempotent republication success."
+      },
+      {
+        "ruleId": "IR-FO-TA-CONFIRM-001",
+        "errCode": "62011",
+        "desc": "TA share confirmation requires PAYMENT_SETTLED before transitioning to SHARES_CONFIRMED. Duplicate terminal confirmations are rejected; this is not an idempotent success rule."
       }
-    ]
+    ],
+    "stateGates": {
+      "RecordTAShareConfirmation": {
+        "fromStates": [
+          "PAYMENT_SETTLED"
+        ],
+        "toState": "SHARES_CONFIRMED"
+      }
+    },
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "aggregates/fund-order/aggregate.yaml",
+      "atom": {
+        "kind": "aggregate",
+        "name": "FundOrder",
+        "seq": 2,
+        "order": {
+          "commands": [
+            "RequestFundPurchase",
+            "ReserveFundSubscription",
+            "ConfirmFundSubscriptionPayment",
+            "CancelFundSubscription",
+            "RecordTAShareConfirmation",
+            "GetFundOrderState",
+            "RecordResultSucceeded",
+            "RecordResultRejectedBeforeEffects",
+            "RecordResultCompensated",
+            "RecordResultRecoveryRequired",
+            "RecordResultOutcomeUnknown"
+          ],
+          "events": [
+            "FundPurchaseRequested",
+            "ReserveFundSubscriptionConfirmed",
+            "FundSubscriptionPaymentConfirmed",
+            "FundSubscriptionCanceled",
+            "FundSharesConfirmed",
+            "result-succeeded",
+            "result-rejected-before-effects",
+            "result-compensated",
+            "result-recovery-required",
+            "result-outcome-unknown"
+          ]
+        },
+        "payload": {
+          "name": "FundOrder",
+          "identifier": {
+            "name": "id",
+            "dataType": "FundOrderId",
+            "origin": "BUSINESS_INPUT"
+          },
+          "entity": "FundOrderEntity",
+          "description": "Mutual fund subscription order lifecycle: TCC payment reservation/confirmation with CreditBalance followed by T+1 TA share confirmation.",
+          "statusEnum": [
+            "REQUESTED",
+            "SUBSCRIPTION_RESERVED",
+            "PAYMENT_SETTLED",
+            "SHARES_CONFIRMED",
+            "CANCELED"
+          ],
+          "stateFields": [
+            {
+              "name": "status",
+              "dataType": "String",
+              "description": "Order lifecycle status.",
+              "origin": "SYSTEM_INJECTED",
+              "writtenBy": [
+                "FundPurchaseRequested",
+                "ReserveFundSubscriptionConfirmed",
+                "FundSubscriptionPaymentConfirmed",
+                "FundSharesConfirmed",
+                "FundSubscriptionCanceled"
+              ],
+              "role": "State"
+            },
+            {
+              "name": "reservedSubscriptions",
+              "dataType": "Map[TxId, Money]",
+              "description": "Prepared fund subscription slots keyed by transaction identity.",
+              "writtenBy": [
+                "ReserveFundSubscriptionConfirmed.txid",
+                "FundSubscriptionPaymentConfirmed.txid",
+                "FundSubscriptionCanceled.txid"
+              ],
+              "role": "State"
+            },
+            {
+              "name": "committedSubscriptions",
+              "dataType": "Map[TxId, Money]",
+              "description": "Durable commit-phase marker keyed by transaction identity for settled subscription payments.",
+              "writtenBy": [
+                "FundSubscriptionPaymentConfirmed.txid"
+              ],
+              "role": "State"
+            },
+            {
+              "name": "compensatedSubscriptions",
+              "dataType": "Map[TxId, Money]",
+              "description": "Durable compensate-phase marker keyed by transaction identity for canceled subscriptions.",
+              "writtenBy": [
+                "FundSubscriptionCanceled.txid"
+              ],
+              "role": "State"
+            },
+            {
+              "name": "confirmedShareLots",
+              "dataType": "Map[OperationId, FundShare]",
+              "description": "T+1 confirmed fund shares allotted by the TA registry.",
+              "writtenBy": [
+                "FundSharesConfirmed.shares"
+              ],
+              "role": "State"
+            },
+            {
+              "name": "sagaResults",
+              "dataType": "Map[TxId, String]",
+              "description": "Saga outcome ledger keyed by transaction identity.",
+              "writtenBy": [
+                "result-succeeded.txid",
+                "result-rejected-before-effects.txid",
+                "result-compensated.txid",
+                "result-recovery-required.txid",
+                "result-outcome-unknown.txid"
+              ],
+              "role": "State"
+            }
+          ],
+          "aggregateRuleRefs": [
+            {
+              "ruleId": "IR-FO-RESERVE-001",
+              "errCode": "62001",
+              "desc": "Subscription already reserved for this transaction: idempotent success."
+            },
+            {
+              "ruleId": "IR-FO-RESERVE-002",
+              "errCode": "62004",
+              "desc": "Subscription amount must be positive and meet fund minimum threshold (back-anchored rule)."
+            },
+            {
+              "ruleId": "IR-FO-COMMIT-001",
+              "errCode": "62008",
+              "desc": "Prepared subscription cannot be found or already committed."
+            },
+            {
+              "ruleId": "IR-FO-CANCEL-001",
+              "errCode": "62009",
+              "desc": "Prepared subscription cannot be found or already canceled."
+            },
+            {
+              "ruleId": "IR-FO-RESULT-001",
+              "errCode": "62010",
+              "desc": "Result already recorded for this transaction: idempotent republication success."
+            }
+          ]
+        }
+      }
+    }
   }

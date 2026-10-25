@@ -1,0 +1,48 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: question
+name: "What if fund TA share confirmation is asynchronous (T+1)?"
+origin:
+  stage: eventStorming
+  board: imported-hotspots
+  seq: 1
+payload:
+  {
+    "type": "question",
+    "name": "What if fund TA share confirmation is asynchronous (T+1)?",
+    "stage": "eventStorming",
+    "description": "The declarations separate payment reservation/deduction (fund-subscription-pay) from the fund-ta-settlement Monarch child plan, which the parent declares through awaitChildRun. RecordTAShareConfirmation requires PAYMENT_SETTLED before setting SHARES_CONFIRMED (IR-FO-TA-CONFIRM-001, 62011); a duplicate terminal confirmation is rejected, not runtime-idempotent success. TA rejection after settled payment is a manual-recovery/refund design question, not compensation of an already committed payment; refund handling and runtime child/command integration remain pending.",
+    "links": [
+      "event:FundSubscriptionPaymentConfirmed",
+      "event:FundSharesConfirmed"
+    ],
+    "author": "domain-expert",
+    "createdAt": "2026-10-24",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "inbox/eventStorming/question-es-what-if-fund-ta-nav-confirmation-is-t-plus-1-1.yaml",
+      "atom": {
+        "kind": "note",
+        "type": "question",
+        "name": "What if fund TA share confirmation is asynchronous (T+1)?",
+        "origin": {
+          "stage": "eventStorming",
+          "board": "board1",
+          "seq": 1
+        },
+        "payload": {
+          "type": "question",
+          "name": "What if fund TA share confirmation is asynchronous (T+1)?",
+          "stage": "eventStorming",
+          "description": "Decouple real-time payment reservation/deduction (Saga: fund-subscription-pay) from T+1 TA share confirmation (Monarch child stage plan: fund-ta-settlement). The parent pipeline awaits the durable child journal via awaitChildRun; a TA rejection triggers manual recovery/refund policy rather than rolling back a committed payment Saga.",
+          "links": [
+            "event:FundSubscriptionPaymentConfirmed",
+            "event:FundSharesConfirmed"
+          ],
+          "author": "domain-expert",
+          "createdAt": "2026-10-24"
+        }
+      }
+    }
+  }

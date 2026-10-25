@@ -1,0 +1,348 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: externalSystem
+name: WealthMockTARegistryDesignProposal
+origin:
+  stage: refining
+  board: wealth-source-design-v1
+  seq: 1
+payload:
+  {
+    "type": "externalSystem",
+    "name": "WealthMockTARegistryDesignProposal",
+    "stage": "refining",
+    "description": "Permitted MockTA design through the existing FundTARegistry boundary, with explicit correlation, arbitrary fixtures and missing rejection/unknown/refund/replay adapters.",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "mock-ta.registry",
+        "category": "mock-ta",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "external-system",
+            "id": "FundTARegistry"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordTAShareConfirmation"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundSharesConfirmed"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundSubscriptionPaymentConfirmed"
+          },
+          {
+            "kind": "artifact",
+            "id": "context.fund"
+          },
+          {
+            "kind": "artifact",
+            "id": "context-map.wealth"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.settlement-refund"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.surface"
+          }
+        ],
+        "body": {
+          "entities": [
+            {
+              "id": "mock-ta.accepted",
+              "kind": "scenario",
+              "label": "受理",
+              "status": "demo-proposal",
+              "implementation": "proposed"
+            },
+            {
+              "id": "mock-ta.confirmed",
+              "kind": "scenario",
+              "label": "确认",
+              "status": "demo-proposal",
+              "implementation": "proposed"
+            },
+            {
+              "id": "mock-ta.rejected",
+              "kind": "scenario",
+              "label": "拒绝",
+              "status": "demo-proposal",
+              "implementation": "proposed"
+            },
+            {
+              "id": "mock-ta.delayed",
+              "kind": "scenario",
+              "label": "延迟",
+              "status": "demo-proposal",
+              "implementation": "proposed"
+            },
+            {
+              "id": "mock-ta.unknown",
+              "kind": "scenario",
+              "label": "结果未知",
+              "status": "demo-proposal",
+              "implementation": "proposed"
+            },
+            {
+              "id": "mock-ta.duplicate-identical",
+              "kind": "scenario",
+              "label": "相同重复确认",
+              "status": "demo-proposal",
+              "implementation": "proposed"
+            },
+            {
+              "id": "mock-ta.duplicate-conflicting",
+              "kind": "scenario",
+              "label": "冲突重复确认",
+              "status": "demo-proposal",
+              "implementation": "proposed"
+            },
+            {
+              "id": "mock-ta.manual-clock",
+              "kind": "touchpoint",
+              "label": "TA手动业务时钟",
+              "status": "demo-proposal",
+              "implementation": "proposed"
+            }
+          ],
+          "externalSystemRef": "FundTARegistry",
+          "mode": "demo-proposal; no executable adapter or real integration",
+          "correlationFields": [
+            {
+              "name": "orderId",
+              "meaning": "Must map explicitly to existing FundOrder identity/fundOrderId."
+            },
+            {
+              "name": "paymentTxId",
+              "meaning": "Must correlate existing local payment txid; confirmation command does not accept this field."
+            },
+            {
+              "name": "taReference",
+              "meaning": "Proposed external receipt identity; persistence/adapter contract missing."
+            }
+          ],
+          "confirmationMapping": {
+            "commandRef": "FundOrder.RecordTAShareConfirmation",
+            "parameters": {
+              "operationId": "propagated persisted settlement operation identity; never guessed from receipt",
+              "fundOrderId": "correlation.orderId after validated mapping",
+              "shares": "arbitrary FundShare fixture encoded by a proposed adapter"
+            },
+            "note": "paymentTxId and taReference are proposed adapter correlation metadata, not invented command parameters."
+          },
+          "clock": {
+            "mode": "manual-business-clock",
+            "advance": "explicit demo operator control",
+            "notApproved": "No real trading calendar, NAV timestamp, cutoff or T+1 guarantee."
+          },
+          "scenarios": [
+            {
+              "id": "mock-ta.accepted",
+              "label": "受理",
+              "outcome": "accepted",
+              "correlation": {
+                "orderId": "demo-order-001",
+                "paymentTxId": "demo-pay-001",
+                "taReference": "demo-ta-001"
+              },
+              "note": "Receipt is not payment proof or share confirmation; accepted-status command/adapter is not declared.",
+              "status": "demo-proposal",
+              "implementation": "proposed",
+              "missingCapabilities": [
+                "decision.settlement-refund"
+              ]
+            },
+            {
+              "id": "mock-ta.confirmed",
+              "label": "确认",
+              "outcome": "confirmed",
+              "correlation": {
+                "orderId": "demo-order-001",
+                "paymentTxId": "demo-pay-001",
+                "taReference": "demo-ta-001"
+              },
+              "existingCommandRef": "FundOrder.RecordTAShareConfirmation",
+              "fixture": {
+                "shares": "80.0000",
+                "nav": "1.2345",
+                "currency": "CNY",
+                "valuationBusinessDate": "demo-day-2"
+              },
+              "note": "Arbitrary independent fixture values; not amount/NAV division, a certified calculation or production pricing.",
+              "status": "demo-proposal",
+              "implementation": "proposed",
+              "missingCapabilities": [
+                "decision.settlement-refund"
+              ]
+            },
+            {
+              "id": "mock-ta.rejected",
+              "label": "拒绝",
+              "outcome": "rejected",
+              "correlation": {
+                "orderId": "demo-order-002",
+                "paymentTxId": "demo-pay-002",
+                "taReference": "demo-ta-002"
+              },
+              "note": "No TA rejection or post-settlement refund command bridge is invented.",
+              "status": "demo-proposal",
+              "implementation": "proposed",
+              "missingCapabilities": [
+                "decision.settlement-refund"
+              ]
+            },
+            {
+              "id": "mock-ta.delayed",
+              "label": "延迟",
+              "outcome": "delayed",
+              "correlation": {
+                "orderId": "demo-order-003",
+                "paymentTxId": "demo-pay-003",
+                "taReference": "demo-ta-003"
+              },
+              "note": "Manually advance business clock; no guaranteed real T+1 deadline.",
+              "status": "demo-proposal",
+              "implementation": "proposed",
+              "missingCapabilities": [
+                "decision.settlement-refund"
+              ]
+            },
+            {
+              "id": "mock-ta.unknown",
+              "label": "结果未知",
+              "outcome": "unknown",
+              "correlation": {
+                "orderId": "demo-order-004",
+                "paymentTxId": "demo-pay-004",
+                "taReference": "demo-ta-004"
+              },
+              "note": "No timeout-as-rejection assumption; reconciliation adapter/capability missing.",
+              "status": "demo-proposal",
+              "implementation": "proposed",
+              "missingCapabilities": [
+                "decision.settlement-refund"
+              ]
+            },
+            {
+              "id": "mock-ta.duplicate-identical",
+              "label": "相同重复确认",
+              "outcome": "duplicate-identical",
+              "correlation": {
+                "orderId": "demo-order-001",
+                "paymentTxId": "demo-pay-001",
+                "taReference": "demo-ta-001"
+              },
+              "fixture": {
+                "shares": "80.0000",
+                "nav": "1.2345"
+              },
+              "note": "Replay same identity/body. Confirmation command guards may reject duplicate delivery; pending adapter deduplication, not exactly-once certification.",
+              "status": "demo-proposal",
+              "implementation": "proposed",
+              "missingCapabilities": [
+                "decision.settlement-refund"
+              ]
+            },
+            {
+              "id": "mock-ta.duplicate-conflicting",
+              "label": "冲突重复确认",
+              "outcome": "duplicate-conflicting",
+              "correlation": {
+                "orderId": "demo-order-001",
+                "paymentTxId": "demo-pay-001",
+                "taReference": "demo-ta-001"
+              },
+              "fixture": {
+                "shares": "81.0000",
+                "nav": "1.2468"
+              },
+              "note": "Replay same identity with changed fixture body must be surfaced for review; conflict handling adapter remains missing.",
+              "status": "demo-proposal",
+              "implementation": "proposed",
+              "missingCapabilities": [
+                "decision.settlement-refund"
+              ]
+            }
+          ],
+          "scenarioFamilies": [
+            "accepted",
+            "confirmed",
+            "rejected",
+            "delayed",
+            "unknown",
+            "duplicate (identical/conflicting)"
+          ],
+          "fixturePolicy": "NAV and share values are arbitrary demo fixtures, not certified formulas, rounding, fees, returns or production TA calculations.",
+          "replayPolicy": {
+            "status": "pending-adapter-deduplication",
+            "note": "Existing confirmation replay/status gates may reject identical duplicates; do not claim idempotent adapter success. Conflicting duplicates require a durable body/correlation check and review."
+          },
+          "missingCapabilities": [
+            "decision.settlement-refund"
+          ],
+          "edges": [
+            {
+              "from": "external.ta",
+              "to": "mock-ta.registry",
+              "label": "permitted demo replacement of TA boundary only",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "mock-ta.manual-clock",
+              "to": "mock-ta.delayed",
+              "label": "proposal: manual progress for delay scenario",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "mock-ta.confirmed",
+              "to": "ux.surface",
+              "label": "proposed evidence-backed confirmed copy",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "mock-ta.rejected",
+              "to": "decision.settlement-refund",
+              "label": "missing order/rejection/refund bridge",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "mock-ta.unknown",
+              "to": "decision.settlement-refund",
+              "label": "missing query/reconciliation bridge",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "mock-ta.duplicate-conflicting",
+              "to": "decision.settlement-refund",
+              "label": "pending durable deduplication and conflict policy",
+              "status": "demo-proposal"
+            }
+          ],
+          "nonGoals": [
+            "Mock external bank",
+            "Real TA integration",
+            "New runtime command/event",
+            "Certified financial calculation",
+            "Pretending rejected/unknown responses already trigger refunds"
+          ]
+        }
+      }
+    },
+    "links": []
+  }

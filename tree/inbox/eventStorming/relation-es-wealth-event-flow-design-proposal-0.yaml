@@ -1,0 +1,727 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: relation
+name: WealthEventFlowDesignProposal
+origin:
+  stage: eventStorming
+  board: wealth-source-design-v1
+  seq: 0
+payload:
+  {
+    "type": "relation",
+    "name": "WealthEventFlowDesignProposal",
+    "stage": "eventStorming",
+    "description": "Imported draft event-flow proposal showing declared success facts and explicit missing rejection, unknown and post-settlement refund bridges.",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "event-flow.wealth",
+        "category": "event-flow",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "event",
+            "id": "CreditBalance.ExternalTopUpRequested"
+          },
+          {
+            "kind": "event",
+            "id": "ExternalTransferOrder.ExternalDebitPrepared"
+          },
+          {
+            "kind": "event",
+            "id": "ExternalTransferOrder.ExternalDebitCommitted"
+          },
+          {
+            "kind": "event",
+            "id": "CreditBalance.CommitIncomingCreditsConfirmed"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundPurchaseRequested"
+          },
+          {
+            "kind": "event",
+            "id": "CreditBalance.ReserveFundsConfirmed"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.ReserveFundSubscriptionConfirmed"
+          },
+          {
+            "kind": "event",
+            "id": "CreditBalance.DeductFundsConfirmed"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundSubscriptionPaymentConfirmed"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundSharesConfirmed"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipPlanCreated"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipInstallmentTriggered"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipInstallmentSucceeded"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipInstallmentFailed"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipPlanPaused"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.result-outcome-unknown"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.result-recovery-required"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.external-bank"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.settlement-refund"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.sip-integrity"
+          },
+          {
+            "kind": "artifact",
+            "id": "context.ledger"
+          },
+          {
+            "kind": "artifact",
+            "id": "context.payments"
+          },
+          {
+            "kind": "artifact",
+            "id": "context.fund"
+          }
+        ],
+        "body": {
+          "entities": [
+            {
+              "id": "flow.top-up-requested",
+              "kind": "event",
+              "label": "充值申请已记录",
+              "status": "demo-proposal",
+              "eventRef": "CreditBalance.ExternalTopUpRequested",
+              "lane": "payments",
+              "order": 0,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.external-prepared",
+              "kind": "event",
+              "label": "本地外部付款指令预留已记录",
+              "status": "demo-proposal",
+              "eventRef": "ExternalTransferOrder.ExternalDebitPrepared",
+              "lane": "payments",
+              "order": 1,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.external-committed",
+              "kind": "event",
+              "label": "本地外部付款指令提交已记录",
+              "status": "demo-proposal",
+              "eventRef": "ExternalTransferOrder.ExternalDebitCommitted",
+              "lane": "payments",
+              "order": 2,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.incoming-committed",
+              "kind": "event",
+              "label": "账户入账已记录",
+              "status": "demo-proposal",
+              "eventRef": "CreditBalance.CommitIncomingCreditsConfirmed",
+              "lane": "ledger",
+              "order": 3,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.purchase-requested",
+              "kind": "event",
+              "label": "申购申请已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.FundPurchaseRequested",
+              "lane": "fund",
+              "order": 4,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.funds-reserved",
+              "kind": "event",
+              "label": "申购资金预留已记录",
+              "status": "demo-proposal",
+              "eventRef": "CreditBalance.ReserveFundsConfirmed",
+              "lane": "ledger",
+              "order": 5,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.subscription-reserved",
+              "kind": "event",
+              "label": "申购订单预留已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.ReserveFundSubscriptionConfirmed",
+              "lane": "fund",
+              "order": 6,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.funds-deducted",
+              "kind": "event",
+              "label": "账户扣款已记录",
+              "status": "demo-proposal",
+              "eventRef": "CreditBalance.DeductFundsConfirmed",
+              "lane": "ledger",
+              "order": 7,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.payment-settled",
+              "kind": "event",
+              "label": "订单付款结算已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.FundSubscriptionPaymentConfirmed",
+              "lane": "fund",
+              "order": 8,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.shares-confirmed",
+              "kind": "event",
+              "label": "TA份额确认已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.FundSharesConfirmed",
+              "lane": "fund",
+              "order": 9,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.sip-created",
+              "kind": "event",
+              "label": "定投计划已记录",
+              "status": "demo-proposal",
+              "eventRef": "SipPlan.SipPlanCreated",
+              "lane": "fund",
+              "order": 0,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.sip-triggered",
+              "kind": "event",
+              "label": "本期定投触发已记录",
+              "status": "demo-proposal",
+              "eventRef": "SipPlan.SipInstallmentTriggered",
+              "lane": "fund",
+              "order": 1,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.sip-succeeded",
+              "kind": "event",
+              "label": "本期成功已记录",
+              "status": "demo-proposal",
+              "eventRef": "SipPlan.SipInstallmentSucceeded",
+              "lane": "fund",
+              "order": 10,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.sip-failed",
+              "kind": "event",
+              "label": "本期失败已记录",
+              "status": "demo-proposal",
+              "eventRef": "SipPlan.SipInstallmentFailed",
+              "lane": "fund",
+              "order": 10,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.sip-paused",
+              "kind": "event",
+              "label": "定投暂停已记录",
+              "status": "demo-proposal",
+              "eventRef": "SipPlan.SipPlanPaused",
+              "lane": "fund",
+              "order": 11,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.saga-unknown",
+              "kind": "event",
+              "label": "资金Saga结果未知已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.result-outcome-unknown",
+              "lane": "fund",
+              "order": 8,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.saga-recovery",
+              "kind": "event",
+              "label": "资金Saga需要恢复已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.result-recovery-required",
+              "lane": "fund",
+              "order": 8,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.ta-rejected",
+              "kind": "state",
+              "label": "TA拒绝后的业务处理缺口",
+              "status": "demo-proposal",
+              "lane": "external-ta",
+              "order": 9,
+              "implementation": "missing",
+              "reason": "No declared TA rejection-to-order/refund bridge."
+            },
+            {
+              "id": "flow.ta-unknown",
+              "kind": "state",
+              "label": "TA结果未知待查询核实",
+              "status": "demo-proposal",
+              "lane": "external-ta",
+              "order": 9,
+              "implementation": "missing",
+              "reason": "Unknown response is not evidence of rejection or refund."
+            },
+            {
+              "id": "flow.refund-needed",
+              "kind": "state",
+              "label": "付款后拒绝，退款路径待设计",
+              "status": "demo-proposal",
+              "lane": "fund",
+              "order": 10,
+              "implementation": "missing",
+              "reason": "Existing TCC cancellation does not establish a post-settlement refund contract."
+            },
+            {
+              "id": "flow.bank-unknown",
+              "kind": "state",
+              "label": "外部银行结果未知待核对",
+              "status": "demo-proposal",
+              "lane": "external-bank",
+              "order": 2,
+              "implementation": "missing",
+              "reason": "Local debit journal is not proof of remote bank capability or settlement."
+            }
+          ],
+          "nodes": [
+            {
+              "id": "flow.top-up-requested",
+              "kind": "event",
+              "label": "充值申请已记录",
+              "status": "demo-proposal",
+              "eventRef": "CreditBalance.ExternalTopUpRequested",
+              "lane": "payments",
+              "order": 0,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.external-prepared",
+              "kind": "event",
+              "label": "本地外部付款指令预留已记录",
+              "status": "demo-proposal",
+              "eventRef": "ExternalTransferOrder.ExternalDebitPrepared",
+              "lane": "payments",
+              "order": 1,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.external-committed",
+              "kind": "event",
+              "label": "本地外部付款指令提交已记录",
+              "status": "demo-proposal",
+              "eventRef": "ExternalTransferOrder.ExternalDebitCommitted",
+              "lane": "payments",
+              "order": 2,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.incoming-committed",
+              "kind": "event",
+              "label": "账户入账已记录",
+              "status": "demo-proposal",
+              "eventRef": "CreditBalance.CommitIncomingCreditsConfirmed",
+              "lane": "ledger",
+              "order": 3,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.purchase-requested",
+              "kind": "event",
+              "label": "申购申请已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.FundPurchaseRequested",
+              "lane": "fund",
+              "order": 4,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.funds-reserved",
+              "kind": "event",
+              "label": "申购资金预留已记录",
+              "status": "demo-proposal",
+              "eventRef": "CreditBalance.ReserveFundsConfirmed",
+              "lane": "ledger",
+              "order": 5,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.subscription-reserved",
+              "kind": "event",
+              "label": "申购订单预留已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.ReserveFundSubscriptionConfirmed",
+              "lane": "fund",
+              "order": 6,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.funds-deducted",
+              "kind": "event",
+              "label": "账户扣款已记录",
+              "status": "demo-proposal",
+              "eventRef": "CreditBalance.DeductFundsConfirmed",
+              "lane": "ledger",
+              "order": 7,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.payment-settled",
+              "kind": "event",
+              "label": "订单付款结算已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.FundSubscriptionPaymentConfirmed",
+              "lane": "fund",
+              "order": 8,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.shares-confirmed",
+              "kind": "event",
+              "label": "TA份额确认已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.FundSharesConfirmed",
+              "lane": "fund",
+              "order": 9,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.sip-created",
+              "kind": "event",
+              "label": "定投计划已记录",
+              "status": "demo-proposal",
+              "eventRef": "SipPlan.SipPlanCreated",
+              "lane": "fund",
+              "order": 0,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.sip-triggered",
+              "kind": "event",
+              "label": "本期定投触发已记录",
+              "status": "demo-proposal",
+              "eventRef": "SipPlan.SipInstallmentTriggered",
+              "lane": "fund",
+              "order": 1,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.sip-succeeded",
+              "kind": "event",
+              "label": "本期成功已记录",
+              "status": "demo-proposal",
+              "eventRef": "SipPlan.SipInstallmentSucceeded",
+              "lane": "fund",
+              "order": 10,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.sip-failed",
+              "kind": "event",
+              "label": "本期失败已记录",
+              "status": "demo-proposal",
+              "eventRef": "SipPlan.SipInstallmentFailed",
+              "lane": "fund",
+              "order": 10,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.sip-paused",
+              "kind": "event",
+              "label": "定投暂停已记录",
+              "status": "demo-proposal",
+              "eventRef": "SipPlan.SipPlanPaused",
+              "lane": "fund",
+              "order": 11,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.saga-unknown",
+              "kind": "event",
+              "label": "资金Saga结果未知已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.result-outcome-unknown",
+              "lane": "fund",
+              "order": 8,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.saga-recovery",
+              "kind": "event",
+              "label": "资金Saga需要恢复已记录",
+              "status": "demo-proposal",
+              "eventRef": "FundOrder.result-recovery-required",
+              "lane": "fund",
+              "order": 8,
+              "implementation": "declared-contract"
+            },
+            {
+              "id": "flow.ta-rejected",
+              "kind": "state",
+              "label": "TA拒绝后的业务处理缺口",
+              "status": "demo-proposal",
+              "lane": "external-ta",
+              "order": 9,
+              "implementation": "missing",
+              "reason": "No declared TA rejection-to-order/refund bridge."
+            },
+            {
+              "id": "flow.ta-unknown",
+              "kind": "state",
+              "label": "TA结果未知待查询核实",
+              "status": "demo-proposal",
+              "lane": "external-ta",
+              "order": 9,
+              "implementation": "missing",
+              "reason": "Unknown response is not evidence of rejection or refund."
+            },
+            {
+              "id": "flow.refund-needed",
+              "kind": "state",
+              "label": "付款后拒绝，退款路径待设计",
+              "status": "demo-proposal",
+              "lane": "fund",
+              "order": 10,
+              "implementation": "missing",
+              "reason": "Existing TCC cancellation does not establish a post-settlement refund contract."
+            },
+            {
+              "id": "flow.bank-unknown",
+              "kind": "state",
+              "label": "外部银行结果未知待核对",
+              "status": "demo-proposal",
+              "lane": "external-bank",
+              "order": 2,
+              "implementation": "missing",
+              "reason": "Local debit journal is not proof of remote bank capability or settlement."
+            }
+          ],
+          "lanes": [
+            {
+              "id": "ledger",
+              "label": "账户记账提案"
+            },
+            {
+              "id": "payments",
+              "label": "支付提案"
+            },
+            {
+              "id": "fund",
+              "label": "基金与定投提案"
+            },
+            {
+              "id": "external-bank",
+              "label": "外部银行边界"
+            },
+            {
+              "id": "external-ta",
+              "label": "TA边界"
+            }
+          ],
+          "edges": [
+            {
+              "from": "flow.top-up-requested",
+              "to": "flow.external-prepared",
+              "label": "success: proposed initiation; host bridge must be verified",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.external-prepared",
+              "to": "flow.external-committed",
+              "label": "success: declared local commit, not remote TCC certification",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.external-committed",
+              "to": "flow.incoming-committed",
+              "label": "success: proposed correlated account credit",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.external-prepared",
+              "to": "flow.bank-unknown",
+              "label": "unknown: external timeout must be reconciled",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "from": "flow.bank-unknown",
+              "to": "decision.external-bank",
+              "label": "decision: query and reconciliation evidence needed",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.incoming-committed",
+              "to": "flow.purchase-requested",
+              "label": "success: optional subsequent investor purchase, not automatic",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.purchase-requested",
+              "to": "flow.funds-reserved",
+              "label": "success: proposed payment orchestration",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.funds-reserved",
+              "to": "flow.subscription-reserved",
+              "label": "success: local preparation boundaries",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.subscription-reserved",
+              "to": "flow.funds-deducted",
+              "label": "success: proposed payment commit",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.funds-deducted",
+              "to": "flow.payment-settled",
+              "label": "success: local order payment evidence",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.payment-settled",
+              "to": "flow.shares-confirmed",
+              "label": "success: asynchronous TA confirmation, no guaranteed T+1 deadline",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.payment-settled",
+              "to": "flow.ta-rejected",
+              "label": "reject: scenario only; bridge missing",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "from": "flow.payment-settled",
+              "to": "flow.ta-unknown",
+              "label": "unknown: delayed or unavailable TA result",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "from": "flow.ta-rejected",
+              "to": "flow.refund-needed",
+              "label": "refund: requirement, not completed refund",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "from": "flow.ta-unknown",
+              "to": "decision.settlement-refund",
+              "label": "unknown: reconcile before retry or refund",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.refund-needed",
+              "to": "decision.settlement-refund",
+              "label": "refund: new post-settlement contract required",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.saga-unknown",
+              "to": "decision.external-bank",
+              "label": "unknown: local Saga ledger is not remote evidence",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.saga-recovery",
+              "to": "decision.settlement-refund",
+              "label": "recovery: authorized evidence and missing adapters",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.sip-created",
+              "to": "flow.sip-triggered",
+              "label": "success: scheduler proposal with manual business clock",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.sip-triggered",
+              "to": "flow.top-up-requested",
+              "label": "success: proposed cycle collection bridge; not claimed implemented",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.shares-confirmed",
+              "to": "flow.sip-succeeded",
+              "label": "success: terminal cycle bridge requires verification",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.sip-triggered",
+              "to": "flow.sip-failed",
+              "label": "reject: failed cycle evidence; terminal consistency pending",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "flow.sip-failed",
+              "to": "decision.sip-integrity",
+              "label": "decision: failure counts and contradictory terminal results unresolved",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "decision.sip-integrity",
+              "to": "flow.sip-paused",
+              "label": "proposal: existing Pause command; no automatic three-failure guarantee",
+              "status": "demo-proposal"
+            }
+          ],
+          "semantics": "Every edge is a design proposal, not proof of runtime execution, exactly-once delivery, external TCC, or a production settlement guarantee."
+        }
+      }
+    },
+    "links": []
+  }

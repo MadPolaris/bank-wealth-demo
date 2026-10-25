@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "bank-wealth.validation-report/v1",
+  "readiness": "truth-and-design-preview",
+  "canonicalSha256": "50d9ded9809499dd1b69842010d245376d3e67043bc94a081e0bb9f64808fd4e",
+  "tool": {
+    "head": "cb2d23342619af3f5d27e5df2361e88fe6d54fb3",
+    "sha256": "0cc14220fac58bde3d4f860bea347259f042814857574a875ba3a6b8d520c1c1"
+  },
+  "baseline": {
+    "canonicalSha256": "2833c08a16673680c44dcb154d6e83c20a25ec3003293f981a02ef6fbade2cfc",
+    "hardErrors": 10
+  },
+  "structure": {
+    "ok": true,
+    "hard": [],
+    "notices": [
+      "[RF5] command \"GetBalance\" declares no parameters (explicit parameterless? confirm)",
+      "[RF5] command \"GetExternalTransferState\" declares no parameters (explicit parameterless? confirm)",
+      "[RF5] command \"GetFundOrderState\" declares no parameters (explicit parameterless? confirm)",
+      "[V2] commandStorming|imported-external-systems: origin.seq not contiguous 0..n-1 (got 3 at position 0) — compiler densifies; do not renumber by hand",
+      "[V2] commandStorming|imported-external-systems: origin.seq not contiguous 0..n-1 (got 4 at position 1) — compiler densifies; do not renumber by hand",
+      "[V2] commandStorming|imported-policy-hypotheses: origin.seq not contiguous 0..n-1 (got 10 at position 0) — compiler densifies; do not renumber by hand",
+      "[SA0] sagas/external-bank-transfer.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+      "[SA0] sagas/fund-subscription-pay.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+      "[ES4] possible solution language: \"SipPlanCreated\" — confirm this is a business fact, not an implementation",
+      "[CS1] event \"DeductFundsConfirmed\" has no trigger source (command/timer/externalSystem/event link): event-es-deduct-funds-confirmed-2.yaml",
+      "[CS3] command \"PrepareExternalDebit\" has no initiating role and no policy invocation: command-cs-prepare-external-debit-1.yaml",
+      "[CS3] command \"RecordTAShareConfirmation\" has no initiating role and no policy invocation: command-cs-record-ta-share-confirmation-3.yaml",
+      "[CS6] timer \"SipBusinessClockDesignProposal\" triggers no event (dangling): inbox/commandStorming/timer-cs-sip-business-clock-design-proposal-1.yaml",
+      "[CS6] externalSystem \"WealthMockTARegistryDesignProposal\" triggers no event (dangling): inbox/refining/externalSystem-rf-wealth-mock-ta-registry-design-proposal-1.yaml"
+    ]
+  },
+  "declarations": {
+    "errors": [],
+    "notices": []
+  },
+  "proposals": {
+    "errors": [],
+    "notices": [
+      "MockTA scenarios are design contracts; no simulated service or settlement/refund execution was run.",
+      "Context/UX references are validated locally; the portable context target index and UI generation are not extended."
+    ],
+    "artifacts": 24,
+    "entities": 126
+  },
+  "protection": {
+    "ok": true
+  },
+  "strictSaga": {
+    "ok": true,
+    "diagnostics": []
+  },
+  "strictExecution": {
+    "ok": true,
+    "diagnostics": []
+  },
+  "generation": "not-run",
+  "runtime": "not-run",
+  "codeBackAnchoring": "not-run",
+  "roundtrip": {
+    "ok": true,
+    "atoms": 104
+  },
+  "projections": {
+    "ok": true,
+    "differences": [],
+    "files": 7
+  }
+}

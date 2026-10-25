@@ -1,0 +1,868 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: relation
+name: WealthUXStructureDesignProposal
+origin:
+  stage: storyMapping
+  board: wealth-source-design-v1
+  seq: 1
+payload:
+  {
+    "type": "relation",
+    "name": "WealthUXStructureDesignProposal",
+    "stage": "storyMapping",
+    "description": "Three evidence-oriented journeys and an information-architecture/navigation proposal connect existing stories to the six skeleton screens without claiming an implemented UX.",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "ux.structure",
+        "category": "ux-structure",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "story",
+            "id": "TopUpFromExternalBank"
+          },
+          {
+            "kind": "story",
+            "id": "PurchaseFund"
+          },
+          {
+            "kind": "story",
+            "id": "CreateAndRunSipPlan"
+          },
+          {
+            "kind": "role",
+            "id": "Investor"
+          },
+          {
+            "kind": "role",
+            "id": "SipScheduler"
+          },
+          {
+            "kind": "role",
+            "id": "WealthOpsOfficer"
+          },
+          {
+            "kind": "entity",
+            "id": "screen.wealth"
+          },
+          {
+            "kind": "entity",
+            "id": "screen.top-up"
+          },
+          {
+            "kind": "entity",
+            "id": "screen.purchase"
+          },
+          {
+            "kind": "entity",
+            "id": "screen.fund-order"
+          },
+          {
+            "kind": "entity",
+            "id": "screen.sip-create"
+          },
+          {
+            "kind": "entity",
+            "id": "screen.sip-detail"
+          },
+          {
+            "kind": "entity",
+            "id": "action.open-top-up"
+          },
+          {
+            "kind": "entity",
+            "id": "action.open-purchase"
+          },
+          {
+            "kind": "entity",
+            "id": "action.open-sip-create"
+          },
+          {
+            "kind": "entity",
+            "id": "action.request-top-up"
+          },
+          {
+            "kind": "entity",
+            "id": "action.request-fund"
+          },
+          {
+            "kind": "entity",
+            "id": "action.inspect-order"
+          },
+          {
+            "kind": "entity",
+            "id": "action.create-sip"
+          },
+          {
+            "kind": "entity",
+            "id": "action.pause-sip"
+          },
+          {
+            "kind": "entity",
+            "id": "timer.sip-due"
+          },
+          {
+            "kind": "entity",
+            "id": "journey.top-up"
+          },
+          {
+            "kind": "entity",
+            "id": "journey.purchase"
+          },
+          {
+            "kind": "entity",
+            "id": "journey.sip"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.top-up-review"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.top-up-submit"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.top-up-observe"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.purchase-input"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.purchase-submit"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.purchase-payment"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.purchase-shares"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.purchase-ops"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.sip-input"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.sip-create"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.sip-trigger"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.sip-observe"
+          },
+          {
+            "kind": "entity",
+            "id": "stage.sip-pause"
+          },
+          {
+            "kind": "entity",
+            "id": "navigation.wealth"
+          },
+          {
+            "kind": "entity",
+            "id": "navigation.top-up"
+          },
+          {
+            "kind": "entity",
+            "id": "navigation.purchase"
+          },
+          {
+            "kind": "entity",
+            "id": "navigation.order"
+          },
+          {
+            "kind": "entity",
+            "id": "navigation.sip-create"
+          },
+          {
+            "kind": "entity",
+            "id": "navigation.sip-detail"
+          },
+          {
+            "kind": "entity",
+            "id": "touchpoint.investor-preview"
+          },
+          {
+            "kind": "entity",
+            "id": "touchpoint.ops-review"
+          },
+          {
+            "kind": "entity",
+            "id": "touchpoint.scheduler-boundary"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.strategy"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.scope"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.skeleton"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.surface"
+          },
+          {
+            "kind": "artifact",
+            "id": "timer.sip"
+          },
+          {
+            "kind": "entity",
+            "id": "action.open-fund-order"
+          },
+          {
+            "kind": "entity",
+            "id": "action.open-sip-detail"
+          }
+        ],
+        "body": {
+          "entities": [
+            {
+              "id": "journey.top-up",
+              "kind": "journey",
+              "label": "充值证据旅程",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "journey.purchase",
+              "kind": "journey",
+              "label": "申购与交割证据旅程",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "journey.sip",
+              "kind": "journey",
+              "label": "计划与本期执行证据旅程",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "stage.top-up-review",
+              "kind": "stage",
+              "label": "了解关联账户与外部能力边界",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "stage.top-up-submit",
+              "kind": "stage",
+              "label": "提交已声明的充值申请契约",
+              "status": "demo-proposal",
+              "implementation": "declared"
+            },
+            {
+              "id": "stage.top-up-observe",
+              "kind": "stage",
+              "label": "等待可核实入账证据",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "stage.purchase-input",
+              "kind": "stage",
+              "label": "查看基金与金额输入框架",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "stage.purchase-submit",
+              "kind": "stage",
+              "label": "提交申购申请契约",
+              "status": "demo-proposal",
+              "implementation": "declared"
+            },
+            {
+              "id": "stage.purchase-payment",
+              "kind": "stage",
+              "label": "查看本地付款结算证据",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "stage.purchase-shares",
+              "kind": "stage",
+              "label": "查看TA份额证据或未知异常",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "stage.purchase-ops",
+              "kind": "stage",
+              "label": "授权核查异常状态契约",
+              "status": "demo-proposal",
+              "implementation": "declared"
+            },
+            {
+              "id": "stage.sip-input",
+              "kind": "stage",
+              "label": "了解计划输入与日历缺口",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "stage.sip-create",
+              "kind": "stage",
+              "label": "提交计划创建契约",
+              "status": "demo-proposal",
+              "implementation": "declared"
+            },
+            {
+              "id": "stage.sip-trigger",
+              "kind": "stage",
+              "label": "系统触发本期，不是投资者按钮",
+              "status": "demo-proposal",
+              "implementation": "declared"
+            },
+            {
+              "id": "stage.sip-observe",
+              "kind": "stage",
+              "label": "查看计划与本期执行证据",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "stage.sip-pause",
+              "kind": "stage",
+              "label": "提交既有暂停契约",
+              "status": "demo-proposal",
+              "implementation": "declared"
+            },
+            {
+              "id": "navigation.wealth",
+              "kind": "navigation",
+              "label": "财富入口",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "navigation.top-up",
+              "kind": "navigation",
+              "label": "充值入口",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "navigation.purchase",
+              "kind": "navigation",
+              "label": "申购入口",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "navigation.order",
+              "kind": "navigation",
+              "label": "订单证据入口",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "navigation.sip-create",
+              "kind": "navigation",
+              "label": "计划建立入口",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "navigation.sip-detail",
+              "kind": "navigation",
+              "label": "计划执行入口",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "touchpoint.investor-preview",
+              "kind": "touchpoint",
+              "label": "投资者真源预览",
+              "status": "demo-proposal",
+              "implementation": "proposal-source-only"
+            },
+            {
+              "id": "touchpoint.ops-review",
+              "kind": "touchpoint",
+              "label": "授权运营核查",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "touchpoint.scheduler-boundary",
+              "kind": "touchpoint",
+              "label": "系统调度边界",
+              "status": "demo-proposal",
+              "implementation": "declared-contract only; no running scheduler claimed"
+            }
+          ],
+          "journeys": [
+            {
+              "id": "journey.top-up",
+              "label": "充值证据旅程",
+              "storyRef": "TopUpFromExternalBank",
+              "steps": [
+                {
+                  "id": "stage.top-up-review",
+                  "actor": "Investor",
+                  "action": "action.open-top-up",
+                  "label": "了解关联账户与外部能力边界",
+                  "informationNeeds": [
+                    "来源/目标账户授权",
+                    "外部能力未验证说明"
+                  ],
+                  "implementation": "missing",
+                  "screenId": "screen.top-up"
+                },
+                {
+                  "id": "stage.top-up-submit",
+                  "actor": "Investor",
+                  "action": "action.request-top-up",
+                  "label": "提交已声明的充值申请契约",
+                  "informationNeeds": [
+                    "金额与币种",
+                    "请求身份与重试说明"
+                  ],
+                  "implementation": "declared",
+                  "screenId": "screen.top-up"
+                },
+                {
+                  "id": "stage.top-up-observe",
+                  "actor": "Investor",
+                  "action": "action.open-top-up",
+                  "label": "等待可核实入账证据",
+                  "informationNeeds": [
+                    "请求已记录不等于已入账",
+                    "关联入账查询缺口"
+                  ],
+                  "implementation": "missing",
+                  "screenId": "screen.top-up"
+                }
+              ],
+              "status": "demo-proposal",
+              "edges": [
+                {
+                  "from": "stage.top-up-review",
+                  "to": "stage.top-up-submit",
+                  "label": "proposed journey progression; not runtime guarantee",
+                  "status": "demo-proposal"
+                },
+                {
+                  "from": "stage.top-up-submit",
+                  "to": "stage.top-up-observe",
+                  "label": "proposed journey progression; not runtime guarantee",
+                  "status": "demo-proposal"
+                }
+              ]
+            },
+            {
+              "id": "journey.purchase",
+              "label": "申购与交割证据旅程",
+              "storyRef": "PurchaseFund",
+              "steps": [
+                {
+                  "id": "stage.purchase-input",
+                  "actor": "Investor",
+                  "action": "action.open-purchase",
+                  "label": "查看基金与金额输入框架",
+                  "informationNeeds": [
+                    "基金代码",
+                    "金额",
+                    "最低限额/费用/日历未决"
+                  ],
+                  "implementation": "missing",
+                  "screenId": "screen.purchase"
+                },
+                {
+                  "id": "stage.purchase-submit",
+                  "actor": "Investor",
+                  "action": "action.request-fund",
+                  "label": "提交申购申请契约",
+                  "informationNeeds": [
+                    "安全请求身份",
+                    "申请已记录文案"
+                  ],
+                  "implementation": "declared",
+                  "screenId": "screen.purchase"
+                },
+                {
+                  "id": "stage.purchase-payment",
+                  "actor": "Investor",
+                  "action": "action.open-fund-order",
+                  "label": "查看本地付款结算证据",
+                  "informationNeeds": [
+                    "付款结算事件",
+                    "不提前显示份额确认"
+                  ],
+                  "implementation": "missing",
+                  "screenId": "screen.fund-order"
+                },
+                {
+                  "id": "stage.purchase-shares",
+                  "actor": "Investor",
+                  "action": "action.open-fund-order",
+                  "label": "查看TA份额证据或未知异常",
+                  "informationNeeds": [
+                    "确认份额",
+                    "任意演示净值说明",
+                    "未知/退款需求区分"
+                  ],
+                  "implementation": "missing",
+                  "screenId": "screen.fund-order"
+                },
+                {
+                  "id": "stage.purchase-ops",
+                  "actor": "WealthOpsOfficer",
+                  "action": "action.inspect-order",
+                  "label": "授权核查异常状态契约",
+                  "informationNeeds": [
+                    "本地写侧证据",
+                    "TA查询/退款桥接缺口"
+                  ],
+                  "implementation": "declared",
+                  "screenId": "screen.fund-order"
+                }
+              ],
+              "status": "demo-proposal",
+              "edges": [
+                {
+                  "from": "stage.purchase-input",
+                  "to": "stage.purchase-submit",
+                  "label": "proposed journey progression; not runtime guarantee",
+                  "status": "demo-proposal"
+                },
+                {
+                  "from": "stage.purchase-submit",
+                  "to": "stage.purchase-payment",
+                  "label": "proposed journey progression; not runtime guarantee",
+                  "status": "demo-proposal"
+                },
+                {
+                  "from": "stage.purchase-payment",
+                  "to": "stage.purchase-shares",
+                  "label": "proposed journey progression; not runtime guarantee",
+                  "status": "demo-proposal"
+                },
+                {
+                  "from": "stage.purchase-shares",
+                  "to": "stage.purchase-ops",
+                  "label": "proposed journey progression; not runtime guarantee",
+                  "status": "demo-proposal"
+                }
+              ]
+            },
+            {
+              "id": "journey.sip",
+              "label": "计划与本期执行证据旅程",
+              "storyRef": "CreateAndRunSipPlan",
+              "steps": [
+                {
+                  "id": "stage.sip-input",
+                  "actor": "Investor",
+                  "action": "action.open-sip-create",
+                  "label": "了解计划输入与日历缺口",
+                  "informationNeeds": [
+                    "基金/金额/关联账户",
+                    "cron转换与日历规则未决"
+                  ],
+                  "implementation": "missing",
+                  "screenId": "screen.sip-create"
+                },
+                {
+                  "id": "stage.sip-create",
+                  "actor": "Investor",
+                  "action": "action.create-sip",
+                  "label": "提交计划创建契约",
+                  "informationNeeds": [
+                    "计划身份",
+                    "计划配置"
+                  ],
+                  "implementation": "declared",
+                  "screenId": "screen.sip-create"
+                },
+                {
+                  "id": "stage.sip-trigger",
+                  "actor": "SipScheduler",
+                  "action": "timer.sip-due",
+                  "label": "系统触发本期，不是投资者按钮",
+                  "informationNeeds": [
+                    "稳定operationId/occurrence",
+                    "计划与金额一致性"
+                  ],
+                  "implementation": "declared"
+                },
+                {
+                  "id": "stage.sip-observe",
+                  "actor": "Investor",
+                  "action": "action.open-sip-detail",
+                  "label": "查看计划与本期执行证据",
+                  "informationNeeds": [
+                    "本期操作身份",
+                    "成功/失败终态与计数缺口"
+                  ],
+                  "implementation": "missing",
+                  "screenId": "screen.sip-detail"
+                },
+                {
+                  "id": "stage.sip-pause",
+                  "actor": "Investor",
+                  "action": "action.pause-sip",
+                  "label": "提交既有暂停契约",
+                  "informationNeeds": [
+                    "暂停原因",
+                    "进行中任务处理未决"
+                  ],
+                  "implementation": "declared",
+                  "screenId": "screen.sip-detail"
+                }
+              ],
+              "status": "demo-proposal",
+              "edges": [
+                {
+                  "from": "stage.sip-input",
+                  "to": "stage.sip-create",
+                  "label": "proposed journey progression; not runtime guarantee",
+                  "status": "demo-proposal"
+                },
+                {
+                  "from": "stage.sip-create",
+                  "to": "stage.sip-trigger",
+                  "label": "proposed journey progression; not runtime guarantee",
+                  "status": "demo-proposal"
+                },
+                {
+                  "from": "stage.sip-trigger",
+                  "to": "stage.sip-observe",
+                  "label": "proposed journey progression; not runtime guarantee",
+                  "status": "demo-proposal"
+                },
+                {
+                  "from": "stage.sip-observe",
+                  "to": "stage.sip-pause",
+                  "label": "proposed journey progression; not runtime guarantee",
+                  "status": "demo-proposal"
+                }
+              ]
+            }
+          ],
+          "informationArchitecture": {
+            "nodes": [
+              {
+                "id": "navigation.wealth",
+                "label": "财富入口",
+                "screenId": "screen.wealth",
+                "status": "demo-proposal"
+              },
+              {
+                "id": "navigation.top-up",
+                "label": "充值入口",
+                "screenId": "screen.top-up",
+                "status": "demo-proposal"
+              },
+              {
+                "id": "navigation.purchase",
+                "label": "申购入口",
+                "screenId": "screen.purchase",
+                "status": "demo-proposal"
+              },
+              {
+                "id": "navigation.order",
+                "label": "订单证据入口",
+                "screenId": "screen.fund-order",
+                "status": "demo-proposal"
+              },
+              {
+                "id": "navigation.sip-create",
+                "label": "计划建立入口",
+                "screenId": "screen.sip-create",
+                "status": "demo-proposal"
+              },
+              {
+                "id": "navigation.sip-detail",
+                "label": "计划执行入口",
+                "screenId": "screen.sip-detail",
+                "status": "demo-proposal"
+              }
+            ],
+            "edges": [
+              {
+                "from": "navigation.wealth",
+                "to": "navigation.top-up",
+                "label": "proposed top-up navigation",
+                "status": "demo-proposal"
+              },
+              {
+                "from": "navigation.wealth",
+                "to": "navigation.purchase",
+                "label": "proposed purchase navigation",
+                "status": "demo-proposal"
+              },
+              {
+                "from": "navigation.purchase",
+                "to": "navigation.order",
+                "label": "proposed correlated order evidence",
+                "status": "demo-proposal"
+              },
+              {
+                "from": "navigation.wealth",
+                "to": "navigation.sip-create",
+                "label": "proposed plan creation navigation",
+                "status": "demo-proposal"
+              },
+              {
+                "from": "navigation.sip-create",
+                "to": "navigation.sip-detail",
+                "label": "proposed plan evidence navigation",
+                "status": "demo-proposal"
+              }
+            ]
+          },
+          "edges": [
+            {
+              "from": "stage.top-up-review",
+              "to": "stage.top-up-submit",
+              "label": "proposed journey progression; not runtime guarantee",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "stage.top-up-submit",
+              "to": "stage.top-up-observe",
+              "label": "proposed journey progression; not runtime guarantee",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "stage.purchase-input",
+              "to": "stage.purchase-submit",
+              "label": "proposed journey progression; not runtime guarantee",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "stage.purchase-submit",
+              "to": "stage.purchase-payment",
+              "label": "proposed journey progression; not runtime guarantee",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "stage.purchase-payment",
+              "to": "stage.purchase-shares",
+              "label": "proposed journey progression; not runtime guarantee",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "stage.purchase-shares",
+              "to": "stage.purchase-ops",
+              "label": "proposed journey progression; not runtime guarantee",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "stage.sip-input",
+              "to": "stage.sip-create",
+              "label": "proposed journey progression; not runtime guarantee",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "stage.sip-create",
+              "to": "stage.sip-trigger",
+              "label": "proposed journey progression; not runtime guarantee",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "stage.sip-trigger",
+              "to": "stage.sip-observe",
+              "label": "proposed journey progression; not runtime guarantee",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "stage.sip-observe",
+              "to": "stage.sip-pause",
+              "label": "proposed journey progression; not runtime guarantee",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "journey.top-up",
+              "to": "ux.scope",
+              "label": "proposed story trace",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "journey.purchase",
+              "to": "ux.scope",
+              "label": "proposed story trace",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "journey.sip",
+              "to": "ux.scope",
+              "label": "proposed story trace",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "navigation.wealth",
+              "to": "screen.wealth",
+              "label": "proposed information architecture screen target",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "navigation.top-up",
+              "to": "screen.top-up",
+              "label": "proposed information architecture screen target",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "navigation.purchase",
+              "to": "screen.purchase",
+              "label": "proposed information architecture screen target",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "navigation.order",
+              "to": "screen.fund-order",
+              "label": "proposed information architecture screen target",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "navigation.sip-create",
+              "to": "screen.sip-create",
+              "label": "proposed information architecture screen target",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "navigation.sip-detail",
+              "to": "screen.sip-detail",
+              "label": "proposed information architecture screen target",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "touchpoint.scheduler-boundary",
+              "to": "timer.sip-due",
+              "label": "system trigger, not investor action",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "touchpoint.ops-review",
+              "to": "action.inspect-order",
+              "label": "authorized query contract; host capability missing",
+              "status": "demo-proposal"
+            }
+          ],
+          "semantics": "declared on a step means its underlying command contract exists, not a completed screen, endpoint or runtime flow. Navigation and information needs remain UX proposals."
+        }
+      }
+    },
+    "links": []
+  }

@@ -1,0 +1,46 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: command
+name: CreateSipPlan
+origin:
+  stage: commandStorming
+  board: board1
+  seq: 4
+payload:
+  {
+    "type": "command",
+    "name": "CreateSipPlan",
+    "stage": "commandStorming",
+    "description": "Create a regular fund investment plan.",
+    "links": [
+      "event:SipPlanCreated"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "aggregates/sip-plan/notes/command-cs-create-sip-plan-0.yaml",
+      "atom": {
+        "kind": "note",
+        "type": "command",
+        "name": "CreateSipPlan",
+        "origin": {
+          "stage": "commandStorming",
+          "board": "board1",
+          "seq": 4
+        },
+        "payload": {
+          "type": "command",
+          "name": "CreateSipPlan",
+          "stage": "commandStorming",
+          "description": "Create a regular fund investment plan.",
+          "links": [
+            "event:SipPlanCreated"
+          ],
+          "author": "facilitator",
+          "createdAt": "2026-10-24"
+        }
+      }
+    }
+  }

@@ -1,0 +1,74 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: question
+name: AutoPauseSipOnThreeFailures
+origin:
+  stage: commandStorming
+  board: imported-policy-hypotheses
+  seq: 10
+payload:
+  {
+    "type": "question",
+    "name": "AutoPauseSipOnThreeFailures",
+    "stage": "commandStorming",
+    "description": "Retired executable policy hypothesis: the previous AutoPauseSipOnThreeFailures declaration invoked PauseSipPlan unconditionally on every SipInstallmentFailed; it did not check three failures, qualifying reason codes or a consecutive-failure counter. RecordSipInstallmentFailed also currently accepts every supplied failure reason unconditionally. Whether and how to pause after three qualifying consecutive failures remains pending, including qualifying reasons, counter state, success/reset semantics, duplicate terminal-cycle handling and out-of-order gating. This imported question does not invoke a command and does not assert an implemented or tested automatic-pause behavior.",
+    "links": [
+      "event:SipInstallmentFailed",
+      "command:PauseSipPlan"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "policies/policy-cs-auto-pause-sip-on-three-failures-10.policy.yaml",
+      "atom": {
+        "kind": "policy",
+        "type": "policy",
+        "name": "AutoPauseSipOnThreeFailures",
+        "origin": {
+          "stage": "commandStorming",
+          "board": "board1",
+          "seq": 10
+        },
+        "triggers": [
+          {
+            "event": "SipInstallmentFailed",
+            "aggregate": "SipPlan"
+          }
+        ],
+        "invokes": [
+          {
+            "command": "PauseSipPlan",
+            "aggregate": "SipPlan"
+          }
+        ],
+        "payload": {
+          "type": "policy",
+          "name": "AutoPauseSipOnThreeFailures",
+          "stage": "commandStorming",
+          "description": "When a SIP installment fails 3 consecutive times due to insufficient funds, pause the SIP plan automatically.",
+          "info": {
+            "triggers": [
+              {
+                "event": "SipInstallmentFailed",
+                "aggregate": "SipPlan"
+              }
+            ],
+            "invokes": [
+              {
+                "command": "PauseSipPlan",
+                "aggregate": "SipPlan"
+              }
+            ]
+          },
+          "links": [
+            "event:SipInstallmentFailed",
+            "command:PauseSipPlan"
+          ],
+          "author": "facilitator",
+          "createdAt": "2026-10-24"
+        }
+      }
+    }
+  }

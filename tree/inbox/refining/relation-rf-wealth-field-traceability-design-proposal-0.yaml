@@ -1,0 +1,2477 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: relation
+name: WealthFieldTraceabilityDesignProposal
+origin:
+  stage: refining
+  board: wealth-source-design-v1
+  seq: 0
+payload:
+  {
+    "type": "relation",
+    "name": "WealthFieldTraceabilityDesignProposal",
+    "stage": "refining",
+    "description": "Existing command-to-event bindings and event-to-state slot evidence, with guards and explicit gaps; no field, guard, command or event is added by this note.",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "traceability.wealth",
+        "category": "traceability",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "artifact",
+            "id": "aggregate-boundary.fund-order"
+          },
+          {
+            "kind": "artifact",
+            "id": "aggregate-boundary.sip-plan"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.settlement-refund"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.sip-integrity"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.StartExternalTopUp"
+          },
+          {
+            "kind": "event",
+            "id": "CreditBalance.ExternalTopUpRequested"
+          },
+          {
+            "kind": "event-field",
+            "id": "CreditBalance.ExternalTopUpRequested.operationId"
+          },
+          {
+            "kind": "event-field",
+            "id": "CreditBalance.ExternalTopUpRequested.externalOrderId"
+          },
+          {
+            "kind": "event-field",
+            "id": "CreditBalance.ExternalTopUpRequested.toAccountId"
+          },
+          {
+            "kind": "event-field",
+            "id": "CreditBalance.ExternalTopUpRequested.amount"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.RecordIncomingCredits"
+          },
+          {
+            "kind": "event",
+            "id": "CreditBalance.RecordIncomingCreditsConfirmed"
+          },
+          {
+            "kind": "event-field",
+            "id": "CreditBalance.RecordIncomingCreditsConfirmed.txid"
+          },
+          {
+            "kind": "state-field",
+            "id": "CreditBalance.incomingCredits"
+          },
+          {
+            "kind": "event-field",
+            "id": "CreditBalance.RecordIncomingCreditsConfirmed.amount"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.CommitIncomingCredits"
+          },
+          {
+            "kind": "event",
+            "id": "CreditBalance.CommitIncomingCreditsConfirmed"
+          },
+          {
+            "kind": "event-field",
+            "id": "CreditBalance.CommitIncomingCreditsConfirmed.txid"
+          },
+          {
+            "kind": "state-field",
+            "id": "CreditBalance.committed"
+          },
+          {
+            "kind": "state-field",
+            "id": "CreditBalance.accountBalance"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.ReserveFunds"
+          },
+          {
+            "kind": "event",
+            "id": "CreditBalance.ReserveFundsConfirmed"
+          },
+          {
+            "kind": "event-field",
+            "id": "CreditBalance.ReserveFundsConfirmed.txid"
+          },
+          {
+            "kind": "state-field",
+            "id": "CreditBalance.reservedAmount"
+          },
+          {
+            "kind": "event-field",
+            "id": "CreditBalance.ReserveFundsConfirmed.amount"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.DeductFunds"
+          },
+          {
+            "kind": "event",
+            "id": "CreditBalance.DeductFundsConfirmed"
+          },
+          {
+            "kind": "event-field",
+            "id": "CreditBalance.DeductFundsConfirmed.txid"
+          },
+          {
+            "kind": "command",
+            "id": "ExternalTransferOrder.PrepareExternalDebit"
+          },
+          {
+            "kind": "event",
+            "id": "ExternalTransferOrder.ExternalDebitPrepared"
+          },
+          {
+            "kind": "event-field",
+            "id": "ExternalTransferOrder.ExternalDebitPrepared.txid"
+          },
+          {
+            "kind": "state-field",
+            "id": "ExternalTransferOrder.preparedDebits"
+          },
+          {
+            "kind": "event-field",
+            "id": "ExternalTransferOrder.ExternalDebitPrepared.amount"
+          },
+          {
+            "kind": "command",
+            "id": "ExternalTransferOrder.CommitExternalDebit"
+          },
+          {
+            "kind": "event",
+            "id": "ExternalTransferOrder.ExternalDebitCommitted"
+          },
+          {
+            "kind": "event-field",
+            "id": "ExternalTransferOrder.ExternalDebitCommitted.txid"
+          },
+          {
+            "kind": "state-field",
+            "id": "ExternalTransferOrder.committedDebits"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RequestFundPurchase"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundPurchaseRequested"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.FundPurchaseRequested.operationId"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.operationId"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.FundPurchaseRequested.investorAccountId"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.investorAccountId"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.FundPurchaseRequested.fundOrderId"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.FundPurchaseRequested.fundCode"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.fundCode"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.FundPurchaseRequested.amount"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.amount"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.ReserveFundSubscription"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.ReserveFundSubscriptionConfirmed"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.ReserveFundSubscriptionConfirmed.txid"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.reservedSubscriptions"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.ReserveFundSubscriptionConfirmed.amount"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.ConfirmFundSubscriptionPayment"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundSubscriptionPaymentConfirmed"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.FundSubscriptionPaymentConfirmed.txid"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.committedSubscriptions"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordTAShareConfirmation"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundSharesConfirmed"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.FundSharesConfirmed.operationId"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.confirmedShareLots"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.FundSharesConfirmed.fundOrderId"
+          },
+          {
+            "kind": "event-field",
+            "id": "FundOrder.FundSharesConfirmed.shares"
+          },
+          {
+            "kind": "command",
+            "id": "SipPlan.CreateSipPlan"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipPlanCreated"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipPlanCreated.planId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipPlanCreated.investorAccountId"
+          },
+          {
+            "kind": "state-field",
+            "id": "SipPlan.investorAccountId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipPlanCreated.externalOrderId"
+          },
+          {
+            "kind": "state-field",
+            "id": "SipPlan.externalOrderId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipPlanCreated.fundCode"
+          },
+          {
+            "kind": "state-field",
+            "id": "SipPlan.fundCode"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipPlanCreated.deductionAmount"
+          },
+          {
+            "kind": "state-field",
+            "id": "SipPlan.deductionAmount"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipPlanCreated.cronExpr"
+          },
+          {
+            "kind": "state-field",
+            "id": "SipPlan.cronExpr"
+          },
+          {
+            "kind": "command",
+            "id": "SipPlan.TriggerSipInstallment"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipInstallmentTriggered"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentTriggered.planId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentTriggered.operationId"
+          },
+          {
+            "kind": "state-field",
+            "id": "SipPlan.installmentLedger"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentTriggered.occurrence"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentTriggered.externalOrderId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentTriggered.investorAccountId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentTriggered.fundOrderId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentTriggered.amount"
+          },
+          {
+            "kind": "command",
+            "id": "SipPlan.RecordSipInstallmentSucceeded"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipInstallmentSucceeded"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentSucceeded.planId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentSucceeded.operationId"
+          },
+          {
+            "kind": "command",
+            "id": "SipPlan.RecordSipInstallmentFailed"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipInstallmentFailed"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentFailed.planId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentFailed.operationId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipInstallmentFailed.reasonCode"
+          },
+          {
+            "kind": "command",
+            "id": "SipPlan.PauseSipPlan"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipPlanPaused"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipPlanPaused.planId"
+          },
+          {
+            "kind": "event-field",
+            "id": "SipPlan.SipPlanPaused.reason"
+          }
+        ],
+        "body": {
+          "entities": [],
+          "rows": [
+            {
+              "id": "trace.CreditBalance.StartExternalTopUp.ExternalTopUpRequested.operationId",
+              "commandRef": "CreditBalance.StartExternalTopUp",
+              "commandParameter": "operationId",
+              "eventRef": "CreditBalance.ExternalTopUpRequested",
+              "eventFieldRef": "CreditBalance.ExternalTopUpRequested.operationId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "operationId",
+                "expr": "param.operationId"
+              },
+              "foldAssignments": [],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.CreditBalance.StartExternalTopUp.ExternalTopUpRequested.externalOrderId",
+              "commandRef": "CreditBalance.StartExternalTopUp",
+              "commandParameter": "externalOrderId",
+              "eventRef": "CreditBalance.ExternalTopUpRequested",
+              "eventFieldRef": "CreditBalance.ExternalTopUpRequested.externalOrderId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "externalOrderId",
+                "expr": "param.externalOrderId"
+              },
+              "foldAssignments": [],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.CreditBalance.StartExternalTopUp.ExternalTopUpRequested.toAccountId",
+              "commandRef": "CreditBalance.StartExternalTopUp",
+              "commandParameter": "toAccountId",
+              "eventRef": "CreditBalance.ExternalTopUpRequested",
+              "eventFieldRef": "CreditBalance.ExternalTopUpRequested.toAccountId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "toAccountId",
+                "expr": "param.toAccountId"
+              },
+              "foldAssignments": [],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.CreditBalance.StartExternalTopUp.ExternalTopUpRequested.amount",
+              "commandRef": "CreditBalance.StartExternalTopUp",
+              "commandParameter": "amount",
+              "eventRef": "CreditBalance.ExternalTopUpRequested",
+              "eventFieldRef": "CreditBalance.ExternalTopUpRequested.amount",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "amount",
+                "expr": "param.amount"
+              },
+              "foldAssignments": [],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.CreditBalance.RecordIncomingCredits.RecordIncomingCreditsConfirmed.txid",
+              "commandRef": "CreditBalance.RecordIncomingCredits",
+              "commandParameter": "txid",
+              "eventRef": "CreditBalance.RecordIncomingCreditsConfirmed",
+              "eventFieldRef": "CreditBalance.RecordIncomingCreditsConfirmed.txid",
+              "stateFieldRefs": [
+                "CreditBalance.incomingCredits"
+              ],
+              "binding": {
+                "slot": "txid",
+                "expr": "param.txid"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "incomingCredits",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "event.amount"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-CB-RECORD-001",
+                  "errCode": "60007",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "incomingCredits",
+                    "key": "param.txid"
+                  },
+                  "desc": "Incoming credits already registered for this transaction (golden master 60007)."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.CreditBalance.RecordIncomingCredits.RecordIncomingCreditsConfirmed.amount",
+              "commandRef": "CreditBalance.RecordIncomingCredits",
+              "commandParameter": "amount",
+              "eventRef": "CreditBalance.RecordIncomingCreditsConfirmed",
+              "eventFieldRef": "CreditBalance.RecordIncomingCreditsConfirmed.amount",
+              "stateFieldRefs": [
+                "CreditBalance.incomingCredits"
+              ],
+              "binding": {
+                "slot": "amount",
+                "expr": "param.amount"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "incomingCredits",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "event.amount"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-CB-RECORD-001",
+                  "errCode": "60007",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "incomingCredits",
+                    "key": "param.txid"
+                  },
+                  "desc": "Incoming credits already registered for this transaction (golden master 60007)."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.CreditBalance.CommitIncomingCredits.CommitIncomingCreditsConfirmed.txid",
+              "commandRef": "CreditBalance.CommitIncomingCredits",
+              "commandParameter": "txid",
+              "eventRef": "CreditBalance.CommitIncomingCreditsConfirmed",
+              "eventFieldRef": "CreditBalance.CommitIncomingCreditsConfirmed.txid",
+              "stateFieldRefs": [
+                "CreditBalance.committed",
+                "CreditBalance.accountBalance",
+                "CreditBalance.incomingCredits"
+              ],
+              "binding": {
+                "slot": "txid",
+                "expr": "param.txid"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "committed",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "state.incomingCredits[event.txid]"
+                },
+                {
+                  "slot": "accountBalance",
+                  "op": "money-apply",
+                  "delta": "state.incomingCredits[event.txid]",
+                  "sign": 1
+                },
+                {
+                  "slot": "incomingCredits",
+                  "op": "remove",
+                  "key": "event.txid"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-CB-COMMIT-001",
+                  "errCode": "60008",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-contains",
+                    "map": "incomingCredits",
+                    "key": "param.txid"
+                  },
+                  "desc": "Incoming credits cannot be found or already committed (golden master 60008)."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.CreditBalance.ReserveFunds.ReserveFundsConfirmed.txid",
+              "commandRef": "CreditBalance.ReserveFunds",
+              "commandParameter": "txid",
+              "eventRef": "CreditBalance.ReserveFundsConfirmed",
+              "eventFieldRef": "CreditBalance.ReserveFundsConfirmed.txid",
+              "stateFieldRefs": [
+                "CreditBalance.reservedAmount"
+              ],
+              "binding": {
+                "slot": "txid",
+                "expr": "param.txid"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "reservedAmount",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "event.amount"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-CB-RESERVE-001",
+                  "errCode": "60008",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "reservedAmount",
+                    "key": "param.txid"
+                  },
+                  "desc": "Already reserved for this transaction: idempotent success, no events (golden master 60008)."
+                },
+                {
+                  "ruleId": "IR-CB-RESERVE-002",
+                  "errCode": "60003",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-sufficient",
+                    "amount": "param.amount",
+                    "in": "accountBalance"
+                  },
+                  "desc": "Insufficient balance for transfer (golden master 60003)."
+                },
+                {
+                  "ruleId": "IR-CB-RESERVE-003",
+                  "errCode": "60004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Transfer amount must be positive (golden master 60004)."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.CreditBalance.ReserveFunds.ReserveFundsConfirmed.amount",
+              "commandRef": "CreditBalance.ReserveFunds",
+              "commandParameter": "amount",
+              "eventRef": "CreditBalance.ReserveFundsConfirmed",
+              "eventFieldRef": "CreditBalance.ReserveFundsConfirmed.amount",
+              "stateFieldRefs": [
+                "CreditBalance.accountBalance",
+                "CreditBalance.reservedAmount"
+              ],
+              "binding": {
+                "slot": "amount",
+                "expr": "param.amount"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "accountBalance",
+                  "op": "money-apply",
+                  "delta": "event.amount",
+                  "sign": -1
+                },
+                {
+                  "slot": "reservedAmount",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "event.amount"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-CB-RESERVE-001",
+                  "errCode": "60008",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "reservedAmount",
+                    "key": "param.txid"
+                  },
+                  "desc": "Already reserved for this transaction: idempotent success, no events (golden master 60008)."
+                },
+                {
+                  "ruleId": "IR-CB-RESERVE-002",
+                  "errCode": "60003",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-sufficient",
+                    "amount": "param.amount",
+                    "in": "accountBalance"
+                  },
+                  "desc": "Insufficient balance for transfer (golden master 60003)."
+                },
+                {
+                  "ruleId": "IR-CB-RESERVE-003",
+                  "errCode": "60004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Transfer amount must be positive (golden master 60004)."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.CreditBalance.DeductFunds.DeductFundsConfirmed.txid",
+              "commandRef": "CreditBalance.DeductFunds",
+              "commandParameter": "txid",
+              "eventRef": "CreditBalance.DeductFundsConfirmed",
+              "eventFieldRef": "CreditBalance.DeductFundsConfirmed.txid",
+              "stateFieldRefs": [
+                "CreditBalance.committed",
+                "CreditBalance.reservedAmount"
+              ],
+              "binding": {
+                "slot": "txid",
+                "expr": "param.txid"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "committed",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "state.reservedAmount[event.txid]"
+                },
+                {
+                  "slot": "reservedAmount",
+                  "op": "remove",
+                  "key": "event.txid"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-CB-DEDUCT-001",
+                  "errCode": "60006",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-contains",
+                    "map": "reservedAmount",
+                    "key": "param.txid"
+                  },
+                  "desc": "No reserved funds found for this transaction (golden master 60006)."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.ExternalTransferOrder.PrepareExternalDebit.ExternalDebitPrepared.txid",
+              "commandRef": "ExternalTransferOrder.PrepareExternalDebit",
+              "commandParameter": "txid",
+              "eventRef": "ExternalTransferOrder.ExternalDebitPrepared",
+              "eventFieldRef": "ExternalTransferOrder.ExternalDebitPrepared.txid",
+              "stateFieldRefs": [
+                "ExternalTransferOrder.preparedDebits"
+              ],
+              "binding": {
+                "slot": "txid",
+                "expr": "param.txid"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "preparedDebits",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "event.amount"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-EXT-PREPARE-001",
+                  "errCode": "61001",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "preparedDebits",
+                    "key": "param.txid"
+                  },
+                  "desc": "External debit already prepared for this transaction: idempotent success."
+                },
+                {
+                  "ruleId": "IR-EXT-PREPARE-002",
+                  "errCode": "61002",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "External debit amount must be positive."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.ExternalTransferOrder.PrepareExternalDebit.ExternalDebitPrepared.amount",
+              "commandRef": "ExternalTransferOrder.PrepareExternalDebit",
+              "commandParameter": "amount",
+              "eventRef": "ExternalTransferOrder.ExternalDebitPrepared",
+              "eventFieldRef": "ExternalTransferOrder.ExternalDebitPrepared.amount",
+              "stateFieldRefs": [
+                "ExternalTransferOrder.preparedDebits"
+              ],
+              "binding": {
+                "slot": "amount",
+                "expr": "param.amount"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "preparedDebits",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "event.amount"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-EXT-PREPARE-001",
+                  "errCode": "61001",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "preparedDebits",
+                    "key": "param.txid"
+                  },
+                  "desc": "External debit already prepared for this transaction: idempotent success."
+                },
+                {
+                  "ruleId": "IR-EXT-PREPARE-002",
+                  "errCode": "61002",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "External debit amount must be positive."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.ExternalTransferOrder.CommitExternalDebit.ExternalDebitCommitted.txid",
+              "commandRef": "ExternalTransferOrder.CommitExternalDebit",
+              "commandParameter": "txid",
+              "eventRef": "ExternalTransferOrder.ExternalDebitCommitted",
+              "eventFieldRef": "ExternalTransferOrder.ExternalDebitCommitted.txid",
+              "stateFieldRefs": [
+                "ExternalTransferOrder.committedDebits",
+                "ExternalTransferOrder.preparedDebits"
+              ],
+              "binding": {
+                "slot": "txid",
+                "expr": "param.txid"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "committedDebits",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "state.preparedDebits[event.txid]"
+                },
+                {
+                  "slot": "preparedDebits",
+                  "op": "remove",
+                  "key": "event.txid"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-EXT-COMMIT-001",
+                  "errCode": "61003",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-contains",
+                    "map": "preparedDebits",
+                    "key": "param.txid"
+                  },
+                  "desc": "No prepared external debit found for this transaction."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.RequestFundPurchase.FundPurchaseRequested.operationId",
+              "commandRef": "FundOrder.RequestFundPurchase",
+              "commandParameter": "operationId",
+              "eventRef": "FundOrder.FundPurchaseRequested",
+              "eventFieldRef": "FundOrder.FundPurchaseRequested.operationId",
+              "stateFieldRefs": [
+                "FundOrder.operationId"
+              ],
+              "binding": {
+                "slot": "operationId",
+                "expr": "param.operationId"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "operationId",
+                  "expr": "event.operationId"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-FO-RESERVE-002",
+                  "errCode": "62004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Subscription amount must be positive. No genuine fund/product minimum threshold is enforced by this guard."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.RequestFundPurchase.FundPurchaseRequested.investorAccountId",
+              "commandRef": "FundOrder.RequestFundPurchase",
+              "commandParameter": "investorAccountId",
+              "eventRef": "FundOrder.FundPurchaseRequested",
+              "eventFieldRef": "FundOrder.FundPurchaseRequested.investorAccountId",
+              "stateFieldRefs": [
+                "FundOrder.investorAccountId"
+              ],
+              "binding": {
+                "slot": "investorAccountId",
+                "expr": "param.investorAccountId"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "investorAccountId",
+                  "expr": "event.investorAccountId"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-FO-RESERVE-002",
+                  "errCode": "62004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Subscription amount must be positive. No genuine fund/product minimum threshold is enforced by this guard."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.RequestFundPurchase.FundPurchaseRequested.fundOrderId",
+              "commandRef": "FundOrder.RequestFundPurchase",
+              "commandParameter": "fundOrderId",
+              "eventRef": "FundOrder.FundPurchaseRequested",
+              "eventFieldRef": "FundOrder.FundPurchaseRequested.fundOrderId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "fundOrderId",
+                "expr": "param.fundOrderId"
+              },
+              "foldAssignments": [],
+              "guardRules": [
+                {
+                  "ruleId": "IR-FO-RESERVE-002",
+                  "errCode": "62004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Subscription amount must be positive. No genuine fund/product minimum threshold is enforced by this guard."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.RequestFundPurchase.FundPurchaseRequested.fundCode",
+              "commandRef": "FundOrder.RequestFundPurchase",
+              "commandParameter": "fundCode",
+              "eventRef": "FundOrder.FundPurchaseRequested",
+              "eventFieldRef": "FundOrder.FundPurchaseRequested.fundCode",
+              "stateFieldRefs": [
+                "FundOrder.fundCode"
+              ],
+              "binding": {
+                "slot": "fundCode",
+                "expr": "param.fundCode"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "fundCode",
+                  "expr": "event.fundCode"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-FO-RESERVE-002",
+                  "errCode": "62004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Subscription amount must be positive. No genuine fund/product minimum threshold is enforced by this guard."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.RequestFundPurchase.FundPurchaseRequested.amount",
+              "commandRef": "FundOrder.RequestFundPurchase",
+              "commandParameter": "amount",
+              "eventRef": "FundOrder.FundPurchaseRequested",
+              "eventFieldRef": "FundOrder.FundPurchaseRequested.amount",
+              "stateFieldRefs": [
+                "FundOrder.amount"
+              ],
+              "binding": {
+                "slot": "amount",
+                "expr": "param.amount"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "amount",
+                  "expr": "event.amount"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-FO-RESERVE-002",
+                  "errCode": "62004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Subscription amount must be positive. No genuine fund/product minimum threshold is enforced by this guard."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.ReserveFundSubscription.ReserveFundSubscriptionConfirmed.txid",
+              "commandRef": "FundOrder.ReserveFundSubscription",
+              "commandParameter": "txid",
+              "eventRef": "FundOrder.ReserveFundSubscriptionConfirmed",
+              "eventFieldRef": "FundOrder.ReserveFundSubscriptionConfirmed.txid",
+              "stateFieldRefs": [
+                "FundOrder.reservedSubscriptions"
+              ],
+              "binding": {
+                "slot": "txid",
+                "expr": "param.txid"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "reservedSubscriptions",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "event.amount"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-FO-RESERVE-001",
+                  "errCode": "62001",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "reservedSubscriptions",
+                    "key": "param.txid"
+                  },
+                  "desc": "Subscription already reserved for this transaction: idempotent success."
+                },
+                {
+                  "ruleId": "IR-FO-RESERVE-002",
+                  "errCode": "62004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Subscription amount must be positive."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.ReserveFundSubscription.ReserveFundSubscriptionConfirmed.amount",
+              "commandRef": "FundOrder.ReserveFundSubscription",
+              "commandParameter": "amount",
+              "eventRef": "FundOrder.ReserveFundSubscriptionConfirmed",
+              "eventFieldRef": "FundOrder.ReserveFundSubscriptionConfirmed.amount",
+              "stateFieldRefs": [
+                "FundOrder.reservedSubscriptions"
+              ],
+              "binding": {
+                "slot": "amount",
+                "expr": "param.amount"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "reservedSubscriptions",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "event.amount"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-FO-RESERVE-001",
+                  "errCode": "62001",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "reservedSubscriptions",
+                    "key": "param.txid"
+                  },
+                  "desc": "Subscription already reserved for this transaction: idempotent success."
+                },
+                {
+                  "ruleId": "IR-FO-RESERVE-002",
+                  "errCode": "62004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Subscription amount must be positive."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.ConfirmFundSubscriptionPayment.FundSubscriptionPaymentConfirmed.txid",
+              "commandRef": "FundOrder.ConfirmFundSubscriptionPayment",
+              "commandParameter": "txid",
+              "eventRef": "FundOrder.FundSubscriptionPaymentConfirmed",
+              "eventFieldRef": "FundOrder.FundSubscriptionPaymentConfirmed.txid",
+              "stateFieldRefs": [
+                "FundOrder.committedSubscriptions",
+                "FundOrder.reservedSubscriptions"
+              ],
+              "binding": {
+                "slot": "txid",
+                "expr": "param.txid"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "committedSubscriptions",
+                  "op": "put",
+                  "key": "event.txid",
+                  "value": "state.reservedSubscriptions[event.txid]"
+                },
+                {
+                  "slot": "reservedSubscriptions",
+                  "op": "remove",
+                  "key": "event.txid"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-FO-COMMIT-001",
+                  "errCode": "62008",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-contains",
+                    "map": "reservedSubscriptions",
+                    "key": "param.txid"
+                  },
+                  "desc": "Prepared subscription cannot be found or already committed."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "BUSINESS_INPUT",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.RecordTAShareConfirmation.FundSharesConfirmed.operationId",
+              "commandRef": "FundOrder.RecordTAShareConfirmation",
+              "commandParameter": "operationId",
+              "eventRef": "FundOrder.FundSharesConfirmed",
+              "eventFieldRef": "FundOrder.FundSharesConfirmed.operationId",
+              "stateFieldRefs": [
+                "FundOrder.confirmedShareLots"
+              ],
+              "binding": {
+                "slot": "operationId",
+                "expr": "param.operationId"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "confirmedShareLots",
+                  "op": "put",
+                  "key": "event.operationId",
+                  "value": "event.shares"
+                }
+              ],
+              "guardRules": [
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-FO-TA-CONFIRM-001",
+                  "errCode": "62011",
+                  "from": [
+                    "PAYMENT_SETTLED"
+                  ],
+                  "toStatus": "SHARES_CONFIRMED",
+                  "desc": "TA share confirmation is accepted only after payment settlement. Duplicate terminal confirmations are rejected, not treated as idempotent success.",
+                  "note": "Only PAYMENT_SETTLED may transition to SHARES_CONFIRMED; terminal duplicates reject with 62011."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.RecordTAShareConfirmation.FundSharesConfirmed.fundOrderId",
+              "commandRef": "FundOrder.RecordTAShareConfirmation",
+              "commandParameter": "fundOrderId",
+              "eventRef": "FundOrder.FundSharesConfirmed",
+              "eventFieldRef": "FundOrder.FundSharesConfirmed.fundOrderId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "fundOrderId",
+                "expr": "param.fundOrderId"
+              },
+              "foldAssignments": [],
+              "guardRules": [
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-FO-TA-CONFIRM-001",
+                  "errCode": "62011",
+                  "from": [
+                    "PAYMENT_SETTLED"
+                  ],
+                  "toStatus": "SHARES_CONFIRMED",
+                  "desc": "TA share confirmation is accepted only after payment settlement. Duplicate terminal confirmations are rejected, not treated as idempotent success.",
+                  "note": "Only PAYMENT_SETTLED may transition to SHARES_CONFIRMED; terminal duplicates reject with 62011."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.FundOrder.RecordTAShareConfirmation.FundSharesConfirmed.shares",
+              "commandRef": "FundOrder.RecordTAShareConfirmation",
+              "commandParameter": "shares",
+              "eventRef": "FundOrder.FundSharesConfirmed",
+              "eventFieldRef": "FundOrder.FundSharesConfirmed.shares",
+              "stateFieldRefs": [
+                "FundOrder.confirmedShareLots"
+              ],
+              "binding": {
+                "slot": "shares",
+                "expr": "param.shares"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "confirmedShareLots",
+                  "op": "put",
+                  "key": "event.operationId",
+                  "value": "event.shares"
+                }
+              ],
+              "guardRules": [
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-FO-TA-CONFIRM-001",
+                  "errCode": "62011",
+                  "from": [
+                    "PAYMENT_SETTLED"
+                  ],
+                  "toStatus": "SHARES_CONFIRMED",
+                  "desc": "TA share confirmation is accepted only after payment settlement. Duplicate terminal confirmations are rejected, not treated as idempotent success.",
+                  "note": "Only PAYMENT_SETTLED may transition to SHARES_CONFIRMED; terminal duplicates reject with 62011."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.CreateSipPlan.SipPlanCreated.planId",
+              "commandRef": "SipPlan.CreateSipPlan",
+              "commandParameter": "planId",
+              "eventRef": "SipPlan.SipPlanCreated",
+              "eventFieldRef": "SipPlan.SipPlanCreated.planId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "planId",
+                "expr": "param.planId"
+              },
+              "foldAssignments": [],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-CREATE-001",
+                  "errCode": "63001",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.deductionAmount"
+                  },
+                  "desc": "SIP per-installment deduction amount must be positive."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.CreateSipPlan.SipPlanCreated.investorAccountId",
+              "commandRef": "SipPlan.CreateSipPlan",
+              "commandParameter": "investorAccountId",
+              "eventRef": "SipPlan.SipPlanCreated",
+              "eventFieldRef": "SipPlan.SipPlanCreated.investorAccountId",
+              "stateFieldRefs": [
+                "SipPlan.investorAccountId"
+              ],
+              "binding": {
+                "slot": "investorAccountId",
+                "expr": "param.investorAccountId"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "investorAccountId",
+                  "expr": "event.investorAccountId"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-CREATE-001",
+                  "errCode": "63001",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.deductionAmount"
+                  },
+                  "desc": "SIP per-installment deduction amount must be positive."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.CreateSipPlan.SipPlanCreated.externalOrderId",
+              "commandRef": "SipPlan.CreateSipPlan",
+              "commandParameter": "externalOrderId",
+              "eventRef": "SipPlan.SipPlanCreated",
+              "eventFieldRef": "SipPlan.SipPlanCreated.externalOrderId",
+              "stateFieldRefs": [
+                "SipPlan.externalOrderId"
+              ],
+              "binding": {
+                "slot": "externalOrderId",
+                "expr": "param.externalOrderId"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "externalOrderId",
+                  "expr": "event.externalOrderId"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-CREATE-001",
+                  "errCode": "63001",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.deductionAmount"
+                  },
+                  "desc": "SIP per-installment deduction amount must be positive."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.CreateSipPlan.SipPlanCreated.fundCode",
+              "commandRef": "SipPlan.CreateSipPlan",
+              "commandParameter": "fundCode",
+              "eventRef": "SipPlan.SipPlanCreated",
+              "eventFieldRef": "SipPlan.SipPlanCreated.fundCode",
+              "stateFieldRefs": [
+                "SipPlan.fundCode"
+              ],
+              "binding": {
+                "slot": "fundCode",
+                "expr": "param.fundCode"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "fundCode",
+                  "expr": "event.fundCode"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-CREATE-001",
+                  "errCode": "63001",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.deductionAmount"
+                  },
+                  "desc": "SIP per-installment deduction amount must be positive."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.CreateSipPlan.SipPlanCreated.deductionAmount",
+              "commandRef": "SipPlan.CreateSipPlan",
+              "commandParameter": "deductionAmount",
+              "eventRef": "SipPlan.SipPlanCreated",
+              "eventFieldRef": "SipPlan.SipPlanCreated.deductionAmount",
+              "stateFieldRefs": [
+                "SipPlan.deductionAmount"
+              ],
+              "binding": {
+                "slot": "deductionAmount",
+                "expr": "param.deductionAmount"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "deductionAmount",
+                  "expr": "event.deductionAmount"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-CREATE-001",
+                  "errCode": "63001",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.deductionAmount"
+                  },
+                  "desc": "SIP per-installment deduction amount must be positive."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.CreateSipPlan.SipPlanCreated.cronExpr",
+              "commandRef": "SipPlan.CreateSipPlan",
+              "commandParameter": "cronExpr",
+              "eventRef": "SipPlan.SipPlanCreated",
+              "eventFieldRef": "SipPlan.SipPlanCreated.cronExpr",
+              "stateFieldRefs": [
+                "SipPlan.cronExpr"
+              ],
+              "binding": {
+                "slot": "cronExpr",
+                "expr": "param.cronExpr"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "cronExpr",
+                  "expr": "event.cronExpr"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-CREATE-001",
+                  "errCode": "63001",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.deductionAmount"
+                  },
+                  "desc": "SIP per-installment deduction amount must be positive."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.TriggerSipInstallment.SipInstallmentTriggered.planId",
+              "commandRef": "SipPlan.TriggerSipInstallment",
+              "commandParameter": "planId",
+              "eventRef": "SipPlan.SipInstallmentTriggered",
+              "eventFieldRef": "SipPlan.SipInstallmentTriggered.planId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "planId",
+                "expr": "param.planId"
+              },
+              "foldAssignments": [],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-TRIGGER-001",
+                  "errCode": "63002",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "installmentLedger",
+                    "key": "param.operationId"
+                  },
+                  "desc": "SIP installment already triggered for this cycle OperationId: idempotent success."
+                },
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-SIP-TRIGGER-002",
+                  "errCode": "63003",
+                  "from": [
+                    "ACTIVE"
+                  ],
+                  "toStatus": "ACTIVE",
+                  "desc": "Only ACTIVE SIP plans may trigger a new operation; the preceding duplicate-operation guard declares empty success first.",
+                  "note": "Require ACTIVE for a new operation after the duplicate-operation empty-success check."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.TriggerSipInstallment.SipInstallmentTriggered.operationId",
+              "commandRef": "SipPlan.TriggerSipInstallment",
+              "commandParameter": "operationId",
+              "eventRef": "SipPlan.SipInstallmentTriggered",
+              "eventFieldRef": "SipPlan.SipInstallmentTriggered.operationId",
+              "stateFieldRefs": [
+                "SipPlan.installmentLedger"
+              ],
+              "binding": {
+                "slot": "operationId",
+                "expr": "param.operationId"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "installmentLedger",
+                  "op": "put",
+                  "key": "event.operationId",
+                  "value": "literal:TRIGGERED"
+                }
+              ],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-TRIGGER-001",
+                  "errCode": "63002",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "installmentLedger",
+                    "key": "param.operationId"
+                  },
+                  "desc": "SIP installment already triggered for this cycle OperationId: idempotent success."
+                },
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-SIP-TRIGGER-002",
+                  "errCode": "63003",
+                  "from": [
+                    "ACTIVE"
+                  ],
+                  "toStatus": "ACTIVE",
+                  "desc": "Only ACTIVE SIP plans may trigger a new operation; the preceding duplicate-operation guard declares empty success first.",
+                  "note": "Require ACTIVE for a new operation after the duplicate-operation empty-success check."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.TriggerSipInstallment.SipInstallmentTriggered.occurrence",
+              "commandRef": "SipPlan.TriggerSipInstallment",
+              "commandParameter": "occurrence",
+              "eventRef": "SipPlan.SipInstallmentTriggered",
+              "eventFieldRef": "SipPlan.SipInstallmentTriggered.occurrence",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "occurrence",
+                "expr": "param.occurrence"
+              },
+              "foldAssignments": [],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-TRIGGER-001",
+                  "errCode": "63002",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "installmentLedger",
+                    "key": "param.operationId"
+                  },
+                  "desc": "SIP installment already triggered for this cycle OperationId: idempotent success."
+                },
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-SIP-TRIGGER-002",
+                  "errCode": "63003",
+                  "from": [
+                    "ACTIVE"
+                  ],
+                  "toStatus": "ACTIVE",
+                  "desc": "Only ACTIVE SIP plans may trigger a new operation; the preceding duplicate-operation guard declares empty success first.",
+                  "note": "Require ACTIVE for a new operation after the duplicate-operation empty-success check."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.TriggerSipInstallment.SipInstallmentTriggered.externalOrderId",
+              "commandRef": "SipPlan.TriggerSipInstallment",
+              "commandParameter": "externalOrderId",
+              "eventRef": "SipPlan.SipInstallmentTriggered",
+              "eventFieldRef": "SipPlan.SipInstallmentTriggered.externalOrderId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "externalOrderId",
+                "expr": "param.externalOrderId"
+              },
+              "foldAssignments": [],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-TRIGGER-001",
+                  "errCode": "63002",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "installmentLedger",
+                    "key": "param.operationId"
+                  },
+                  "desc": "SIP installment already triggered for this cycle OperationId: idempotent success."
+                },
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-SIP-TRIGGER-002",
+                  "errCode": "63003",
+                  "from": [
+                    "ACTIVE"
+                  ],
+                  "toStatus": "ACTIVE",
+                  "desc": "Only ACTIVE SIP plans may trigger a new operation; the preceding duplicate-operation guard declares empty success first.",
+                  "note": "Require ACTIVE for a new operation after the duplicate-operation empty-success check."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.TriggerSipInstallment.SipInstallmentTriggered.investorAccountId",
+              "commandRef": "SipPlan.TriggerSipInstallment",
+              "commandParameter": "investorAccountId",
+              "eventRef": "SipPlan.SipInstallmentTriggered",
+              "eventFieldRef": "SipPlan.SipInstallmentTriggered.investorAccountId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "investorAccountId",
+                "expr": "param.investorAccountId"
+              },
+              "foldAssignments": [],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-TRIGGER-001",
+                  "errCode": "63002",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "installmentLedger",
+                    "key": "param.operationId"
+                  },
+                  "desc": "SIP installment already triggered for this cycle OperationId: idempotent success."
+                },
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-SIP-TRIGGER-002",
+                  "errCode": "63003",
+                  "from": [
+                    "ACTIVE"
+                  ],
+                  "toStatus": "ACTIVE",
+                  "desc": "Only ACTIVE SIP plans may trigger a new operation; the preceding duplicate-operation guard declares empty success first.",
+                  "note": "Require ACTIVE for a new operation after the duplicate-operation empty-success check."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.TriggerSipInstallment.SipInstallmentTriggered.fundOrderId",
+              "commandRef": "SipPlan.TriggerSipInstallment",
+              "commandParameter": "fundOrderId",
+              "eventRef": "SipPlan.SipInstallmentTriggered",
+              "eventFieldRef": "SipPlan.SipInstallmentTriggered.fundOrderId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "fundOrderId",
+                "expr": "param.fundOrderId"
+              },
+              "foldAssignments": [],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-TRIGGER-001",
+                  "errCode": "63002",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "installmentLedger",
+                    "key": "param.operationId"
+                  },
+                  "desc": "SIP installment already triggered for this cycle OperationId: idempotent success."
+                },
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-SIP-TRIGGER-002",
+                  "errCode": "63003",
+                  "from": [
+                    "ACTIVE"
+                  ],
+                  "toStatus": "ACTIVE",
+                  "desc": "Only ACTIVE SIP plans may trigger a new operation; the preceding duplicate-operation guard declares empty success first.",
+                  "note": "Require ACTIVE for a new operation after the duplicate-operation empty-success check."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.TriggerSipInstallment.SipInstallmentTriggered.amount",
+              "commandRef": "SipPlan.TriggerSipInstallment",
+              "commandParameter": "amount",
+              "eventRef": "SipPlan.SipInstallmentTriggered",
+              "eventFieldRef": "SipPlan.SipInstallmentTriggered.amount",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "amount",
+                "expr": "param.amount"
+              },
+              "foldAssignments": [],
+              "guardRules": [
+                {
+                  "ruleId": "IR-SIP-TRIGGER-001",
+                  "errCode": "63002",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "installmentLedger",
+                    "key": "param.operationId"
+                  },
+                  "desc": "SIP installment already triggered for this cycle OperationId: idempotent success."
+                },
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-SIP-TRIGGER-002",
+                  "errCode": "63003",
+                  "from": [
+                    "ACTIVE"
+                  ],
+                  "toStatus": "ACTIVE",
+                  "desc": "Only ACTIVE SIP plans may trigger a new operation; the preceding duplicate-operation guard declares empty success first.",
+                  "note": "Require ACTIVE for a new operation after the duplicate-operation empty-success check."
+                }
+              ],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.RecordSipInstallmentSucceeded.SipInstallmentSucceeded.planId",
+              "commandRef": "SipPlan.RecordSipInstallmentSucceeded",
+              "commandParameter": "planId",
+              "eventRef": "SipPlan.SipInstallmentSucceeded",
+              "eventFieldRef": "SipPlan.SipInstallmentSucceeded.planId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "planId",
+                "expr": "param.planId"
+              },
+              "foldAssignments": [],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.RecordSipInstallmentSucceeded.SipInstallmentSucceeded.operationId",
+              "commandRef": "SipPlan.RecordSipInstallmentSucceeded",
+              "commandParameter": "operationId",
+              "eventRef": "SipPlan.SipInstallmentSucceeded",
+              "eventFieldRef": "SipPlan.SipInstallmentSucceeded.operationId",
+              "stateFieldRefs": [
+                "SipPlan.installmentLedger"
+              ],
+              "binding": {
+                "slot": "operationId",
+                "expr": "param.operationId"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "installmentLedger",
+                  "op": "put",
+                  "key": "event.operationId",
+                  "value": "literal:SUCCEEDED"
+                }
+              ],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.RecordSipInstallmentFailed.SipInstallmentFailed.planId",
+              "commandRef": "SipPlan.RecordSipInstallmentFailed",
+              "commandParameter": "planId",
+              "eventRef": "SipPlan.SipInstallmentFailed",
+              "eventFieldRef": "SipPlan.SipInstallmentFailed.planId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "planId",
+                "expr": "param.planId"
+              },
+              "foldAssignments": [],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.RecordSipInstallmentFailed.SipInstallmentFailed.operationId",
+              "commandRef": "SipPlan.RecordSipInstallmentFailed",
+              "commandParameter": "operationId",
+              "eventRef": "SipPlan.SipInstallmentFailed",
+              "eventFieldRef": "SipPlan.SipInstallmentFailed.operationId",
+              "stateFieldRefs": [
+                "SipPlan.installmentLedger"
+              ],
+              "binding": {
+                "slot": "operationId",
+                "expr": "param.operationId"
+              },
+              "foldAssignments": [
+                {
+                  "slot": "installmentLedger",
+                  "op": "put",
+                  "key": "event.operationId",
+                  "value": "literal:FAILED"
+                }
+              ],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "declared state slot(s)",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.RecordSipInstallmentFailed.SipInstallmentFailed.reasonCode",
+              "commandRef": "SipPlan.RecordSipInstallmentFailed",
+              "commandParameter": "reasonCode",
+              "eventRef": "SipPlan.SipInstallmentFailed",
+              "eventFieldRef": "SipPlan.SipInstallmentFailed.reasonCode",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "reasonCode",
+                "expr": "param.reasonCode"
+              },
+              "foldAssignments": [],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.PauseSipPlan.SipPlanPaused.planId",
+              "commandRef": "SipPlan.PauseSipPlan",
+              "commandParameter": "planId",
+              "eventRef": "SipPlan.SipPlanPaused",
+              "eventFieldRef": "SipPlan.SipPlanPaused.planId",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "planId",
+                "expr": "param.planId"
+              },
+              "foldAssignments": [],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "trace.SipPlan.PauseSipPlan.SipPlanPaused.reason",
+              "commandRef": "SipPlan.PauseSipPlan",
+              "commandParameter": "reason",
+              "eventRef": "SipPlan.SipPlanPaused",
+              "eventFieldRef": "SipPlan.SipPlanPaused.reason",
+              "stateFieldRefs": [],
+              "binding": {
+                "slot": "reason",
+                "expr": "param.reason"
+              },
+              "foldAssignments": [],
+              "guardRules": [],
+              "sourceIndicators": {
+                "commandParameterOrigin": "BUSINESS_INPUT",
+                "eventFieldOrigin": "PROPAGATED",
+                "evidence": "existing original-tree slice and event declarations"
+              },
+              "retention": "no direct retained field mapping in inspected folds; event-only or keyed/map-derived facts may require explicit query/projection design",
+              "status": "demo-proposal"
+            }
+          ],
+          "guards": [
+            {
+              "commandRef": "CreditBalance.StartExternalTopUp",
+              "rules": [],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "CreditBalance.RecordIncomingCredits",
+              "rules": [
+                {
+                  "ruleId": "IR-CB-RECORD-001",
+                  "errCode": "60007",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "incomingCredits",
+                    "key": "param.txid"
+                  },
+                  "desc": "Incoming credits already registered for this transaction (golden master 60007)."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "CreditBalance.CommitIncomingCredits",
+              "rules": [
+                {
+                  "ruleId": "IR-CB-COMMIT-001",
+                  "errCode": "60008",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-contains",
+                    "map": "incomingCredits",
+                    "key": "param.txid"
+                  },
+                  "desc": "Incoming credits cannot be found or already committed (golden master 60008)."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "CreditBalance.ReserveFunds",
+              "rules": [
+                {
+                  "ruleId": "IR-CB-RESERVE-001",
+                  "errCode": "60008",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "reservedAmount",
+                    "key": "param.txid"
+                  },
+                  "desc": "Already reserved for this transaction: idempotent success, no events (golden master 60008)."
+                },
+                {
+                  "ruleId": "IR-CB-RESERVE-002",
+                  "errCode": "60003",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-sufficient",
+                    "amount": "param.amount",
+                    "in": "accountBalance"
+                  },
+                  "desc": "Insufficient balance for transfer (golden master 60003)."
+                },
+                {
+                  "ruleId": "IR-CB-RESERVE-003",
+                  "errCode": "60004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Transfer amount must be positive (golden master 60004)."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "CreditBalance.DeductFunds",
+              "rules": [
+                {
+                  "ruleId": "IR-CB-DEDUCT-001",
+                  "errCode": "60006",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-contains",
+                    "map": "reservedAmount",
+                    "key": "param.txid"
+                  },
+                  "desc": "No reserved funds found for this transaction (golden master 60006)."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "ExternalTransferOrder.PrepareExternalDebit",
+              "rules": [
+                {
+                  "ruleId": "IR-EXT-PREPARE-001",
+                  "errCode": "61001",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "preparedDebits",
+                    "key": "param.txid"
+                  },
+                  "desc": "External debit already prepared for this transaction: idempotent success."
+                },
+                {
+                  "ruleId": "IR-EXT-PREPARE-002",
+                  "errCode": "61002",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "External debit amount must be positive."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "ExternalTransferOrder.CommitExternalDebit",
+              "rules": [
+                {
+                  "ruleId": "IR-EXT-COMMIT-001",
+                  "errCode": "61003",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-contains",
+                    "map": "preparedDebits",
+                    "key": "param.txid"
+                  },
+                  "desc": "No prepared external debit found for this transaction."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "FundOrder.RequestFundPurchase",
+              "rules": [
+                {
+                  "ruleId": "IR-FO-RESERVE-002",
+                  "errCode": "62004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Subscription amount must be positive. No genuine fund/product minimum threshold is enforced by this guard."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "FundOrder.ReserveFundSubscription",
+              "rules": [
+                {
+                  "ruleId": "IR-FO-RESERVE-001",
+                  "errCode": "62001",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "reservedSubscriptions",
+                    "key": "param.txid"
+                  },
+                  "desc": "Subscription already reserved for this transaction: idempotent success."
+                },
+                {
+                  "ruleId": "IR-FO-RESERVE-002",
+                  "errCode": "62004",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.amount"
+                  },
+                  "desc": "Subscription amount must be positive."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "FundOrder.ConfirmFundSubscriptionPayment",
+              "rules": [
+                {
+                  "ruleId": "IR-FO-COMMIT-001",
+                  "errCode": "62008",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "map-contains",
+                    "map": "reservedSubscriptions",
+                    "key": "param.txid"
+                  },
+                  "desc": "Prepared subscription cannot be found or already committed."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "FundOrder.RecordTAShareConfirmation",
+              "rules": [
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-FO-TA-CONFIRM-001",
+                  "errCode": "62011",
+                  "from": [
+                    "PAYMENT_SETTLED"
+                  ],
+                  "toStatus": "SHARES_CONFIRMED",
+                  "desc": "TA share confirmation is accepted only after payment settlement. Duplicate terminal confirmations are rejected, not treated as idempotent success.",
+                  "note": "Only PAYMENT_SETTLED may transition to SHARES_CONFIRMED; terminal duplicates reject with 62011."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "SipPlan.CreateSipPlan",
+              "rules": [
+                {
+                  "ruleId": "IR-SIP-CREATE-001",
+                  "errCode": "63001",
+                  "onFail": "reject",
+                  "when": {
+                    "form": "money-positive",
+                    "amount": "param.deductionAmount"
+                  },
+                  "desc": "SIP per-installment deduction amount must be positive."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "SipPlan.TriggerSipInstallment",
+              "rules": [
+                {
+                  "ruleId": "IR-SIP-TRIGGER-001",
+                  "errCode": "63002",
+                  "onFail": "succeed-empty",
+                  "when": {
+                    "form": "map-absent",
+                    "map": "installmentLedger",
+                    "key": "param.operationId"
+                  },
+                  "desc": "SIP installment already triggered for this cycle OperationId: idempotent success."
+                },
+                {
+                  "kind": "statusTransition",
+                  "ref": "IR-SIP-TRIGGER-002",
+                  "errCode": "63003",
+                  "from": [
+                    "ACTIVE"
+                  ],
+                  "toStatus": "ACTIVE",
+                  "desc": "Only ACTIVE SIP plans may trigger a new operation; the preceding duplicate-operation guard declares empty success first.",
+                  "note": "Require ACTIVE for a new operation after the duplicate-operation empty-success check."
+                }
+              ],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "SipPlan.RecordSipInstallmentSucceeded",
+              "rules": [],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "SipPlan.RecordSipInstallmentFailed",
+              "rules": [],
+              "source": "existing slice declaration; not runtime verification"
+            },
+            {
+              "commandRef": "SipPlan.PauseSipPlan",
+              "rules": [],
+              "source": "existing slice declaration; not runtime verification"
+            }
+          ],
+          "notes": [
+            {
+              "topic": "Product minimum",
+              "source": "Existing money-positive guard form",
+              "note": "A descriptive minimum-threshold phrase is not evidence of a minimum-value rule."
+            },
+            {
+              "topic": "Read model semantics",
+              "source": "Proposal",
+              "note": "State status can be derived from event meaning; no event status field is invented."
+            },
+            {
+              "topic": "Request retention",
+              "source": "Current original-tree fold snapshot",
+              "note": "References only include state fields present at capture; omitted direct mappings are surfaced as gaps."
+            },
+            {
+              "topic": "SIP terminal integrity",
+              "source": "Existing cycle ledger and guards plus proposal",
+              "note": "No claimed counts, consistency or paused-state guard unless actually declared."
+            }
+          ],
+          "edges": [
+            {
+              "from": "traceability.wealth",
+              "to": "ux.skeleton",
+              "label": "UI arguments and read content must trace to declared contracts",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "traceability.wealth",
+              "to": "decision.settlement-refund",
+              "label": "financial and refund gaps require decisions",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "traceability.wealth",
+              "to": "decision.sip-integrity",
+              "label": "terminal/calendar/identity gaps require decisions",
+              "status": "demo-proposal"
+            }
+          ]
+        }
+      }
+    },
+    "links": []
+  }

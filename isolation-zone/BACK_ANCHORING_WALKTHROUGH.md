@@ -1,45 +1,30 @@
-# 隔离区手写迭代与知识回锚（Back-Anchoring）实操记录
+# 隔离区与知识回锚：历史示例及下一阶段验证要求
 
-## 1. 触发场景：AI Agent 在手写隔离区发现领域规则缺口
-在实现 `FundOrderIsolationAdapter.scala` 的过程中，AI Agent 接收到产品侧补充要求：
-> “基金申购存在最低起购金额校验（且严禁0元或负数申购），如果在 `Prepare` 阶段不拦截，会导致核心账户 `CreditBalance` 白白执行一次冻结再走 TCC `Compensate`。”
+## 当前状态
 
-## 2. 错误做法（破坏真源唯一性）
-在 `FundOrderIsolationAdapter.encodeCommand` 手写代码中私自加上：
-```scala
-if (amount.minorUnits <= 0) throw new IllegalArgumentException("62004: invalid amount")
-```
-这会导致业务规则漂移（Truth Drift）：AST 与 `tree/` 真源不知道 `62004` 错误码的存在，前端 `use-cases.yaml` 也无法感知该前置条件。
+这里的两个 Scala 文件是随原示例导入的说明性材料。本批保持其原字节，不把文件头的 “Generated” 当作已复验生成证据，也没有编译或运行它们。`FundOrderGeneratedContract.scala` 只有协议与 Port 声明，没有注释所称的 guard/fold 内核；`fixture.types` 等依赖不在本仓库完整提供。
 
-## 3. 正确做法：通过 `sourceMap` 逆向回锚（Back-Anchoring）到 `tree/`
-AI Agent 检索 `compiled/saga-ir.json` 的 `sourceMap`，定位到 `FundOrder` 聚合的真源文件，按以下 4 步回锚：
+`compiled/saga-ir.json`、`compiled/execution-ir.json` 同样保持原字节。它们描述 contract-only；本次真源修改后没有重生成，部分位置映射原本也已陈旧。Saga 的 supplied sourceMap 只有 Saga 与 bindings 根项，不能用它声称定位了 FundOrder 聚合规则。
 
-1. **回锚至 `tree/inbox/eventStorming/question-es-is-minimum-subscription-amount-enforced-in-aggregate-4.yaml`**：
-   记录问题决议：在 `FundOrder` 聚合内通过 `IR-FO-RESERVE-002`（错误码 `62004`）拦截。
-2. **回锚至 `tree/aggregates/fund-order/aggregate.yaml`**：
-   在 `aggregateRuleRefs` 中注册：
-   ```yaml
-   {
-     "ruleId": "IR-FO-RESERVE-002",
-     "errCode": "62004",
-     "desc": "Subscription amount must be positive and meet fund minimum threshold (back-anchored rule)."
-   }
-   ```
-3. **回锚至 `tree/aggregates/fund-order/slices/reserve-fund-subscription.slice.yaml`**：
-   在 `guards` 中声明结构化守卫：
-   ```yaml
-   {
-     "ruleId": "IR-FO-RESERVE-002",
-     "errCode": "62004",
-     "onFail": "reject",
-     "when": {
-       "form": "money-positive",
-       "amount": "param.amount"
-     },
-     "desc": "Subscription amount must be positive."
-   }
-   ```
-4. **回锚至 `tree/use-cases.yaml`**：
-   将 `IR-FO-RESERVE-002` (`62004`) 绑定到 `PurchaseFund` 用例的 `preconditions`。
-5. **重新编译生成 AST 与新 Digest**：
-   编译器重新导出 `compiled/saga-ir.json`，更新脚手架守卫内核，保持手写隔离区 100% 纯粹（仅负责协议编解码与端口适配）。
+## 规则缺口的正确分类
+
+原实录把“金额为正”和“满足基金最低起购额”混为同一条件。实际 `money-positive` 只表达前者；本批修正了规范描述，并把产品最低额、有效版本、币种和第一/后续购买等条件保留为待设计能力。
+
+同理，“TA 拒绝后应退款”是领域需求，不是 Codec 解析细节；“连续三次余额不足自动暂停”也需要顺序、计数、清零与终态一致性知识。不能在 Adapter 私加业务分支，再把真源未表达的行为称为完成。
+
+## 可验证的后续回锚流程
+
+1. 从观察到的代码行为或失败场景提出具体知识变更，保留证据和来源。
+2. 分类：协议编解码细节留 Adapter；领域不变量回到领域 atom；用户文案/恢复动作回到体验提议；跨边界能力进入契约/决策债。
+3. 查找稳定知识身份与真实来源映射。若生成器没有该层映射，明确提出能力缺口，不伪造 sourceMap 行号。
+4. 人工裁决并修改唯一真源；公共格式新增键先通过保真、验证及消费者三层设计。
+5. 使用同一工具版本重新编译/生成，在明确的目标目录遵守生成与手写领地；保护隔离区，检查一对多代码落点。
+6. 运行新增场景/回归/恢复验证，确认代码使用新规则；留下工具指纹、输入/产物 digest、锚点和结果。
+
+当前本地图投影记录的是便签文件和 JSON payload 指针，它是知识浏览来源，不是编译器生成的一对多代码认证。
+
+## Digest 的范围
+
+Saga digest 主要覆盖 Saga 编译契约，不自动覆盖所有 aggregate guard、体验文案或 Inbox。修改起购额规则不一定改变 Saga digest。真正的 provenance 应分别记录输入树、领域产物、编排契约、绑定、生成器和代码锚的覆盖关系，不能用一个 digest 代替全链路一致性证明。
+
+本批只验收真源侧与图投影；完整代码回锚按 [运行/生成侧移交](../docs/HANDOFF.md) 推进。

@@ -1,0 +1,54 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: event
+name: FundPurchaseRequested
+origin:
+  stage: eventStorming
+  board: board1
+  seq: 5
+payload:
+  {
+    "type": "event",
+    "name": "FundPurchaseRequested",
+    "stage": "eventStorming",
+    "description": "Investor submits a mutual fund subscription order.",
+    "info": {
+      "timeline": "FundSubscription",
+      "sequence": 5,
+      "step": 0,
+      "pivotal": true
+    },
+    "links": [],
+    "author": "facilitator",
+    "createdAt": "2026-10-24",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "aggregates/fund-order/notes/event-es-fund-purchase-requested-0.yaml",
+      "atom": {
+        "kind": "note",
+        "type": "event",
+        "name": "FundPurchaseRequested",
+        "origin": {
+          "stage": "eventStorming",
+          "board": "board1",
+          "seq": 5
+        },
+        "payload": {
+          "type": "event",
+          "name": "FundPurchaseRequested",
+          "stage": "eventStorming",
+          "description": "Investor submits a mutual fund subscription order.",
+          "info": {
+            "timeline": "FundSubscription",
+            "sequence": 5,
+            "step": 0,
+            "pivotal": true
+          },
+          "links": [],
+          "author": "facilitator",
+          "createdAt": "2026-10-24"
+        }
+      }
+    }
+  }

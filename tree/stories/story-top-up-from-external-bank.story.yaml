@@ -1,0 +1,49 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: story
+name: TopUpFromExternalBank
+seq: 0
+payload:
+  {
+    "name": "TopUpFromExternalBank",
+    "role": "Investor",
+    "aggregate": "CreditBalance",
+    "goal": "Request funding of my core account from an external bank and inspect the declared transfer evidence.",
+    "soThat": "The desired cross-bank funding flow is traceable to its request and TCC confirmation facts; end-to-end safety and runtime reconciliation are not certified by this story.",
+    "slices": {
+      "command": "StartExternalTopUp",
+      "events": [
+        "ExternalTopUpRequested",
+        "ExternalDebitCommitted",
+        "CommitIncomingCreditsConfirmed"
+      ],
+      "readModels": []
+    },
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "stories/top-up-from-external-bank.story.yaml",
+      "atom": {
+        "kind": "story",
+        "name": "TopUpFromExternalBank",
+        "seq": 0,
+        "payload": {
+          "name": "TopUpFromExternalBank",
+          "role": "Investor",
+          "aggregate": "CreditBalance",
+          "goal": "Transfer money from an external bank card into my core bank account with strict TCC reconciliation.",
+          "soThat": "My core account is funded safely without double-debit or lost-credit anomalies.",
+          "slices": {
+            "command": "StartExternalTopUp",
+            "events": [
+              "ExternalTopUpRequested",
+              "ExternalDebitCommitted",
+              "CommitIncomingCreditsConfirmed"
+            ],
+            "readModels": [
+              "InvestorWealthOverview"
+            ]
+          }
+        }
+      }
+    }
+  }

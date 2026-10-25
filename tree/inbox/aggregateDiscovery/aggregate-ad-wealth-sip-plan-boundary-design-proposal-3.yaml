@@ -1,0 +1,179 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: aggregate
+name: WealthSipPlanBoundaryDesignProposal
+origin:
+  stage: aggregateDiscovery
+  board: wealth-source-design-v1
+  seq: 3
+payload:
+  {
+    "type": "aggregate",
+    "name": "WealthSipPlanBoundaryDesignProposal",
+    "stage": "aggregateDiscovery",
+    "description": "Own the retained plan configuration, status and operation-keyed cycle ledger inside the fund context, not a fourth context.",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "aggregate-boundary.sip-plan",
+        "category": "aggregate-boundary",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "aggregate",
+            "id": "SipPlan"
+          },
+          {
+            "kind": "artifact",
+            "id": "context.fund"
+          },
+          {
+            "kind": "artifact",
+            "id": "subdomain.fund"
+          },
+          {
+            "kind": "artifact",
+            "id": "traceability.wealth"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.sip-integrity"
+          }
+        ],
+        "body": {
+          "canonicalAggregate": "SipPlan",
+          "proposedContextId": "context.fund",
+          "proposedSubdomainId": "subdomain.fund",
+          "responsibility": "Own the retained plan configuration, status and operation-keyed cycle ledger inside the fund context, not a fourth context.",
+          "existingContract": {
+            "identifier": {
+              "name": "planId",
+              "dataType": "SipPlanId",
+              "origin": "BUSINESS_INPUT"
+            },
+            "stateFields": [
+              {
+                "name": "status",
+                "dataType": "String"
+              },
+              {
+                "name": "investorAccountId",
+                "dataType": "AccountId"
+              },
+              {
+                "name": "externalOrderId",
+                "dataType": "ExternalOrderId"
+              },
+              {
+                "name": "fundCode",
+                "dataType": "String"
+              },
+              {
+                "name": "cronExpr",
+                "dataType": "String"
+              },
+              {
+                "name": "deductionAmount",
+                "dataType": "Money"
+              },
+              {
+                "name": "installmentLedger",
+                "dataType": "Map[OperationId, String]"
+              }
+            ],
+            "commands": [
+              "CreateSipPlan",
+              "TriggerSipInstallment",
+              "RecordSipInstallmentSucceeded",
+              "RecordSipInstallmentFailed",
+              "PauseSipPlan"
+            ],
+            "events": [
+              "SipPlanCreated",
+              "SipInstallmentTriggered",
+              "SipInstallmentSucceeded",
+              "SipInstallmentFailed",
+              "SipPlanPaused"
+            ],
+            "guardRules": [
+              {
+                "command": "CreateSipPlan",
+                "ruleId": "IR-SIP-CREATE-001",
+                "errCode": "63001",
+                "onFail": "reject",
+                "when": {
+                  "form": "money-positive",
+                  "amount": "param.deductionAmount"
+                },
+                "desc": "SIP per-installment deduction amount must be positive."
+              },
+              {
+                "command": "TriggerSipInstallment",
+                "ruleId": "IR-SIP-TRIGGER-001",
+                "errCode": "63002",
+                "onFail": "succeed-empty",
+                "when": {
+                  "form": "map-absent",
+                  "map": "installmentLedger",
+                  "key": "param.operationId"
+                },
+                "desc": "SIP installment already triggered for this cycle OperationId: idempotent success."
+              },
+              {
+                "command": "TriggerSipInstallment",
+                "kind": "statusTransition",
+                "ref": "IR-SIP-TRIGGER-002",
+                "errCode": "63003",
+                "from": [
+                  "ACTIVE"
+                ],
+                "toStatus": "ACTIVE",
+                "desc": "Only ACTIVE SIP plans may trigger a new operation; the preceding duplicate-operation guard declares empty success first.",
+                "note": "Require ACTIVE for a new operation after the duplicate-operation empty-success check."
+              }
+            ],
+            "observation": "Snapshot of original tree declarations, not verified runnable behavior."
+          },
+          "proposedInvariants": [
+            "Existing TriggerSipInstallment map-absent guard suppresses a repeated operationId only.",
+            "Plan identity, configured amount, paused status and contradictory terminal outcomes need explicit review."
+          ],
+          "pending": [
+            "Success/failure counts and consecutive-failure policy semantics remain undecided.",
+            "Cron/calendar/cutoff/catch-up rules are not approved UX or financial conventions."
+          ],
+          "entities": [],
+          "edges": [
+            {
+              "from": "aggregate-boundary.sip-plan",
+              "to": "context.fund",
+              "label": "proposed ownership",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "aggregate-boundary.sip-plan",
+              "to": "subdomain.fund",
+              "label": "proposed problem-space responsibility",
+              "status": "demo-proposal"
+            }
+          ],
+          "nonClaims": [
+            "No new aggregate product",
+            "No runtime/domain guard changes",
+            "No production financial or integration certification"
+          ]
+        }
+      }
+    },
+    "links": []
+  }

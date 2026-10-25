@@ -5,7 +5,7 @@ type: role
 name: SipScheduler
 origin:
   stage: commandStorming
-  board: board1
+  board: imported-roles
   seq: 1
 payload:
   {
@@ -17,5 +17,30 @@ payload:
       "command:TriggerSipInstallment"
     ],
     "author": "facilitator",
-    "createdAt": "2026-10-24"
+    "createdAt": "2026-10-24",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "inbox/commandStorming/role-cs-sip-scheduler-1.yaml",
+      "atom": {
+        "kind": "note",
+        "type": "role",
+        "name": "SipScheduler",
+        "origin": {
+          "stage": "commandStorming",
+          "board": "board1",
+          "seq": 1
+        },
+        "payload": {
+          "type": "role",
+          "name": "SipScheduler",
+          "stage": "commandStorming",
+          "description": "Deterministic periodic timer that triggers due SIP installments with stable cycle OperationIds.",
+          "links": [
+            "command:TriggerSipInstallment"
+          ],
+          "author": "facilitator",
+          "createdAt": "2026-10-24"
+        }
+      }
+    }
   }

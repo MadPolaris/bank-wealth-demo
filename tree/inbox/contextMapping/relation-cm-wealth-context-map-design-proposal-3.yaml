@@ -1,0 +1,201 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: relation
+name: WealthContextMapDesignProposal
+origin:
+  stage: contextMapping
+  board: wealth-source-design-v1
+  seq: 3
+payload:
+  {
+    "type": "relation",
+    "name": "WealthContextMapDesignProposal",
+    "stage": "contextMapping",
+    "description": "Three proposed internal contexts and two explicit external boundaries; SIP belongs to fund, and no remote TCC capability is claimed.",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "context-map.wealth",
+        "category": "context-map",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "artifact",
+            "id": "context.ledger"
+          },
+          {
+            "kind": "artifact",
+            "id": "context.payments"
+          },
+          {
+            "kind": "artifact",
+            "id": "context.fund"
+          },
+          {
+            "kind": "artifact",
+            "id": "subdomain.ledger"
+          },
+          {
+            "kind": "artifact",
+            "id": "subdomain.payments"
+          },
+          {
+            "kind": "artifact",
+            "id": "subdomain.fund"
+          },
+          {
+            "kind": "external-system",
+            "id": "InterbankClearingGateway"
+          },
+          {
+            "kind": "external-system",
+            "id": "FundTARegistry"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.external-bank"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.settlement-refund"
+          },
+          {
+            "kind": "artifact",
+            "id": "mock-ta.registry"
+          }
+        ],
+        "body": {
+          "entities": [
+            {
+              "id": "external.bank",
+              "kind": "external-system",
+              "label": "外部银行/清算边界",
+              "status": "demo-proposal",
+              "externalSystemRef": "InterbankClearingGateway",
+              "implementation": "unverified-external-capability",
+              "mockPermission": "not authorized"
+            },
+            {
+              "id": "external.ta",
+              "kind": "external-system",
+              "label": "基金TA边界",
+              "status": "demo-proposal",
+              "externalSystemRef": "FundTARegistry",
+              "implementation": "external-contract-declared",
+              "mockPermission": "MockTA proposal permitted"
+            }
+          ],
+          "nodes": [
+            {
+              "id": "context.ledger",
+              "kind": "context",
+              "label": "账户记账",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "context.payments",
+              "kind": "context",
+              "label": "支付与外部银行指令",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "context.fund",
+              "kind": "context",
+              "label": "基金申购与定投",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "external.bank",
+              "kind": "external-system",
+              "label": "外部银行/清算边界",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "external.ta",
+              "kind": "external-system",
+              "label": "基金TA边界",
+              "status": "demo-proposal"
+            }
+          ],
+          "edges": [
+            {
+              "from": "context.payments",
+              "to": "external.bank",
+              "label": "proposed anti-corruption boundary: capability and reconciliation pending",
+              "status": "demo-proposal",
+              "relationship": "ACL proposal",
+              "decisionId": "decision.external-bank",
+              "remoteTccClaim": false
+            },
+            {
+              "from": "context.payments",
+              "to": "context.ledger",
+              "label": "proposed correlated incoming-credit contract",
+              "status": "demo-proposal",
+              "relationship": "local contract proposal"
+            },
+            {
+              "from": "context.fund",
+              "to": "context.ledger",
+              "label": "proposed local fund payment/reservation contract",
+              "status": "demo-proposal",
+              "relationship": "local contract proposal"
+            },
+            {
+              "from": "context.fund",
+              "to": "external.ta",
+              "label": "proposed asynchronous submission/confirmation boundary",
+              "status": "demo-proposal",
+              "relationship": "ACL proposal",
+              "decisionId": "decision.settlement-refund"
+            },
+            {
+              "from": "external.ta",
+              "to": "mock-ta.registry",
+              "label": "permitted TA fixture proposal; no real integration",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "external.bank",
+              "to": "decision.external-bank",
+              "label": "do not infer remote debit/prepare/commit behavior",
+              "status": "demo-proposal"
+            }
+          ],
+          "ownership": [
+            {
+              "contextId": "context.ledger",
+              "aggregates": [
+                "CreditBalance"
+              ]
+            },
+            {
+              "contextId": "context.payments",
+              "aggregates": [
+                "ExternalTransferOrder"
+              ]
+            },
+            {
+              "contextId": "context.fund",
+              "aggregates": [
+                "FundOrder",
+                "SipPlan"
+              ]
+            }
+          ],
+          "semantics": "Graph depicts proposed domain boundaries, not deployment, external TCC, settlement, or end-to-end implementation certification."
+        }
+      }
+    },
+    "links": []
+  }

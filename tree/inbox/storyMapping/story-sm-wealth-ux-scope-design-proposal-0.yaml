@@ -1,0 +1,486 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: story
+name: WealthUXScopeDesignProposal
+origin:
+  stage: storyMapping
+  board: wealth-source-design-v1
+  seq: 0
+payload:
+  {
+    "type": "story",
+    "name": "WealthUXScopeDesignProposal",
+    "stage": "storyMapping",
+    "description": "Activity/task/release scope proposal traces existing three stories to source preview now, TA mock runtime later and explicitly deferred real external integration.",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "ux.scope",
+        "category": "ux-scope",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "story",
+            "id": "TopUpFromExternalBank"
+          },
+          {
+            "kind": "story",
+            "id": "PurchaseFund"
+          },
+          {
+            "kind": "story",
+            "id": "CreateAndRunSipPlan"
+          },
+          {
+            "kind": "entity",
+            "id": "activity.prepare"
+          },
+          {
+            "kind": "entity",
+            "id": "activity.fund"
+          },
+          {
+            "kind": "entity",
+            "id": "activity.plan"
+          },
+          {
+            "kind": "entity",
+            "id": "activity.observe"
+          },
+          {
+            "kind": "entity",
+            "id": "task.preview-top-up"
+          },
+          {
+            "kind": "entity",
+            "id": "task.preview-purchase"
+          },
+          {
+            "kind": "entity",
+            "id": "task.preview-sip"
+          },
+          {
+            "kind": "entity",
+            "id": "task.preview-status"
+          },
+          {
+            "kind": "entity",
+            "id": "task.mock-ta"
+          },
+          {
+            "kind": "entity",
+            "id": "task.mock-sip-ta"
+          },
+          {
+            "kind": "entity",
+            "id": "task.real-bank"
+          },
+          {
+            "kind": "entity",
+            "id": "task.real-ta"
+          },
+          {
+            "kind": "entity",
+            "id": "release.truth-preview"
+          },
+          {
+            "kind": "entity",
+            "id": "release.mock-runtime"
+          },
+          {
+            "kind": "entity",
+            "id": "release.external-integration"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.strategy"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.structure"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.skeleton"
+          },
+          {
+            "kind": "artifact",
+            "id": "mock-ta.registry"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.external-bank"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.settlement-refund"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.sip-integrity"
+          }
+        ],
+        "body": {
+          "entities": [
+            {
+              "id": "activity.prepare",
+              "kind": "activity",
+              "label": "查看账户与资金来源",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "activity.fund",
+              "kind": "activity",
+              "label": "发起充值或申购",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "activity.plan",
+              "kind": "activity",
+              "label": "配置定投",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "activity.observe",
+              "kind": "activity",
+              "label": "查看证据与异常",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "task.preview-top-up",
+              "kind": "task",
+              "label": "选择资金来源并提交充值申请",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "task.preview-purchase",
+              "kind": "task",
+              "label": "选择基金、填写金额并确认申购",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "task.preview-sip",
+              "kind": "task",
+              "label": "设置基金、金额和周期并创建定投计划",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "task.preview-status",
+              "kind": "task",
+              "label": "查看申购进度与异常处理说明",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "task.mock-ta",
+              "kind": "task",
+              "label": "等待份额确认或跟踪拒绝后的退款进度",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "task.mock-sip-ta",
+              "kind": "task",
+              "label": "查看各期扣款、申购和确认结果",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "task.real-bank",
+              "kind": "task",
+              "label": "查询外部入金的最终结果并处理异常",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "task.real-ta",
+              "kind": "task",
+              "label": "查询基金拒绝后的退款到账结果",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "release.truth-preview",
+              "kind": "release",
+              "label": "现在：真源设计预览",
+              "status": "demo-proposal",
+              "phase": "now",
+              "implementation": "source-side proposal only"
+            },
+            {
+              "id": "release.mock-runtime",
+              "kind": "release",
+              "label": "后续：获准TA模拟运行",
+              "status": "demo-proposal",
+              "phase": "later",
+              "implementation": "missing",
+              "note": "Only TA mock permitted; no bank mock authorized."
+            },
+            {
+              "id": "release.external-integration",
+              "kind": "release",
+              "label": "延后：真实外部集成",
+              "status": "demo-proposal",
+              "phase": "deferred",
+              "implementation": "missing",
+              "note": "Requires explicit capability evidence and approval."
+            }
+          ],
+          "backbone": [
+            "activity.prepare",
+            "activity.fund",
+            "activity.plan",
+            "activity.observe"
+          ],
+          "activities": [
+            {
+              "id": "activity.prepare",
+              "kind": "activity",
+              "label": "查看账户与资金来源"
+            },
+            {
+              "id": "activity.fund",
+              "kind": "activity",
+              "label": "发起充值或申购"
+            },
+            {
+              "id": "activity.plan",
+              "kind": "activity",
+              "label": "配置定投"
+            },
+            {
+              "id": "activity.observe",
+              "kind": "activity",
+              "label": "查看证据与异常"
+            }
+          ],
+          "tasks": [
+            {
+              "id": "task.preview-top-up",
+              "label": "选择资金来源并提交充值申请",
+              "activityId": "activity.prepare",
+              "storyRef": "TopUpFromExternalBank",
+              "releaseId": "release.truth-preview",
+              "status": "demo-proposal",
+              "implementation": "proposal-source-only"
+            },
+            {
+              "id": "task.preview-purchase",
+              "label": "选择基金、填写金额并确认申购",
+              "activityId": "activity.fund",
+              "storyRef": "PurchaseFund",
+              "releaseId": "release.truth-preview",
+              "status": "demo-proposal",
+              "implementation": "proposal-source-only"
+            },
+            {
+              "id": "task.preview-sip",
+              "label": "设置基金、金额和周期并创建定投计划",
+              "activityId": "activity.plan",
+              "storyRef": "CreateAndRunSipPlan",
+              "releaseId": "release.truth-preview",
+              "status": "demo-proposal",
+              "implementation": "proposal-source-only"
+            },
+            {
+              "id": "task.preview-status",
+              "label": "查看申购进度与异常处理说明",
+              "activityId": "activity.observe",
+              "storyRef": "PurchaseFund",
+              "releaseId": "release.truth-preview",
+              "status": "demo-proposal",
+              "implementation": "proposal-source-only"
+            },
+            {
+              "id": "task.mock-ta",
+              "label": "等待份额确认或跟踪拒绝后的退款进度",
+              "activityId": "activity.observe",
+              "storyRef": "PurchaseFund",
+              "releaseId": "release.mock-runtime",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "task.mock-sip-ta",
+              "label": "查看各期扣款、申购和确认结果",
+              "activityId": "activity.observe",
+              "storyRef": "CreateAndRunSipPlan",
+              "releaseId": "release.mock-runtime",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "task.real-bank",
+              "label": "查询外部入金的最终结果并处理异常",
+              "activityId": "activity.fund",
+              "storyRef": "TopUpFromExternalBank",
+              "releaseId": "release.external-integration",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            },
+            {
+              "id": "task.real-ta",
+              "label": "查询基金拒绝后的退款到账结果",
+              "activityId": "activity.observe",
+              "storyRef": "PurchaseFund",
+              "releaseId": "release.mock-runtime",
+              "status": "demo-proposal",
+              "implementation": "missing"
+            }
+          ],
+          "releases": [
+            {
+              "id": "release.truth-preview",
+              "kind": "release",
+              "label": "现在：真源设计预览",
+              "status": "demo-proposal",
+              "phase": "now",
+              "implementation": "source-side proposal only"
+            },
+            {
+              "id": "release.mock-runtime",
+              "kind": "release",
+              "label": "后续：获准TA模拟运行",
+              "status": "demo-proposal",
+              "phase": "later",
+              "implementation": "missing",
+              "note": "Only TA mock permitted; no bank mock authorized."
+            },
+            {
+              "id": "release.external-integration",
+              "kind": "release",
+              "label": "延后：真实外部集成",
+              "status": "demo-proposal",
+              "phase": "deferred",
+              "implementation": "missing",
+              "note": "Requires explicit capability evidence and approval."
+            }
+          ],
+          "edges": [
+            {
+              "from": "activity.prepare",
+              "to": "task.preview-top-up",
+              "label": "proposed story-map task",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "activity.fund",
+              "to": "task.preview-purchase",
+              "label": "proposed story-map task",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "activity.plan",
+              "to": "task.preview-sip",
+              "label": "proposed story-map task",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "activity.observe",
+              "to": "task.preview-status",
+              "label": "proposed story-map task",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "activity.observe",
+              "to": "task.mock-ta",
+              "label": "proposed story-map task",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "activity.observe",
+              "to": "task.mock-sip-ta",
+              "label": "proposed story-map task",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "activity.fund",
+              "to": "task.real-bank",
+              "label": "proposed story-map task",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "activity.observe",
+              "to": "task.real-ta",
+              "label": "proposed story-map task",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "task.preview-top-up",
+              "to": "release.truth-preview",
+              "label": "proposed release allocation",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "task.preview-purchase",
+              "to": "release.truth-preview",
+              "label": "proposed release allocation",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "task.preview-sip",
+              "to": "release.truth-preview",
+              "label": "proposed release allocation",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "task.preview-status",
+              "to": "release.truth-preview",
+              "label": "proposed release allocation",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "task.mock-ta",
+              "to": "release.mock-runtime",
+              "label": "proposed release allocation",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "task.mock-sip-ta",
+              "to": "release.mock-runtime",
+              "label": "proposed release allocation",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "task.real-bank",
+              "to": "release.external-integration",
+              "label": "proposed release allocation",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "task.real-ta",
+              "to": "release.mock-runtime",
+              "label": "proposed release allocation",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "release.mock-runtime",
+              "to": "mock-ta.registry",
+              "label": "TA-only permitted mock, not an implemented runtime",
+              "status": "demo-proposal"
+            },
+            {
+              "from": "release.external-integration",
+              "to": "decision.external-bank",
+              "label": "external integration deferred pending approval/capability",
+              "status": "demo-proposal"
+            }
+          ],
+          "scopeLimits": [
+            "Activity/task labels express customer goals, not agent implementation tasks. Release allocation is a proposed delivery sequence; source preview implements no customer UI.",
+            "Mock runtime must cover rejection/refund tracking; real fund-company integration is not required for the demo.",
+            "User approved source-side scope and MockTA permission only.",
+            "No UX, product, minimum, rounding, fee, calendar or financial convention approval inferred.",
+            "No external bank mock included.",
+            "No automatic-three-failure policy duplicated."
+          ]
+        }
+      }
+    },
+    "links": []
+  }

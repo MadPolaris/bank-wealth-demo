@@ -26,8 +26,106 @@ payload:
     "produces": [
       "FundSharesConfirmed"
     ],
-    "guards": [],
-    "description": "Record T+1 confirmed fund shares emitted by the TA settlement child run."
+    "guards": [
+      {
+        "kind": "statusTransition",
+        "ref": "IR-FO-TA-CONFIRM-001",
+        "errCode": "62011",
+        "from": [
+          "PAYMENT_SETTLED"
+        ],
+        "toStatus": "SHARES_CONFIRMED",
+        "desc": "TA share confirmation is accepted only after payment settlement. Duplicate terminal confirmations are rejected, not treated as idempotent success.",
+        "note": "Only PAYMENT_SETTLED may transition to SHARES_CONFIRMED; terminal duplicates reject with 62011."
+      }
+    ],
+    "description": "Declare the recording of TA-confirmed shares only from PAYMENT_SETTLED to SHARES_CONFIRMED. An already SHARES_CONFIRMED order rejects a duplicate with 62011; this state gate does not establish runtime idempotence or complete TA integration.",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "aggregates/fund-order/slices/record-ta-share-confirmation.slice.yaml",
+      "atom": {
+        "kind": "slice",
+        "aggregate": "FundOrder",
+        "command": "RecordTAShareConfirmation",
+        "payload": {
+          "name": "RecordTAShareConfirmation",
+          "parameters": [
+            {
+              "name": "operationId",
+              "dataType": "OperationId",
+              "origin": "BUSINESS_INPUT"
+            },
+            {
+              "name": "fundOrderId",
+              "dataType": "FundOrderId",
+              "origin": "BUSINESS_INPUT"
+            },
+            {
+              "name": "shares",
+              "dataType": "FundShare",
+              "origin": "BUSINESS_INPUT"
+            }
+          ],
+          "produces": [
+            "FundSharesConfirmed"
+          ],
+          "guards": [],
+          "description": "Record T+1 confirmed fund shares emitted by the TA settlement child run."
+        },
+        "events": {
+          "FundSharesConfirmed": {
+            "name": "FundSharesConfirmed",
+            "payloads": [
+              {
+                "name": "operationId",
+                "dataType": "OperationId",
+                "origin": "PROPAGATED",
+                "lineageHint": "RecordTAShareConfirmation.operationId"
+              },
+              {
+                "name": "fundOrderId",
+                "dataType": "FundOrderId",
+                "origin": "PROPAGATED",
+                "lineageHint": "RecordTAShareConfirmation.fundOrderId"
+              },
+              {
+                "name": "shares",
+                "dataType": "FundShare",
+                "origin": "PROPAGATED",
+                "lineageHint": "RecordTAShareConfirmation.shares"
+              }
+            ],
+            "description": "Durable fact: T+1 fund shares confirmed by TA Registry.",
+            "bindings": [
+              {
+                "slot": "operationId",
+                "expr": "param.operationId"
+              },
+              {
+                "slot": "fundOrderId",
+                "expr": "param.fundOrderId"
+              },
+              {
+                "slot": "shares",
+                "expr": "param.shares"
+              }
+            ],
+            "foldAssignments": [
+              {
+                "slot": "confirmedShareLots",
+                "op": "put",
+                "key": "event.operationId",
+                "value": "event.shares"
+              },
+              {
+                "slot": "status",
+                "expr": "literal:SHARES_CONFIRMED"
+              }
+            ]
+          }
+        }
+      }
+    }
   }
 events:
   {

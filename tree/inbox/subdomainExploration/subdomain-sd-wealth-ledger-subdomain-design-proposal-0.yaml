@@ -1,0 +1,67 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: subdomain
+name: WealthLedgerSubdomainDesignProposal
+origin:
+  stage: subdomainExploration
+  board: wealth-source-design-v1
+  seq: 0
+payload:
+  {
+    "type": "subdomain",
+    "name": "WealthLedgerSubdomainDesignProposal",
+    "stage": "subdomainExploration",
+    "description": "Proposed 账户记账 responsibility and aggregate ownership based on the imported draft.",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "subdomain.ledger",
+        "category": "subdomain",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "aggregate",
+            "id": "CreditBalance"
+          },
+          {
+            "kind": "artifact",
+            "id": "context.ledger"
+          },
+          {
+            "kind": "artifact",
+            "id": "aggregate-boundary.credit-balance"
+          }
+        ],
+        "body": {
+          "label": "账户记账",
+          "purpose": "Local account money and ledger phase evidence.",
+          "classification": "supporting-domain proposal; classification requires review",
+          "aggregates": [
+            "CreditBalance"
+          ],
+          "contextId": "context.ledger",
+          "entities": [],
+          "edges": [
+            {
+              "from": "subdomain.ledger",
+              "to": "context.ledger",
+              "label": "proposal: context realizes this subdomain",
+              "status": "demo-proposal"
+            }
+          ],
+          "scope": "Source-side proposal only; classification and financial conventions not approved."
+        }
+      }
+    },
+    "links": []
+  }

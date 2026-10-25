@@ -1,0 +1,74 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: context
+name: WealthPaymentsContextDesignProposal
+origin:
+  stage: contextMapping
+  board: wealth-source-design-v1
+  seq: 1
+payload:
+  {
+    "type": "context",
+    "name": "WealthPaymentsContextDesignProposal",
+    "stage": "contextMapping",
+    "description": "Proposed 支付与外部银行指令 bounded context; local ownership does not extend to an external system.",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "context.payments",
+        "category": "context",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "bankwealth source-side; MockTA permitted",
+          "basis": "agent-assisted design proposal based on imported draft; no real workshop held/claimed",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "aggregate",
+            "id": "ExternalTransferOrder"
+          },
+          {
+            "kind": "artifact",
+            "id": "subdomain.payments"
+          },
+          {
+            "kind": "artifact",
+            "id": "context-map.wealth"
+          },
+          {
+            "kind": "artifact",
+            "id": "aggregate-boundary.external-transfer-order"
+          }
+        ],
+        "body": {
+          "label": "支付与外部银行指令",
+          "aggregates": [
+            "ExternalTransferOrder"
+          ],
+          "subdomainId": "subdomain.payments",
+          "owns": "Local cross-bank instruction, correlation and reconciliation boundary.",
+          "contractBoundary": "Proposed logical ownership, not separate deployment/service/transaction guarantees.",
+          "entities": [],
+          "edges": [
+            {
+              "from": "context.payments",
+              "to": "subdomain.payments",
+              "label": "proposed problem-space mapping",
+              "status": "demo-proposal"
+            }
+          ],
+          "nonGoals": [
+            "Owning external bank ledger",
+            "Claiming certified remote TCC"
+          ]
+        }
+      }
+    },
+    "links": []
+  }

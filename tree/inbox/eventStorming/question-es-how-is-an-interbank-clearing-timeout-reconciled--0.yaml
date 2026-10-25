@@ -1,0 +1,48 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: question
+name: "How is an interbank clearing timeout reconciled?"
+origin:
+  stage: eventStorming
+  board: imported-hotspots
+  seq: 0
+payload:
+  {
+    "type": "question",
+    "name": "How is an interbank clearing timeout reconciled?",
+    "stage": "eventStorming",
+    "description": "When an external bank debit returns timeout/unknown during Prepare or Commit, never auto-compensate or treat timeout as business rejection. Freeze TxId and args, persist CommitDecision before Commit, and reconcile via read-only participant query before resuming or entering manual recovery (recovery-required).",
+    "links": [
+      "event:ExternalDebitPrepared",
+      "event:CommitIncomingCreditsConfirmed"
+    ],
+    "author": "domain-expert",
+    "createdAt": "2026-10-24",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "inbox/eventStorming/question-es-how-is-interbank-clearing-timeout-reconciled-0.yaml",
+      "atom": {
+        "kind": "note",
+        "type": "question",
+        "name": "How is an interbank clearing timeout reconciled?",
+        "origin": {
+          "stage": "eventStorming",
+          "board": "board1",
+          "seq": 0
+        },
+        "payload": {
+          "type": "question",
+          "name": "How is an interbank clearing timeout reconciled?",
+          "stage": "eventStorming",
+          "description": "When an external bank debit returns timeout/unknown during Prepare or Commit, never auto-compensate or treat timeout as business rejection. Freeze TxId and args, persist CommitDecision before Commit, and reconcile via read-only participant query before resuming or entering manual recovery (recovery-required).",
+          "links": [
+            "event:ExternalDebitPrepared",
+            "event:IncomingCreditsCommitted"
+          ],
+          "author": "domain-expert",
+          "createdAt": "2026-10-24"
+        }
+      }
+    }
+  }

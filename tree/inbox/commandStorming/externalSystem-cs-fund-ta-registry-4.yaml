@@ -5,7 +5,7 @@ type: externalSystem
 name: FundTARegistry
 origin:
   stage: commandStorming
-  board: board1
+  board: imported-external-systems
   seq: 4
 payload:
   {
@@ -17,5 +17,30 @@ payload:
       "event:FundSharesConfirmed"
     ],
     "author": "facilitator",
-    "createdAt": "2026-10-24"
+    "createdAt": "2026-10-24",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "inbox/commandStorming/externalSystem-cs-fund-ta-registry-4.yaml",
+      "atom": {
+        "kind": "note",
+        "type": "externalSystem",
+        "name": "FundTARegistry",
+        "origin": {
+          "stage": "commandStorming",
+          "board": "board1",
+          "seq": 4
+        },
+        "payload": {
+          "type": "externalSystem",
+          "name": "FundTARegistry",
+          "stage": "commandStorming",
+          "description": "External Fund Transfer Agent (TA) system that calculates T+1 NAV and confirms allotted fund shares.",
+          "links": [
+            "event:FundSharesConfirmed"
+          ],
+          "author": "facilitator",
+          "createdAt": "2026-10-24"
+        }
+      }
+    }
   }

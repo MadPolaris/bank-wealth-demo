@@ -53,7 +53,146 @@ payload:
         "desc": "SIP per-installment deduction amount must be positive."
       }
     ],
-    "description": "Investor creates a regular investment plan binding external bank source, core account, and target fund."
+    "description": "Investor creates a regular investment plan binding external bank source, core account, and target fund.",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "aggregates/sip-plan/slices/create-sip-plan.slice.yaml",
+      "atom": {
+        "kind": "slice",
+        "aggregate": "SipPlan",
+        "command": "CreateSipPlan",
+        "payload": {
+          "name": "CreateSipPlan",
+          "parameters": [
+            {
+              "name": "planId",
+              "dataType": "SipPlanId",
+              "origin": "BUSINESS_INPUT"
+            },
+            {
+              "name": "investorAccountId",
+              "dataType": "AccountId",
+              "origin": "BUSINESS_INPUT"
+            },
+            {
+              "name": "externalOrderId",
+              "dataType": "ExternalOrderId",
+              "origin": "BUSINESS_INPUT"
+            },
+            {
+              "name": "fundCode",
+              "dataType": "String",
+              "origin": "BUSINESS_INPUT"
+            },
+            {
+              "name": "deductionAmount",
+              "dataType": "Money",
+              "origin": "BUSINESS_INPUT"
+            },
+            {
+              "name": "cronExpr",
+              "dataType": "String",
+              "origin": "BUSINESS_INPUT"
+            }
+          ],
+          "produces": [
+            "SipPlanCreated"
+          ],
+          "guards": [
+            {
+              "ruleId": "IR-SIP-CREATE-001",
+              "errCode": "63001",
+              "onFail": "reject",
+              "when": {
+                "form": "money-positive",
+                "amount": "param.deductionAmount"
+              },
+              "desc": "SIP per-installment deduction amount must be positive."
+            }
+          ],
+          "description": "Investor creates a regular investment plan binding external bank source, core account, and target fund."
+        },
+        "events": {
+          "SipPlanCreated": {
+            "name": "SipPlanCreated",
+            "payloads": [
+              {
+                "name": "planId",
+                "dataType": "SipPlanId",
+                "origin": "PROPAGATED",
+                "lineageHint": "CreateSipPlan.planId"
+              },
+              {
+                "name": "investorAccountId",
+                "dataType": "AccountId",
+                "origin": "PROPAGATED",
+                "lineageHint": "CreateSipPlan.investorAccountId"
+              },
+              {
+                "name": "externalOrderId",
+                "dataType": "ExternalOrderId",
+                "origin": "PROPAGATED",
+                "lineageHint": "CreateSipPlan.externalOrderId"
+              },
+              {
+                "name": "fundCode",
+                "dataType": "String",
+                "origin": "PROPAGATED",
+                "lineageHint": "CreateSipPlan.fundCode"
+              },
+              {
+                "name": "deductionAmount",
+                "dataType": "Money",
+                "origin": "PROPAGATED",
+                "lineageHint": "CreateSipPlan.deductionAmount"
+              },
+              {
+                "name": "cronExpr",
+                "dataType": "String",
+                "origin": "PROPAGATED",
+                "lineageHint": "CreateSipPlan.cronExpr"
+              }
+            ],
+            "bindings": [
+              {
+                "slot": "planId",
+                "expr": "param.planId"
+              },
+              {
+                "slot": "investorAccountId",
+                "expr": "param.investorAccountId"
+              },
+              {
+                "slot": "externalOrderId",
+                "expr": "param.externalOrderId"
+              },
+              {
+                "slot": "fundCode",
+                "expr": "param.fundCode"
+              },
+              {
+                "slot": "deductionAmount",
+                "expr": "param.deductionAmount"
+              },
+              {
+                "slot": "cronExpr",
+                "expr": "param.cronExpr"
+              }
+            ],
+            "foldAssignments": [
+              {
+                "slot": "status",
+                "expr": "literal:ACTIVE"
+              },
+              {
+                "slot": "deductionAmount",
+                "expr": "param.deductionAmount"
+              }
+            ]
+          }
+        }
+      }
+    }
   }
 events:
   {
@@ -130,7 +269,23 @@ events:
         },
         {
           "slot": "deductionAmount",
-          "expr": "param.deductionAmount"
+          "expr": "event.deductionAmount"
+        },
+        {
+          "slot": "investorAccountId",
+          "expr": "event.investorAccountId"
+        },
+        {
+          "slot": "externalOrderId",
+          "expr": "event.externalOrderId"
+        },
+        {
+          "slot": "fundCode",
+          "expr": "event.fundCode"
+        },
+        {
+          "slot": "cronExpr",
+          "expr": "event.cronExpr"
         }
       ]
     }

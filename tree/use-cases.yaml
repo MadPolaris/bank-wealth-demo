@@ -6,11 +6,11 @@ payload:
     "useCases": [
       {
         "useCase": "TopUpFromExternalBank",
-        "sources": "Stage 1-5 vertical slice — cross-bank TCC collection into CreditBalance",
+        "sources": "Imported cross-bank funding description, corrected against the existing CreditBalance, ExternalTransferOrder and external-bank-transfer declarations; imported design text is not workshop evidence.",
         "preconditions": [
           {
             "aggregate": "ExternalTransferOrder",
-            "state": "external bank clearing channel active",
+            "state": "external debit amount is positive; IR-EXT-PREPARE-002 (61002) does not check clearing-channel availability",
             "invariantRef": "IR-EXT-PREPARE-002",
             "errCode": "61002"
           }
@@ -26,11 +26,23 @@ payload:
             ]
           }
         ],
-        "extensions": []
+        "extensions": [],
+        "description": "Documentary main flow and alternatives referencing existing command/event declarations; steps identify the entry command only, not an automatically executable sequence or tested end-to-end behavior.",
+        "mainFlow": [
+          "Investor submits StartExternalTopUp to CreditBalance; its declared emission is ExternalTopUpRequested.",
+          "The external-bank-transfer contract declares PrepareExternalDebit -> ExternalDebitPrepared and RecordIncomingCredits -> RecordIncomingCreditsConfirmed under one transaction identity.",
+          "After a durable commit decision, the contract declares CommitExternalDebit -> ExternalDebitCommitted and CommitIncomingCredits -> CommitIncomingCreditsConfirmed. This narrative does not certify the entry-event mapper, external clearing effects or a runnable host.",
+          "GetExternalTransferState and GetBalance are read-only evidence queries; InvestorWealthOverview has no account-balance projection."
+        ],
+        "alternatives": [
+          "Nonpositive external debit amount rejects during PrepareExternalDebit with IR-EXT-PREPARE-002 / 61002; StartExternalTopUp itself currently has no guards.",
+          "Known rejection or compensation and recovery-required/outcome-unknown are distinct contract outcomes. Timeout is not evidence of business rejection or permission to reverse a committed phase.",
+          "The contract names CompensateExternalDebit -> ExternalDebitCompensated and CancelIncomingCredit -> CancelIncomingCreditConfirmed for compensation; external effect safety and runtime recovery remain unproved here."
+        ]
       },
       {
         "useCase": "PurchaseFund",
-        "sources": "Stage 1-5 vertical slice — core account TCC deduction + T+1 TA share settlement",
+        "sources": "Imported fund-subscription description, corrected against RequestFundPurchase, the fund-subscription-pay declaration and TA confirmation slice; documentary contract references, not workshop evidence.",
         "preconditions": [
           {
             "aggregate": "CreditBalance",
@@ -40,7 +52,7 @@ payload:
           },
           {
             "aggregate": "FundOrder",
-            "state": "subscription amount meets minimum threshold",
+            "state": "subscription amount is positive; a genuine product-specific minimum is not enforced",
             "invariantRef": "IR-FO-RESERVE-002",
             "errCode": "62004"
           }
@@ -56,17 +68,36 @@ payload:
             ]
           }
         ],
-        "extensions": []
+        "extensions": [],
+        "description": "Documentary main flow and alternatives referencing existing command/event declarations; steps identify the entry command only, not an automatically executable sequence or tested end-to-end behavior.",
+        "mainFlow": [
+          "Investor submits RequestFundPurchase -> FundPurchaseRequested; the event fold retains operationId, investorAccountId, fundCode and amount on FundOrder.",
+          "The fund-subscription-pay contract declares ReserveFunds -> ReserveFundsConfirmed and ReserveFundSubscription -> ReserveFundSubscriptionConfirmed, then DeductFunds -> DeductFundsConfirmed and ConfirmFundSubscriptionPayment -> FundSubscriptionPaymentConfirmed.",
+          "The fund-purchase-invoke declaration awaits fund-ta-settlement separately from the settled payment Saga; child execution and command integration are not established by this use case.",
+          "RecordTAShareConfirmation -> FundSharesConfirmed is admitted only from PAYMENT_SETTLED to SHARES_CONFIRMED by IR-FO-TA-CONFIRM-001 / 62011. InvestorWealthOverview declares request fields and confirmedShares, not balance, valuation or a status join."
+        ],
+        "alternatives": [
+          "IR-FO-RESERVE-002 / 62004 rejects nonpositive request/reservation amounts. No fund/product minimum threshold is present.",
+          "IR-CB-RESERVE-002 / 60003 rejects insufficient core-account balance at ReserveFunds. Contract compensation uses ReleaseReservedFunds -> ReleaseReservedFundsConfirmed and CancelFundSubscription -> FundSubscriptionCanceled; no cross-contract runtime guarantee is claimed.",
+          "RecordTAShareConfirmation rejects PAYMENT-unsettled or duplicate SHARES_CONFIRMED orders with 62011; duplicate terminal confirmation is not empty-success idempotence.",
+          "TA rejection after payment settlement leaves manual recovery/refund design pending; it is not permission to compensate an already committed payment Saga."
+        ]
       },
       {
         "useCase": "ExecuteSipInstallment",
-        "sources": "Stage 1-5 vertical slice — end-to-end SIP cycle orchestration pipeline",
+        "sources": "Imported SIP-cycle description, corrected against the existing SipPlan slices and SIP composition declaration; not evidence of a real workshop or complete runtime integration.",
         "preconditions": [
           {
             "aggregate": "SipPlan",
-            "state": "SIP plan is ACTIVE and cycle OperationId has not been executed",
+            "state": "supplied operationId is absent from installmentLedger for a new trigger; an existing key declares empty success before the ACTIVE check",
             "invariantRef": "IR-SIP-TRIGGER-001",
             "errCode": "63002"
+          },
+          {
+            "aggregate": "SipPlan",
+            "state": "plan is ACTIVE for a new operation after the duplicate-operation empty-success check",
+            "invariantRef": "IR-SIP-TRIGGER-002",
+            "errCode": "63003"
           }
         ],
         "steps": [
@@ -80,7 +111,110 @@ payload:
             ]
           }
         ],
-        "extensions": []
+        "extensions": [],
+        "description": "Documentary main flow and alternatives referencing existing command/event declarations; steps identify the entry command only, not an automatically executable sequence or tested end-to-end behavior.",
+        "mainFlow": [
+          "Plan creation is documented by the CreateAndRunSipPlan story: CreateSipPlan -> SipPlanCreated retains investorAccountId, externalOrderId, fundCode, deductionAmount and cronExpr. Cron validation and scheduling execution are not certified.",
+          "SipScheduler submits TriggerSipInstallment -> SipInstallmentTriggered. The declared guard order is duplicate-operation empty success, then ACTIVE-only admission for a new operation.",
+          "sip-installment-execution declares external-bank-transfer, then fund-subscription-pay, then awaitChildRun of fund-ta-settlement under separate durable stage identities. This describes contracts, not verified entry-event or child-result wiring.",
+          "RecordSipInstallmentSucceeded -> SipInstallmentSucceeded and RecordSipInstallmentFailed -> SipInstallmentFailed are existing recording commands; their terminal-cycle admission, duplicate handling and out-of-order consistency are still pending.",
+          "SipPlanExecutionView declares create/trigger/failure event fields only, without latest-cycle chronology, history assembly or current-status computation."
+        ],
+        "alternatives": [
+          "A repeated supplied operationId declares empty success before the new-operation ACTIVE check. Agreement between supplied cycle identities/configuration and retained plan state remains pending.",
+          "A new operation on a non-ACTIVE plan rejects with IR-SIP-TRIGGER-002 / 63003.",
+          "Business-rejection/compensated outcomes stop the declared composition; recovery-required/outcome-unknown require manual recovery rather than an assumed business rollback.",
+          "Failure recording currently has no guards and accepts every supplied reasonCode. No active AutoPauseSipOnThreeFailures policy remains; qualifying reasons, three-count threshold, reset rules and out-of-order gate are pending."
+        ]
       }
-    ]
+    ],
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "use-cases.yaml",
+      "atom": {
+        "kind": "use-cases",
+        "payload": {
+          "useCases": [
+            {
+              "useCase": "TopUpFromExternalBank",
+              "sources": "Stage 1-5 vertical slice — cross-bank TCC collection into CreditBalance",
+              "preconditions": [
+                {
+                  "aggregate": "ExternalTransferOrder",
+                  "state": "external bank clearing channel active",
+                  "invariantRef": "IR-EXT-PREPARE-002",
+                  "errCode": "61002"
+                }
+              ],
+              "steps": [
+                {
+                  "id": "request-top-up",
+                  "story": "TopUpFromExternalBank",
+                  "command": "StartExternalTopUp",
+                  "aggregate": "CreditBalance",
+                  "emissions": [
+                    "ExternalTopUpRequested"
+                  ]
+                }
+              ],
+              "extensions": []
+            },
+            {
+              "useCase": "PurchaseFund",
+              "sources": "Stage 1-5 vertical slice — core account TCC deduction + T+1 TA share settlement",
+              "preconditions": [
+                {
+                  "aggregate": "CreditBalance",
+                  "state": "core account has sufficient available balance",
+                  "invariantRef": "IR-CB-RESERVE-002",
+                  "errCode": "60003"
+                },
+                {
+                  "aggregate": "FundOrder",
+                  "state": "subscription amount meets minimum threshold",
+                  "invariantRef": "IR-FO-RESERVE-002",
+                  "errCode": "62004"
+                }
+              ],
+              "steps": [
+                {
+                  "id": "submit-subscription",
+                  "story": "PurchaseFund",
+                  "command": "RequestFundPurchase",
+                  "aggregate": "FundOrder",
+                  "emissions": [
+                    "FundPurchaseRequested"
+                  ]
+                }
+              ],
+              "extensions": []
+            },
+            {
+              "useCase": "ExecuteSipInstallment",
+              "sources": "Stage 1-5 vertical slice — end-to-end SIP cycle orchestration pipeline",
+              "preconditions": [
+                {
+                  "aggregate": "SipPlan",
+                  "state": "SIP plan is ACTIVE and cycle OperationId has not been executed",
+                  "invariantRef": "IR-SIP-TRIGGER-001",
+                  "errCode": "63002"
+                }
+              ],
+              "steps": [
+                {
+                  "id": "trigger-cycle",
+                  "story": "CreateAndRunSipPlan",
+                  "command": "TriggerSipInstallment",
+                  "aggregate": "SipPlan",
+                  "emissions": [
+                    "SipInstallmentTriggered"
+                  ]
+                }
+              ],
+              "extensions": []
+            }
+          ]
+        }
+      }
+    }
   }

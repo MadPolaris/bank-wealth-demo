@@ -1,0 +1,46 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: command
+name: RequestFundPurchase
+origin:
+  stage: commandStorming
+  board: board1
+  seq: 2
+payload:
+  {
+    "type": "command",
+    "name": "RequestFundPurchase",
+    "stage": "commandStorming",
+    "description": "Submit a mutual fund subscription request.",
+    "links": [
+      "event:FundPurchaseRequested"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24",
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "aggregates/fund-order/notes/command-cs-request-fund-purchase-0.yaml",
+      "atom": {
+        "kind": "note",
+        "type": "command",
+        "name": "RequestFundPurchase",
+        "origin": {
+          "stage": "commandStorming",
+          "board": "board1",
+          "seq": 2
+        },
+        "payload": {
+          "type": "command",
+          "name": "RequestFundPurchase",
+          "stage": "commandStorming",
+          "description": "Submit a mutual fund subscription request.",
+          "links": [
+            "event:FundPurchaseRequested"
+          ],
+          "author": "facilitator",
+          "createdAt": "2026-10-24"
+        }
+      }
+    }
+  }

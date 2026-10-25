@@ -1,0 +1,53 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: story
+name: PurchaseFund
+seq: 1
+payload:
+  {
+    "name": "PurchaseFund",
+    "role": "Investor",
+    "aggregate": "FundOrder",
+    "goal": "Submit a positive-amount fund subscription request and trace the desired payment and TA share confirmation flow.",
+    "soThat": "Request identity, account, fund and amount are retained and declared share confirmations can be traced. Product minimum enforcement, runtime integration and refund handling remain pending.",
+    "slices": {
+      "command": "RequestFundPurchase",
+      "events": [
+        "FundPurchaseRequested",
+        "DeductFundsConfirmed",
+        "FundSubscriptionPaymentConfirmed",
+        "FundSharesConfirmed"
+      ],
+      "readModels": [
+        "InvestorWealthOverview"
+      ]
+    },
+    "sourceCapture": {
+      "baselineCommit": "26b144a574b0eafd43cd4376237fc41a2845d617",
+      "originalFile": "stories/purchase-fund.story.yaml",
+      "atom": {
+        "kind": "story",
+        "name": "PurchaseFund",
+        "seq": 1,
+        "payload": {
+          "name": "PurchaseFund",
+          "role": "Investor",
+          "aggregate": "FundOrder",
+          "goal": "Subscribe to a mutual fund using my core account balance and receive T+1 confirmed fund shares.",
+          "soThat": "My payment is atomically reserved/deducted and my allotted shares are tracked to T+1 settlement.",
+          "slices": {
+            "command": "RequestFundPurchase",
+            "events": [
+              "FundPurchaseRequested",
+              "DeductFundsConfirmed",
+              "FundSubscriptionPaymentConfirmed",
+              "FundSharesConfirmed"
+            ],
+            "readModels": [
+              "InvestorWealthOverview"
+            ]
+          }
+        }
+      }
+    }
+  }
