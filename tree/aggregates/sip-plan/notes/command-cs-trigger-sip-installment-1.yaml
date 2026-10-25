@@ -1,0 +1,21 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: command
+name: TriggerSipInstallment
+origin:
+  stage: commandStorming
+  board: board1
+  seq: 5
+payload:
+  {
+    "type": "command",
+    "name": "TriggerSipInstallment",
+    "stage": "commandStorming",
+    "description": "Trigger a scheduled SIP cycle installment.",
+    "links": [
+      "event:SipInstallmentTriggered"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

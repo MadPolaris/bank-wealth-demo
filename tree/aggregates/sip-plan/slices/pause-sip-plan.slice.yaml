@@ -1,0 +1,60 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: PauseSipPlan
+payload:
+  {
+    "name": "PauseSipPlan",
+    "parameters": [
+      {
+        "name": "planId",
+        "dataType": "SipPlanId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "reason",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "SipPlanPaused"
+    ],
+    "guards": [],
+    "description": "Pause an active SIP plan (investor-initiated or policy-triggered after consecutive failures)."
+  }
+events:
+  {
+    "SipPlanPaused": {
+      "name": "SipPlanPaused",
+      "payloads": [
+        {
+          "name": "planId",
+          "dataType": "SipPlanId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "reason",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "planId",
+          "expr": "param.planId"
+        },
+        {
+          "slot": "reason",
+          "expr": "param.reason"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "status",
+          "expr": "literal:PAUSED"
+        }
+      ]
+    }
+  }

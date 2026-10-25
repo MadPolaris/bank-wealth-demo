@@ -1,0 +1,119 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RequestFundPurchase
+payload:
+  {
+    "name": "RequestFundPurchase",
+    "description": "Investor submits a mutual fund subscription order.",
+    "parameters": [
+      {
+        "name": "operationId",
+        "dataType": "OperationId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "investorAccountId",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "fundOrderId",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "fundCode",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "ruleId": "IR-FO-RESERVE-002",
+        "errCode": "62004",
+        "onFail": "reject",
+        "when": {
+          "form": "money-positive",
+          "amount": "param.amount"
+        },
+        "desc": "Subscription amount must be positive and meet fund minimum threshold."
+      }
+    ],
+    "produces": [
+      "FundPurchaseRequested"
+    ]
+  }
+events:
+  {
+    "FundPurchaseRequested": {
+      "name": "FundPurchaseRequested",
+      "description": "Investor submitted a fund purchase request; triggers fund-subscription-pay Saga.",
+      "payloads": [
+        {
+          "name": "operationId",
+          "dataType": "OperationId",
+          "origin": "PROPAGATED",
+          "lineageHint": "RequestFundPurchase.operationId"
+        },
+        {
+          "name": "investorAccountId",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED",
+          "lineageHint": "RequestFundPurchase.investorAccountId"
+        },
+        {
+          "name": "fundOrderId",
+          "dataType": "FundOrderId",
+          "origin": "PROPAGATED",
+          "lineageHint": "RequestFundPurchase.fundOrderId"
+        },
+        {
+          "name": "fundCode",
+          "dataType": "String",
+          "origin": "PROPAGATED",
+          "lineageHint": "RequestFundPurchase.fundCode"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "PROPAGATED",
+          "lineageHint": "RequestFundPurchase.amount"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "operationId",
+          "expr": "param.operationId"
+        },
+        {
+          "slot": "investorAccountId",
+          "expr": "param.investorAccountId"
+        },
+        {
+          "slot": "fundOrderId",
+          "expr": "param.fundOrderId"
+        },
+        {
+          "slot": "fundCode",
+          "expr": "param.fundCode"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "status",
+          "expr": "literal:REQUESTED"
+        }
+      ]
+    }
+  }

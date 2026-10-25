@@ -1,0 +1,26 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: event
+name: SipInstallmentFailed
+origin:
+  stage: eventStorming
+  board: board1
+  seq: 10
+payload:
+  {
+    "type": "event",
+    "name": "SipInstallmentFailed",
+    "stage": "eventStorming",
+    "description": "A scheduled SIP installment fails due to insufficient external or core balance.",
+    "info": {
+      "timeline": "SipLifecycle",
+      "sequence": 10,
+      "step": 2
+    },
+    "links": [
+      "event:SipInstallmentTriggered@strong"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

@@ -1,0 +1,86 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: use-cases
+payload:
+  {
+    "useCases": [
+      {
+        "useCase": "TopUpFromExternalBank",
+        "sources": "Stage 1-5 vertical slice — cross-bank TCC collection into CreditBalance",
+        "preconditions": [
+          {
+            "aggregate": "ExternalTransferOrder",
+            "state": "external bank clearing channel active",
+            "invariantRef": "IR-EXT-PREPARE-002",
+            "errCode": "61002"
+          }
+        ],
+        "steps": [
+          {
+            "id": "request-top-up",
+            "story": "TopUpFromExternalBank",
+            "command": "StartExternalTopUp",
+            "aggregate": "CreditBalance",
+            "emissions": [
+              "ExternalTopUpRequested"
+            ]
+          }
+        ],
+        "extensions": []
+      },
+      {
+        "useCase": "PurchaseFund",
+        "sources": "Stage 1-5 vertical slice — core account TCC deduction + T+1 TA share settlement",
+        "preconditions": [
+          {
+            "aggregate": "CreditBalance",
+            "state": "core account has sufficient available balance",
+            "invariantRef": "IR-CB-RESERVE-002",
+            "errCode": "60003"
+          },
+          {
+            "aggregate": "FundOrder",
+            "state": "subscription amount meets minimum threshold",
+            "invariantRef": "IR-FO-RESERVE-002",
+            "errCode": "62004"
+          }
+        ],
+        "steps": [
+          {
+            "id": "submit-subscription",
+            "story": "PurchaseFund",
+            "command": "RequestFundPurchase",
+            "aggregate": "FundOrder",
+            "emissions": [
+              "FundPurchaseRequested"
+            ]
+          }
+        ],
+        "extensions": []
+      },
+      {
+        "useCase": "ExecuteSipInstallment",
+        "sources": "Stage 1-5 vertical slice — end-to-end SIP cycle orchestration pipeline",
+        "preconditions": [
+          {
+            "aggregate": "SipPlan",
+            "state": "SIP plan is ACTIVE and cycle OperationId has not been executed",
+            "invariantRef": "IR-SIP-TRIGGER-001",
+            "errCode": "63002"
+          }
+        ],
+        "steps": [
+          {
+            "id": "trigger-cycle",
+            "story": "CreateAndRunSipPlan",
+            "command": "TriggerSipInstallment",
+            "aggregate": "SipPlan",
+            "emissions": [
+              "SipInstallmentTriggered"
+            ]
+          }
+        ],
+        "extensions": []
+      }
+    ]
+  }

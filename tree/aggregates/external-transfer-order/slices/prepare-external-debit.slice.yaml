@@ -1,0 +1,90 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: ExternalTransferOrder
+command: PrepareExternalDebit
+payload:
+  {
+    "name": "PrepareExternalDebit",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "ExternalOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "ExternalDebitPrepared"
+    ],
+    "guards": [
+      {
+        "ruleId": "IR-EXT-PREPARE-001",
+        "errCode": "61001",
+        "onFail": "succeed-empty",
+        "when": {
+          "form": "map-absent",
+          "map": "preparedDebits",
+          "key": "param.txid"
+        },
+        "desc": "External debit already prepared for this transaction: idempotent success."
+      },
+      {
+        "ruleId": "IR-EXT-PREPARE-002",
+        "errCode": "61002",
+        "onFail": "reject",
+        "when": {
+          "form": "money-positive",
+          "amount": "param.amount"
+        },
+        "desc": "External debit amount must be positive."
+      }
+    ],
+    "description": "TCC Prepare phase on ExternalTransferOrder: hold cross-bank debit quota."
+  }
+events:
+  {
+    "ExternalDebitPrepared": {
+      "name": "ExternalDebitPrepared",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "BUSINESS_INPUT"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "BUSINESS_INPUT"
+        }
+      ],
+      "description": "Durable fact: cross-bank debit hold prepared under transaction identity.",
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "preparedDebits",
+          "op": "put",
+          "key": "event.txid",
+          "value": "event.amount"
+        }
+      ]
+    }
+  }

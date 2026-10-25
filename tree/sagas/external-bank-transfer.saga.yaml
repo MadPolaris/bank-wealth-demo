@@ -1,0 +1,413 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: saga
+id: external-bank-transfer
+name: "Collect funds from external bank into core CreditBalance"
+seq: 0
+version: v1
+payload:
+  {
+    "schemaVersion": "truthsrc.saga/v1",
+    "purpose": "Cross-bank collection TCC Saga: debit an external bank clearing order (source: ExternalTransferOrder) and credit the investor's core bank account (target: CreditBalance) with explicit singleton serial barriers.",
+    "invariants": [
+      "Currency and exact minor units are conserved across interbank clearing and core account credit"
+    ],
+    "transactionIdType": "TxId",
+    "args": [
+      {
+        "slot": "externalOrderId",
+        "type": "ExternalOrderId"
+      },
+      {
+        "slot": "toAccountId",
+        "type": "AccountId"
+      },
+      {
+        "slot": "amount",
+        "type": "Money"
+      }
+    ],
+    "participants": [
+      {
+        "id": "source",
+        "aggregate": "ExternalTransferOrder",
+        "resourceRef": {
+          "ref": "args:externalOrderId",
+          "type": "ExternalOrderId"
+        }
+      },
+      {
+        "id": "target",
+        "aggregate": "CreditBalance",
+        "resourceRef": {
+          "ref": "args:toAccountId",
+          "type": "AccountId"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "id": 1,
+        "dependsOn": []
+      },
+      {
+        "id": 2,
+        "dependsOn": [
+          1
+        ]
+      }
+    ],
+    "steps": [
+      {
+        "id": "prepare-external-debit",
+        "participant": "source",
+        "group": 1,
+        "phases": {
+          "prepare": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "ExternalTransferOrder",
+              "name": "PrepareExternalDebit"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:externalOrderId",
+                "type": "ExternalOrderId"
+              },
+              {
+                "slot": "amount",
+                "ref": "args:amount",
+                "type": "Money"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "amount",
+                "type": "Money"
+              }
+            ]
+          },
+          "commit": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "ExternalTransferOrder",
+              "name": "CommitExternalDebit"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:externalOrderId",
+                "type": "ExternalOrderId"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              }
+            ]
+          },
+          "compensate": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "ExternalTransferOrder",
+              "name": "CompensateExternalDebit"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:externalOrderId",
+                "type": "ExternalOrderId"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "credit-core-account",
+        "participant": "target",
+        "group": 2,
+        "phases": {
+          "prepare": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "CreditBalance",
+              "name": "RecordIncomingCredits"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:toAccountId",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "ref": "args:amount",
+                "type": "Money"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "amount",
+                "type": "Money"
+              }
+            ]
+          },
+          "commit": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "CreditBalance",
+              "name": "CommitIncomingCredits"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:toAccountId",
+                "type": "AccountId"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              }
+            ]
+          },
+          "compensate": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "CreditBalance",
+              "name": "CancelIncomingCredit"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:toAccountId",
+                "type": "AccountId"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "resilience": {
+      "maxAttempts": 1,
+      "phaseTimeoutMs": 1000,
+      "queryTimeoutMs": 1000,
+      "backoffMs": 0,
+      "totalTimeoutMs": 10000
+    },
+    "safety": {
+      "commitDecision": "durable-before-commit",
+      "abortDecision": "durable-before-compensate",
+      "afterCommit": "forward-recovery",
+      "unknown": "reconcile-before-resume",
+      "compensation": "confirmed-reservations",
+      "cancelBeforePrepare": "empty-release-and-fence",
+      "retryIdentity": "stable-operation",
+      "manualRecovery": "authorized-reconciliation-evidence"
+    },
+    "admission": {
+      "maxParticipants": 2,
+      "maxInFlight": 1,
+      "maxItemsPerChunk": 64,
+      "manifest": {
+        "mode": "static",
+        "durable": true
+      }
+    },
+    "triggers": [
+      {
+        "id": "from-command",
+        "kind": "command",
+        "sourceRef": {
+          "aggregate": "CreditBalance",
+          "name": "StartExternalTopUp"
+        },
+        "argsMapping": [
+          {
+            "slot": "externalOrderId",
+            "ref": "source:externalOrderId",
+            "type": "ExternalOrderId"
+          },
+          {
+            "slot": "toAccountId",
+            "ref": "source:toAccountId",
+            "type": "AccountId"
+          },
+          {
+            "slot": "amount",
+            "ref": "source:amount",
+            "type": "Money"
+          }
+        ],
+        "idempotency": {
+          "ref": "source:operationId",
+          "type": "OperationId",
+          "scope": "saga-version",
+          "conflict": "reject-different-args"
+        }
+      },
+      {
+        "id": "from-event",
+        "kind": "event",
+        "sourceRef": {
+          "aggregate": "CreditBalance",
+          "name": "ExternalTopUpRequested"
+        },
+        "argsMapping": [
+          {
+            "slot": "externalOrderId",
+            "ref": "source:externalOrderId",
+            "type": "ExternalOrderId"
+          },
+          {
+            "slot": "toAccountId",
+            "ref": "source:toAccountId",
+            "type": "AccountId"
+          },
+          {
+            "slot": "amount",
+            "ref": "source:amount",
+            "type": "Money"
+          }
+        ],
+        "idempotency": {
+          "ref": "source:operationId",
+          "type": "OperationId",
+          "scope": "saga-version",
+          "conflict": "reject-different-args"
+        }
+      }
+    ],
+    "resultKinds": [
+      "succeeded",
+      "rejected-before-effects",
+      "compensated",
+      "recovery-required",
+      "outcome-unknown"
+    ],
+    "completions": [
+      {
+        "kind": "succeeded",
+        "eventRef": {
+          "aggregate": "CreditBalance",
+          "name": "result-succeeded"
+        },
+        "bindings": [
+          {
+            "slot": "txid",
+            "ref": "txid",
+            "type": "TxId"
+          }
+        ]
+      },
+      {
+        "kind": "rejected-before-effects",
+        "eventRef": {
+          "aggregate": "CreditBalance",
+          "name": "result-rejected-before-effects"
+        },
+        "bindings": [
+          {
+            "slot": "txid",
+            "ref": "txid",
+            "type": "TxId"
+          }
+        ]
+      },
+      {
+        "kind": "compensated",
+        "eventRef": {
+          "aggregate": "CreditBalance",
+          "name": "result-compensated"
+        },
+        "bindings": [
+          {
+            "slot": "txid",
+            "ref": "txid",
+            "type": "TxId"
+          }
+        ]
+      },
+      {
+        "kind": "recovery-required",
+        "eventRef": {
+          "aggregate": "CreditBalance",
+          "name": "result-recovery-required"
+        },
+        "bindings": [
+          {
+            "slot": "txid",
+            "ref": "txid",
+            "type": "TxId"
+          }
+        ]
+      },
+      {
+        "kind": "outcome-unknown",
+        "eventRef": {
+          "aggregate": "CreditBalance",
+          "name": "result-outcome-unknown"
+        },
+        "bindings": [
+          {
+            "slot": "txid",
+            "ref": "txid",
+            "type": "TxId"
+          }
+        ]
+      }
+    ]
+  }

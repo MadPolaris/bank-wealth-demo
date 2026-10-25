@@ -1,0 +1,71 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: CreditBalance
+command: DeductFunds
+payload:
+  {
+    "name": "DeductFunds",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "DeductFundsConfirmed"
+    ],
+    "guards": [
+      {
+        "ruleId": "IR-CB-DEDUCT-001",
+        "errCode": "60006",
+        "onFail": "reject",
+        "when": {
+          "form": "map-contains",
+          "map": "reservedAmount",
+          "key": "param.txid"
+        },
+        "desc": "No reserved funds found for this transaction (golden master 60006)."
+      }
+    ],
+    "description": "Stable operation identity, exact payload compatibility and durable participant receipt required."
+  }
+events:
+  {
+    "DeductFundsConfirmed": {
+      "name": "DeductFundsConfirmed",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "BUSINESS_INPUT"
+        }
+      ],
+      "description": "Designed durable fact: the reserved funds under this transaction identity were deducted; the fold clears the entry the txid names.",
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "committed",
+          "op": "put",
+          "key": "event.txid",
+          "value": "state.reservedAmount[event.txid]"
+        },
+        {
+          "slot": "reservedAmount",
+          "op": "remove",
+          "key": "event.txid"
+        }
+      ]
+    }
+  }

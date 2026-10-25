@@ -1,0 +1,75 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: ConfirmFundSubscriptionPayment
+payload:
+  {
+    "name": "ConfirmFundSubscriptionPayment",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "FundSubscriptionPaymentConfirmed"
+    ],
+    "guards": [
+      {
+        "ruleId": "IR-FO-COMMIT-001",
+        "errCode": "62008",
+        "onFail": "reject",
+        "when": {
+          "form": "map-contains",
+          "map": "reservedSubscriptions",
+          "key": "param.txid"
+        },
+        "desc": "Prepared subscription cannot be found or already committed."
+      }
+    ],
+    "description": "TCC Commit phase on FundOrder: confirm payment settlement and mark order ready for TA submission."
+  }
+events:
+  {
+    "FundSubscriptionPaymentConfirmed": {
+      "name": "FundSubscriptionPaymentConfirmed",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "BUSINESS_INPUT"
+        }
+      ],
+      "description": "Durable fact: fund subscription payment settled.",
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "committedSubscriptions",
+          "op": "put",
+          "key": "event.txid",
+          "value": "state.reservedSubscriptions[event.txid]"
+        },
+        {
+          "slot": "reservedSubscriptions",
+          "op": "remove",
+          "key": "event.txid"
+        },
+        {
+          "slot": "status",
+          "expr": "literal:PAYMENT_SETTLED"
+        }
+      ]
+    }
+  }

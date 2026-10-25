@@ -1,0 +1,3121 @@
+{
+  "schemaVersion": "truthsrc.execution/v1",
+  "workshop": "bank-wealth-demo",
+  "pipelines": [
+    {
+      "id": "fund-purchase-invoke",
+      "name": "Direct mutual fund purchase and T+1 TA share confirmation",
+      "readiness": "contract-only",
+      "inputs": [
+        {
+          "id": "operation",
+          "type": "OperationId",
+          "durability": "start-record"
+        },
+        {
+          "id": "occurrence",
+          "type": "OperationId",
+          "durability": "durable-reference"
+        },
+        {
+          "id": "investorAccountId",
+          "type": "AccountId",
+          "durability": "start-record"
+        },
+        {
+          "id": "fundOrderId",
+          "type": "FundOrderId",
+          "durability": "start-record"
+        },
+        {
+          "id": "amount",
+          "type": "Money",
+          "durability": "start-record"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "paymentTxid",
+          "ref": "step:pay-subscription:paymentTxid",
+          "type": "TxId"
+        },
+        {
+          "id": "confirmedShares",
+          "ref": "step:await-ta-settlement:shares",
+          "type": "FundShare"
+        },
+        {
+          "id": "taChildRun",
+          "ref": "step:await-ta-settlement:childRun",
+          "type": "OperationId"
+        }
+      ],
+      "steps": [
+        {
+          "id": "pay-subscription",
+          "name": "Invoke fund-subscription-pay v1",
+          "ordinal": 0,
+          "reads": [
+            {
+              "slot": "operation",
+              "ref": "input:operation",
+              "type": "OperationId"
+            },
+            {
+              "slot": "occurrence",
+              "ref": "input:occurrence",
+              "type": "OperationId"
+            },
+            {
+              "slot": "investorAccountId",
+              "ref": "input:investorAccountId",
+              "type": "AccountId"
+            },
+            {
+              "slot": "fundOrderId",
+              "ref": "input:fundOrderId",
+              "type": "FundOrderId"
+            },
+            {
+              "slot": "amount",
+              "ref": "input:amount",
+              "type": "Money"
+            }
+          ],
+          "writes": [
+            {
+              "id": "paymentTxid",
+              "slot": "txid",
+              "type": "TxId",
+              "durability": "durable-reference"
+            }
+          ],
+          "outcomes": [
+            {
+              "code": "Succeeded",
+              "kind": "success",
+              "action": "continue"
+            },
+            {
+              "code": "Rejected",
+              "kind": "business-rejection",
+              "action": "stop"
+            },
+            {
+              "code": "Compensated",
+              "kind": "business-rejection",
+              "action": "stop"
+            },
+            {
+              "code": "RecoveryRequired",
+              "kind": "infrastructure-failure",
+              "action": "manual-recovery"
+            },
+            {
+              "code": "Unknown",
+              "kind": "unknown-effect",
+              "action": "manual-recovery"
+            }
+          ],
+          "invokeSaga": {
+            "ref": {
+              "sagaId": "fund-subscription-pay",
+              "version": "v1"
+            },
+            "args": [
+              {
+                "slot": "investorAccountId",
+                "ref": "input:investorAccountId",
+                "type": "AccountId"
+              },
+              {
+                "slot": "fundOrderId",
+                "ref": "input:fundOrderId",
+                "type": "FundOrderId"
+              },
+              {
+                "slot": "amount",
+                "ref": "input:amount",
+                "type": "Money"
+              }
+            ],
+            "transactionIdentity": {
+              "type": "TxId",
+              "derivation": "durable-source-stage",
+              "source": {
+                "ref": "input:operation",
+                "type": "OperationId"
+              },
+              "stageId": "pay-subscription",
+              "stageOccurrence": {
+                "ref": "input:occurrence",
+                "type": "OperationId"
+              },
+              "scope": "saga-version",
+              "conflict": "reject-different-args"
+            },
+            "start": "durable-intent-before-start",
+            "completionMode": "await-terminal",
+            "results": [
+              {
+                "resultKind": "succeeded",
+                "code": "Succeeded",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "ref": "result:txid",
+                    "type": "TxId"
+                  }
+                ]
+              },
+              {
+                "resultKind": "rejected-before-effects",
+                "code": "Rejected",
+                "outputs": []
+              },
+              {
+                "resultKind": "compensated",
+                "code": "Compensated",
+                "outputs": []
+              },
+              {
+                "resultKind": "recovery-required",
+                "code": "RecoveryRequired",
+                "outputs": []
+              },
+              {
+                "resultKind": "outcome-unknown",
+                "code": "Unknown",
+                "outputs": []
+              }
+            ]
+          }
+        },
+        {
+          "id": "await-ta-settlement",
+          "name": "Await T+1 TA share confirmation child plan",
+          "ordinal": 1,
+          "reads": [
+            {
+              "slot": "operation",
+              "ref": "input:operation",
+              "type": "OperationId"
+            },
+            {
+              "slot": "occurrence",
+              "ref": "input:occurrence",
+              "type": "OperationId"
+            },
+            {
+              "slot": "investorAccountId",
+              "ref": "input:investorAccountId",
+              "type": "AccountId"
+            },
+            {
+              "slot": "fundOrderId",
+              "ref": "input:fundOrderId",
+              "type": "FundOrderId"
+            },
+            {
+              "slot": "amount",
+              "ref": "input:amount",
+              "type": "Money"
+            }
+          ],
+          "writes": [
+            {
+              "id": "shares",
+              "slot": "shares",
+              "type": "FundShare",
+              "durability": "durable-reference"
+            },
+            {
+              "id": "childRun",
+              "slot": "childRun",
+              "type": "OperationId",
+              "durability": "durable-reference"
+            }
+          ],
+          "outcomes": [
+            {
+              "code": "TACompleted",
+              "kind": "success",
+              "action": "continue"
+            },
+            {
+              "code": "TARejected",
+              "kind": "business-rejection",
+              "action": "stop"
+            },
+            {
+              "code": "TAFailed",
+              "kind": "business-rejection",
+              "action": "stop"
+            },
+            {
+              "code": "RecoveryRequired",
+              "kind": "infrastructure-failure",
+              "action": "manual-recovery"
+            },
+            {
+              "code": "Unknown",
+              "kind": "unknown-effect",
+              "action": "manual-recovery"
+            }
+          ],
+          "awaitChildRun": {
+            "childRun": {
+              "planRef": {
+                "pipelineId": "fund-ta-settlement"
+              },
+              "identity": {
+                "derivation": "durable-parent-step",
+                "source": {
+                  "ref": "input:operation",
+                  "type": "OperationId"
+                },
+                "stepId": "await-ta-settlement",
+                "stageOccurrence": {
+                  "ref": "input:occurrence",
+                  "type": "OperationId"
+                },
+                "conflict": "reject-different-args"
+              },
+              "payload": [
+                {
+                  "slot": "investorAccountId",
+                  "ref": "input:investorAccountId",
+                  "type": "AccountId"
+                },
+                {
+                  "slot": "fundOrderId",
+                  "ref": "input:fundOrderId",
+                  "type": "FundOrderId"
+                },
+                {
+                  "slot": "amount",
+                  "ref": "input:amount",
+                  "type": "Money"
+                }
+              ],
+              "payloadCompatibility": "exact"
+            },
+            "start": "durable-intent-before-start",
+            "completionMode": "await-terminal",
+            "results": [
+              {
+                "resultKind": "succeeded",
+                "code": "TACompleted",
+                "outputs": [
+                  {
+                    "slot": "shares",
+                    "ref": "result:shares",
+                    "type": "FundShare"
+                  },
+                  {
+                    "slot": "childRun",
+                    "ref": "result:childRun",
+                    "type": "OperationId"
+                  }
+                ]
+              },
+              {
+                "resultKind": "child-rejected",
+                "code": "TARejected",
+                "outputs": []
+              },
+              {
+                "resultKind": "child-failed",
+                "code": "TAFailed",
+                "outputs": []
+              },
+              {
+                "resultKind": "recovery-required",
+                "code": "RecoveryRequired",
+                "outputs": []
+              },
+              {
+                "resultKind": "outcome-unknown",
+                "code": "Unknown",
+                "outputs": []
+              }
+            ]
+          }
+        }
+      ],
+      "recovery": {
+        "inputResponsibility": "host",
+        "inputs": [
+          "input:operation",
+          "input:occurrence",
+          "input:investorAccountId",
+          "input:fundOrderId",
+          "input:amount"
+        ],
+        "planVersion": "plan-v1",
+        "planCompatibility": "exact",
+        "checkpoint": "confirmed-prefix",
+        "unknownEffect": "reconcile-before-resume",
+        "ownership": "single-writer"
+      },
+      "admission": {
+        "maxConcurrentRuns": 1,
+        "maxInFlightSteps": 1,
+        "maxItemsPerChunk": 1,
+        "maxInFlightChunks": 1
+      },
+      "binding": {
+        "engine": "monarch-persistence/0.2.1",
+        "module": "fixture.wealth.FundPurchasePipelineModule",
+        "codec": {
+          "id": "PipelineCodec",
+          "version": "pipeline-v1",
+          "compatibleVersions": [
+            "pipeline-v1"
+          ]
+        },
+        "types": [
+          {
+            "id": "TxId",
+            "implementation": "fixture.types.TxId"
+          },
+          {
+            "id": "OperationId",
+            "implementation": "fixture.types.OperationId"
+          },
+          {
+            "id": "AccountId",
+            "implementation": "fixture.types.AccountId"
+          },
+          {
+            "id": "ExternalOrderId",
+            "implementation": "fixture.types.ExternalOrderId"
+          },
+          {
+            "id": "FundOrderId",
+            "implementation": "fixture.types.FundOrderId"
+          },
+          {
+            "id": "SipPlanId",
+            "implementation": "fixture.types.SipPlanId"
+          },
+          {
+            "id": "Money",
+            "implementation": "fixture.types.Money"
+          },
+          {
+            "id": "FundShare",
+            "implementation": "fixture.types.FundShare"
+          }
+        ],
+        "ports": [],
+        "invocations": [
+          {
+            "stepId": "pay-subscription",
+            "ref": {
+              "sagaId": "fund-subscription-pay",
+              "version": "v1"
+            },
+            "adapter": "fixture.StrictSagaAdapter",
+            "runtime": {
+              "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+              "apiMode": "strict",
+              "entrypoint": "fixture.wealth.FundSubscriptionPaySagaEntry"
+            },
+            "argsCodec": {
+              "id": "ArgsCodec",
+              "version": "codec-v1",
+              "mapper": "fixture.ArgsCodec"
+            },
+            "resultCodec": {
+              "id": "SagaResultCodec",
+              "version": "codec-v1",
+              "mapper": "fixture.SagaResultCodec"
+            },
+            "transactionIdentity": {
+              "mapper": "fixture.DurableSourceStageIdentity",
+              "derivation": "durable-source-stage",
+              "payloadCompatibility": "exact"
+            }
+          }
+        ],
+        "childRuns": [
+          {
+            "stepId": "await-ta-settlement",
+            "planRef": {
+              "pipelineId": "fund-ta-settlement"
+            },
+            "runtime": {
+              "artifact": "net.imadz:monarch-persistence_2.13:0.2.1",
+              "apiMode": "strict"
+            },
+            "journal": {
+              "pidPrefix": "fund-ta-child"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "sip-installment-execution",
+      "name": "End-to-end SIP installment: cross-bank debit -> core account credit -> fund subscription -> T+1 TA settlement",
+      "readiness": "contract-only",
+      "inputs": [
+        {
+          "id": "operation",
+          "type": "OperationId",
+          "durability": "start-record"
+        },
+        {
+          "id": "occurrence",
+          "type": "OperationId",
+          "durability": "durable-reference"
+        },
+        {
+          "id": "externalOrderId",
+          "type": "ExternalOrderId",
+          "durability": "start-record"
+        },
+        {
+          "id": "investorAccountId",
+          "type": "AccountId",
+          "durability": "start-record"
+        },
+        {
+          "id": "fundOrderId",
+          "type": "FundOrderId",
+          "durability": "start-record"
+        },
+        {
+          "id": "amount",
+          "type": "Money",
+          "durability": "start-record"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "transferTxid",
+          "ref": "step:collect-external-funds:transferTxid",
+          "type": "TxId"
+        },
+        {
+          "id": "subscriptionTxid",
+          "ref": "step:pay-subscription:subscriptionTxid",
+          "type": "TxId"
+        },
+        {
+          "id": "confirmedShares",
+          "ref": "step:await-ta-settlement:shares",
+          "type": "FundShare"
+        },
+        {
+          "id": "taChildRun",
+          "ref": "step:await-ta-settlement:childRun",
+          "type": "OperationId"
+        }
+      ],
+      "steps": [
+        {
+          "id": "collect-external-funds",
+          "name": "Invoke external-bank-transfer v1 to fund core account",
+          "ordinal": 0,
+          "reads": [
+            {
+              "slot": "operation",
+              "ref": "input:operation",
+              "type": "OperationId"
+            },
+            {
+              "slot": "occurrence",
+              "ref": "input:occurrence",
+              "type": "OperationId"
+            },
+            {
+              "slot": "externalOrderId",
+              "ref": "input:externalOrderId",
+              "type": "ExternalOrderId"
+            },
+            {
+              "slot": "investorAccountId",
+              "ref": "input:investorAccountId",
+              "type": "AccountId"
+            },
+            {
+              "slot": "amount",
+              "ref": "input:amount",
+              "type": "Money"
+            }
+          ],
+          "writes": [
+            {
+              "id": "transferTxid",
+              "slot": "txid",
+              "type": "TxId",
+              "durability": "durable-reference"
+            }
+          ],
+          "outcomes": [
+            {
+              "code": "Succeeded",
+              "kind": "success",
+              "action": "continue"
+            },
+            {
+              "code": "Rejected",
+              "kind": "business-rejection",
+              "action": "stop"
+            },
+            {
+              "code": "Compensated",
+              "kind": "business-rejection",
+              "action": "stop"
+            },
+            {
+              "code": "RecoveryRequired",
+              "kind": "infrastructure-failure",
+              "action": "manual-recovery"
+            },
+            {
+              "code": "Unknown",
+              "kind": "unknown-effect",
+              "action": "manual-recovery"
+            }
+          ],
+          "invokeSaga": {
+            "ref": {
+              "sagaId": "external-bank-transfer",
+              "version": "v1"
+            },
+            "args": [
+              {
+                "slot": "externalOrderId",
+                "ref": "input:externalOrderId",
+                "type": "ExternalOrderId"
+              },
+              {
+                "slot": "toAccountId",
+                "ref": "input:investorAccountId",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "ref": "input:amount",
+                "type": "Money"
+              }
+            ],
+            "transactionIdentity": {
+              "type": "TxId",
+              "derivation": "durable-source-stage",
+              "source": {
+                "ref": "input:operation",
+                "type": "OperationId"
+              },
+              "stageId": "collect-external-funds",
+              "stageOccurrence": {
+                "ref": "input:occurrence",
+                "type": "OperationId"
+              },
+              "scope": "saga-version",
+              "conflict": "reject-different-args"
+            },
+            "start": "durable-intent-before-start",
+            "completionMode": "await-terminal",
+            "results": [
+              {
+                "resultKind": "succeeded",
+                "code": "Succeeded",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "ref": "result:txid",
+                    "type": "TxId"
+                  }
+                ]
+              },
+              {
+                "resultKind": "rejected-before-effects",
+                "code": "Rejected",
+                "outputs": []
+              },
+              {
+                "resultKind": "compensated",
+                "code": "Compensated",
+                "outputs": []
+              },
+              {
+                "resultKind": "recovery-required",
+                "code": "RecoveryRequired",
+                "outputs": []
+              },
+              {
+                "resultKind": "outcome-unknown",
+                "code": "Unknown",
+                "outputs": []
+              }
+            ]
+          }
+        },
+        {
+          "id": "pay-subscription",
+          "name": "Invoke fund-subscription-pay v1 from funded core account",
+          "ordinal": 1,
+          "reads": [
+            {
+              "slot": "operation",
+              "ref": "input:operation",
+              "type": "OperationId"
+            },
+            {
+              "slot": "occurrence",
+              "ref": "input:occurrence",
+              "type": "OperationId"
+            },
+            {
+              "slot": "investorAccountId",
+              "ref": "input:investorAccountId",
+              "type": "AccountId"
+            },
+            {
+              "slot": "fundOrderId",
+              "ref": "input:fundOrderId",
+              "type": "FundOrderId"
+            },
+            {
+              "slot": "amount",
+              "ref": "input:amount",
+              "type": "Money"
+            }
+          ],
+          "writes": [
+            {
+              "id": "subscriptionTxid",
+              "slot": "txid",
+              "type": "TxId",
+              "durability": "durable-reference"
+            }
+          ],
+          "outcomes": [
+            {
+              "code": "Succeeded",
+              "kind": "success",
+              "action": "continue"
+            },
+            {
+              "code": "Rejected",
+              "kind": "business-rejection",
+              "action": "stop"
+            },
+            {
+              "code": "Compensated",
+              "kind": "business-rejection",
+              "action": "stop"
+            },
+            {
+              "code": "RecoveryRequired",
+              "kind": "infrastructure-failure",
+              "action": "manual-recovery"
+            },
+            {
+              "code": "Unknown",
+              "kind": "unknown-effect",
+              "action": "manual-recovery"
+            }
+          ],
+          "invokeSaga": {
+            "ref": {
+              "sagaId": "fund-subscription-pay",
+              "version": "v1"
+            },
+            "args": [
+              {
+                "slot": "investorAccountId",
+                "ref": "input:investorAccountId",
+                "type": "AccountId"
+              },
+              {
+                "slot": "fundOrderId",
+                "ref": "input:fundOrderId",
+                "type": "FundOrderId"
+              },
+              {
+                "slot": "amount",
+                "ref": "input:amount",
+                "type": "Money"
+              }
+            ],
+            "transactionIdentity": {
+              "type": "TxId",
+              "derivation": "durable-source-stage",
+              "source": {
+                "ref": "input:operation",
+                "type": "OperationId"
+              },
+              "stageId": "pay-subscription",
+              "stageOccurrence": {
+                "ref": "input:occurrence",
+                "type": "OperationId"
+              },
+              "scope": "saga-version",
+              "conflict": "reject-different-args"
+            },
+            "start": "durable-intent-before-start",
+            "completionMode": "await-terminal",
+            "results": [
+              {
+                "resultKind": "succeeded",
+                "code": "Succeeded",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "ref": "result:txid",
+                    "type": "TxId"
+                  }
+                ]
+              },
+              {
+                "resultKind": "rejected-before-effects",
+                "code": "Rejected",
+                "outputs": []
+              },
+              {
+                "resultKind": "compensated",
+                "code": "Compensated",
+                "outputs": []
+              },
+              {
+                "resultKind": "recovery-required",
+                "code": "RecoveryRequired",
+                "outputs": []
+              },
+              {
+                "resultKind": "outcome-unknown",
+                "code": "Unknown",
+                "outputs": []
+              }
+            ]
+          }
+        },
+        {
+          "id": "await-ta-settlement",
+          "name": "Await T+1 TA share confirmation child plan",
+          "ordinal": 2,
+          "reads": [
+            {
+              "slot": "operation",
+              "ref": "input:operation",
+              "type": "OperationId"
+            },
+            {
+              "slot": "occurrence",
+              "ref": "input:occurrence",
+              "type": "OperationId"
+            },
+            {
+              "slot": "investorAccountId",
+              "ref": "input:investorAccountId",
+              "type": "AccountId"
+            },
+            {
+              "slot": "fundOrderId",
+              "ref": "input:fundOrderId",
+              "type": "FundOrderId"
+            },
+            {
+              "slot": "amount",
+              "ref": "input:amount",
+              "type": "Money"
+            }
+          ],
+          "writes": [
+            {
+              "id": "shares",
+              "slot": "shares",
+              "type": "FundShare",
+              "durability": "durable-reference"
+            },
+            {
+              "id": "childRun",
+              "slot": "childRun",
+              "type": "OperationId",
+              "durability": "durable-reference"
+            }
+          ],
+          "outcomes": [
+            {
+              "code": "TACompleted",
+              "kind": "success",
+              "action": "continue"
+            },
+            {
+              "code": "TARejected",
+              "kind": "business-rejection",
+              "action": "stop"
+            },
+            {
+              "code": "TAFailed",
+              "kind": "business-rejection",
+              "action": "stop"
+            },
+            {
+              "code": "RecoveryRequired",
+              "kind": "infrastructure-failure",
+              "action": "manual-recovery"
+            },
+            {
+              "code": "Unknown",
+              "kind": "unknown-effect",
+              "action": "manual-recovery"
+            }
+          ],
+          "awaitChildRun": {
+            "childRun": {
+              "planRef": {
+                "pipelineId": "fund-ta-settlement"
+              },
+              "identity": {
+                "derivation": "durable-parent-step",
+                "source": {
+                  "ref": "input:operation",
+                  "type": "OperationId"
+                },
+                "stepId": "await-ta-settlement",
+                "stageOccurrence": {
+                  "ref": "input:occurrence",
+                  "type": "OperationId"
+                },
+                "conflict": "reject-different-args"
+              },
+              "payload": [
+                {
+                  "slot": "investorAccountId",
+                  "ref": "input:investorAccountId",
+                  "type": "AccountId"
+                },
+                {
+                  "slot": "fundOrderId",
+                  "ref": "input:fundOrderId",
+                  "type": "FundOrderId"
+                },
+                {
+                  "slot": "amount",
+                  "ref": "input:amount",
+                  "type": "Money"
+                }
+              ],
+              "payloadCompatibility": "exact"
+            },
+            "start": "durable-intent-before-start",
+            "completionMode": "await-terminal",
+            "results": [
+              {
+                "resultKind": "succeeded",
+                "code": "TACompleted",
+                "outputs": [
+                  {
+                    "slot": "shares",
+                    "ref": "result:shares",
+                    "type": "FundShare"
+                  },
+                  {
+                    "slot": "childRun",
+                    "ref": "result:childRun",
+                    "type": "OperationId"
+                  }
+                ]
+              },
+              {
+                "resultKind": "child-rejected",
+                "code": "TARejected",
+                "outputs": []
+              },
+              {
+                "resultKind": "child-failed",
+                "code": "TAFailed",
+                "outputs": []
+              },
+              {
+                "resultKind": "recovery-required",
+                "code": "RecoveryRequired",
+                "outputs": []
+              },
+              {
+                "resultKind": "outcome-unknown",
+                "code": "Unknown",
+                "outputs": []
+              }
+            ]
+          }
+        }
+      ],
+      "recovery": {
+        "inputResponsibility": "host",
+        "inputs": [
+          "input:operation",
+          "input:occurrence",
+          "input:externalOrderId",
+          "input:investorAccountId",
+          "input:fundOrderId",
+          "input:amount"
+        ],
+        "planVersion": "plan-v1",
+        "planCompatibility": "exact",
+        "checkpoint": "confirmed-prefix",
+        "unknownEffect": "reconcile-before-resume",
+        "ownership": "single-writer"
+      },
+      "admission": {
+        "maxConcurrentRuns": 1,
+        "maxInFlightSteps": 1,
+        "maxItemsPerChunk": 1,
+        "maxInFlightChunks": 1
+      },
+      "binding": {
+        "engine": "monarch-persistence/0.2.1",
+        "module": "fixture.wealth.SipInstallmentPipelineModule",
+        "codec": {
+          "id": "PipelineCodec",
+          "version": "pipeline-v1",
+          "compatibleVersions": [
+            "pipeline-v1"
+          ]
+        },
+        "types": [
+          {
+            "id": "TxId",
+            "implementation": "fixture.types.TxId"
+          },
+          {
+            "id": "OperationId",
+            "implementation": "fixture.types.OperationId"
+          },
+          {
+            "id": "AccountId",
+            "implementation": "fixture.types.AccountId"
+          },
+          {
+            "id": "ExternalOrderId",
+            "implementation": "fixture.types.ExternalOrderId"
+          },
+          {
+            "id": "FundOrderId",
+            "implementation": "fixture.types.FundOrderId"
+          },
+          {
+            "id": "SipPlanId",
+            "implementation": "fixture.types.SipPlanId"
+          },
+          {
+            "id": "Money",
+            "implementation": "fixture.types.Money"
+          },
+          {
+            "id": "FundShare",
+            "implementation": "fixture.types.FundShare"
+          }
+        ],
+        "ports": [],
+        "invocations": [
+          {
+            "stepId": "collect-external-funds",
+            "ref": {
+              "sagaId": "external-bank-transfer",
+              "version": "v1"
+            },
+            "adapter": "fixture.StrictSagaAdapter",
+            "runtime": {
+              "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+              "apiMode": "strict",
+              "entrypoint": "fixture.interbank.ExternalBankTransferSagaEntry"
+            },
+            "argsCodec": {
+              "id": "ArgsCodec",
+              "version": "codec-v1",
+              "mapper": "fixture.ArgsCodec"
+            },
+            "resultCodec": {
+              "id": "SagaResultCodec",
+              "version": "codec-v1",
+              "mapper": "fixture.SagaResultCodec"
+            },
+            "transactionIdentity": {
+              "mapper": "fixture.DurableSourceStageIdentity",
+              "derivation": "durable-source-stage",
+              "payloadCompatibility": "exact"
+            }
+          },
+          {
+            "stepId": "pay-subscription",
+            "ref": {
+              "sagaId": "fund-subscription-pay",
+              "version": "v1"
+            },
+            "adapter": "fixture.StrictSagaAdapter",
+            "runtime": {
+              "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+              "apiMode": "strict",
+              "entrypoint": "fixture.wealth.FundSubscriptionPaySagaEntry"
+            },
+            "argsCodec": {
+              "id": "ArgsCodec",
+              "version": "codec-v1",
+              "mapper": "fixture.ArgsCodec"
+            },
+            "resultCodec": {
+              "id": "SagaResultCodec",
+              "version": "codec-v1",
+              "mapper": "fixture.SagaResultCodec"
+            },
+            "transactionIdentity": {
+              "mapper": "fixture.DurableSourceStageIdentity",
+              "derivation": "durable-source-stage",
+              "payloadCompatibility": "exact"
+            }
+          }
+        ],
+        "childRuns": [
+          {
+            "stepId": "await-ta-settlement",
+            "planRef": {
+              "pipelineId": "fund-ta-settlement"
+            },
+            "runtime": {
+              "artifact": "net.imadz:monarch-persistence_2.13:0.2.1",
+              "apiMode": "strict"
+            },
+            "journal": {
+              "pidPrefix": "fund-ta-child"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "documentOnly": [
+    {
+      "id": "fund-ta-settlement",
+      "reason": "execution-not-declared",
+      "source": {
+        "document": "canonical",
+        "pointer": "/pipelines/0",
+        "file": "tree/pipelines/fund-ta-settlement.pipeline.yaml",
+        "atom": "pipeline:fund-ta-settlement",
+        "path": "/",
+        "location": {
+          "line": 3,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "sip-cross-bank-design-boundary",
+      "reason": "execution-not-declared",
+      "source": {
+        "document": "canonical",
+        "pointer": "/pipelines/3",
+        "file": "tree/pipelines/sip-cross-bank-design-boundary.pipeline.yaml",
+        "atom": "pipeline:sip-cross-bank-design-boundary",
+        "path": "/",
+        "location": {
+          "line": 3,
+          "column": 1
+        }
+      }
+    }
+  ],
+  "sourceMap": {
+    "/pipelines/0": {
+      "document": "canonical",
+      "pointer": "/pipelines/1",
+      "file": "tree/pipelines/fund-purchase-invoke.pipeline.yaml",
+      "atom": "pipeline:fund-purchase-invoke",
+      "path": "/execution",
+      "location": {
+        "line": 10,
+        "column": 3
+      }
+    },
+    "/pipelines/1": {
+      "document": "canonical",
+      "pointer": "/pipelines/2",
+      "file": "tree/pipelines/sip-installment-execution.pipeline.yaml",
+      "atom": "pipeline:sip-installment-execution",
+      "path": "/execution",
+      "location": {
+        "line": 10,
+        "column": 3
+      }
+    }
+  },
+  "sagas": [
+    {
+      "definition": {
+        "id": "external-bank-transfer",
+        "name": "Collect funds from external bank into core CreditBalance",
+        "seq": 0,
+        "version": "v1",
+        "payload": {
+          "schemaVersion": "truthsrc.saga/v1",
+          "purpose": "Cross-bank collection TCC Saga: debit an external bank clearing order (source: ExternalTransferOrder) and credit the investor's core bank account (target: CreditBalance) with explicit singleton serial barriers.",
+          "invariants": [
+            "Currency and exact minor units are conserved across interbank clearing and core account credit"
+          ],
+          "transactionIdType": "TxId",
+          "args": [
+            {
+              "slot": "externalOrderId",
+              "type": "ExternalOrderId"
+            },
+            {
+              "slot": "toAccountId",
+              "type": "AccountId"
+            },
+            {
+              "slot": "amount",
+              "type": "Money"
+            }
+          ],
+          "participants": [
+            {
+              "id": "source",
+              "aggregate": "ExternalTransferOrder",
+              "resourceRef": {
+                "ref": "args:externalOrderId",
+                "type": "ExternalOrderId"
+              }
+            },
+            {
+              "id": "target",
+              "aggregate": "CreditBalance",
+              "resourceRef": {
+                "ref": "args:toAccountId",
+                "type": "AccountId"
+              }
+            }
+          ],
+          "groups": [
+            {
+              "id": 1,
+              "dependsOn": []
+            },
+            {
+              "id": 2,
+              "dependsOn": [
+                1
+              ]
+            }
+          ],
+          "steps": [
+            {
+              "id": "prepare-external-debit",
+              "participant": "source",
+              "group": 1,
+              "phases": {
+                "prepare": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "ExternalTransferOrder",
+                    "name": "PrepareExternalDebit"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:externalOrderId",
+                      "type": "ExternalOrderId"
+                    },
+                    {
+                      "slot": "amount",
+                      "ref": "args:amount",
+                      "type": "Money"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "amount",
+                      "type": "Money"
+                    }
+                  ]
+                },
+                "commit": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "ExternalTransferOrder",
+                    "name": "CommitExternalDebit"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:externalOrderId",
+                      "type": "ExternalOrderId"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "compensate": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "ExternalTransferOrder",
+                    "name": "CompensateExternalDebit"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:externalOrderId",
+                      "type": "ExternalOrderId"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "id": "credit-core-account",
+              "participant": "target",
+              "group": 2,
+              "phases": {
+                "prepare": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "RecordIncomingCredits"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:toAccountId",
+                      "type": "AccountId"
+                    },
+                    {
+                      "slot": "amount",
+                      "ref": "args:amount",
+                      "type": "Money"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "amount",
+                      "type": "Money"
+                    }
+                  ]
+                },
+                "commit": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "CommitIncomingCredits"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:toAccountId",
+                      "type": "AccountId"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "compensate": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "CancelIncomingCredit"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:toAccountId",
+                      "type": "AccountId"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "resilience": {
+            "maxAttempts": 1,
+            "phaseTimeoutMs": 1000,
+            "queryTimeoutMs": 1000,
+            "backoffMs": 0,
+            "totalTimeoutMs": 10000
+          },
+          "safety": {
+            "commitDecision": "durable-before-commit",
+            "abortDecision": "durable-before-compensate",
+            "afterCommit": "forward-recovery",
+            "unknown": "reconcile-before-resume",
+            "compensation": "confirmed-reservations",
+            "cancelBeforePrepare": "empty-release-and-fence",
+            "retryIdentity": "stable-operation",
+            "manualRecovery": "authorized-reconciliation-evidence"
+          },
+          "admission": {
+            "maxParticipants": 2,
+            "maxInFlight": 1,
+            "maxItemsPerChunk": 64,
+            "manifest": {
+              "mode": "static",
+              "durable": true
+            }
+          },
+          "triggers": [
+            {
+              "id": "from-command",
+              "kind": "command",
+              "sourceRef": {
+                "aggregate": "CreditBalance",
+                "name": "StartExternalTopUp"
+              },
+              "argsMapping": [
+                {
+                  "slot": "externalOrderId",
+                  "ref": "source:externalOrderId",
+                  "type": "ExternalOrderId"
+                },
+                {
+                  "slot": "toAccountId",
+                  "ref": "source:toAccountId",
+                  "type": "AccountId"
+                },
+                {
+                  "slot": "amount",
+                  "ref": "source:amount",
+                  "type": "Money"
+                }
+              ],
+              "idempotency": {
+                "ref": "source:operationId",
+                "type": "OperationId",
+                "scope": "saga-version",
+                "conflict": "reject-different-args"
+              }
+            },
+            {
+              "id": "from-event",
+              "kind": "event",
+              "sourceRef": {
+                "aggregate": "CreditBalance",
+                "name": "ExternalTopUpRequested"
+              },
+              "argsMapping": [
+                {
+                  "slot": "externalOrderId",
+                  "ref": "source:externalOrderId",
+                  "type": "ExternalOrderId"
+                },
+                {
+                  "slot": "toAccountId",
+                  "ref": "source:toAccountId",
+                  "type": "AccountId"
+                },
+                {
+                  "slot": "amount",
+                  "ref": "source:amount",
+                  "type": "Money"
+                }
+              ],
+              "idempotency": {
+                "ref": "source:operationId",
+                "type": "OperationId",
+                "scope": "saga-version",
+                "conflict": "reject-different-args"
+              }
+            }
+          ],
+          "resultKinds": [
+            "succeeded",
+            "rejected-before-effects",
+            "compensated",
+            "recovery-required",
+            "outcome-unknown"
+          ],
+          "completions": [
+            {
+              "kind": "succeeded",
+              "eventRef": {
+                "aggregate": "CreditBalance",
+                "name": "result-succeeded"
+              },
+              "bindings": [
+                {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                }
+              ]
+            },
+            {
+              "kind": "rejected-before-effects",
+              "eventRef": {
+                "aggregate": "CreditBalance",
+                "name": "result-rejected-before-effects"
+              },
+              "bindings": [
+                {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                }
+              ]
+            },
+            {
+              "kind": "compensated",
+              "eventRef": {
+                "aggregate": "CreditBalance",
+                "name": "result-compensated"
+              },
+              "bindings": [
+                {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                }
+              ]
+            },
+            {
+              "kind": "recovery-required",
+              "eventRef": {
+                "aggregate": "CreditBalance",
+                "name": "result-recovery-required"
+              },
+              "bindings": [
+                {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                }
+              ]
+            },
+            {
+              "kind": "outcome-unknown",
+              "eventRef": {
+                "aggregate": "CreditBalance",
+                "name": "result-outcome-unknown"
+              },
+              "bindings": [
+                {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "binding": {
+        "sagaId": "external-bank-transfer",
+        "version": "v1",
+        "module": "fixture.interbank.ExternalBankTransferSagaModule",
+        "engine": {
+          "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+          "apiMode": "strict",
+          "entrypoint": "fixture.interbank.ExternalBankTransferSagaEntry",
+          "capabilities": {
+            "required": [
+              "durable-commit-decision",
+              "durable-abort-decision",
+              "typed-nonterminal-unknown",
+              "safe-status-reattach",
+              "receipt-reconciliation",
+              "participant-idempotency-query",
+              "pinned-definition-codec",
+              "manual-evidence-authorization",
+              "cancel-before-prepare-fencing",
+              "durable-manifest"
+            ]
+          }
+        },
+        "codec": {
+          "id": "ArgsCodec",
+          "version": "codec-v1",
+          "compatibleVersions": [
+            "codec-v1"
+          ],
+          "mapper": "fixture.ArgsCodec"
+        },
+        "types": [
+          {
+            "id": "TxId",
+            "canonicalType": "TxId",
+            "implementation": "fixture.types.TxId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "OperationId",
+            "canonicalType": "OperationId",
+            "implementation": "fixture.types.OperationId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "AccountId",
+            "canonicalType": "AccountId",
+            "implementation": "fixture.types.AccountId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "ExternalOrderId",
+            "canonicalType": "ExternalOrderId",
+            "implementation": "fixture.types.ExternalOrderId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "FundOrderId",
+            "canonicalType": "FundOrderId",
+            "implementation": "fixture.types.FundOrderId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "SipPlanId",
+            "canonicalType": "SipPlanId",
+            "implementation": "fixture.types.SipPlanId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "Money",
+            "canonicalType": "Money",
+            "implementation": "fixture.types.Money",
+            "kind": "money",
+            "currency": "ISO-4217",
+            "amountEncoding": "minor-unit-string",
+            "scale": 2,
+            "precision": 38,
+            "codec": "fixture.ExactMoneyCodec"
+          }
+        ],
+        "participants": [
+          {
+            "participantId": "source",
+            "addressing": {
+              "resolver": "fixture.externalOrderResolver",
+              "aggregate": "ExternalTransferOrder",
+              "resourceType": "ExternalOrderId",
+              "mode": "exact-resource"
+            }
+          },
+          {
+            "participantId": "target",
+            "addressing": {
+              "resolver": "fixture.creditBalanceResolver",
+              "aggregate": "CreditBalance",
+              "resourceType": "AccountId",
+              "mode": "exact-resource"
+            }
+          }
+        ],
+        "steps": [
+          {
+            "stepId": "prepare-external-debit",
+            "phases": {
+              "prepare": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "ExternalTransferOrder",
+                    "name": "ExternalDebitPrepared"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "amount",
+                      "ref": "receipt:amount",
+                      "type": "Money"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "commit": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "ExternalTransferOrder",
+                    "name": "ExternalDebitCommitted"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "compensate": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "ExternalTransferOrder",
+                    "name": "ExternalDebitCompensated"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              }
+            }
+          },
+          {
+            "stepId": "credit-core-account",
+            "phases": {
+              "prepare": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "RecordIncomingCreditsConfirmed"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "amount",
+                      "ref": "receipt:amount",
+                      "type": "Money"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "commit": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "CommitIncomingCreditsConfirmed"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "compensate": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "CancelIncomingCreditConfirmed"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              }
+            }
+          }
+        ],
+        "triggerMappers": [
+          {
+            "triggerId": "from-command",
+            "argsMapper": "fixture.TriggerArgsMapper",
+            "idempotencyMapper": "fixture.TriggerIdempotencyMapper"
+          },
+          {
+            "triggerId": "from-event",
+            "argsMapper": "fixture.TriggerArgsMapper",
+            "idempotencyMapper": "fixture.TriggerIdempotencyMapper"
+          }
+        ],
+        "completionMappers": [
+          {
+            "kind": "succeeded",
+            "mapper": "fixture.CompletionMapper"
+          },
+          {
+            "kind": "rejected-before-effects",
+            "mapper": "fixture.CompletionMapper"
+          },
+          {
+            "kind": "compensated",
+            "mapper": "fixture.CompletionMapper"
+          },
+          {
+            "kind": "recovery-required",
+            "mapper": "fixture.CompletionMapper"
+          },
+          {
+            "kind": "outcome-unknown",
+            "mapper": "fixture.CompletionMapper"
+          }
+        ]
+      },
+      "readiness": "contract-only"
+    },
+    {
+      "definition": {
+        "id": "fund-subscription-pay",
+        "name": "Reserve and deduct core bank funds for mutual fund subscription",
+        "seq": 1,
+        "version": "v1",
+        "payload": {
+          "schemaVersion": "truthsrc.saga/v1",
+          "purpose": "Fund subscription payment TCC Saga: reserve and deduct funds from the investor's core CreditBalance (source) and confirm payment on the FundOrder aggregate (target) before T+1 TA submission.",
+          "invariants": [
+            "Core bank account deduction and fund order settled subscription amount are strictly conserved"
+          ],
+          "transactionIdType": "TxId",
+          "args": [
+            {
+              "slot": "investorAccountId",
+              "type": "AccountId"
+            },
+            {
+              "slot": "fundOrderId",
+              "type": "FundOrderId"
+            },
+            {
+              "slot": "amount",
+              "type": "Money"
+            }
+          ],
+          "participants": [
+            {
+              "id": "source",
+              "aggregate": "CreditBalance",
+              "resourceRef": {
+                "ref": "args:investorAccountId",
+                "type": "AccountId"
+              }
+            },
+            {
+              "id": "target",
+              "aggregate": "FundOrder",
+              "resourceRef": {
+                "ref": "args:fundOrderId",
+                "type": "FundOrderId"
+              }
+            }
+          ],
+          "groups": [
+            {
+              "id": 1,
+              "dependsOn": []
+            },
+            {
+              "id": 2,
+              "dependsOn": [
+                1
+              ]
+            }
+          ],
+          "steps": [
+            {
+              "id": "reserve-core-funds",
+              "participant": "source",
+              "group": 1,
+              "phases": {
+                "prepare": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "ReserveFunds"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:investorAccountId",
+                      "type": "AccountId"
+                    },
+                    {
+                      "slot": "amount",
+                      "ref": "args:amount",
+                      "type": "Money"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "amount",
+                      "type": "Money"
+                    }
+                  ]
+                },
+                "commit": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "DeductFunds"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:investorAccountId",
+                      "type": "AccountId"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "compensate": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "ReleaseReservedFunds"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:investorAccountId",
+                      "type": "AccountId"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "id": "reserve-fund-order",
+              "participant": "target",
+              "group": 2,
+              "phases": {
+                "prepare": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "FundOrder",
+                    "name": "ReserveFundSubscription"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:fundOrderId",
+                      "type": "FundOrderId"
+                    },
+                    {
+                      "slot": "amount",
+                      "ref": "args:amount",
+                      "type": "Money"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "amount",
+                      "type": "Money"
+                    }
+                  ]
+                },
+                "commit": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "FundOrder",
+                    "name": "ConfirmFundSubscriptionPayment"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:fundOrderId",
+                      "type": "FundOrderId"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "compensate": {
+                  "kind": "command",
+                  "commandRef": {
+                    "aggregate": "FundOrder",
+                    "name": "CancelFundSubscription"
+                  },
+                  "bindings": [
+                    {
+                      "slot": "txid",
+                      "ref": "txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "resource",
+                      "ref": "args:fundOrderId",
+                      "type": "FundOrderId"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "resilience": {
+            "maxAttempts": 1,
+            "phaseTimeoutMs": 1000,
+            "queryTimeoutMs": 1000,
+            "backoffMs": 0,
+            "totalTimeoutMs": 10000
+          },
+          "safety": {
+            "commitDecision": "durable-before-commit",
+            "abortDecision": "durable-before-compensate",
+            "afterCommit": "forward-recovery",
+            "unknown": "reconcile-before-resume",
+            "compensation": "confirmed-reservations",
+            "cancelBeforePrepare": "empty-release-and-fence",
+            "retryIdentity": "stable-operation",
+            "manualRecovery": "authorized-reconciliation-evidence"
+          },
+          "admission": {
+            "maxParticipants": 2,
+            "maxInFlight": 1,
+            "maxItemsPerChunk": 64,
+            "manifest": {
+              "mode": "static",
+              "durable": true
+            }
+          },
+          "triggers": [
+            {
+              "id": "from-command",
+              "kind": "command",
+              "sourceRef": {
+                "aggregate": "FundOrder",
+                "name": "RequestFundPurchase"
+              },
+              "argsMapping": [
+                {
+                  "slot": "investorAccountId",
+                  "ref": "source:investorAccountId",
+                  "type": "AccountId"
+                },
+                {
+                  "slot": "fundOrderId",
+                  "ref": "source:fundOrderId",
+                  "type": "FundOrderId"
+                },
+                {
+                  "slot": "amount",
+                  "ref": "source:amount",
+                  "type": "Money"
+                }
+              ],
+              "idempotency": {
+                "ref": "source:operationId",
+                "type": "OperationId",
+                "scope": "saga-version",
+                "conflict": "reject-different-args"
+              }
+            },
+            {
+              "id": "from-event",
+              "kind": "event",
+              "sourceRef": {
+                "aggregate": "FundOrder",
+                "name": "FundPurchaseRequested"
+              },
+              "argsMapping": [
+                {
+                  "slot": "investorAccountId",
+                  "ref": "source:investorAccountId",
+                  "type": "AccountId"
+                },
+                {
+                  "slot": "fundOrderId",
+                  "ref": "source:fundOrderId",
+                  "type": "FundOrderId"
+                },
+                {
+                  "slot": "amount",
+                  "ref": "source:amount",
+                  "type": "Money"
+                }
+              ],
+              "idempotency": {
+                "ref": "source:operationId",
+                "type": "OperationId",
+                "scope": "saga-version",
+                "conflict": "reject-different-args"
+              }
+            }
+          ],
+          "resultKinds": [
+            "succeeded",
+            "rejected-before-effects",
+            "compensated",
+            "recovery-required",
+            "outcome-unknown"
+          ],
+          "completions": [
+            {
+              "kind": "succeeded",
+              "eventRef": {
+                "aggregate": "FundOrder",
+                "name": "result-succeeded"
+              },
+              "bindings": [
+                {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                }
+              ]
+            },
+            {
+              "kind": "rejected-before-effects",
+              "eventRef": {
+                "aggregate": "FundOrder",
+                "name": "result-rejected-before-effects"
+              },
+              "bindings": [
+                {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                }
+              ]
+            },
+            {
+              "kind": "compensated",
+              "eventRef": {
+                "aggregate": "FundOrder",
+                "name": "result-compensated"
+              },
+              "bindings": [
+                {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                }
+              ]
+            },
+            {
+              "kind": "recovery-required",
+              "eventRef": {
+                "aggregate": "FundOrder",
+                "name": "result-recovery-required"
+              },
+              "bindings": [
+                {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                }
+              ]
+            },
+            {
+              "kind": "outcome-unknown",
+              "eventRef": {
+                "aggregate": "FundOrder",
+                "name": "result-outcome-unknown"
+              },
+              "bindings": [
+                {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "binding": {
+        "sagaId": "fund-subscription-pay",
+        "version": "v1",
+        "module": "fixture.wealth.FundSubscriptionPaySagaModule",
+        "engine": {
+          "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+          "apiMode": "strict",
+          "entrypoint": "fixture.wealth.FundSubscriptionPaySagaEntry",
+          "capabilities": {
+            "required": [
+              "durable-commit-decision",
+              "durable-abort-decision",
+              "typed-nonterminal-unknown",
+              "safe-status-reattach",
+              "receipt-reconciliation",
+              "participant-idempotency-query",
+              "pinned-definition-codec",
+              "manual-evidence-authorization",
+              "cancel-before-prepare-fencing",
+              "durable-manifest"
+            ]
+          }
+        },
+        "codec": {
+          "id": "ArgsCodec",
+          "version": "codec-v1",
+          "compatibleVersions": [
+            "codec-v1"
+          ],
+          "mapper": "fixture.ArgsCodec"
+        },
+        "types": [
+          {
+            "id": "TxId",
+            "canonicalType": "TxId",
+            "implementation": "fixture.types.TxId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "OperationId",
+            "canonicalType": "OperationId",
+            "implementation": "fixture.types.OperationId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "AccountId",
+            "canonicalType": "AccountId",
+            "implementation": "fixture.types.AccountId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "ExternalOrderId",
+            "canonicalType": "ExternalOrderId",
+            "implementation": "fixture.types.ExternalOrderId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "FundOrderId",
+            "canonicalType": "FundOrderId",
+            "implementation": "fixture.types.FundOrderId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "SipPlanId",
+            "canonicalType": "SipPlanId",
+            "implementation": "fixture.types.SipPlanId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "Money",
+            "canonicalType": "Money",
+            "implementation": "fixture.types.Money",
+            "kind": "money",
+            "currency": "ISO-4217",
+            "amountEncoding": "minor-unit-string",
+            "scale": 2,
+            "precision": 38,
+            "codec": "fixture.ExactMoneyCodec"
+          }
+        ],
+        "participants": [
+          {
+            "participantId": "source",
+            "addressing": {
+              "resolver": "fixture.creditBalanceResolver",
+              "aggregate": "CreditBalance",
+              "resourceType": "AccountId",
+              "mode": "exact-resource"
+            }
+          },
+          {
+            "participantId": "target",
+            "addressing": {
+              "resolver": "fixture.fundOrderResolver",
+              "aggregate": "FundOrder",
+              "resourceType": "FundOrderId",
+              "mode": "exact-resource"
+            }
+          }
+        ],
+        "steps": [
+          {
+            "stepId": "reserve-core-funds",
+            "phases": {
+              "prepare": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "ReserveFundsConfirmed"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "amount",
+                      "ref": "receipt:amount",
+                      "type": "Money"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "commit": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "DeductFundsConfirmed"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "compensate": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "ReleaseReservedFundsConfirmed"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              }
+            }
+          },
+          {
+            "stepId": "reserve-fund-order",
+            "phases": {
+              "prepare": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "FundOrder",
+                    "name": "ReserveFundSubscriptionConfirmed"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    },
+                    {
+                      "slot": "amount",
+                      "ref": "receipt:amount",
+                      "type": "Money"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "commit": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "FundOrder",
+                    "name": "FundSubscriptionPaymentConfirmed"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "compensate": {
+                "kind": "command",
+                "port": "fixture.PhasePort",
+                "commandMapper": "fixture.CommandMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "FundOrder",
+                    "name": "FundSubscriptionCanceled"
+                  },
+                  "mapper": "fixture.ConfirmationMapper",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "ref": "receipt:txid",
+                      "type": "TxId"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.QueryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.ReceiptMapper",
+                  "version": "receipt-v1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.IdempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              }
+            }
+          }
+        ],
+        "triggerMappers": [
+          {
+            "triggerId": "from-command",
+            "argsMapper": "fixture.TriggerArgsMapper",
+            "idempotencyMapper": "fixture.TriggerIdempotencyMapper"
+          },
+          {
+            "triggerId": "from-event",
+            "argsMapper": "fixture.TriggerArgsMapper",
+            "idempotencyMapper": "fixture.TriggerIdempotencyMapper"
+          }
+        ],
+        "completionMappers": [
+          {
+            "kind": "succeeded",
+            "mapper": "fixture.CompletionMapper"
+          },
+          {
+            "kind": "rejected-before-effects",
+            "mapper": "fixture.CompletionMapper"
+          },
+          {
+            "kind": "compensated",
+            "mapper": "fixture.CompletionMapper"
+          },
+          {
+            "kind": "recovery-required",
+            "mapper": "fixture.CompletionMapper"
+          },
+          {
+            "kind": "outcome-unknown",
+            "mapper": "fixture.CompletionMapper"
+          }
+        ]
+      },
+      "readiness": "contract-only"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: ReserveFundSubscription
+payload:
+  {
+    "name": "ReserveFundSubscription",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "ReserveFundSubscriptionConfirmed"
+    ],
+    "guards": [
+      {
+        "ruleId": "IR-FO-RESERVE-001",
+        "errCode": "62001",
+        "onFail": "succeed-empty",
+        "when": {
+          "form": "map-absent",
+          "map": "reservedSubscriptions",
+          "key": "param.txid"
+        },
+        "desc": "Subscription already reserved for this transaction: idempotent success."
+      },
+      {
+        "ruleId": "IR-FO-RESERVE-002",
+        "errCode": "62004",
+        "onFail": "reject",
+        "when": {
+          "form": "money-positive",
+          "amount": "param.amount"
+        },
+        "desc": "Subscription amount must be positive."
+      }
+    ],
+    "description": "TCC Prepare phase on FundOrder: reserve fund subscription quota under transaction identity."
+  }
+events:
+  {
+    "ReserveFundSubscriptionConfirmed": {
+      "name": "ReserveFundSubscriptionConfirmed",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "BUSINESS_INPUT"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "BUSINESS_INPUT"
+        }
+      ],
+      "description": "Durable fact: fund subscription quota reserved under transaction identity.",
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "reservedSubscriptions",
+          "op": "put",
+          "key": "event.txid",
+          "value": "event.amount"
+        },
+        {
+          "slot": "status",
+          "expr": "literal:SUBSCRIPTION_RESERVED"
+        }
+      ]
+    }
+  }

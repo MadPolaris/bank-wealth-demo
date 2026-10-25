@@ -1,0 +1,88 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: CreditBalance
+command: StartExternalTopUp
+payload:
+  {
+    "name": "StartExternalTopUp",
+    "description": "Entry command on core account to request an interbank top-up transfer from an external bank account.",
+    "parameters": [
+      {
+        "name": "operationId",
+        "dataType": "OperationId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "externalOrderId",
+        "dataType": "ExternalOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "toAccountId",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [],
+    "produces": [
+      "ExternalTopUpRequested"
+    ]
+  }
+events:
+  {
+    "ExternalTopUpRequested": {
+      "name": "ExternalTopUpRequested",
+      "description": "Durable event requesting execution of the external-bank-transfer Saga.",
+      "payloads": [
+        {
+          "name": "operationId",
+          "dataType": "OperationId",
+          "origin": "PROPAGATED",
+          "lineageHint": "StartExternalTopUp.operationId"
+        },
+        {
+          "name": "externalOrderId",
+          "dataType": "ExternalOrderId",
+          "origin": "PROPAGATED",
+          "lineageHint": "StartExternalTopUp.externalOrderId"
+        },
+        {
+          "name": "toAccountId",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED",
+          "lineageHint": "StartExternalTopUp.toAccountId"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "PROPAGATED",
+          "lineageHint": "StartExternalTopUp.amount"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "operationId",
+          "expr": "param.operationId"
+        },
+        {
+          "slot": "externalOrderId",
+          "expr": "param.externalOrderId"
+        },
+        {
+          "slot": "toAccountId",
+          "expr": "param.toAccountId"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        }
+      ],
+      "foldAssignments": []
+    }
+  }

@@ -1,0 +1,84 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RecordTAShareConfirmation
+payload:
+  {
+    "name": "RecordTAShareConfirmation",
+    "parameters": [
+      {
+        "name": "operationId",
+        "dataType": "OperationId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "fundOrderId",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "shares",
+        "dataType": "FundShare",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "FundSharesConfirmed"
+    ],
+    "guards": [],
+    "description": "Record T+1 confirmed fund shares emitted by the TA settlement child run."
+  }
+events:
+  {
+    "FundSharesConfirmed": {
+      "name": "FundSharesConfirmed",
+      "payloads": [
+        {
+          "name": "operationId",
+          "dataType": "OperationId",
+          "origin": "PROPAGATED",
+          "lineageHint": "RecordTAShareConfirmation.operationId"
+        },
+        {
+          "name": "fundOrderId",
+          "dataType": "FundOrderId",
+          "origin": "PROPAGATED",
+          "lineageHint": "RecordTAShareConfirmation.fundOrderId"
+        },
+        {
+          "name": "shares",
+          "dataType": "FundShare",
+          "origin": "PROPAGATED",
+          "lineageHint": "RecordTAShareConfirmation.shares"
+        }
+      ],
+      "description": "Durable fact: T+1 fund shares confirmed by TA Registry.",
+      "bindings": [
+        {
+          "slot": "operationId",
+          "expr": "param.operationId"
+        },
+        {
+          "slot": "fundOrderId",
+          "expr": "param.fundOrderId"
+        },
+        {
+          "slot": "shares",
+          "expr": "param.shares"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "confirmedShareLots",
+          "op": "put",
+          "key": "event.operationId",
+          "value": "event.shares"
+        },
+        {
+          "slot": "status",
+          "expr": "literal:SHARES_CONFIRMED"
+        }
+      ]
+    }
+  }

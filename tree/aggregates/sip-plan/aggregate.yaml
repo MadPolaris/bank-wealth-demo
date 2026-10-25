@@ -1,0 +1,75 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: aggregate
+name: SipPlan
+seq: 3
+order:
+  commands: ["CreateSipPlan", "TriggerSipInstallment", "RecordSipInstallmentSucceeded", "RecordSipInstallmentFailed", "PauseSipPlan"]
+  events: ["SipPlanCreated", "SipInstallmentTriggered", "SipInstallmentSucceeded", "SipInstallmentFailed", "SipPlanPaused"]
+payload:
+  {
+    "name": "SipPlan",
+    "identifier": {
+      "name": "planId",
+      "dataType": "SipPlanId",
+      "origin": "BUSINESS_INPUT"
+    },
+    "entity": "SipPlanEntity",
+    "description": "Regular investment plan (定投计划) lifecycle: schedule creation, deterministic cycle installment triggering, and consecutive-failure auto-pause.",
+    "statusEnum": [
+      "ACTIVE",
+      "PAUSED",
+      "CANCELED"
+    ],
+    "stateFields": [
+      {
+        "name": "status",
+        "dataType": "String",
+        "description": "ACTIVE / PAUSED / CANCELED",
+        "origin": "SYSTEM_INJECTED",
+        "writtenBy": [
+          "SipPlanCreated",
+          "SipPlanPaused"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "deductionAmount",
+        "dataType": "Money",
+        "description": "Per-installment investment amount.",
+        "origin": "BUSINESS_INPUT",
+        "writtenBy": [
+          "SipPlanCreated.deductionAmount"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "installmentLedger",
+        "dataType": "Map[OperationId, String]",
+        "description": "Execution status of each triggered installment cycle keyed by deterministic cycle OperationId.",
+        "writtenBy": [
+          "SipInstallmentTriggered.operationId",
+          "SipInstallmentSucceeded.operationId",
+          "SipInstallmentFailed.operationId"
+        ],
+        "role": "State"
+      }
+    ],
+    "aggregateRuleRefs": [
+      {
+        "ruleId": "IR-SIP-CREATE-001",
+        "errCode": "63001",
+        "desc": "SIP per-installment deduction amount must be positive."
+      },
+      {
+        "ruleId": "IR-SIP-TRIGGER-001",
+        "errCode": "63002",
+        "desc": "SIP installment already triggered for this cycle OperationId: idempotent guard."
+      },
+      {
+        "ruleId": "IR-SIP-TRIGGER-002",
+        "errCode": "63003",
+        "desc": "Only ACTIVE SIP plans can trigger new installments."
+      }
+    ]
+  }

@@ -1,0 +1,62 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: RecordSipInstallmentSucceeded
+payload:
+  {
+    "name": "RecordSipInstallmentSucceeded",
+    "parameters": [
+      {
+        "name": "planId",
+        "dataType": "SipPlanId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "operationId",
+        "dataType": "OperationId",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "SipInstallmentSucceeded"
+    ],
+    "guards": [],
+    "description": "Mark a triggered SIP cycle installment as succeeded after TA share confirmation."
+  }
+events:
+  {
+    "SipInstallmentSucceeded": {
+      "name": "SipInstallmentSucceeded",
+      "payloads": [
+        {
+          "name": "planId",
+          "dataType": "SipPlanId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "operationId",
+          "dataType": "OperationId",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "planId",
+          "expr": "param.planId"
+        },
+        {
+          "slot": "operationId",
+          "expr": "param.operationId"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "installmentLedger",
+          "op": "put",
+          "key": "event.operationId",
+          "value": "literal:SUCCEEDED"
+        }
+      ]
+    }
+  }

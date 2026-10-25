@@ -1,0 +1,80 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: CreditBalance
+command: RecordIncomingCredits
+payload:
+  {
+    "name": "RecordIncomingCredits",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "RecordIncomingCreditsConfirmed"
+    ],
+    "guards": [
+      {
+        "ruleId": "IR-CB-RECORD-001",
+        "errCode": "60007",
+        "onFail": "reject",
+        "when": {
+          "form": "map-absent",
+          "map": "incomingCredits",
+          "key": "param.txid"
+        },
+        "desc": "Incoming credits already registered for this transaction (golden master 60007)."
+      }
+    ],
+    "description": "Stable operation identity, exact payload compatibility and durable participant receipt required."
+  }
+events:
+  {
+    "RecordIncomingCreditsConfirmed": {
+      "name": "RecordIncomingCreditsConfirmed",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "BUSINESS_INPUT"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "BUSINESS_INPUT"
+        }
+      ],
+      "description": "Designed durable fact: incoming credits of the exact amount were recorded under the transaction identity; the state fold keys the entry by txid.",
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "incomingCredits",
+          "op": "put",
+          "key": "event.txid",
+          "value": "event.amount"
+        }
+      ]
+    }
+  }

@@ -1,0 +1,21 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: externalSystem
+name: FundTARegistry
+origin:
+  stage: commandStorming
+  board: board1
+  seq: 4
+payload:
+  {
+    "type": "externalSystem",
+    "name": "FundTARegistry",
+    "stage": "commandStorming",
+    "description": "External Fund Transfer Agent (TA) system that calculates T+1 NAV and confirms allotted fund shares.",
+    "links": [
+      "event:FundSharesConfirmed"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

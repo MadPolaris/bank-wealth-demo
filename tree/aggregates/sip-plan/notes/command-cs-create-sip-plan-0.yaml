@@ -1,0 +1,21 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: command
+name: CreateSipPlan
+origin:
+  stage: commandStorming
+  board: board1
+  seq: 4
+payload:
+  {
+    "type": "command",
+    "name": "CreateSipPlan",
+    "stage": "commandStorming",
+    "description": "Create a regular fund investment plan.",
+    "links": [
+      "event:SipPlanCreated"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

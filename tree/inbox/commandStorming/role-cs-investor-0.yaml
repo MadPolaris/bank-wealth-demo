@@ -1,0 +1,24 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: role
+name: Investor
+origin:
+  stage: commandStorming
+  board: board1
+  seq: 0
+payload:
+  {
+    "type": "role",
+    "name": "Investor",
+    "stage": "commandStorming",
+    "description": "Retail banking customer who tops up core accounts from external banks, purchases mutual funds, and configures regular SIP plans.",
+    "links": [
+      "command:StartExternalTopUp",
+      "command:RequestFundPurchase",
+      "command:CreateSipPlan",
+      "command:PauseSipPlan"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "truthsrc.saga-runtime-binding/v2",
+  "target": {
+    "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+    "artifactStatus": "unpublished-candidate",
+    "apiMode": "strict",
+    "definitionApi": "net.imadz.infra.saga.strict.StrictSagaDefinition",
+    "coordinatorApi": "net.imadz.infra.saga.strict.StrictSagaCoordinator",
+    "executionMode": "static-serial-allTCC",
+    "capabilities": [
+      "positive-int-definition-version",
+      "static-participants",
+      "serial-all-tcc",
+      "fresh-canonical-args",
+      "pinned-args-codec",
+      "pinned-phase-receipt-codecs",
+      "minor-unit-string-money",
+      "singleton-serial-barriers",
+      "confirmed-receipt-context",
+      "fresh-receipt-decode"
+    ]
+  },
+  "sagas": [
+    {
+      "sagaId": "external-bank-transfer",
+      "definitionVersion": "v1",
+      "runtimeVersion": 1,
+      "argsCodec": {
+        "id": "ArgsCodec",
+        "version": "codec-v1",
+        "runtimeVersion": 1
+      },
+      "receiptCodecs": [
+        {
+          "stepId": "prepare-external-debit",
+          "phase": "prepare",
+          "id": "ext-debit-prepare-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "prepare-external-debit",
+          "phase": "commit",
+          "id": "ext-debit-commit-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "prepare-external-debit",
+          "phase": "compensate",
+          "id": "ext-debit-compensate-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "credit-core-account",
+          "phase": "prepare",
+          "id": "core-credit-prepare-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "credit-core-account",
+          "phase": "commit",
+          "id": "core-credit-commit-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "credit-core-account",
+          "phase": "compensate",
+          "id": "core-credit-compensate-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        }
+      ]
+    },
+    {
+      "sagaId": "fund-subscription-pay",
+      "definitionVersion": "v1",
+      "runtimeVersion": 1,
+      "argsCodec": {
+        "id": "ArgsCodec",
+        "version": "codec-v1",
+        "runtimeVersion": 1
+      },
+      "receiptCodecs": [
+        {
+          "stepId": "reserve-core-funds",
+          "phase": "prepare",
+          "id": "sub-core-prepare-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "reserve-core-funds",
+          "phase": "commit",
+          "id": "sub-core-commit-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "reserve-core-funds",
+          "phase": "compensate",
+          "id": "sub-core-compensate-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "reserve-fund-order",
+          "phase": "prepare",
+          "id": "sub-fo-prepare-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "reserve-fund-order",
+          "phase": "commit",
+          "id": "sub-fo-commit-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "reserve-fund-order",
+          "phase": "compensate",
+          "id": "sub-fo-compensate-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        }
+      ]
+    }
+  ]
+}

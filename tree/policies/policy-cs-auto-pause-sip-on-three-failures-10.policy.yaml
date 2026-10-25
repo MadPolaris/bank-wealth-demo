@@ -1,0 +1,42 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: policy
+type: policy
+name: AutoPauseSipOnThreeFailures
+origin:
+  stage: commandStorming
+  board: board1
+  seq: 10
+triggers:
+  - event: SipInstallmentFailed
+    aggregate: SipPlan
+invokes:
+  - command: PauseSipPlan
+    aggregate: SipPlan
+payload:
+  {
+    "type": "policy",
+    "name": "AutoPauseSipOnThreeFailures",
+    "stage": "commandStorming",
+    "description": "When a SIP installment fails 3 consecutive times due to insufficient funds, pause the SIP plan automatically.",
+    "info": {
+      "triggers": [
+        {
+          "event": "SipInstallmentFailed",
+          "aggregate": "SipPlan"
+        }
+      ],
+      "invokes": [
+        {
+          "command": "PauseSipPlan",
+          "aggregate": "SipPlan"
+        }
+      ]
+    },
+    "links": [
+      "event:SipInstallmentFailed",
+      "command:PauseSipPlan"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

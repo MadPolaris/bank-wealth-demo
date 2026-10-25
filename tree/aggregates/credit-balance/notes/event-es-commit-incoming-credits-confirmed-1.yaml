@@ -1,0 +1,27 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: event
+name: CommitIncomingCreditsConfirmed
+origin:
+  stage: eventStorming
+  board: board1
+  seq: 1
+payload:
+  {
+    "type": "event",
+    "name": "CommitIncomingCreditsConfirmed",
+    "stage": "eventStorming",
+    "description": "Incoming cross-bank funds are committed into available core account balance.",
+    "info": {
+      "timeline": "CoreAccountFunding",
+      "sequence": 1,
+      "step": 1,
+      "pivotal": true
+    },
+    "links": [
+      "event:ExternalTopUpRequested@strong"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

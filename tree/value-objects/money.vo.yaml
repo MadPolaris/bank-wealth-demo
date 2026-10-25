@@ -1,0 +1,24 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: Money
+seq: 0
+payload:
+  {
+    "name": "Money",
+    "description": "Exact monetary amount in an ISO-4217 currency (encoded as minor-unit-string in strict bindings, never floating-point).",
+    "fields": [
+      {
+        "name": "amount",
+        "dataType": "Decimal",
+        "description": "Exact numeric amount",
+        "uiLabel": "Amount"
+      },
+      {
+        "name": "currency",
+        "dataType": "String",
+        "description": "ISO 4217 currency code (e.g. CNY, USD)",
+        "uiLabel": "Currency"
+      }
+    ]
+  }

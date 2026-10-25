@@ -1,0 +1,71 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: CreditBalance
+command: CancelIncomingCredit
+payload:
+  {
+    "name": "CancelIncomingCredit",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "CancelIncomingCreditConfirmed"
+    ],
+    "guards": [
+      {
+        "ruleId": "IR-CB-CANCEL-001",
+        "errCode": "60009",
+        "onFail": "reject",
+        "when": {
+          "form": "map-contains",
+          "map": "incomingCredits",
+          "key": "param.txid"
+        },
+        "desc": "Incoming credits cannot be found or already canceled (golden master 60009)."
+      }
+    ],
+    "description": "Stable operation identity, exact payload compatibility and durable participant receipt required."
+  }
+events:
+  {
+    "CancelIncomingCreditConfirmed": {
+      "name": "CancelIncomingCreditConfirmed",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "BUSINESS_INPUT"
+        }
+      ],
+      "description": "Designed durable fact: the incoming credits under this transaction identity were canceled; the fold clears the entry the txid names.",
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "compensated",
+          "op": "put",
+          "key": "event.txid",
+          "value": "state.incomingCredits[event.txid]"
+        },
+        {
+          "slot": "incomingCredits",
+          "op": "remove",
+          "key": "event.txid"
+        }
+      ]
+    }
+  }

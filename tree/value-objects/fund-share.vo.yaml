@@ -1,0 +1,30 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: FundShare
+seq: 1
+payload:
+  {
+    "name": "FundShare",
+    "description": "Confirmed mutual fund share lot with fund code and net asset value (NAV) snapshot.",
+    "fields": [
+      {
+        "name": "fundCode",
+        "dataType": "String",
+        "description": "6-digit fund identifier",
+        "uiLabel": "Fund Code"
+      },
+      {
+        "name": "shares",
+        "dataType": "Decimal",
+        "description": "Confirmed share units",
+        "uiLabel": "Confirmed Shares"
+      },
+      {
+        "name": "nav",
+        "dataType": "Decimal",
+        "description": "T+1 Net Asset Value per share",
+        "uiLabel": "Confirmed NAV"
+      }
+    ]
+  }

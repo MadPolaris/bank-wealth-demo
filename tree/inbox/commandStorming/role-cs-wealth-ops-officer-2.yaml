@@ -1,0 +1,22 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: role
+name: WealthOpsOfficer
+origin:
+  stage: commandStorming
+  board: board1
+  seq: 2
+payload:
+  {
+    "type": "role",
+    "name": "WealthOpsOfficer",
+    "stage": "commandStorming",
+    "description": "Operations specialist who reviews recovery-required and outcome-unknown cross-bank or TA exceptions with authorized reconciliation evidence.",
+    "links": [
+      "command:GetBalance",
+      "command:GetFundOrderState"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

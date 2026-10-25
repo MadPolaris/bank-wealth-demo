@@ -1,0 +1,23 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: externalSystem
+name: InterbankClearingGateway
+origin:
+  stage: commandStorming
+  board: board1
+  seq: 3
+payload:
+  {
+    "type": "externalSystem",
+    "name": "InterbankClearingGateway",
+    "stage": "commandStorming",
+    "description": "External central bank / UnionPay interbank clearing network for cross-bank account debit and settlement.",
+    "links": [
+      "event:ExternalDebitPrepared",
+      "event:ExternalDebitCommitted",
+      "event:ExternalDebitCompensated"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

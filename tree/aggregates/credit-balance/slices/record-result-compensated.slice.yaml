@@ -1,0 +1,61 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: CreditBalance
+command: RecordResultCompensated
+payload:
+  {
+    "name": "RecordResultCompensated",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "result-compensated"
+    ],
+    "guards": [
+      {
+        "ruleId": "IR-CB-RESULT-001",
+        "errCode": "60010",
+        "onFail": "succeed-empty",
+        "when": {
+          "form": "map-absent",
+          "map": "sagaResults",
+          "key": "param.txid"
+        },
+        "desc": "Result already recorded for this transaction: idempotent republication success, no events (designed strict TCC outcome ledger 60010)."
+      }
+    ],
+    "description": "Idempotent publication of the saga terminal outcome (kind compensated) onto the aggregate journal; the host completion flow asks this command (result-publication convention, SCHEMA.md P5)."
+  }
+events:
+  {
+    "result-compensated": {
+      "name": "result-compensated",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "BUSINESS_INPUT"
+        }
+      ],
+      "description": "Designed durable fact: the saga compensated all prepared effects for this transaction identity; the fold records the kind in the sagaResults ledger.",
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "sagaResults",
+          "op": "put",
+          "key": "event.txid",
+          "value": "literal:compensated"
+        }
+      ]
+    }
+  }

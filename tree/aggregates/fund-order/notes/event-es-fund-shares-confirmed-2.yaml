@@ -1,0 +1,27 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: event
+name: FundSharesConfirmed
+origin:
+  stage: eventStorming
+  board: board1
+  seq: 7
+payload:
+  {
+    "type": "event",
+    "name": "FundSharesConfirmed",
+    "stage": "eventStorming",
+    "description": "Fund TA registry confirms T+1 NAV and allotted fund shares.",
+    "info": {
+      "timeline": "TASettlement",
+      "sequence": 7,
+      "step": 2,
+      "pivotal": true
+    },
+    "links": [
+      "event:FundSubscriptionPaymentConfirmed@eventual"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

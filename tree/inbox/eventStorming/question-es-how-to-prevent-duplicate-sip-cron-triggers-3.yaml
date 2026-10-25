@@ -1,0 +1,21 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: question
+name: "How to prevent duplicate SIP cron triggers for the same cycle?"
+origin:
+  stage: eventStorming
+  board: board1
+  seq: 3
+payload:
+  {
+    "type": "question",
+    "name": "How to prevent duplicate SIP cron triggers for the same cycle?",
+    "stage": "eventStorming",
+    "description": "Each SIP cycle carries a deterministic OperationId (planId + cycleDate) and stageOccurrence token. Both Saga triggers and Pipeline invokeSaga/awaitChildRun derive TxId via durable-source-stage with conflict: reject-different-args.",
+    "links": [
+      "event:SipInstallmentTriggered"
+    ],
+    "author": "domain-expert",
+    "createdAt": "2026-10-24"
+  }

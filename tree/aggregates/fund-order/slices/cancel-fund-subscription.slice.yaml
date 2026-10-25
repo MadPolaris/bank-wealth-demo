@@ -1,0 +1,75 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: CancelFundSubscription
+payload:
+  {
+    "name": "CancelFundSubscription",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "produces": [
+      "FundSubscriptionCanceled"
+    ],
+    "guards": [
+      {
+        "ruleId": "IR-FO-CANCEL-001",
+        "errCode": "62009",
+        "onFail": "reject",
+        "when": {
+          "form": "map-contains",
+          "map": "reservedSubscriptions",
+          "key": "param.txid"
+        },
+        "desc": "Prepared subscription cannot be found or already canceled."
+      }
+    ],
+    "description": "TCC Compensate phase on FundOrder: cancel prepared subscription reservation."
+  }
+events:
+  {
+    "FundSubscriptionCanceled": {
+      "name": "FundSubscriptionCanceled",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "BUSINESS_INPUT"
+        }
+      ],
+      "description": "Durable fact: prepared fund subscription was canceled.",
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "compensatedSubscriptions",
+          "op": "put",
+          "key": "event.txid",
+          "value": "state.reservedSubscriptions[event.txid]"
+        },
+        {
+          "slot": "reservedSubscriptions",
+          "op": "remove",
+          "key": "event.txid"
+        },
+        {
+          "slot": "status",
+          "expr": "literal:CANCELED"
+        }
+      ]
+    }
+  }

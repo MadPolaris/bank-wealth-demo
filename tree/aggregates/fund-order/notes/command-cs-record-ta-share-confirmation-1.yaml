@@ -1,0 +1,21 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: command
+name: RecordTAShareConfirmation
+origin:
+  stage: commandStorming
+  board: board1
+  seq: 3
+payload:
+  {
+    "type": "command",
+    "name": "RecordTAShareConfirmation",
+    "stage": "commandStorming",
+    "description": "Record T+1 confirmed fund shares from Fund TA Registry.",
+    "links": [
+      "event:FundSharesConfirmed"
+    ],
+    "author": "facilitator",
+    "createdAt": "2026-10-24"
+  }

@@ -1,0 +1,25 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: story
+name: PurchaseFund
+seq: 1
+payload:
+  {
+    "name": "PurchaseFund",
+    "role": "Investor",
+    "aggregate": "FundOrder",
+    "goal": "Subscribe to a mutual fund using my core account balance and receive T+1 confirmed fund shares.",
+    "soThat": "My payment is atomically reserved/deducted and my allotted shares are tracked to T+1 settlement.",
+    "slices": {
+      "command": "RequestFundPurchase",
+      "events": [
+        "FundPurchaseRequested",
+        "DeductFundsConfirmed",
+        "FundSubscriptionPaymentConfirmed",
+        "FundSharesConfirmed"
+      ],
+      "readModels": [
+        "InvestorWealthOverview"
+      ]
+    }
+  }
