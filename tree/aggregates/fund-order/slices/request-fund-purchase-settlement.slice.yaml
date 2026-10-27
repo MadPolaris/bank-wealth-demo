@@ -1,0 +1,185 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RequestFundPurchaseSettlement
+payload:
+  {
+    "name": "RequestFundPurchaseSettlement",
+    "description": "Creation-only CNY cash purchase request, preserving original investor/collection accounts and full positive principal; emits only the independent cash-v2 entry.",
+    "parameters": [
+      {
+        "name": "operationId",
+        "dataType": "OperationId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "fundOrderId",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "investorAccountId",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "fundCollectionAccountId",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "fundCode",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-NO-RECREATE",
+        "errCode": "62100",
+        "cond": "state.status.isEmpty && state.contractVersion.isEmpty && state.reservedSubscriptions.isEmpty && state.committedSubscriptions.isEmpty && state.compensatedSubscriptions.isEmpty",
+        "desc": "A purchase request is creation-only: neither the legacy nor cash entry can reset/recreate an existing FundOrder."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-REQUEST-ID",
+        "errCode": "62101",
+        "cond": "param.fundOrderId == state.id && param.investorAccountId != param.fundCollectionAccountId",
+        "desc": "Request must address this order and investor/collection accounts must differ."
+      },
+      {
+        "ruleId": "IR-FO-RESERVE-002",
+        "errCode": "62004",
+        "onFail": "reject",
+        "when": {
+          "form": "money-positive",
+          "amount": "param.amount"
+        },
+        "desc": "Subscription amount must be positive. A genuine fund/product minimum threshold is not enforced by this rule and remains pending."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-CNY",
+        "errCode": "62102",
+        "cond": "param.amount.currency == \"CNY\"",
+        "desc": "Demo cash amount must be exactly CNY; canonical Money.amount remains decimal, not wire minorUnitsString."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-FUND",
+        "errCode": "62103",
+        "cond": "param.fundCode.nonEmpty",
+        "desc": "Original fund code must be nonempty; real product eligibility is not certified."
+      }
+    ],
+    "produces": [
+      "FundPurchaseSettlementRequested"
+    ],
+    "provenance": {
+      "source": "Approved second batch agent-assisted proposal",
+      "workshopHeld": false,
+      "contractVersion": "cash-purchase-v2"
+    }
+  }
+events:
+  {
+    "FundPurchaseSettlementRequested": {
+      "name": "FundPurchaseSettlementRequested",
+      "description": "Creation-only CNY cash purchase request, preserving original investor/collection accounts and full positive principal; emits only the independent cash-v2 entry.",
+      "payloads": [
+        {
+          "name": "operationId",
+          "dataType": "OperationId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "fundOrderId",
+          "dataType": "FundOrderId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "investorAccountId",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "fundCollectionAccountId",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "fundCode",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "operationId",
+          "expr": "param.operationId"
+        },
+        {
+          "slot": "fundOrderId",
+          "expr": "param.fundOrderId"
+        },
+        {
+          "slot": "investorAccountId",
+          "expr": "param.investorAccountId"
+        },
+        {
+          "slot": "fundCollectionAccountId",
+          "expr": "param.fundCollectionAccountId"
+        },
+        {
+          "slot": "fundCode",
+          "expr": "param.fundCode"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "contractVersion",
+          "expr": "literal:cash-purchase-v2"
+        },
+        {
+          "slot": "status",
+          "expr": "literal:REQUESTED"
+        },
+        {
+          "slot": "operationId",
+          "expr": "event.operationId"
+        },
+        {
+          "slot": "investorAccountId",
+          "expr": "event.investorAccountId"
+        },
+        {
+          "slot": "fundCollectionAccountId",
+          "expr": "event.fundCollectionAccountId"
+        },
+        {
+          "slot": "fundCode",
+          "expr": "event.fundCode"
+        },
+        {
+          "slot": "amount",
+          "expr": "event.amount"
+        }
+      ]
+    }
+  }

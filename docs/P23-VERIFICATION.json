@@ -1,0 +1,1027 @@
+{
+  "schemaVersion": "bank-p23-verification/v1",
+  "measuredAt": "2026-10-27T11:58:20.468172+00:00",
+  "root": "/Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo",
+  "head": "dda2f24f4569bc4e6468b4339dcea9fdb983a63d",
+  "branch": "feature/bank-wealth-truth-preview",
+  "scope": "Final current-byte gate summary and completion of this bank source-consumption session; known contract review gaps remain open.",
+  "artifact": {
+    "id": "decision.p23-bank-v1-handoff",
+    "designVersion": "bank-v1-p23-design-1",
+    "file": "tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml",
+    "sha256": "1e9f0b2b129e8b1be4729a5c6ed785c986f3929ceeba80ece613eeebc748dabd"
+  },
+  "bankSourceDesign": "tests-passed-review-gaps-open",
+  "bankSourceDesignAccepted": false,
+  "stages": {
+    "currentDeclaredTestGates": "passed",
+    "selectedPolicyReferences": "recorded-and-tested",
+    "currentBindings": "existing-versions-checked-not-complete-v1",
+    "contractReview": "six-open-gaps",
+    "runtimeArtifactClosure": "blocked",
+    "sourceConsumption": "finished-returned"
+  },
+  "counts": {
+    "flows": 4,
+    "scenarios": 30,
+    "coverageRows": 23,
+    "acceptancePackages": 40,
+    "atoms": 141,
+    "artifacts": 37,
+    "entities": 200,
+    "openReviewGaps": 6
+  },
+  "tests": {
+    "p23": {
+      "receipt": {
+        "file": "p23-tests-final.json",
+        "bytes": 74630,
+        "sha256": "549ce4a3645a56cdcba2c5efbaa3278314d602a6a7dd0e2e885d7a0f6ed91908"
+      },
+      "command": [
+        "npm",
+        "run",
+        "test:p23"
+      ],
+      "node": "v22.23.4",
+      "counts": {
+        "tests": 70,
+        "pass": 70,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "exitCode": 0,
+      "stdout": {
+        "file": "p23-tests-final.stdout.log",
+        "sha256": "72ab5a6a2f4148eda9e2ff400003e15eccce35777effa524701534009798f309"
+      },
+      "stderr": {
+        "file": "p23-tests-final.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "testWindowSourceDrift": [],
+      "currentContractTestToolBindingProjectionBytesMatch": true,
+      "postTestDocumentationChange": {
+        "file": "docs/P23-BUSINESS-HANDOFF.md",
+        "beforeSha256": "8d6b13610a216e8fb210227036bf19e00efddd2a679a36655bb1eb2c017ec589",
+        "afterSha256": "38200cd85925eb411abb2622fd19b9d8ef85585bbe97417128b46d6b617acdda",
+        "reason": "Final status/role clarification and disclosure of known review gaps only; no contract/test/tool/binding/projection changes.",
+        "testedAfterEdit": false,
+        "mechanicalLinksCheckedAfterEdit": true
+      }
+    },
+    "current": {
+      "receipt": {
+        "file": "v1-contract-final.json",
+        "bytes": 74646,
+        "sha256": "bd87ca0a893185f57f6824e2d38cbcda811265edaff8d4e0f8c638813a2388f4"
+      },
+      "command": [
+        "npm",
+        "run",
+        "test:v1-contract"
+      ],
+      "node": "v22.23.4",
+      "counts": {
+        "tests": 450,
+        "pass": 450,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "exitCode": 0,
+      "stdout": {
+        "file": "v1-contract-final.stdout.log",
+        "sha256": "a8cd85ca50d1b6e08f6ed10e37659fa15a278e584f83f833de0f89cae82011a7"
+      },
+      "stderr": {
+        "file": "v1-contract-final.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "testWindowSourceDrift": [],
+      "currentContractTestToolBindingProjectionBytesMatch": true,
+      "postTestDocumentationChange": {
+        "file": "docs/P23-BUSINESS-HANDOFF.md",
+        "beforeSha256": "8d6b13610a216e8fb210227036bf19e00efddd2a679a36655bb1eb2c017ec589",
+        "afterSha256": "38200cd85925eb411abb2622fd19b9d8ef85585bbe97417128b46d6b617acdda",
+        "reason": "Final status/role clarification and disclosure of known review gaps only; no contract/test/tool/binding/projection changes.",
+        "testedAfterEdit": false,
+        "mechanicalLinksCheckedAfterEdit": true
+      }
+    },
+    "legacy": {
+      "receipt": {
+        "file": "default-tests-final.json",
+        "bytes": 74629,
+        "sha256": "03f5fde272e623d4b02dd9e872fa7a2955ff5c246220b0ff6385fa9a365d6fea"
+      },
+      "command": [
+        "npm",
+        "test"
+      ],
+      "node": "v22.23.4",
+      "counts": {
+        "tests": 285,
+        "pass": 285,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "exitCode": 0,
+      "stdout": {
+        "file": "default-tests-final.stdout.log",
+        "sha256": "51b63304ea1843a50f5504a81ac8717b26352b871e366ea3351389ae694b449c"
+      },
+      "stderr": {
+        "file": "default-tests-final.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "testWindowSourceDrift": [],
+      "currentContractTestToolBindingProjectionBytesMatch": true,
+      "postTestDocumentationChange": {
+        "file": "docs/P23-BUSINESS-HANDOFF.md",
+        "beforeSha256": "8d6b13610a216e8fb210227036bf19e00efddd2a679a36655bb1eb2c017ec589",
+        "afterSha256": "38200cd85925eb411abb2622fd19b9d8ef85585bbe97417128b46d6b617acdda",
+        "reason": "Final status/role clarification and disclosure of known review gaps only; no contract/test/tool/binding/projection changes.",
+        "testedAfterEdit": false,
+        "mechanicalLinksCheckedAfterEdit": true
+      }
+    },
+    "source": {
+      "receipt": {
+        "file": "verify-final.json",
+        "bytes": 74531,
+        "sha256": "f2fa12eeefc9a5488b7348e99242d2f551f4beba849bf1dd4462c5e06d058a17"
+      },
+      "command": [
+        "npm",
+        "run",
+        "verify"
+      ],
+      "node": "v22.23.4",
+      "counts": {},
+      "exitCode": 0,
+      "stdout": {
+        "file": "verify-final.stdout.log",
+        "sha256": "d83aaf4833b37297567b955912cfd985740ec6f8eda4278344ade6d3f01360d1"
+      },
+      "stderr": {
+        "file": "verify-final.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "testWindowSourceDrift": [],
+      "currentContractTestToolBindingProjectionBytesMatch": true,
+      "postTestDocumentationChange": {
+        "file": "docs/P23-BUSINESS-HANDOFF.md",
+        "beforeSha256": "8d6b13610a216e8fb210227036bf19e00efddd2a679a36655bb1eb2c017ec589",
+        "afterSha256": "38200cd85925eb411abb2622fd19b9d8ef85585bbe97417128b46d6b617acdda",
+        "reason": "Final status/role clarification and disclosure of known review gaps only; no contract/test/tool/binding/projection changes.",
+        "testedAfterEdit": false,
+        "mechanicalLinksCheckedAfterEdit": true
+      }
+    }
+  },
+  "sourceReport": {
+    "schemaVersion": "bank-wealth.validation-report/v1",
+    "readiness": "cash-contract-and-mock-ta-preview",
+    "canonicalSha256": "6c921cecd0c6725977dcc282be1ce73194e1d02c800025811cbe2aa2b6c850fa",
+    "sourceFingerprint": "dee9b581e1a35acb6425506d79909b3c1df7ab716f1ab302d79071bd6656087f",
+    "tool": {
+      "head": "b621ac057f1c8bd135d1ff08626314f428f8858a",
+      "sha256": "315bb736c8c29060f4bac2cc9234b756cd5802efa72ea0578923c69942725a73"
+    },
+    "baseline": {
+      "canonicalSha256": "2833c08a16673680c44dcb154d6e83c20a25ec3003293f981a02ef6fbade2cfc",
+      "hardErrors": 10
+    },
+    "structure": {
+      "ok": true,
+      "hard": [],
+      "notices": [
+        "[RF5] command \"GetBalance\" declares no parameters (explicit parameterless? confirm)",
+        "[RF5] command \"GetExternalTransferState\" declares no parameters (explicit parameterless? confirm)",
+        "[RF5] command \"GetFundOrderState\" declares no parameters (explicit parameterless? confirm)",
+        "[V2] commandStorming|imported-external-systems: origin.seq not contiguous 0..n-1 (got 3 at position 0) — compiler densifies; do not renumber by hand",
+        "[V2] commandStorming|imported-external-systems: origin.seq not contiguous 0..n-1 (got 4 at position 1) — compiler densifies; do not renumber by hand",
+        "[V2] commandStorming|imported-policy-hypotheses: origin.seq not contiguous 0..n-1 (got 10 at position 0) — compiler densifies; do not renumber by hand",
+        "[SA0] sagas/external-bank-transfer.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+        "[SA0] sagas/fund-purchase-payment-v2.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+        "[SA0] sagas/fund-purchase-refund.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+        "[SA0] sagas/fund-subscription-pay.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+        "[ES4] possible solution language: \"SipPlanCreated\" — confirm this is a business fact, not an implementation",
+        "[CS1] event \"DeductFundsConfirmed\" has no trigger source (command/timer/externalSystem/event link): event-es-deduct-funds-confirmed-2.yaml",
+        "[CS3] command \"PrepareExternalDebit\" has no initiating role and no policy invocation: command-cs-prepare-external-debit-1.yaml",
+        "[CS3] command \"RecordTAShareConfirmation\" has no initiating role and no policy invocation: command-cs-record-ta-share-confirmation-3.yaml",
+        "[CS6] timer \"SipBusinessClockDesignProposal\" triggers no event (dangling): inbox/commandStorming/timer-cs-sip-business-clock-design-proposal-1.yaml",
+        "[CS6] externalSystem \"WealthMockTARegistryDesignProposal\" triggers no event (dangling): inbox/refining/externalSystem-rf-wealth-mock-ta-registry-design-proposal-1.yaml"
+      ]
+    },
+    "declarations": {
+      "errors": [],
+      "notices": []
+    },
+    "proposals": {
+      "errors": [],
+      "notices": [
+        "Legacy MockTA scenario registry is a first-batch proposal; cash-v2 simulator configuration is in contract.cash-purchase-v2. This declaration check executes no service or settlement/refund.",
+        "Context/UX references are validated locally; the portable context target index and UI generation are not extended."
+      ],
+      "artifacts": 37,
+      "entities": 200
+    },
+    "cashContract": {
+      "errors": [],
+      "notices": [
+        "Declaration checks only: authenticated first-publication association, durable reconciliation, exact receipt codecs and mixed-guard evaluation order remain unimplemented/unverified host obligations."
+      ],
+      "readiness": "declaration-only",
+      "runnable": false,
+      "runtimeBindingVerified": false,
+      "checkedResultKinds": [
+        "succeeded",
+        "rejected-before-effects",
+        "compensated",
+        "recovery-required",
+        "outcome-unknown"
+      ]
+    },
+    "protection": {
+      "ok": true,
+      "originalFiles": 13,
+      "addedFiles": 4,
+      "changed": [],
+      "unauthorized": [],
+      "missing": []
+    },
+    "strictSaga": {
+      "ok": true,
+      "diagnostics": []
+    },
+    "strictExecution": {
+      "ok": true,
+      "diagnostics": []
+    },
+    "runtimeLowering": {
+      "ok": true,
+      "diagnostics": [],
+      "readiness": "lowered-contract-only",
+      "runnable": false,
+      "runtimeBindingVerified": false
+    },
+    "generation": "not-run",
+    "runtime": "not-run",
+    "codeBackAnchoring": "not-run",
+    "roundtrip": {
+      "ok": true,
+      "atoms": 141
+    },
+    "projections": {
+      "ok": true,
+      "differences": [],
+      "files": 9
+    }
+  },
+  "inputs": {
+    "file": "INPUTS-SHA256.json",
+    "bytes": 50256,
+    "sha256": "3c89e3c9cca79e2407cebff7b9bc77e531c7e50adc36806effde29392fd645d0"
+  },
+  "bankSource": {
+    "file": "BANK-SOURCE-SHA256.json",
+    "bytes": 42110,
+    "sha256": "7dc907c787d0b5069f00748eac9bbb881e07886c0fad62d591755c1f41a0634a"
+  },
+  "flowPointers": [
+    {
+      "id": "payment",
+      "businessContractVersion": "cash-purchase-v2",
+      "file": "tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml",
+      "pointer": "/payload/info/artifact/body/flows/0",
+      "existingDeclarations": {
+        "sagaId": "fund-purchase-payment-v2",
+        "definitionVersion": "v2",
+        "pipelineId": "fund-purchase-cash-payment",
+        "executionSchemaVersion": "truthsrc.execution/v1",
+        "planVersion": "plan-v2"
+      },
+      "bindings": [
+        {
+          "file": "wealth-bindings.json",
+          "pointer": "/sagas/0",
+          "bindingSchemaVersion": "truthsrc.saga-binding/v1",
+          "identity": {
+            "key": "sagaId",
+            "value": "fund-purchase-payment-v2"
+          },
+          "versions": {
+            "version": "v2"
+          },
+          "codec": {
+            "id": "CashPurchaseV2ArgsCodec",
+            "version": "codec-v1",
+            "compatibleVersions": [
+              "codec-v1"
+            ],
+            "mapper": "fixture.wealth.pay.ArgsCodec"
+          },
+          "status": "existing-declaration-not-runtime-qualified",
+          "runtimeVerified": false
+        },
+        {
+          "file": "wealth-runtime-binding.json",
+          "pointer": "/sagas/0",
+          "bindingSchemaVersion": "truthsrc.saga-runtime-binding/v2",
+          "identity": {
+            "key": "sagaId",
+            "value": "fund-purchase-payment-v2"
+          },
+          "versions": {
+            "definitionVersion": "v2",
+            "runtimeVersion": 2
+          },
+          "codec": {
+            "id": "CashPurchaseV2ArgsCodec",
+            "version": "codec-v1",
+            "runtimeVersion": 1
+          },
+          "status": "existing-declaration-not-runtime-qualified",
+          "runtimeVerified": false
+        },
+        {
+          "file": "wealth-execution-bindings.json",
+          "pointer": "/pipelines/0",
+          "bindingSchemaVersion": "truthsrc.execution-binding/v1",
+          "identity": {
+            "key": "pipelineId",
+            "value": "fund-purchase-cash-payment"
+          },
+          "versions": {},
+          "codec": {
+            "id": "CashPurchasePipelineCodec",
+            "version": "pipeline-v2",
+            "compatibleVersions": [
+              "pipeline-v2"
+            ]
+          },
+          "status": "existing-declaration-not-runtime-qualified",
+          "runtimeVerified": false
+        }
+      ],
+      "pendingRequirements": [
+        {
+          "id": "payment-typed-products",
+          "requirement": "ordered guards/complete params/folds/exact Money",
+          "publicExtensionIds": [
+            "X01",
+            "X02",
+            "X03"
+          ],
+          "status": "binding-requirements-pending-public-contract",
+          "implementation": "not-started",
+          "runtimeVerified": false
+        },
+        {
+          "id": "payment-host",
+          "requirement": "heterogeneous phase face, event-only pipeline entry, early original-order completion",
+          "publicExtensionIds": [
+            "X04",
+            "X07",
+            "X08"
+          ],
+          "status": "binding-requirements-pending-public-contract",
+          "implementation": "not-started",
+          "runtimeVerified": false
+        }
+      ],
+      "scenarioIds": [
+        "PAY-success",
+        "PAY-repeat",
+        "PAY-conflict",
+        "PAY-early-reject",
+        "PAY-unknown-recover",
+        "PAY-cancel-before-prepare"
+      ]
+    },
+    {
+      "id": "ta",
+      "businessContractVersion": "cash-purchase-v2",
+      "file": "tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml",
+      "pointer": "/payload/info/artifact/body/flows/1",
+      "existingDeclarations": {
+        "commands": [
+          "FundOrder.RegisterFundTASubmission",
+          "FundOrder.RecordFundTAAccepted",
+          "FundOrder.RecordFundTAConfirmed",
+          "FundOrder.RecordFundTARejected",
+          "FundOrder.RecordFundTAUnknown"
+        ],
+        "mockConfigurationSchemaVersion": "bank-wealth.mock-ta/v1",
+        "dedicatedSagaDeclaration": false
+      },
+      "bindings": [],
+      "pendingRequirements": [
+        {
+          "id": "ta-receipt-binding",
+          "requirement": "original receipt bytes and complete typed slot/identity/resource mapping",
+          "publicExtensionIds": [
+            "X02",
+            "X03",
+            "X07"
+          ],
+          "status": "binding-requirements-pending-public-contract",
+          "implementation": "not-started",
+          "runtimeVerified": false
+        },
+        {
+          "id": "ta-event-entry",
+          "requirement": "event-only input, durable external submission/query and correlated terminal delivery",
+          "publicExtensionIds": [
+            "X04",
+            "X08"
+          ],
+          "status": "binding-requirements-pending-public-contract",
+          "implementation": "not-started",
+          "runtimeVerified": false
+        }
+      ],
+      "scenarioIds": [
+        "TA-confirm",
+        "TA-repeat",
+        "TA-conflicting-body",
+        "TA-unknown-confirm",
+        "TA-before-payment",
+        "TA-wrong-resource",
+        "TA-accepted-only"
+      ]
+    },
+    {
+      "id": "refund",
+      "businessContractVersion": "cash-purchase-v2-refund-policy-v1",
+      "file": "tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml",
+      "pointer": "/payload/info/artifact/body/flows/2",
+      "existingDeclarations": {
+        "sagaId": "fund-purchase-refund",
+        "definitionVersion": "v1",
+        "pipelineId": "fund-purchase-cash-refund",
+        "executionSchemaVersion": "truthsrc.execution/v1",
+        "planVersion": "plan-v2"
+      },
+      "bindings": [
+        {
+          "file": "wealth-bindings.json",
+          "pointer": "/sagas/1",
+          "bindingSchemaVersion": "truthsrc.saga-binding/v1",
+          "identity": {
+            "key": "sagaId",
+            "value": "fund-purchase-refund"
+          },
+          "versions": {
+            "version": "v1"
+          },
+          "codec": {
+            "id": "CashRefundArgsCodec",
+            "version": "codec-v1",
+            "compatibleVersions": [
+              "codec-v1"
+            ],
+            "mapper": "fixture.wealth.refund.ArgsCodec"
+          },
+          "status": "existing-declaration-not-runtime-qualified",
+          "runtimeVerified": false
+        },
+        {
+          "file": "wealth-runtime-binding.json",
+          "pointer": "/sagas/1",
+          "bindingSchemaVersion": "truthsrc.saga-runtime-binding/v2",
+          "identity": {
+            "key": "sagaId",
+            "value": "fund-purchase-refund"
+          },
+          "versions": {
+            "definitionVersion": "v1",
+            "runtimeVersion": 1
+          },
+          "codec": {
+            "id": "CashRefundArgsCodec",
+            "version": "codec-v1",
+            "runtimeVersion": 1
+          },
+          "status": "existing-declaration-not-runtime-qualified",
+          "runtimeVerified": false
+        },
+        {
+          "file": "wealth-execution-bindings.json",
+          "pointer": "/pipelines/1",
+          "bindingSchemaVersion": "truthsrc.execution-binding/v1",
+          "identity": {
+            "key": "pipelineId",
+            "value": "fund-purchase-cash-refund"
+          },
+          "versions": {},
+          "codec": {
+            "id": "CashRefundPipelineCodec",
+            "version": "pipeline-v2",
+            "compatibleVersions": [
+              "pipeline-v2"
+            ]
+          },
+          "status": "existing-declaration-not-runtime-qualified",
+          "runtimeVerified": false
+        }
+      ],
+      "pendingRequirements": [
+        {
+          "id": "refund-stable-computation",
+          "requirement": "typed handler-generated refundTxId equals durable pipeline identity",
+          "publicExtensionIds": [
+            "X02",
+            "X08"
+          ],
+          "status": "binding-requirements-pending-public-contract",
+          "implementation": "not-started",
+          "runtimeVerified": false
+        },
+        {
+          "id": "refund-result-target",
+          "requirement": "account-result to original-order mapping/authority with retained principal and early association",
+          "publicExtensionIds": [
+            "X04",
+            "X07"
+          ],
+          "status": "binding-requirements-pending-public-contract",
+          "implementation": "not-started",
+          "runtimeVerified": false
+        }
+      ],
+      "scenarioIds": [
+        "REFUND-success",
+        "REFUND-repeat",
+        "REFUND-substitute",
+        "REFUND-unknown-recover",
+        "REFUND-no-TA-reject",
+        "REFUND-conflicting-terminal"
+      ]
+    },
+    {
+      "id": "sip",
+      "businessContractVersion": "sip-local-cash-v1-design",
+      "file": "tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml",
+      "pointer": "/payload/info/artifact/body/flows/3",
+      "existingDeclarations": {
+        "aggregateRef": "SipPlan",
+        "pipelineId": "sip-installment-execution",
+        "declarationRole": "legacy-external-not-v1-cash",
+        "oldPath": [
+          "external-bank-transfer@v1",
+          "fund-subscription-pay@v1",
+          "fund-ta-settlement-child"
+        ],
+        "migrated": false,
+        "terminalSlicesGuardedForV1": false
+      },
+      "bindings": [
+        {
+          "file": "execution-bindings.json",
+          "pointer": "/pipelines/1",
+          "bindingSchemaVersion": "truthsrc.execution-binding/v1",
+          "identity": {
+            "key": "pipelineId",
+            "value": "sip-installment-execution"
+          },
+          "versions": {},
+          "codec": {
+            "id": "PipelineCodec",
+            "version": "pipeline-v1",
+            "compatibleVersions": [
+              "pipeline-v1"
+            ]
+          },
+          "status": "legacy-external-not-v1-cash",
+          "runtimeVerified": false
+        }
+      ],
+      "pendingRequirements": [
+        {
+          "id": "sip-v1-declarations",
+          "requirement": "public-consumable local-cash occurrence/source/terminal descriptors with typed ports; old external pipeline is not migrated",
+          "publicExtensionIds": [
+            "X01",
+            "X02",
+            "X05",
+            "X07",
+            "X08"
+          ],
+          "status": "binding-requirements-pending-public-contract",
+          "implementation": "not-started",
+          "runtimeVerified": false
+        },
+        {
+          "id": "sip-finite-host",
+          "requirement": "finite per-occurrence cash plan and typed durable checkpoint without Fab-only steps",
+          "publicExtensionIds": [
+            "X08"
+          ],
+          "status": "binding-requirements-pending-public-contract",
+          "implementation": "not-started",
+          "runtimeVerified": false
+        }
+      ],
+      "scenarioIds": [
+        "SIP-success",
+        "SIP-repeat-slot",
+        "SIP-conflict-config",
+        "SIP-unknown-recover",
+        "SIP-no-effects-failure",
+        "SIP-pause-backlog",
+        "SIP-inflight-pause",
+        "SIP-revision-backlog",
+        "SIP-late-terminal",
+        "SIP-refund-count-boundary",
+        "SIP-catch-up-order"
+      ]
+    }
+  ],
+  "scenarioPointers": [
+    {
+      "id": "PAY-success",
+      "flow": "payment",
+      "pointer": "/payload/info/artifact/body/scenarios/0",
+      "acceptancePackage": "P27-1",
+      "execution": "not-run"
+    },
+    {
+      "id": "PAY-repeat",
+      "flow": "payment",
+      "pointer": "/payload/info/artifact/body/scenarios/1",
+      "acceptancePackage": "P26-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "PAY-conflict",
+      "flow": "payment",
+      "pointer": "/payload/info/artifact/body/scenarios/2",
+      "acceptancePackage": "P27-2",
+      "execution": "not-run"
+    },
+    {
+      "id": "PAY-early-reject",
+      "flow": "payment",
+      "pointer": "/payload/info/artifact/body/scenarios/3",
+      "acceptancePackage": "P27-5",
+      "execution": "not-run"
+    },
+    {
+      "id": "PAY-unknown-recover",
+      "flow": "payment",
+      "pointer": "/payload/info/artifact/body/scenarios/4",
+      "acceptancePackage": "P27-4",
+      "execution": "not-run"
+    },
+    {
+      "id": "PAY-cancel-before-prepare",
+      "flow": "payment",
+      "pointer": "/payload/info/artifact/body/scenarios/5",
+      "acceptancePackage": "P27-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "TA-confirm",
+      "flow": "ta",
+      "pointer": "/payload/info/artifact/body/scenarios/6",
+      "acceptancePackage": "P28-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "TA-repeat",
+      "flow": "ta",
+      "pointer": "/payload/info/artifact/body/scenarios/7",
+      "acceptancePackage": "P28-2",
+      "execution": "not-run"
+    },
+    {
+      "id": "TA-conflicting-body",
+      "flow": "ta",
+      "pointer": "/payload/info/artifact/body/scenarios/8",
+      "acceptancePackage": "P28-2",
+      "execution": "not-run"
+    },
+    {
+      "id": "TA-unknown-confirm",
+      "flow": "ta",
+      "pointer": "/payload/info/artifact/body/scenarios/9",
+      "acceptancePackage": "P28-1",
+      "execution": "not-run"
+    },
+    {
+      "id": "TA-before-payment",
+      "flow": "ta",
+      "pointer": "/payload/info/artifact/body/scenarios/10",
+      "acceptancePackage": "P28-2",
+      "execution": "not-run"
+    },
+    {
+      "id": "TA-wrong-resource",
+      "flow": "ta",
+      "pointer": "/payload/info/artifact/body/scenarios/11",
+      "acceptancePackage": "P28-2",
+      "execution": "not-run"
+    },
+    {
+      "id": "TA-accepted-only",
+      "flow": "ta",
+      "pointer": "/payload/info/artifact/body/scenarios/12",
+      "acceptancePackage": "P28-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "REFUND-success",
+      "flow": "refund",
+      "pointer": "/payload/info/artifact/body/scenarios/13",
+      "acceptancePackage": "P29-2",
+      "execution": "not-run"
+    },
+    {
+      "id": "REFUND-repeat",
+      "flow": "refund",
+      "pointer": "/payload/info/artifact/body/scenarios/14",
+      "acceptancePackage": "P29-1",
+      "execution": "not-run"
+    },
+    {
+      "id": "REFUND-substitute",
+      "flow": "refund",
+      "pointer": "/payload/info/artifact/body/scenarios/15",
+      "acceptancePackage": "P29-1",
+      "execution": "not-run"
+    },
+    {
+      "id": "REFUND-unknown-recover",
+      "flow": "refund",
+      "pointer": "/payload/info/artifact/body/scenarios/16",
+      "acceptancePackage": "P29-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "REFUND-no-TA-reject",
+      "flow": "refund",
+      "pointer": "/payload/info/artifact/body/scenarios/17",
+      "acceptancePackage": "P29-1",
+      "execution": "not-run"
+    },
+    {
+      "id": "REFUND-conflicting-terminal",
+      "flow": "refund",
+      "pointer": "/payload/info/artifact/body/scenarios/18",
+      "acceptancePackage": "P29-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-success",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/19",
+      "acceptancePackage": "P30-2",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-repeat-slot",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/20",
+      "acceptancePackage": "P30-2",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-conflict-config",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/21",
+      "acceptancePackage": "P30-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-unknown-recover",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/22",
+      "acceptancePackage": "P30-4",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-no-effects-failure",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/23",
+      "acceptancePackage": "P30-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-pause-backlog",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/24",
+      "acceptancePackage": "P30-1",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-inflight-pause",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/25",
+      "acceptancePackage": "P30-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-revision-backlog",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/26",
+      "acceptancePackage": "P30-1",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-late-terminal",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/27",
+      "acceptancePackage": "P30-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-refund-count-boundary",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/28",
+      "acceptancePackage": "P30-3",
+      "execution": "not-run"
+    },
+    {
+      "id": "SIP-catch-up-order",
+      "flow": "sip",
+      "pointer": "/payload/info/artifact/body/scenarios/29",
+      "acceptancePackage": "P30-4",
+      "execution": "not-run"
+    }
+  ],
+  "publicTool": {
+    "head": "b621ac057f1c8bd135d1ff08626314f428f8858a",
+    "root": "/Users/zhongdj/Workspaces/mad-polaris/metarch-truthsrc",
+    "bankFingerprint": {
+      "head": "b621ac057f1c8bd135d1ff08626314f428f8858a",
+      "sha256": "315bb736c8c29060f4bac2cc9234b756cd5802efa72ea0578923c69942725a73"
+    },
+    "bankStaticImportAndSchemaSources": [
+      {
+        "file": "lib/compile-snapshot.mjs",
+        "sha256": "2a37c90103ab400ed6759a6bddbc9656f90390a0fd72b59fd495318ef4f1459c"
+      },
+      {
+        "file": "lib/compile.mjs",
+        "sha256": "7f343b9b7892f81a4b99ad9dcc340a8bbeb70faf6de09af54804da5af668ca3c"
+      },
+      {
+        "file": "lib/decompose.mjs",
+        "sha256": "8761949205ada61b23a1474ec8268736c24d9838c477c8f0f3406f4524171a83"
+      },
+      {
+        "file": "lib/execution/compile.mjs",
+        "sha256": "1b3ce854694aab37211c58d5ab4635d882438f81766cd5340ffb910edc03eca6"
+      },
+      {
+        "file": "lib/immutable-data.mjs",
+        "sha256": "e4e799defe1a70fdaedd8ea0264dda0fcf8d0ceb65bfd22bc3220920d7b75110"
+      },
+      {
+        "file": "lib/saga/compile-pure.mjs",
+        "sha256": "787f8910f0d31d56abaf6a0f12e86f387f3794f6e6ce043785a0b13186d76e49"
+      },
+      {
+        "file": "lib/saga/compile.mjs",
+        "sha256": "24bb2eba6a6ae65dc41baab68b96c0d11a2f47cec7c46f13d6a4319a64fd49b9"
+      },
+      {
+        "file": "lib/saga/runtime-binding.mjs",
+        "sha256": "99b7ab6ac4348a10bc425a3691503dd1363936db65b39c88cdaa9d9679f6a013"
+      },
+      {
+        "file": "lib/shared-pure.mjs",
+        "sha256": "6863c78048d50e844c56d001862e19adb22d26fb036d05e3bb6a580a89965971"
+      },
+      {
+        "file": "lib/shared.mjs",
+        "sha256": "c5214eca51bfc8d55eb5aee458fa0cf2934424272caae127859f11266c82e55a"
+      },
+      {
+        "file": "lib/validate.mjs",
+        "sha256": "b9d89bddc842bbc1a9d7580da2a5b05bd9cd744fda6b62203c91bf0a6e5c311b"
+      },
+      {
+        "file": "schema/execution-ir-v1.schema.json",
+        "sha256": "950a9c7b4b13e2eb158789d0bbcbadee268575f07e0e20ec4c612c096d08b5b9"
+      },
+      {
+        "file": "schema/saga-ir-v1.schema.json",
+        "sha256": "f94eeead3a956f4ce54b002d942e6b2a1f3fe49008cf738b15da10e0ad8ea46c"
+      }
+    ],
+    "closureBasis": "existing bank static import/schema algorithm; not dynamic read tracing",
+    "frozenSourceInventory": "/Users/zhongdj/Workspaces/mad-polaris/metarch-truthsrc/.rounds/x01-a-p23-handoff-gschlf6v/SOURCE-SHA256.json",
+    "frozenSourceInventorySha256": "c4a549c3fafad549a6a7433d61992f0153ee8c38356a3e0525922fc3707b882c",
+    "filesChecked": 676,
+    "currentDrift": []
+  },
+  "ownDelta": [
+    "README.md",
+    "docs/FULL-TARGET-ROADMAP.md",
+    "docs/HANDOFF.md",
+    "docs/IMPLEMENTATION-STATUS.md",
+    "docs/P23-BUSINESS-HANDOFF.md",
+    "docs/P23-VERIFICATION.json",
+    "package.json",
+    "projections/README.md",
+    "projections/index.json",
+    "test/p23-finish-contract.test.mjs",
+    "tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml"
+  ],
+  "protectedOriginalBankFiles": 196,
+  "protectedDrift": [],
+  "postTestDocumentationChanges": [
+    {
+      "file": "docs/P23-BUSINESS-HANDOFF.md",
+      "beforeSha256": "8d6b13610a216e8fb210227036bf19e00efddd2a679a36655bb1eb2c017ec589",
+      "afterSha256": "38200cd85925eb411abb2622fd19b9d8ef85585bbe97417128b46d6b617acdda",
+      "reason": "Final status/role clarification and disclosure of known review gaps only; no contract/test/tool/binding/projection changes.",
+      "testedAfterEdit": false,
+      "mechanicalLinksCheckedAfterEdit": true
+    }
+  ],
+  "contractOrTestChangesAfterFinalGates": false,
+  "testsRerunDuringSummary": false,
+  "independentReview": {
+    "file": "independent-review.json",
+    "bytes": 1663,
+    "sha256": "24e393ae33b2bbef470fdcd0ffeb8a41e91015a11d2ad7be0b035f5a2e56b682"
+  },
+  "reviewFindings": {
+    "file": "REVIEW-FINDINGS.json",
+    "bytes": 6395,
+    "sha256": "407107b0555baefe8c5052129c22e30fedc01867dfbbf512aa432f75c7f6f5ff"
+  },
+  "corrections": {
+    "file": "CORRECTIONS.md",
+    "bytes": 4575,
+    "sha256": "5448bce1bddcb7efddab69be88fa5fd878d9dd472364e77c8283737565c8fa07"
+  },
+  "sourceConsumptionWindow": {
+    "state": "returned-by-bank-consumer",
+    "notice": ".scratch/p23-bank-handoff-pxzkgeyq/SOURCE-CONSUMPTION-WINDOW-RETURN.json",
+    "releasesOnly": "this bank P23 source/design-consumption session",
+    "publicImplementationAuthorized": false
+  },
+  "remainingBlockers": [
+    {
+      "id": "P23-contract-review-gaps",
+      "status": "open",
+      "owner": "bank-business-example-line",
+      "findings": {
+        "file": "REVIEW-FINDINGS.json",
+        "bytes": 6395,
+        "sha256": "407107b0555baefe8c5052129c22e30fedc01867dfbbf512aa432f75c7f6f5ff"
+      },
+      "count": 6,
+      "requiresNewMilestone": false
+    },
+    {
+      "id": "P23-runtime-artifact-closure",
+      "status": "blocked",
+      "owner": "runtime-artifact/toolchain-owner",
+      "required": [
+        "source-binary-provenance",
+        "POM-license",
+        "direct-and-transitive-dependencies",
+        "independent-clean-consumption"
+      ],
+      "historicalEvidence": {
+        "file": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-finish-contract-main-20261027/preflight.json",
+        "sha256": "ed0cbe9ca7c67a9e3941e5afa134c397594674dc9ee934f31bde808ca9a13816"
+      },
+      "reverifiedThisRound": false
+    },
+    {
+      "id": "V1-technical-binding-and-generation",
+      "status": "future-P24-P25",
+      "owner": "public-standard/toolchain-contract-first-then-bank-concrete-bindings",
+      "note": "Current bank inputs serve as requirements/counterexamples; bank is not required to invent undefined public formats."
+    }
+  ],
+  "completeP23": false,
+  "allV1BindingsComplete": false,
+  "publicSemanticAdmissionOfNewOverlay": false,
+  "applicationGeneration": false,
+  "fundsRuntime": false,
+  "applicationRecovery": false,
+  "codeBackAnchoring": false,
+  "publicSourceModified": false,
+  "runtimeModified": false,
+  "pausedSuiteExecuted": false,
+  "committed": false,
+  "pushed": false,
+  "evidenceDirectory": ".scratch/p23-bank-handoff-pxzkgeyq",
+  "roleAlignment": {
+    "bankBusinessExample": "this session",
+    "publicStandardsAndToolchain": "complete-generated-file-anchors",
+    "publicFormatsFirstThenConcreteBankBindings": true,
+    "newIndependentSourceCopyProposed": false
+  }
+}

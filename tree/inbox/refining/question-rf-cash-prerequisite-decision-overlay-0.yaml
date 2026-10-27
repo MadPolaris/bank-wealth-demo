@@ -1,0 +1,553 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: question
+name: CashPrerequisiteDecisionOverlay
+origin:
+  stage: refining
+  board: wealth-cash-next-design-v1
+  seq: 0
+payload:
+  {
+    "type": "question",
+    "name": "CashPrerequisiteDecisionOverlay",
+    "stage": "refining",
+    "description": "Select only the three user-approved demo cash prerequisite designs, preserve I0 historical register and leave eight decisions open; no runtime enforcement claim.",
+    "info": {
+      "curator": "agent-assisted bank next-design author",
+      "artifact": {
+        "id": "decision.cash-entry-prerequisites",
+        "category": "decision",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted design under user-approved next-design plan",
+          "workshopHeld": false,
+          "scopeAuthorization": "bank-source-design-and-local-acceptance-only",
+          "basis": "Three selected demo prerequisite designs and public work-package handoff only; no public implementation, production approval or runtime proof."
+        },
+        "references": [
+          {
+            "kind": "artifact",
+            "id": "decision.i0-baseline-coverage"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.cash-first-slice-design"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.i0-boundary-ownership"
+          },
+          {
+            "kind": "artifact",
+            "id": "contract.cash-purchase-v2"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.cash-v2"
+          },
+          {
+            "kind": "artifact",
+            "id": "flow.cash-v2"
+          },
+          {
+            "kind": "aggregate",
+            "id": "CreditBalance"
+          },
+          {
+            "kind": "aggregate",
+            "id": "FundOrder"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.RecordIncomingCredits"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.CommitIncomingCredits"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RequestFundPurchaseSettlement"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundPurchaseSettlementRequested"
+          }
+        ],
+        "body": {
+          "entities": [],
+          "edges": [],
+          "decisionStatus": "three-selected-demo-designs-other-decisions-open",
+          "authorization": {
+            "source": "user-approved-next-design-plan",
+            "implementationScope": "bank-source-design-and-local-acceptance-only",
+            "selectedDecisionIds": [
+              "I0-S01-account-setup",
+              "I0-S02-account-ownership",
+              "I0-S09-cash-entry-owner"
+            ],
+            "publicExecutionAuthorized": false,
+            "productionPoliciesApproved": false,
+            "externalBankMockAuthorized": false
+          },
+          "historyPolicy": "additive-current-overlay; original I0 register/source/tests/receipts keep historical bytes; no general automatic supersession mechanism is claimed",
+          "originalRegister": {
+            "artifact": "decision.i0-baseline-coverage",
+            "pointer": "/payload/info/artifact/body/scopeDecisions"
+          },
+          "resolvedDecisions": [
+            {
+              "id": "I0-S01-account-setup",
+              "status": "selected-demo-design",
+              "selectedChoice": "owned-seeded-ledger-fixture",
+              "owner": "bank-wealth domain/product owner",
+              "supersedes": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/0"
+              },
+              "originalChoicePointer": "/payload/info/artifact/body/scopeDecisions/0/choices/0",
+              "scope": "cash-payment-demo-prerequisite-only",
+              "designBasis": "user-approved-next-design-plan",
+              "implementation": "not-started",
+              "enforcementVerified": false,
+              "details": {
+                "selection": "owned-seeded-ledger-fixture",
+                "aggregateRef": "CreditBalance",
+                "owner": "bank-wealth fixture/bootstrap owner",
+                "fundingProvenance": "explicit-demo-seed-not-real-bank-funds",
+                "accountLifecycleIncluded": false,
+                "fixtureContract": {
+                  "locationOwner": "bank-wealth-demo",
+                  "actualFixturePublished": false,
+                  "fields": [
+                    "fixtureId",
+                    "fixtureVersion",
+                    "principalId",
+                    "investorAccountId",
+                    "fundCode",
+                    "fundCollectionAccountId",
+                    "currency",
+                    "seedAmount",
+                    "setupOperationId",
+                    "setupTxId"
+                  ],
+                  "relationships": [
+                    "principalId owns the explicitly seeded investorAccountId",
+                    "fundCode resolves to a different bank-owned fundCollectionAccountId",
+                    "seedAmount is exact domain Money for the investor and names its fixture provenance",
+                    "collection starts empty/zero with explicit setup readiness, never an undisclosed top-up",
+                    "setup identity is scoped to fixture version and resource; changing seed data requires a separately authorized new dataset, not reseeding an existing account"
+                  ],
+                  "currencyAuthority": {
+                    "artifact": "contract.cash-purchase-v2",
+                    "pointer": "/payload/info/artifact/body/demoPolicy"
+                  },
+                  "amountPolicy": "fixture-specific exact positive amount, not a product minimum, fee or production funding rule",
+                  "emptyStatePolicy": "zero/empty available balance and empty phase maps; future codec/default binding must actually support the declared representation"
+                },
+                "bootstrap": {
+                  "commandRefs": [
+                    "CreditBalance.RecordIncomingCredits",
+                    "CreditBalance.CommitIncomingCredits"
+                  ],
+                  "eventRefs": [
+                    "CreditBalance.RecordIncomingCreditsConfirmed",
+                    "CreditBalance.CommitIncomingCreditsConfirmed"
+                  ],
+                  "stateFieldRefs": [
+                    "CreditBalance.accountBalance",
+                    "CreditBalance.incomingCredits",
+                    "CreditBalance.committed",
+                    "CreditBalance.compensated"
+                  ],
+                  "stateEvolution": "event-application-only",
+                  "directStateAssignmentAllowed": false,
+                  "journalRewriteAllowed": false,
+                  "nonzeroEmptyDefaultAllowed": false,
+                  "externalTopUpAllowed": false,
+                  "reseedOnInsufficientBalanceAllowed": false,
+                  "identity": "persist fixture version/resource/exact Money/setupOperationId/setupTxId before any send; setupTxId is not any payment or refund TxId",
+                  "ownership": "single-owned-bootstrap-writer-with-exclusive-resource-admission",
+                  "committedReplay": "matching committed marker and exact fixture amount means no new record or commit",
+                  "pendingReplay": "matching incomingCredits with no committed/compensated marker resumes the same commit only",
+                  "conflictPolicy": "different amount/resource/version/identity, compensated setup or contradictory markers stops before any write",
+                  "unresolvedSendPolicy": "query/reconcile the same durable setup identity and resource; missing pending alone never proves no effect or authorizes a repeated record",
+                  "recoveryEvidenceRequired": [
+                    "durable setup intent and exact args",
+                    "authenticated participant markers at the same resource",
+                    "source event replay and persisted writer recovery",
+                    "exclusive resource admission and delayed/in-flight send reconciliation"
+                  ],
+                  "knownHazard": "RecordIncomingCredits only tests pending absence; CommitIncomingCredits removes pending and retains committed. Same txid alone does not prevent a later Record/Commit from duplicating seed.",
+                  "duplicateDelayedCommandPolicy": "future host/participant boundary must prove a committed-aware fence for delayed duplicate Record/Commit; a prior host read or source-design check is not sufficient",
+                  "participantFixAuthority": "if existing commands cannot meet replay/fence obligations, report a separately authorized runtime/domain package; do not alter frozen slices or declare a host-only shim qualified",
+                  "readiness": "blocked-until-real-bootstrap-replay-and-fencing-evidence",
+                  "bootstrapVerified": false
+                },
+                "excludes": [
+                  "real account opening, closing, freezing and KYC/regulatory lifecycle",
+                  "external bank funding or bank mock",
+                  "production seed, fees, cutoff, minimum or rounding policy",
+                  "direct state/journal/snapshot mutation to manufacture money"
+                ]
+              },
+              "acceptance": [
+                {
+                  "id": "SETUP-A01",
+                  "assertion": "prove seed exact event folds and zero/empty starting state",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "SETUP-A02",
+                  "assertion": "committed/pending/conflict replay and delayed duplicate fence; no double seed across process restart",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "SETUP-A03",
+                  "assertion": "setup identity and exclusive resource writer distinct from payment/refund",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "SETUP-A04",
+                  "assertion": "insufficient balance is rejection, never reseed or external mock",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                }
+              ]
+            },
+            {
+              "id": "I0-S02-account-ownership",
+              "status": "selected-demo-design",
+              "selectedChoice": "bank-owned-versioned-trusted-fixture-authority",
+              "owner": "bank-wealth domain/auth owner",
+              "supersedes": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/1"
+              },
+              "originalChoicePointer": "/payload/info/artifact/body/scopeDecisions/1/choices/0",
+              "scope": "cash-payment-demo-prerequisite-only",
+              "designBasis": "user-approved-next-design-plan",
+              "implementation": "not-started",
+              "enforcementVerified": false,
+              "details": {
+                "selection": "bank-owned-versioned-trusted-fixture-authority",
+                "owner": "bank-wealth auth/application owner",
+                "authoritySource": "server-owned-versioned-demo-fixture",
+                "authenticatedPrincipalRequired": true,
+                "relations": [
+                  "principalId -> investorAccountId",
+                  "fundCode -> fundCollectionAccountId",
+                  "account/resource/collection eligibility tied to fixtureVersion and explicit active status"
+                ],
+                "publicInputs": [
+                  "fundCode",
+                  "amount"
+                ],
+                "clientAccountSelectionAllowed": false,
+                "clientOperationIdentityAllowed": false,
+                "newAdmissionChecks": [
+                  "authenticated principal",
+                  "current active principal ownership and fund collection eligibility",
+                  "setup readiness for both accounts",
+                  "investor and collection IDs differ",
+                  "exact currency/amount satisfy the existing cash contract",
+                  "unknown/missing/ambiguous/expired/disabled mapping rejects before domain creation"
+                ],
+                "persistedBeforeDomainCreation": [
+                  "operationId",
+                  "fundOrderId",
+                  "principalId",
+                  "investorAccountId",
+                  "fundCollectionAccountId",
+                  "fundCode",
+                  "amount",
+                  "mappingVersion",
+                  "fixtureVersion",
+                  "requestFingerprint"
+                ],
+                "retainedOperationSnapshot": "immutable exact original principal/order/accounts/fund/Money and authority versions; sensitive snapshot is bank-owned durable host data, not a compiled tree tool artifact",
+                "retryRemapAllowed": false,
+                "sameOperationConflict": "different principal or exact request/retained tuple rejects; no alternate account or operation fallback",
+                "versionChangePolicy": "new operations use current active mapping; updates cannot rewrite a retained operation or in-flight original account pair",
+                "revokedNewAdmission": "reject-new-operation",
+                "revokedExistingOperation": "retain original tuple; no fresh customer action or remap. Authenticated recovery/reconciliation only, with no newly authorized debit merely from stale customer eligibility.",
+                "unknownPolicy": "same operation remains unresolved; observation/query is not permission for a new debit/refund or identity",
+                "machineBoundary": "public Investor endpoints cannot deliver payment/TA/refund completion proofs; mapping fixture is neither a proof nor runtime sender authentication",
+                "actualFixturePublished": false,
+                "authorityEnforced": false,
+                "excludes": [
+                  "dynamic account/fund relationship administration",
+                  "full revocation/account lifecycle protocol",
+                  "production regulatory/product eligibility",
+                  "browser-selected account or machine-result payload"
+                ]
+              },
+              "acceptance": [
+                {
+                  "id": "AUTH-A01",
+                  "assertion": "cross-principal/unknown/inactive/ambiguous collection mapping fail before creation",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "AUTH-A02",
+                  "assertion": "persisted operation retains exact original resources on retry/version update/revocation",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "AUTH-A03",
+                  "assertion": "browser cannot choose accounts/business identity/machine completion",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "AUTH-A04",
+                  "assertion": "pending source association and authenticated recovery use original owner and tuple",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                }
+              ]
+            },
+            {
+              "id": "I0-S09-cash-entry-owner",
+              "status": "selected-demo-design",
+              "selectedChoice": "single-invoke-durable-cash-pipeline",
+              "owner": "bank-wealth application host owner",
+              "supersedes": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/8"
+              },
+              "originalChoicePointer": "/payload/info/artifact/body/scopeDecisions/8/choices/1",
+              "scope": "cash-payment-demo-prerequisite-only",
+              "designBasis": "user-approved-next-design-plan",
+              "implementation": "not-started",
+              "enforcementVerified": false,
+              "details": {
+                "selection": "single-invoke-durable-cash-pipeline",
+                "owner": "bank-wealth durable cash pipeline host owner",
+                "pipelineId": "fund-purchase-cash-payment",
+                "pipelineStageId": "pay-cash-purchase",
+                "saga": {
+                  "id": "fund-purchase-payment-v2",
+                  "version": "v2"
+                },
+                "sourceEventRef": "FundOrder.FundPurchaseSettlementRequested",
+                "creationCommandRef": "FundOrder.RequestFundPurchaseSettlement",
+                "directSagaSourceSubscriptionEnabled": false,
+                "independentDirectSagaStartAllowed": false,
+                "preservedDeclarations": [
+                  "tree/sagas/fund-purchase-payment-v2.saga.yaml",
+                  "tree/pipelines/fund-purchase-cash-payment.pipeline.yaml",
+                  "wealth-execution-bindings.json"
+                ],
+                "activationPolicy": "future assembly enables only pipeline entry; frozen Saga event trigger remains declarative and is not independently subscribed",
+                "pipelineInputs": [
+                  {
+                    "slot": "operation",
+                    "type": "OperationId",
+                    "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.operationId"
+                  },
+                  {
+                    "slot": "occurrence",
+                    "type": "OperationId",
+                    "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.operationId",
+                    "policy": "one cash stage occurrence equals retained operationId; never per-attempt/random/time occurrence"
+                  },
+                  {
+                    "slot": "investorAccountId",
+                    "type": "AccountId",
+                    "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.investorAccountId"
+                  },
+                  {
+                    "slot": "fundOrderId",
+                    "type": "FundOrderId",
+                    "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.fundOrderId"
+                  },
+                  {
+                    "slot": "fundCollectionAccountId",
+                    "type": "AccountId",
+                    "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.fundCollectionAccountId"
+                  },
+                  {
+                    "slot": "amount",
+                    "type": "Money",
+                    "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.amount"
+                  }
+                ],
+                "pinnedBinding": {
+                  "pipelineCodec": "CashPurchasePipelineCodec@pipeline-v2",
+                  "argsCodec": "CashPurchaseV2ArgsCodec@codec-v1",
+                  "planVersion": "plan-v2",
+                  "planCompatibility": "exact",
+                  "derivation": "durable-source-stage",
+                  "payloadCompatibility": "exact"
+                },
+                "persistBeforeInvokeAndEarlyOutcome": [
+                  "retained source event journal identity and operation/order association",
+                  "pipeline id/plan version/stage id/occurrence",
+                  "Saga id/version, args codec and exact original args digest",
+                  "retained Saga start TxId and source-to-start association"
+                ],
+                "transactionIdentity": "use pinned durable-source-stage mapper and persist the association; public/host implementation must prove its recipe against source operation and must not start an alternate event-trigger recipe",
+                "recipeEquivalenceVerified": false,
+                "argsRecomputedOnRetry": false,
+                "freshIdentityOnUnknownAllowed": false,
+                "creationRetry": {
+                  "creationOnly": true,
+                  "resendOnRetryAllowed": false,
+                  "allocationOnPendingAllowed": false,
+                  "retainedAssociation": "host-generated operation/fundOrder recorded before creation; bind the acknowledged or recovered FundPurchaseSettlementRequested source event to that same intent",
+                  "pendingSubmission": "query/reconcile original FundOrder/journal and recover association; do not blindly resend a creation-only command or create a replacement order",
+                  "refresh": "owner-scoped query or authorized recovery of the retained operation, not a new command from screen reload",
+                  "requestIntentHandle": "server-issued retained intent/opaque lookup handle is not a client-selected OperationId; concrete endpoint/session transport remains open under S10/X07",
+                  "proofBoundary": "cannot infer at-most-once from a single step or in-JVM generation guard; durable exact identity and authenticated replay/recovery are mandatory"
+                },
+                "resultBridge": {
+                  "authorityArtifact": "contract.cash-purchase-v2",
+                  "pointer": "/payload/info/artifact/body/paymentResultBridge",
+                  "beforeOrderPrepareMayComplete": true,
+                  "authenticatesAllFiveKinds": "future-obligation-not-implemented",
+                  "target": "retained FundOrder id, never first participant or browser target"
+                },
+                "runtimeBindingVerified": false,
+                "runnable": false,
+                "excludes": [
+                  "independent direct Saga start",
+                  "new source args from latest mapping on recovery",
+                  "refund/SIP/other-pipeline start owner selection",
+                  "proof that one invoke step is exactly-once"
+                ]
+              },
+              "acceptance": [
+                {
+                  "id": "START-A01",
+                  "assertion": "one pipeline start and disabled direct Saga subscriber",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "START-A02",
+                  "assertion": "same source/replay uses same stage occurrence, Saga txid, pinned args and version",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "START-A03",
+                  "assertion": "crash/pending create/early outcome recover retained association without re-creation",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "START-A04",
+                  "assertion": "unknown observes/reconciles same operation, never fresh start or rewritten resources",
+                  "evidenceLevel": "future-behavior",
+                  "execution": "not-run"
+                }
+              ]
+            }
+          ],
+          "remainingOpenDecisions": [
+            {
+              "id": "I0-S03-internal-transfer",
+              "status": "open",
+              "owner": "bank-wealth domain/product owner",
+              "original": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/2"
+              }
+            },
+            {
+              "id": "I0-S04-holdings",
+              "status": "open",
+              "owner": "bank-wealth fund domain/product owner",
+              "original": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/3"
+              }
+            },
+            {
+              "id": "I0-S05-sip-clock",
+              "status": "open",
+              "owner": "bank-wealth scheduling domain/product owner",
+              "original": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/4"
+              }
+            },
+            {
+              "id": "I0-S06-sip-occurrence",
+              "status": "open",
+              "owner": "bank-wealth SIP domain/application owner",
+              "original": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/5"
+              }
+            },
+            {
+              "id": "I0-S07-sip-counters",
+              "status": "open",
+              "owner": "bank-wealth SIP domain/product owner",
+              "original": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/6"
+              }
+            },
+            {
+              "id": "I0-S08-batch-scope",
+              "status": "open",
+              "owner": "bank-wealth domain/product owner",
+              "original": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/7"
+              }
+            },
+            {
+              "id": "I0-S10-consumer-stack",
+              "status": "open",
+              "owner": "bank-wealth application/product owner with metarch-truthsrc plugin owners",
+              "original": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/9"
+              }
+            },
+            {
+              "id": "I0-S11-financial-rules",
+              "status": "open",
+              "owner": "bank-wealth fund domain/product owner",
+              "original": {
+                "artifact": "decision.i0-baseline-coverage",
+                "pointer": "/payload/info/artifact/body/scopeDecisions/10"
+              }
+            }
+          ],
+          "inheritedBoundaries": {
+            "cashContract": "contract.cash-purchase-v2",
+            "fundCompany": "simulation-authorized",
+            "externalBankMock": "not-authorized",
+            "unknownAllowsNewDebit": false,
+            "unknownAllowsRefund": false,
+            "legacyCashDoubleDispatchAllowed": false,
+            "customerFinalSuccess": "TA-confirmed-not-payment-marker",
+            "pausedDrafts": "paused-preserve-no-execution"
+          },
+          "designCompleteness": "partial-three-prerequisites-selected-not-complete",
+          "evidenceBoundary": {
+            "designSelection": "selected-by-user-plan-approval",
+            "currentAcceptance": "receipt-not-tree",
+            "publicImplementation": "not-started",
+            "applicationGeneration": "not-run",
+            "bootstrapVerified": false,
+            "authorityEnforced": false,
+            "runtimeBindingVerified": false,
+            "runnable": false,
+            "independentAudit": "not-performed"
+          }
+        }
+      }
+    }
+  }

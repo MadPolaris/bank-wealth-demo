@@ -126,6 +126,43 @@ payload:
           "Business-rejection/compensated outcomes stop the declared composition; recovery-required/outcome-unknown require manual recovery rather than an assumed business rollback.",
           "Failure recording currently has no guards and accepts every supplied reasonCode. No active AutoPauseSipOnThreeFailures policy remains; qualifying reasons, three-count threshold, reset rules and out-of-order gate are pending."
         ]
+      },
+      {
+        "useCase": "CashFundPurchaseLifecycle",
+        "sources": "Approved second batch agent-assisted cash-purchase-v2 contract proposal; no held workshop or observed funds runtime.",
+        "description": "Source-side request and separate evidence-recording alternatives only; no unsupported TA/refund branch is added to an execution pipeline.",
+        "preconditions": [
+          {
+            "aggregate": "FundOrder",
+            "state": "Creation-only order, original investor and collection accounts differ, positive CNY principal; host proves ownership and collection authorization",
+            "invariantRef": "IR-FO-CASH-NO-RECREATE",
+            "errCode": "62100"
+          }
+        ],
+        "steps": [
+          {
+            "id": "request-cash-purchase",
+            "story": "CashFundPurchaseLifecycle",
+            "command": "RequestFundPurchaseSettlement",
+            "aggregate": "FundOrder",
+            "emissions": [
+              "FundPurchaseSettlementRequested"
+            ]
+          }
+        ],
+        "extensions": [],
+        "mainFlow": [
+          "The only new payment Saga entry is FundPurchaseSettlementRequested; investor outgoing then collection incoming then order payment confirmation are separate singleton barriers under a durable decision.",
+          "Existing FundSubscriptionPaymentConfirmed retains selectedPaymentTxId; host must additionally verify collection commit and exact successful fund-purchase-payment-v2/v2 evidence before TA registration.",
+          "TA accepted/confirmed/rejected/unknown are correlated exact-body receipt commands; UNKNOWN retains preceding TA lifecycle. Identical duplicate emits no event; conflicting body rejects.",
+          "Only explicit TA_REJECTED plus known successful cash payment may emit FundPurchaseRefundRequested from retained original accounts/principal. Handler computes and retains an independent refund TxId.",
+          "fund-purchase-refund/v1 publishes five generic result events on the collection CreditBalance; a trusted host bridges verified kinds to the matching FundOrder result command. Only RecordFundRefundCompleted -> FundRefundCompleted permits refunded evidence."
+        ],
+        "alternatives": [
+          "Legacy RequestFundPurchase remains legacy-v1 and does not trigger new cash Saga or qualify for new TA/refund commands merely by PAYMENT_SETTLED.",
+          "TA UNKNOWN and refund outcome-unknown/recovery-required require evidence reconciliation and never authorize another debit or refund.",
+          "Canonical receipt-to-typed-slot validation, exact original payment/refund identity derivation and sender/evidence authentication remain pending bridges; declaration guards are not executed/certified by this source tool."
+        ]
       }
     ],
     "sourceCapture": {

@@ -1,0 +1,969 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: question
+name: CashPurchaseV2Contract
+origin:
+  stage: refining
+  board: wealth-cash-v2
+  seq: 0
+payload:
+  {
+    "type": "question",
+    "name": "CashPurchaseV2Contract",
+    "stage": "refining",
+    "description": "Which explicit demo cash/TA/refund conventions and trusted bridge obligations govern the isolated cash-purchase-v2 proposal?",
+    "info": {
+      "curator": "agent-assisted proposal curator",
+      "date": "2026-10-25",
+      "artifact": {
+        "id": "contract.cash-purchase-v2",
+        "category": "cash-purchase-contract",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "Approved second batch: isolated bankwealth source declarations and MockTA only",
+          "basis": "Explicit demo defaults; not actual fund rules or a held workshop",
+          "curator": "agent-assisted proposal curator",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "aggregate",
+            "id": "FundOrder"
+          },
+          {
+            "kind": "aggregate",
+            "id": "CreditBalance"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundSubscriptionPaymentConfirmed"
+          },
+          {
+            "kind": "artifact",
+            "id": "mock-ta.registry"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.settlement-refund"
+          },
+          {
+            "kind": "story",
+            "id": "CashFundPurchaseLifecycle"
+          },
+          {
+            "kind": "read-model",
+            "id": "FundCashPurchaseLifecycle"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RequestFundPurchaseSettlement"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RegisterFundTASubmission"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordFundTAAccepted"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordFundTAConfirmed"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordFundTARejected"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordFundTAUnknown"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RequestFundPurchaseRefund"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordFundRefundCompleted"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordFundPurchaseRefundRejected"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordFundPurchaseRefundCompensated"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordFundPurchaseRefundRecoveryRequired"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordFundPurchaseRefundOutcomeUnknown"
+          }
+        ],
+        "body": {
+          "entities": [],
+          "demoPolicy": {
+            "currency": "CNY",
+            "feesMinorUnits": "0",
+            "refundMode": "full-principal",
+            "clock": "manual"
+          },
+          "cashPath": {
+            "contractVersion": "cash-purchase-v2",
+            "payment": {
+              "qualifiedRef": "saga:fund-purchase-payment-v2@v2",
+              "entry": "FundOrder.FundPurchaseSettlementRequested",
+              "participants": [
+                "investor CreditBalance outgoing",
+                "fund collection CreditBalance incoming",
+                "FundOrder subscription TCC"
+              ],
+              "barriers": [
+                1,
+                2,
+                3
+              ],
+              "commitOrder": "investor then collection then order; durable decision before commits",
+              "collectionDisposition": "Retain collection funds until TA confirmation or independent authorized refund; no automatic onward transfer"
+            },
+            "refund": {
+              "qualifiedRef": "saga:fund-purchase-refund@v1",
+              "entry": "FundOrder.FundPurchaseRefundRequested",
+              "eligibility": "Only cash-purchase-v2 with selected successful payment and explicit correlated TA_REJECTED; UNKNOWN never authorizes refund",
+              "direction": "Retained original collection account to retained original investor account",
+              "amount": "Retained original full principal, CNY; never arbitrary caller amount/target",
+              "identity": "New refund OperationId and stable TxId scoped to fund-purchase-refund/v1, distinct from original payment identity; do not reuse payment reservations; FundPurchaseRefundRequested.refundTxId is handler-computed (no arbitrary command parameter/binding), then retained and checked on all result commands. The trusted mapper must reconcile event-start and pipeline durable-source-stage identity before any invocation; choose one entry owner, never double-start with differing recipes.",
+              "requestIsNotSuccess": true,
+              "completion": "FundRefundCompleted only after host verifies the independent cash Saga succeeded and matches original paymentTxId, retained refundOperationId and derived refundTxId; schema does not authenticate senders"
+            }
+          },
+          "taProtocol": {
+            "submission": {
+              "command": "FundOrder.RegisterFundTASubmission",
+              "requiredEvidence": "Both collection CreditBalance committed receipt and FundOrder committed receipt plus exact fund-purchase-payment-v2/v2 succeeded evidence for selected payment; strict bridge remains pending",
+              "identity": [
+                "fundOrderId",
+                "paymentTxId",
+                "taRequestId"
+              ],
+              "requestConflict": "Reject different exact request body under same taRequestId"
+            },
+            "receipt": {
+              "identity": "receiptId",
+              "body": "receiptBody exact String, never parsed/reformatted before duplicate comparison",
+              "taReference": "TA business reference, not delivery receipt identity; accepted and confirmed have different receiptId values",
+              "ledger": "FundOrder.taReceipts Map[String, String], receiptId to exact receiptBody",
+              "duplicate": "Identity/resource checks and exact-body conflict check precede map-absent succeed-empty; identical duplicate is empty success before phase guards, different body is rejection",
+              "correlation": [
+                "fundOrderId",
+                "paymentTxId",
+                "taRequestId",
+                "taReference",
+                "fundCode",
+                "currency"
+              ],
+              "unknown": "Observation only; retain preceding TA lifecycle, no implied rejection/refund"
+            },
+            "canonicalCodecObligation": {
+              "status": "bridge-pending",
+              "requirement": "Decode exact receiptBody with canonical bank-wealth.mock-ta/v1 validator and compare every typed command slot to the decoded body; arbitrary client String is not trusted proof",
+              "moneyConversion": "Domain Money amount decimal string + currency must be explicitly and exactly converted to wire minorUnitsString + currency (scale 2); no float coercion or nominal type alias",
+              "sharesConversion": "Confirmed shares/nav exact decimal strings map to the actual FundShare fields fundCode/shares/nav; currency is a separate receipt slot matched to original Money.currency. No invented FundShare totalValue/currency member or certified formula.",
+              "sourceDrivenMapping": [
+                {
+                  "outcome": "accepted",
+                  "command": "FundOrder.RecordFundTAAccepted",
+                  "event": "FundOrder.FundTAAccepted"
+                },
+                {
+                  "outcome": "confirmed",
+                  "command": "FundOrder.RecordFundTAConfirmed",
+                  "event": "FundOrder.FundTASharesConfirmed"
+                },
+                {
+                  "outcome": "rejected",
+                  "command": "FundOrder.RecordFundTARejected",
+                  "event": "FundOrder.FundTARejected"
+                },
+                {
+                  "outcome": "unknown",
+                  "command": "FundOrder.RecordFundTAUnknown",
+                  "event": "FundOrder.FundTAOutcomeUnknownObserved"
+                }
+              ],
+              "digest": "Bind exact canonical receipt byte digest and request byte digest to durable bridge evidence, not just taReference",
+              "legacyConflict": "Old RecordTAShareConfirmation/FundSharesConfirmed parameters/event/guard remain unchanged by authorization. Trusted host must not route cash-v2 orders through that legacy command; it lacks version/correlation checks and could otherwise bypass the new receipt ledger at PAYMENT_SETTLED. No generator/runtime bridge currently proves this exclusion."
+            }
+          },
+          "mockConfiguration": {
+            "schemaVersion": "bank-wealth.mock-ta/v1",
+            "currency": "CNY",
+            "feesMinorUnits": "0",
+            "refundMode": "full-principal",
+            "initialBusinessTick": 0,
+            "scenarios": [
+              {
+                "id": "confirmed",
+                "outcome": "confirmed",
+                "delayTicks": 1,
+                "fixture": {
+                  "shares": "80.0000",
+                  "nav": "1.2345"
+                }
+              },
+              {
+                "id": "rejected",
+                "outcome": "rejected",
+                "delayTicks": 1,
+                "reason": "TA_DEMO_REJECTED"
+              },
+              {
+                "id": "delayed",
+                "outcome": "confirmed",
+                "delayTicks": 3,
+                "fixture": {
+                  "shares": "80.0000",
+                  "nav": "1.2345"
+                }
+              },
+              {
+                "id": "unknown",
+                "outcome": "unknown",
+                "delayTicks": 0
+              },
+              {
+                "id": "accepted",
+                "outcome": "accepted",
+                "delayTicks": 0
+              },
+              {
+                "id": "duplicate-identical",
+                "outcome": "confirmed",
+                "delayTicks": 1,
+                "fixture": {
+                  "shares": "80.0000",
+                  "nav": "1.2345"
+                },
+                "delivery": "identical-duplicate"
+              },
+              {
+                "id": "duplicate-conflicting",
+                "outcome": "confirmed",
+                "delayTicks": 1,
+                "fixture": {
+                  "shares": "80.0000",
+                  "nav": "1.2345"
+                },
+                "delivery": "conflicting-duplicate",
+                "conflictFixture": {
+                  "shares": "81.0000",
+                  "nav": "1.2468"
+                }
+              }
+            ]
+          },
+          "sourceRuntimeBoundaries": {
+            "declarations": "Source-side contract only; strict compile and lowering are not runtime certification",
+            "sagaResultsBridge": "Cash-v2 payment uses FundOrder.cashPaymentResults and terminal-only cashPaymentFinalResults, not legacy sagaResults. Refund generic CreditBalance completions retain their protected contract, but their write-once sagaResults cannot be the sole bridge input after a recoverable outcome; consume authenticated durable refund Saga outcomes/reconciliation independently.",
+            "receiptEnforcement": "Mixed structured/legacy guard author order is required but current generator reorder is unresolved; conditions carry exact obligations rather than false placeholders",
+            "phaseMarkers": "FundOrder committedSubscriptions/compensatedSubscriptions do not match generator expected committed/compensated names; not fixed here",
+            "host": "Ownership and collection authorization, initial funded account balance, exact typed codecs, proof authentication and durable restart/reconciliation bridges remain prerequisites",
+            "notImplemented": [
+              "Actual payment service",
+              "Production TA",
+              "Real external bank",
+              "Trading calendar/cutoff",
+              "Product minimum",
+              "Certified fees/rounding/NAV formulas",
+              "Full SIP migration",
+              "Complete app/JVM recovery",
+              "Code-anchor writeback"
+            ],
+            "mockOnly": "MockTA reload proves only simulator journal reload, not funds engine or whole business recovery",
+            "legacyPhaseCompatibility": "Cash-only invariantRef conditions added to existing FundOrder reserve/commit/cancel without changing params/event slots; prevent another cash txid or resetting TA/refund by old TCC commands. Original legacy phase behavior and RecordTAShareConfirmation contract unchanged.",
+            "guardForms": {
+              "structured": [
+                "money-positive",
+                "map-contains",
+                "map-absent"
+              ],
+              "legacy": "kind: invariantRef with cond carries exact scalar/resource/lifecycle/body/share association declarations. No unsupported when.form or false placeholder is used.",
+              "evaluation": "Resource/correlation/exact-body conflict before structured map-absent succeed-empty before phase guard; mixed-order generator enforcement remains unresolved."
+            },
+            "stateDefaults": "No default state/JVM behavior is certified. Creation-only cond state.status.isEmpty and state.contractVersion.isEmpty requires the generated/host initial state representation to be empty; nonempty initial status would require a separately verified host/default contract, not silent guard reinterpretation.",
+            "paymentResult": "New cash-only five-kind declarations permit authenticated recovery-required/outcome-unknown to succeeded/rejected-before-effects/compensated, protect terminal conflicts before empty success and preserve order/TA/refund lifecycle. TxId-only source cannot authenticate sender or first pre-Prepare association; runtime host remains pending.",
+            "refundResultReconciliation": {
+              "status": "bridge-pending",
+              "trustedHostOnly": true,
+              "browserMayPublish": false,
+              "outcomeSource": "authenticated-durable-saga-outcome",
+              "genericCompletionIsSoleAuthority": false,
+              "reason": "The refund Saga generic CreditBalance result publication remains write-once. A nonterminal account result may suppress a later generic event; bridge must independently observe/query the pinned durable Saga outcome and its authenticated reconciliation, never wait exclusively for that generic ledger/event.",
+              "sagaId": "fund-purchase-refund",
+              "version": "v1",
+              "sourceEventRef": "FundOrder.FundPurchaseRefundRequested",
+              "identityMapping": [
+                {
+                  "commandParameter": "fundOrderId",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseRefundRequested.fundOrderId",
+                  "stateFieldRef": "FundOrder.id"
+                },
+                {
+                  "commandParameter": "paymentTxId",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseRefundRequested.paymentTxId",
+                  "stateFieldRef": "FundOrder.selectedPaymentTxId"
+                },
+                {
+                  "commandParameter": "refundOperationId",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseRefundRequested.refundOperationId",
+                  "stateFieldRef": "FundOrder.refundOperationId"
+                },
+                {
+                  "commandParameter": "refundTxId",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseRefundRequested.refundTxId",
+                  "stateFieldRef": "FundOrder.refundTxId"
+                }
+              ],
+              "exactArgs": [
+                {
+                  "slot": "fundCollectionAccountId",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseRefundRequested.fundCollectionAccountId",
+                  "stateFieldRef": "FundOrder.fundCollectionAccountId"
+                },
+                {
+                  "slot": "investorAccountId",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseRefundRequested.investorAccountId",
+                  "stateFieldRef": "FundOrder.investorAccountId"
+                },
+                {
+                  "slot": "amount",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseRefundRequested.amount",
+                  "stateFieldRef": "FundOrder.amount"
+                }
+              ],
+              "terminalLedgerRef": "FundOrder.refundFinalResults",
+              "receiptLedgerRef": "FundOrder.refundResultReceipts",
+              "receiptKindLedgerRef": "FundOrder.refundResultReceiptKinds",
+              "terminalPolicy": {
+                "recoverableKinds": [
+                  "recovery-required",
+                  "outcome-unknown"
+                ],
+                "terminalKinds": [
+                  "succeeded",
+                  "rejected-before-effects",
+                  "compensated"
+                ],
+                "recoverableToTerminal": "authenticated-reconciliation",
+                "sameFinal": "succeed-empty",
+                "conflictingFinal": "reject",
+                "nonterminalAfterFinal": "reject",
+                "receiptConflict": "reject-exact-body-or-kind-before-duplicate"
+              },
+              "receiptAuthority": "Trusted durable bridge receiptId/body must bind Saga id/version, resultKind, original payment/order, retained new refund operation/txid, exact original accounts/Money and receipt/args digests. Compare every typed command slot before invocation. Same receipt under another kind rejects even if body String is copied; new receipt same final is empty success. No browser-provided proof.",
+              "mapping": [
+                {
+                  "sourceEvent": "CreditBalance.result-succeeded",
+                  "commandRef": "FundOrder.RecordFundRefundCompleted",
+                  "eventRef": "FundOrder.FundRefundCompleted",
+                  "resultKind": "succeeded",
+                  "completionEventRef": "CreditBalance.result-succeeded",
+                  "source": "authenticated-durable-saga-outcome",
+                  "transactionBinding": {
+                    "slot": "txid",
+                    "ref": "txid",
+                    "type": "TxId"
+                  }
+                },
+                {
+                  "sourceEvent": "CreditBalance.result-rejected-before-effects",
+                  "commandRef": "FundOrder.RecordFundPurchaseRefundRejected",
+                  "eventRef": "FundOrder.FundPurchaseRefundRejected",
+                  "resultKind": "rejected-before-effects",
+                  "completionEventRef": "CreditBalance.result-rejected-before-effects",
+                  "source": "authenticated-durable-saga-outcome",
+                  "transactionBinding": {
+                    "slot": "txid",
+                    "ref": "txid",
+                    "type": "TxId"
+                  }
+                },
+                {
+                  "sourceEvent": "CreditBalance.result-compensated",
+                  "commandRef": "FundOrder.RecordFundPurchaseRefundCompensated",
+                  "eventRef": "FundOrder.FundPurchaseRefundCompensated",
+                  "resultKind": "compensated",
+                  "completionEventRef": "CreditBalance.result-compensated",
+                  "source": "authenticated-durable-saga-outcome",
+                  "transactionBinding": {
+                    "slot": "txid",
+                    "ref": "txid",
+                    "type": "TxId"
+                  }
+                },
+                {
+                  "sourceEvent": "CreditBalance.result-recovery-required",
+                  "commandRef": "FundOrder.RecordFundPurchaseRefundRecoveryRequired",
+                  "eventRef": "FundOrder.FundPurchaseRefundRecoveryRequired",
+                  "resultKind": "recovery-required",
+                  "completionEventRef": "CreditBalance.result-recovery-required",
+                  "source": "authenticated-durable-saga-outcome",
+                  "transactionBinding": {
+                    "slot": "txid",
+                    "ref": "txid",
+                    "type": "TxId"
+                  }
+                },
+                {
+                  "sourceEvent": "CreditBalance.result-outcome-unknown",
+                  "commandRef": "FundOrder.RecordFundPurchaseRefundOutcomeUnknown",
+                  "eventRef": "FundOrder.FundPurchaseRefundOutcomeUnknownObserved",
+                  "resultKind": "outcome-unknown",
+                  "completionEventRef": "CreditBalance.result-outcome-unknown",
+                  "source": "authenticated-durable-saga-outcome",
+                  "transactionBinding": {
+                    "slot": "txid",
+                    "ref": "txid",
+                    "type": "TxId"
+                  }
+                }
+              ],
+              "nonterminal": "Observation only; REFUND_REQUESTED remains unresolved. Authentication/reconciliation is mandatory before any final delivery; UNKNOWN cannot authorize another refund or fresh debit."
+            },
+            "taTypedSlotBridge": {
+              "status": "bridge-pending",
+              "trustedHostOnly": true,
+              "browserMayPublish": false,
+              "sourceEventRef": "FundOrder.FundTASubmissionRegistered",
+              "requestMapping": [
+                {
+                  "wireField": "requestId",
+                  "sourceEventFieldRef": "FundOrder.FundTASubmissionRegistered.taRequestId",
+                  "dataType": "String"
+                },
+                {
+                  "wireField": "orderId",
+                  "sourceEventFieldRef": "FundOrder.FundTASubmissionRegistered.fundOrderId",
+                  "dataType": "FundOrderId"
+                },
+                {
+                  "wireField": "paymentTxId",
+                  "sourceEventFieldRef": "FundOrder.FundTASubmissionRegistered.paymentTxId",
+                  "dataType": "TxId"
+                }
+              ],
+              "retainedRequestFields": [
+                {
+                  "wireField": "investorAccountId",
+                  "stateFieldRef": "FundOrder.investorAccountId"
+                },
+                {
+                  "wireField": "fundCollectionAccountId",
+                  "stateFieldRef": "FundOrder.fundCollectionAccountId"
+                },
+                {
+                  "wireField": "fundCode",
+                  "stateFieldRef": "FundOrder.fundCode"
+                },
+                {
+                  "wireField": "amount",
+                  "stateFieldRef": "FundOrder.amount"
+                }
+              ],
+              "receiptMapping": [
+                {
+                  "outcome": "accepted",
+                  "commandRef": "FundOrder.RecordFundTAAccepted",
+                  "parameters": [
+                    {
+                      "commandParameter": "fundOrderId",
+                      "wireField": "orderId",
+                      "dataType": "FundOrderId"
+                    },
+                    {
+                      "commandParameter": "paymentTxId",
+                      "wireField": "paymentTxId",
+                      "dataType": "TxId"
+                    },
+                    {
+                      "commandParameter": "taRequestId",
+                      "wireField": "requestId",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "taReference",
+                      "wireField": "taReference",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "receiptId",
+                      "wireField": "receiptId",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "receiptBody",
+                      "wireField": "$canonicalBytes",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "fundCode",
+                      "wireField": "fundCode",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "currency",
+                      "wireField": "amount.currency",
+                      "dataType": "String"
+                    }
+                  ]
+                },
+                {
+                  "outcome": "confirmed",
+                  "commandRef": "FundOrder.RecordFundTAConfirmed",
+                  "parameters": [
+                    {
+                      "commandParameter": "fundOrderId",
+                      "wireField": "orderId",
+                      "dataType": "FundOrderId"
+                    },
+                    {
+                      "commandParameter": "paymentTxId",
+                      "wireField": "paymentTxId",
+                      "dataType": "TxId"
+                    },
+                    {
+                      "commandParameter": "taRequestId",
+                      "wireField": "requestId",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "taReference",
+                      "wireField": "taReference",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "receiptId",
+                      "wireField": "receiptId",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "receiptBody",
+                      "wireField": "$canonicalBytes",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "fundCode",
+                      "wireField": "fundCode",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "currency",
+                      "wireField": "amount.currency",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "shares",
+                      "wireField": "shares",
+                      "dataType": "FundShare"
+                    }
+                  ]
+                },
+                {
+                  "outcome": "rejected",
+                  "commandRef": "FundOrder.RecordFundTARejected",
+                  "parameters": [
+                    {
+                      "commandParameter": "fundOrderId",
+                      "wireField": "orderId",
+                      "dataType": "FundOrderId"
+                    },
+                    {
+                      "commandParameter": "paymentTxId",
+                      "wireField": "paymentTxId",
+                      "dataType": "TxId"
+                    },
+                    {
+                      "commandParameter": "taRequestId",
+                      "wireField": "requestId",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "taReference",
+                      "wireField": "taReference",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "receiptId",
+                      "wireField": "receiptId",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "receiptBody",
+                      "wireField": "$canonicalBytes",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "fundCode",
+                      "wireField": "fundCode",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "currency",
+                      "wireField": "amount.currency",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "reason",
+                      "wireField": "reason",
+                      "dataType": "String"
+                    }
+                  ]
+                },
+                {
+                  "outcome": "unknown",
+                  "commandRef": "FundOrder.RecordFundTAUnknown",
+                  "parameters": [
+                    {
+                      "commandParameter": "fundOrderId",
+                      "wireField": "orderId",
+                      "dataType": "FundOrderId"
+                    },
+                    {
+                      "commandParameter": "paymentTxId",
+                      "wireField": "paymentTxId",
+                      "dataType": "TxId"
+                    },
+                    {
+                      "commandParameter": "taRequestId",
+                      "wireField": "requestId",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "taReference",
+                      "wireField": "taReference",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "receiptId",
+                      "wireField": "receiptId",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "receiptBody",
+                      "wireField": "$canonicalBytes",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "fundCode",
+                      "wireField": "fundCode",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "currency",
+                      "wireField": "amount.currency",
+                      "dataType": "String"
+                    },
+                    {
+                      "commandParameter": "reason",
+                      "wireField": "$trustedUnknownReason",
+                      "dataType": "String"
+                    }
+                  ]
+                }
+              ],
+              "checks": [
+                "Decode exact canonical receipt bytes; compare each typed command slot before delivery and compare original accounts/full amount to retained FundOrder. ReceiptBody String itself has no authority.",
+                "Submission request bytes must match registered order/payment/request plus retained fund/accounts/full Money; minorUnits/currency require exact scale-2 conversion, no floating coercion.",
+                "UNKNOWN receipt has no reason field in MockTA; trusted bridge derives an observation reason without claiming TA rejection. Confirmed FundShare is actual fundCode/shares/nav, never invented amount/currency fields."
+              ]
+            },
+            "cashCancelFence": {
+              "status": "bridge-pending",
+              "commandRef": "FundOrder.CancelCashFundSubscription",
+              "eventRef": "FundOrder.FundCashSubscriptionCanceled",
+              "emptyReservation": "Persist compensatedSubscriptions[txid] using original state.amount and CANCELED even before Prepare; no cash effect.",
+              "exactAssociation": "Same original source-event and durable Saga start txid, original order and Money; resource/conflict/no-commit checks before identical duplicate empty success.",
+              "latePrepare": "CANCELED plus compensatedSubscriptions fence rejects late Prepare; no terminal or committed lifecycle reset.",
+              "legacy": "Old CancelFundSubscription/old Saga remain unchanged; only cash-v2 compensate uses this declaration.",
+              "runtime": "Auth, guard order, marker and receipt codecs remain pending; source declaration is not runtime certification."
+            }
+          },
+          "refundResultBridge": {
+            "status": "bridge-pending",
+            "authority": "No schema proof token authenticates a sender. Only trusted host after strict cash Saga identity/version/args digest + exact durable receipts validation.",
+            "sourceAggregate": "CreditBalance",
+            "sourceResource": "retained fundCollectionAccountId",
+            "sagaId": "fund-purchase-refund",
+            "version": "v1",
+            "correlation": [
+              "original selectedPaymentTxId",
+              "retained refundOperationId",
+              "retained derived refundTxId",
+              "original collection/investor accounts",
+              "original full Money"
+            ],
+            "mapping": [
+              {
+                "sourceEvent": "CreditBalance.result-succeeded",
+                "commandRef": "FundOrder.RecordFundRefundCompleted",
+                "eventRef": "FundOrder.FundRefundCompleted",
+                "resultKind": "succeeded"
+              },
+              {
+                "sourceEvent": "CreditBalance.result-rejected-before-effects",
+                "commandRef": "FundOrder.RecordFundPurchaseRefundRejected",
+                "eventRef": "FundOrder.FundPurchaseRefundRejected",
+                "resultKind": "rejected-before-effects"
+              },
+              {
+                "sourceEvent": "CreditBalance.result-compensated",
+                "commandRef": "FundOrder.RecordFundPurchaseRefundCompensated",
+                "eventRef": "FundOrder.FundPurchaseRefundCompensated",
+                "resultKind": "compensated"
+              },
+              {
+                "sourceEvent": "CreditBalance.result-recovery-required",
+                "commandRef": "FundOrder.RecordFundPurchaseRefundRecoveryRequired",
+                "eventRef": "FundOrder.FundPurchaseRefundRecoveryRequired",
+                "resultKind": "recovery-required"
+              },
+              {
+                "sourceEvent": "CreditBalance.result-outcome-unknown",
+                "commandRef": "FundOrder.RecordFundPurchaseRefundOutcomeUnknown",
+                "eventRef": "FundOrder.FundPurchaseRefundOutcomeUnknownObserved",
+                "resultKind": "outcome-unknown"
+              }
+            ],
+            "automaticMutationPolicy": false,
+            "unknown": "Persist observation only; leave REFUND_REQUESTED unresolved, no completion/retry authorization"
+          },
+          "pipelineInputAuthority": {
+            "status": "bridge-pending",
+            "payment": {
+              "qualifiedRef": "pipeline:fund-purchase-cash-payment",
+              "sourceEvent": "FundOrder.FundPurchaseSettlementRequested",
+              "inputs": {
+                "operation": "source.operationId",
+                "occurrence": "durable host stage occurrence, never attempt or clock",
+                "investorAccountId": "source.investorAccountId",
+                "fundOrderId": "source.fundOrderId",
+                "fundCollectionAccountId": "source.fundCollectionAccountId",
+                "amount": "source.amount"
+              }
+            },
+            "refund": {
+              "qualifiedRef": "pipeline:fund-purchase-cash-refund",
+              "sourceEvent": "FundOrder.FundPurchaseRefundRequested",
+              "inputs": {
+                "operation": "source.refundOperationId",
+                "occurrence": "durable host stage occurrence, never attempt or clock",
+                "fundCollectionAccountId": "source.fundCollectionAccountId retained from original request",
+                "investorAccountId": "source.investorAccountId retained from original request",
+                "amount": "source.amount retained original full principal"
+              }
+            },
+            "constraints": [
+              "Pipelines are host-only contract surfaces, not public arbitrary cash command endpoints.",
+              "Bind all start-record args from the authorized persisted source event; compare same source event against FundOrder state and strict Saga args digest before start.",
+              "Choose a single start owner: direct source-event Saga trigger OR the singleinvoke pipeline; never independently start both identity recipes.",
+              "Before any selected payment/refund is recorded, the trusted identity mapper must demonstrate equivalence between source-event scoped identity and durable-source-stage identity. That equivalence is not enforced or certified by these declarations.",
+              "Handler-computed FundPurchaseRefundRequested.refundTxId must equal the selected authoritative stable identity recipe, and must differ from original selectedPaymentTxId; no clock/random/attempt or payment reservation reuse."
+            ]
+          },
+          "paymentResultBridge": {
+            "status": "bridge-pending",
+            "trustedHostOnly": true,
+            "browserMayPublish": false,
+            "automaticMutationPolicy": false,
+            "sagaId": "fund-purchase-payment-v2",
+            "version": "v2",
+            "sourceEventRef": "FundOrder.FundPurchaseSettlementRequested",
+            "authority": "Authenticate the durable Saga result and reconciliation evidence, not arbitrary browser txid, body String or actor sender name. This note does not implement or certify authentication. Host capability must be unavailable to Investor/public command endpoints.",
+            "association": {
+              "evidence": "persisted-authorized-source-event-and-durable-saga-start",
+              "beforeOrderCommit": true,
+              "requiresCommitForEveryKind": false,
+              "target": {
+                "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.fundOrderId",
+                "stateIdentityRef": "FundOrder.id",
+                "sagaArg": "fundOrderId"
+              },
+              "transaction": {
+                "source": "authenticated-durable-saga-start.txid",
+                "type": "TxId",
+                "conflict": "reject-different-txid-for-same-source-operation"
+              },
+              "sourceFields": [
+                {
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.operationId",
+                  "stateFieldRef": "FundOrder.operationId"
+                },
+                {
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.investorAccountId",
+                  "stateFieldRef": "FundOrder.investorAccountId"
+                },
+                {
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.fundCollectionAccountId",
+                  "stateFieldRef": "FundOrder.fundCollectionAccountId"
+                },
+                {
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.fundCode",
+                  "stateFieldRef": "FundOrder.fundCode"
+                },
+                {
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.amount",
+                  "stateFieldRef": "FundOrder.amount"
+                }
+              ],
+              "args": [
+                {
+                  "slot": "investorAccountId",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.investorAccountId"
+                },
+                {
+                  "slot": "fundOrderId",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.fundOrderId"
+                },
+                {
+                  "slot": "fundCollectionAccountId",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.fundCollectionAccountId"
+                },
+                {
+                  "slot": "amount",
+                  "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.amount"
+                }
+              ],
+              "operation": {
+                "sourceEventFieldRef": "FundOrder.FundPurchaseSettlementRequested.operationId",
+                "stateFieldRef": "FundOrder.operationId",
+                "scope": "saga-version",
+                "conflict": "reject-different-args"
+              },
+              "obligations": [
+                "Verify pinned Saga id/version, exact args codec/digest and same retained original order/accounts/Money before the first publication, including rejected-before-effects/compensated where order Prepare/Commit may never execute.",
+                "Persist the source-event to start txid association before delivery; route to the FundOrder from pinned fundOrderId, never browser input. Compare existing cash-result keys and phase-marker keys; reject a different identity.",
+                "Direct event trigger versus single-invoke pipeline must choose one owner and prove identity recipe equivalence before start; no second operation to hide UNKNOWN.",
+                "Succeeded additionally requires investor debit + collection credit + order commit exact receipts, durable commit decision and selected payment correlation. Recoverable-to-terminal needs authenticated durable reconciliation; source guards do not verify that evidence."
+              ]
+            },
+            "mapping": [
+              {
+                "resultKind": "succeeded",
+                "commandRef": "FundOrder.RecordFundCashPaymentSucceeded",
+                "eventRef": "FundOrder.FundCashPaymentSucceeded",
+                "commandParameter": "txid",
+                "eventFieldRef": "FundOrder.FundCashPaymentSucceeded.txid",
+                "binding": {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                },
+                "sourceIndicators": {
+                  "commandParameterOrigin": "PROPAGATED",
+                  "eventFieldOrigin": "PROPAGATED"
+                }
+              },
+              {
+                "resultKind": "rejected-before-effects",
+                "commandRef": "FundOrder.RecordFundCashPaymentRejectedBeforeEffects",
+                "eventRef": "FundOrder.FundCashPaymentRejectedBeforeEffects",
+                "commandParameter": "txid",
+                "eventFieldRef": "FundOrder.FundCashPaymentRejectedBeforeEffects.txid",
+                "binding": {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                },
+                "sourceIndicators": {
+                  "commandParameterOrigin": "PROPAGATED",
+                  "eventFieldOrigin": "PROPAGATED"
+                }
+              },
+              {
+                "resultKind": "compensated",
+                "commandRef": "FundOrder.RecordFundCashPaymentCompensated",
+                "eventRef": "FundOrder.FundCashPaymentCompensated",
+                "commandParameter": "txid",
+                "eventFieldRef": "FundOrder.FundCashPaymentCompensated.txid",
+                "binding": {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                },
+                "sourceIndicators": {
+                  "commandParameterOrigin": "PROPAGATED",
+                  "eventFieldOrigin": "PROPAGATED"
+                }
+              },
+              {
+                "resultKind": "recovery-required",
+                "commandRef": "FundOrder.RecordFundCashPaymentRecoveryRequired",
+                "eventRef": "FundOrder.FundCashPaymentRecoveryRequired",
+                "commandParameter": "txid",
+                "eventFieldRef": "FundOrder.FundCashPaymentRecoveryRequired.txid",
+                "binding": {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                },
+                "sourceIndicators": {
+                  "commandParameterOrigin": "PROPAGATED",
+                  "eventFieldOrigin": "PROPAGATED"
+                }
+              },
+              {
+                "resultKind": "outcome-unknown",
+                "commandRef": "FundOrder.RecordFundCashPaymentOutcomeUnknown",
+                "eventRef": "FundOrder.FundCashPaymentOutcomeUnknown",
+                "commandParameter": "txid",
+                "eventFieldRef": "FundOrder.FundCashPaymentOutcomeUnknown.txid",
+                "binding": {
+                  "slot": "txid",
+                  "ref": "txid",
+                  "type": "TxId"
+                },
+                "sourceIndicators": {
+                  "commandParameterOrigin": "PROPAGATED",
+                  "eventFieldOrigin": "PROPAGATED"
+                }
+              }
+            ],
+            "currentLedgerRef": "FundOrder.cashPaymentResults",
+            "terminalLedgerRef": "FundOrder.cashPaymentFinalResults",
+            "terminalPolicy": {
+              "recoverableKinds": [
+                "recovery-required",
+                "outcome-unknown"
+              ],
+              "terminalKinds": [
+                "succeeded",
+                "rejected-before-effects",
+                "compensated"
+              ],
+              "recoverableToTerminal": "authenticated-reconciliation",
+              "sameFinal": "succeed-empty",
+              "conflictingFinal": "reject",
+              "nonterminalAfterFinal": "reject",
+              "nonterminalDuplicate": "restate-observation-no-authorization"
+            },
+            "statusPolicy": {
+              "paymentResultDoesNotSetOrderStatus": true,
+              "succeeded": "Order remains PAYMENT_SETTLED or later; TA only after selected exact committed payment and new cash terminal succeeded ledger plus trusted collection evidence.",
+              "rejectedBeforeEffects": "No payment or refund authorization; retain request/order phase facts and present separate payment failure evidence.",
+              "compensated": "Not a post-settlement refund; retain order phase facts and present separate payment compensated evidence.",
+              "recoverable": "Unresolved, no automatic TA/refund/retry; no fresh payment identity.",
+              "unknown": "Observation only, no TA/refund authorization."
+            },
+            "compilerBoundary": "All five completions remain TxId-only event payloads with strict txid pins. The closed completionMappers schema permits kind/mapper only, not commandRef or authentication token; source mapping supplies producer command refs and trusted host obligations separately."
+          }
+        }
+      }
+    },
+    "links": []
+  }

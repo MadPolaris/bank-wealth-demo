@@ -1,0 +1,181 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: read-model
+name: FundCashPurchaseLifecycle
+seq: 2
+payload:
+  {
+    "name": "FundCashPurchaseLifecycle",
+    "description": "Event-slot declarations for the separate cash-v2 request/payment/TA/refund evidence. Requested principal is not refund completion; unknown observations do not imply rejection or refund. No latest-state chronology, financial join or runtime projection is certified.",
+    "sourceAggregate": "FundOrder",
+    "consumesEvents": [
+      "FundPurchaseSettlementRequested",
+      "FundSubscriptionPaymentConfirmed",
+      "FundTASubmissionRegistered",
+      "FundTAAccepted",
+      "FundTASharesConfirmed",
+      "FundTARejected",
+      "FundTAOutcomeUnknownObserved",
+      "FundPurchaseRefundRequested",
+      "FundRefundCompleted",
+      "FundPurchaseRefundRejected",
+      "FundPurchaseRefundCompensated",
+      "FundPurchaseRefundRecoveryRequired",
+      "FundPurchaseRefundOutcomeUnknownObserved",
+      "FundCashPaymentSucceeded",
+      "FundCashPaymentRejectedBeforeEffects",
+      "FundCashPaymentCompensated",
+      "FundCashPaymentRecoveryRequired",
+      "FundCashPaymentOutcomeUnknown"
+    ],
+    "fields": [
+      {
+        "name": "fundOrderId",
+        "dataType": "FundOrderId",
+        "source": "aggregateIdentity"
+      },
+      {
+        "name": "requestOperationId",
+        "dataType": "OperationId",
+        "source": "eventField:FundPurchaseSettlementRequested.operationId"
+      },
+      {
+        "name": "investorAccountId",
+        "dataType": "AccountId",
+        "source": "eventField:FundPurchaseSettlementRequested.investorAccountId"
+      },
+      {
+        "name": "fundCollectionAccountId",
+        "dataType": "AccountId",
+        "source": "eventField:FundPurchaseSettlementRequested.fundCollectionAccountId"
+      },
+      {
+        "name": "fundCode",
+        "dataType": "String",
+        "source": "eventField:FundPurchaseSettlementRequested.fundCode"
+      },
+      {
+        "name": "principal",
+        "dataType": "Money",
+        "source": "eventField:FundPurchaseSettlementRequested.amount"
+      },
+      {
+        "name": "paymentTxId",
+        "dataType": "TxId",
+        "source": "eventField:FundSubscriptionPaymentConfirmed.txid"
+      },
+      {
+        "name": "taRequestId",
+        "dataType": "String",
+        "source": "eventField:FundTASubmissionRegistered.taRequestId"
+      },
+      {
+        "name": "taAcceptedReceiptId",
+        "dataType": "String",
+        "source": "eventField:FundTAAccepted.receiptId"
+      },
+      {
+        "name": "taConfirmedReceiptId",
+        "dataType": "String",
+        "source": "eventField:FundTASharesConfirmed.receiptId"
+      },
+      {
+        "name": "confirmedShares",
+        "dataType": "FundShare",
+        "source": "eventField:FundTASharesConfirmed.shares"
+      },
+      {
+        "name": "taRejectedReceiptId",
+        "dataType": "String",
+        "source": "eventField:FundTARejected.receiptId"
+      },
+      {
+        "name": "taRejectionReason",
+        "dataType": "String",
+        "source": "eventField:FundTARejected.reason"
+      },
+      {
+        "name": "unknownTAReceiptId",
+        "dataType": "String",
+        "source": "eventField:FundTAOutcomeUnknownObserved.receiptId"
+      },
+      {
+        "name": "taUnknownObservation",
+        "dataType": "String",
+        "source": "eventField:FundTAOutcomeUnknownObserved.observationKind"
+      },
+      {
+        "name": "refundOperationId",
+        "dataType": "OperationId",
+        "source": "eventField:FundPurchaseRefundRequested.refundOperationId"
+      },
+      {
+        "name": "refundTxId",
+        "dataType": "TxId",
+        "source": "eventField:FundPurchaseRefundRequested.refundTxId"
+      },
+      {
+        "name": "refundRequestedPrincipal",
+        "dataType": "Money",
+        "source": "eventField:FundPurchaseRefundRequested.amount"
+      },
+      {
+        "name": "refundCompletedTxId",
+        "dataType": "TxId",
+        "source": "eventField:FundRefundCompleted.refundTxId"
+      },
+      {
+        "name": "refundSucceededEvidence",
+        "dataType": "String",
+        "source": "eventField:FundRefundCompleted.resultKind"
+      },
+      {
+        "name": "refundRejectedEvidence",
+        "dataType": "String",
+        "source": "eventField:FundPurchaseRefundRejected.resultKind"
+      },
+      {
+        "name": "refundCompensatedEvidence",
+        "dataType": "String",
+        "source": "eventField:FundPurchaseRefundCompensated.resultKind"
+      },
+      {
+        "name": "refundRecoveryEvidence",
+        "dataType": "String",
+        "source": "eventField:FundPurchaseRefundRecoveryRequired.resultKind"
+      },
+      {
+        "name": "refundUnknownEvidence",
+        "dataType": "String",
+        "source": "eventField:FundPurchaseRefundOutcomeUnknownObserved.resultKind"
+      },
+      {
+        "name": "cashPaymentSucceededTxId",
+        "dataType": "TxId",
+        "source": "eventField:FundCashPaymentSucceeded.txid"
+      },
+      {
+        "name": "cashPaymentRejectedBeforeEffectsTxId",
+        "dataType": "TxId",
+        "source": "eventField:FundCashPaymentRejectedBeforeEffects.txid"
+      },
+      {
+        "name": "cashPaymentCompensatedTxId",
+        "dataType": "TxId",
+        "source": "eventField:FundCashPaymentCompensated.txid"
+      },
+      {
+        "name": "cashPaymentRecoveryRequiredTxId",
+        "dataType": "TxId",
+        "source": "eventField:FundCashPaymentRecoveryRequired.txid"
+      },
+      {
+        "name": "cashPaymentOutcomeUnknownTxId",
+        "dataType": "TxId",
+        "source": "eventField:FundCashPaymentOutcomeUnknown.txid"
+      }
+    ],
+    "visible_to": [
+      "Investor"
+    ]
+  }

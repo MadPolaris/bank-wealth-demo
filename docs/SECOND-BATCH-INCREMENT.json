@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "bank-wealth.increment/v1",
+  "baseCommit": "dda2f24",
+  "baselineFile": "docs/BASELINE.json",
+  "newProtectedFamilyFiles": [
+    "tree/pipelines/fund-purchase-cash-payment.pipeline.yaml",
+    "tree/pipelines/fund-purchase-cash-refund.pipeline.yaml",
+    "tree/sagas/fund-purchase-payment-v2.saga.yaml",
+    "tree/sagas/fund-purchase-refund.saga.yaml"
+  ],
+  "newBindingDocuments": [
+    "wealth-bindings.json",
+    "wealth-execution-bindings.json",
+    "wealth-runtime-binding.json"
+  ],
+  "authorization": "Second batch permits additive cash-purchase and refund contracts only; original protected files remain byte-identical."
+}

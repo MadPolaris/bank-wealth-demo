@@ -1,0 +1,170 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: story
+name: CashFundPurchaseLifecycle
+seq: 3
+payload:
+  {
+    "name": "CashFundPurchaseLifecycle",
+    "role": "Investor",
+    "aggregate": "FundOrder",
+    "goal": "Request a positive CNY cash fund purchase and distinguish collection/payment settlement, TA acceptance/confirmation/rejection/unknown, and authorized independent refund request versus completion.",
+    "soThat": "The original cash instruction is immutable and TA rejection permits only a separately verified full-principal refund; neither UNKNOWN nor a requested refund is shown as refunded.",
+    "slices": [
+      {
+        "command": "RequestFundPurchaseSettlement",
+        "events": [
+          "FundPurchaseSettlementRequested"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RegisterFundTASubmission",
+        "events": [
+          "FundTASubmissionRegistered"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundTAAccepted",
+        "events": [
+          "FundTAAccepted"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundTAConfirmed",
+        "events": [
+          "FundTASharesConfirmed"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundTARejected",
+        "events": [
+          "FundTARejected"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundTAUnknown",
+        "events": [
+          "FundTAOutcomeUnknownObserved"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RequestFundPurchaseRefund",
+        "events": [
+          "FundPurchaseRefundRequested"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundRefundCompleted",
+        "events": [
+          "FundRefundCompleted"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundPurchaseRefundRejected",
+        "events": [
+          "FundPurchaseRefundRejected"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundPurchaseRefundCompensated",
+        "events": [
+          "FundPurchaseRefundCompensated"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundPurchaseRefundRecoveryRequired",
+        "events": [
+          "FundPurchaseRefundRecoveryRequired"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundPurchaseRefundOutcomeUnknown",
+        "events": [
+          "FundPurchaseRefundOutcomeUnknownObserved"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundCashPaymentSucceeded",
+        "events": [
+          "FundCashPaymentSucceeded"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundCashPaymentRejectedBeforeEffects",
+        "events": [
+          "FundCashPaymentRejectedBeforeEffects"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundCashPaymentCompensated",
+        "events": [
+          "FundCashPaymentCompensated"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundCashPaymentRecoveryRequired",
+        "events": [
+          "FundCashPaymentRecoveryRequired"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      },
+      {
+        "command": "RecordFundCashPaymentOutcomeUnknown",
+        "events": [
+          "FundCashPaymentOutcomeUnknown"
+        ],
+        "readModels": [
+          "FundCashPurchaseLifecycle"
+        ]
+      }
+    ],
+    "authority": "Investor submits the purchase and refund request only; TA/result commands require a trusted evidence bridge. A story does not grant Investor command authorization for those host-only observations.",
+    "contractRef": "contract.cash-purchase-v2"
+  }

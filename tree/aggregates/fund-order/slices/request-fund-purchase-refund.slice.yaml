@@ -1,0 +1,171 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RequestFundPurchaseRefund
+payload:
+  {
+    "name": "RequestFundPurchaseRefund",
+    "description": "Request an independent full-principal refund only for retained cash-v2 paid order with explicit TA rejection. Caller supplies no amount/accounts; refundTxId is handler-computed stable version-scoped identity, not an arbitrary client slot.",
+    "parameters": [
+      {
+        "name": "fundOrderId",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "refundOperationId",
+        "dataType": "OperationId",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-V2-ONLY",
+        "errCode": "62104",
+        "cond": "state.contractVersion == \"cash-purchase-v2\"",
+        "desc": "New TA/refund lifecycle requires the cash-purchase-v2 request contract; legacy PAYMENT_SETTLED is insufficient."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-RESOURCE",
+        "errCode": "62105",
+        "cond": "param.fundOrderId == state.id",
+        "desc": "Command must address the retained original FundOrder identity."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-REFUND-TA-REJECTED",
+        "errCode": "62123",
+        "cond": "state.status == \"TA_REJECTED\" && state.taStatus == \"TA_REJECTED\" && state.taRejectionReason.nonEmpty",
+        "desc": "Only explicit correlated TA rejection after settled cash payment permits new refund request; UNKNOWN does not."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-REFUND-PAYMENT-EVIDENCE",
+        "errCode": "62124",
+        "cond": "state.committedSubscriptions.get(state.selectedPaymentTxId).contains(state.amount) && state.cashPaymentFinalResults.get(state.selectedPaymentTxId).contains(\"succeeded\")",
+        "desc": "Original payment committed and succeeded evidence is mandatory; host must verify exact cash Saga and collection evidence."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-REFUND-NEW-OP",
+        "errCode": "62125",
+        "cond": "param.refundOperationId != state.operationId",
+        "desc": "Refund operation must be new and distinct from payment source operation."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-REFUND-ONE-REQUEST",
+        "errCode": "62126",
+        "cond": "state.refundOutcome.isEmpty",
+        "desc": "Do not start another refund after a refund has been requested; UNKNOWN/recovery requires reconciliation, not a fresh debit."
+      }
+    ],
+    "produces": [
+      "FundPurchaseRefundRequested"
+    ],
+    "provenance": {
+      "source": "Approved second batch agent-assisted proposal",
+      "workshopHeld": false,
+      "contractVersion": "cash-purchase-v2"
+    }
+  }
+events:
+  {
+    "FundPurchaseRefundRequested": {
+      "name": "FundPurchaseRefundRequested",
+      "description": "Request an independent full-principal refund only for retained cash-v2 paid order with explicit TA rejection. Caller supplies no amount/accounts; refundTxId is handler-computed stable version-scoped identity, not an arbitrary client slot.",
+      "payloads": [
+        {
+          "name": "fundOrderId",
+          "dataType": "FundOrderId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "refundOperationId",
+          "dataType": "OperationId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "paymentTxId",
+          "dataType": "TxId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "investorAccountId",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "fundCollectionAccountId",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "fundCode",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "refundTxId",
+          "dataType": "TxId",
+          "origin": "SYSTEM_INJECTED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "fundOrderId",
+          "expr": "param.fundOrderId"
+        },
+        {
+          "slot": "refundOperationId",
+          "expr": "param.refundOperationId"
+        },
+        {
+          "slot": "paymentTxId",
+          "expr": "state.selectedPaymentTxId"
+        },
+        {
+          "slot": "investorAccountId",
+          "expr": "state.investorAccountId"
+        },
+        {
+          "slot": "fundCollectionAccountId",
+          "expr": "state.fundCollectionAccountId"
+        },
+        {
+          "slot": "fundCode",
+          "expr": "state.fundCode"
+        },
+        {
+          "slot": "amount",
+          "expr": "state.amount"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "refundOperationId",
+          "expr": "event.refundOperationId"
+        },
+        {
+          "slot": "refundTxId",
+          "expr": "event.refundTxId"
+        },
+        {
+          "slot": "refundOutcome",
+          "expr": "literal:requested"
+        },
+        {
+          "slot": "status",
+          "expr": "literal:REFUND_REQUESTED"
+        }
+      ]
+    }
+  }

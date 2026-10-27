@@ -1,0 +1,2037 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: question
+name: I0BaselineCoverageDesignProposal
+origin:
+  stage: refining
+  board: wealth-i0-design-v1
+  seq: 0
+payload:
+  {
+    "type": "question",
+    "name": "I0BaselineCoverageDesignProposal",
+    "stage": "refining",
+    "description": "What complete bounded bank-wealth business/product/technical coverage, scope decisions and evidence layers are needed before source-driven public extensions and cash implementation?",
+    "info": {
+      "curator": "agent-assisted I0 source proposal author",
+      "artifact": {
+        "id": "decision.i0-baseline-coverage",
+        "category": "decision",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted design proposal under user-approved I0 direction",
+          "workshopHeld": false,
+          "scopeAuthorization": "I0-source-and-design-only",
+          "basis": "Approved bounded bank-wealth source/design direction and existing source contract/UX/decision notes; no fictional workshop, new policy approval, public implementation or runtime acceptance."
+        },
+        "references": [
+          {
+            "kind": "aggregate",
+            "id": "CreditBalance"
+          },
+          {
+            "kind": "artifact",
+            "id": "context.ledger"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.strategy"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.skeleton"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.GetBalance"
+          },
+          {
+            "kind": "artifact",
+            "id": "contract.cash-purchase-v2"
+          },
+          {
+            "kind": "aggregate",
+            "id": "FundOrder"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.cash-v2"
+          },
+          {
+            "kind": "role",
+            "id": "Investor"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RequestFundPurchaseSettlement"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.scope"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.ReserveFunds"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.CommitIncomingCredits"
+          },
+          {
+            "kind": "story",
+            "id": "TopUpFromExternalBank"
+          },
+          {
+            "kind": "aggregate",
+            "id": "ExternalTransferOrder"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.external-bank"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.structure"
+          },
+          {
+            "kind": "external-system",
+            "id": "InterbankClearingGateway"
+          },
+          {
+            "kind": "command",
+            "id": "CreditBalance.StartExternalTopUp"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundPurchaseSettlementRequested"
+          },
+          {
+            "kind": "story",
+            "id": "CashFundPurchaseLifecycle"
+          },
+          {
+            "kind": "artifact",
+            "id": "flow.cash-v2"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.CancelCashFundSubscription"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.committedSubscriptions"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.compensatedSubscriptions"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundCashPaymentSucceeded"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundCashPaymentOutcomeUnknown"
+          },
+          {
+            "kind": "read-model",
+            "id": "FundCashPurchaseLifecycle"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.cashPaymentResults"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.cashPaymentFinalResults"
+          },
+          {
+            "kind": "external-system",
+            "id": "FundTARegistry"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RegisterFundTASubmission"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundTASharesConfirmed"
+          },
+          {
+            "kind": "artifact",
+            "id": "mock-ta.registry"
+          },
+          {
+            "kind": "read-model",
+            "id": "InvestorWealthOverview"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.settlement-refund"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RequestFundPurchaseRefund"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundRefundCompleted"
+          },
+          {
+            "kind": "state-field",
+            "id": "FundOrder.refundFinalResults"
+          },
+          {
+            "kind": "aggregate",
+            "id": "SipPlan"
+          },
+          {
+            "kind": "story",
+            "id": "CreateAndRunSipPlan"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.sip-integrity"
+          },
+          {
+            "kind": "command",
+            "id": "SipPlan.CreateSipPlan"
+          },
+          {
+            "kind": "command",
+            "id": "SipPlan.TriggerSipInstallment"
+          },
+          {
+            "kind": "command",
+            "id": "SipPlan.PauseSipPlan"
+          },
+          {
+            "kind": "read-model",
+            "id": "SipPlanExecutionView"
+          },
+          {
+            "kind": "artifact",
+            "id": "timer.sip"
+          },
+          {
+            "kind": "state-field",
+            "id": "SipPlan.installmentLedger"
+          },
+          {
+            "kind": "event",
+            "id": "SipPlan.SipInstallmentTriggered"
+          },
+          {
+            "kind": "command",
+            "id": "SipPlan.RecordSipInstallmentSucceeded"
+          },
+          {
+            "kind": "command",
+            "id": "SipPlan.RecordSipInstallmentFailed"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.surface"
+          },
+          {
+            "kind": "role",
+            "id": "WealthOpsOfficer"
+          },
+          {
+            "kind": "role",
+            "id": "SipScheduler"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.GetFundOrderState"
+          },
+          {
+            "kind": "artifact",
+            "id": "context-map.wealth"
+          }
+        ],
+        "body": {
+          "entities": [],
+          "edges": [],
+          "decisionStatus": "open",
+          "authorization": {
+            "direction": "user-approved",
+            "implementationScope": "I0-source-and-design-only",
+            "newBusinessPoliciesApproved": false
+          },
+          "evidencePolicy": {
+            "historicalAcceptance": "second-batch-only",
+            "currentAcceptance": "pending",
+            "requiredDimensions": [
+              "scope",
+              "design",
+              "evidence"
+            ],
+            "interpretation": "Scope and design labels are source review facts, not measured pass/fail results. Historical receipts describe their own batch only; current machine evidence must be independently observed outside the tree.",
+            "evidenceLayers": [
+              "source-declaration-and-reference",
+              "local-design-and-contract-check",
+              "generated-surface-and-compilation",
+              "component-behavior-and-persistence-replay",
+              "integrated-business-and-customer-observation"
+            ],
+            "nonEquivalences": [
+              "Declared is not approved product policy.",
+              "Compile/lowering is not generated behavior or authenticated evidence.",
+              "Simulator reload is not funds, Saga, or whole-application recovery.",
+              "A source hash is freshness evidence, not semantic or financial certification."
+            ],
+            "currentDesignCompleteness": "not-complete"
+          },
+          "draftDisposition": {
+            "status": "paused-preserve",
+            "files": [
+              "tools/qualify-domain.mjs",
+              "test/domain-runner.test.mjs",
+              "qualification/fund-order-cash"
+            ],
+            "resumeBankLocalGenerationShim": false,
+            "constraint": "Preserve the paused drafts without repair, execution, movement, deletion, or promotion to acceptance. Do not recreate tools/domain-spec.mjs. Any replacement requires a separate authorized public extension and consumer work package."
+          },
+          "externalBoundaries": {
+            "fundCompany": "simulation-authorized",
+            "externalBankMock": "not-authorized"
+          },
+          "purpose": "Register the complete bounded bank-wealth demo across business, product, and technical design, then let reusable needs drive public truthsrc proposals. This is not the whole bank, a production product, or authorization to execute cross-repository work.",
+          "iterationRoute": [
+            "I0-source-and-design",
+            "cash-payment-vertical-slice",
+            "TA-holdings-and-independent-refund",
+            "SIP-cycles",
+            "bounded-demo-qualification"
+          ],
+          "coverageRows": [
+            {
+              "id": "I0-C01",
+              "topic": "Account setup, opening/freezing/closing and seeded funding",
+              "scope": "undecided",
+              "scopeBasis": "A funded CreditBalance is a cash prerequisite; user direction does not select account lifecycle or a funding/bootstrap policy.",
+              "design": "open",
+              "business": {
+                "presence": "aggregate-declared-policy-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "aggregate",
+                    "id": "CreditBalance"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "context.ledger"
+                  }
+                ],
+                "gaps": [
+                  "No approved opening, freeze, close, eligibility, or initial funding contract; decide fixture-only setup versus a minimal lifecycle."
+                ]
+              },
+              "product": {
+                "presence": "prerequisite-proposal",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.strategy"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.skeleton"
+                  }
+                ],
+                "gaps": [
+                  "Explain setup and unavailable funds without inventing an opening screen or live available-balance field."
+                ]
+              },
+              "technical": {
+                "presence": "host-default-and-seed-unverified",
+                "evidenceRefs": [
+                  {
+                    "kind": "aggregate",
+                    "id": "CreditBalance"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "CreditBalance.GetBalance"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  }
+                ],
+                "gaps": [
+                  "Generated empty state, stable account identity, explicit seed provenance, persistence and ownership checks need separate evidence."
+                ]
+              },
+              "owner": "bank-wealth domain/product owner with application host owner",
+              "iteration": "I0-S01 then cash prerequisite package"
+            },
+            {
+              "id": "I0-C02",
+              "topic": "Investor account ownership and fund collection account mapping",
+              "scope": "required",
+              "scopeBasis": "Trusted account context is already required by the cash contract and experience; the provisioning and ownership lifecycle remain open in I0-S02.",
+              "design": "proposed",
+              "business": {
+                "presence": "trusted-boundary-declared",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "aggregate",
+                    "id": "CreditBalance"
+                  },
+                  {
+                    "kind": "aggregate",
+                    "id": "FundOrder"
+                  }
+                ],
+                "gaps": [
+                  "Choose ownership source, collection mapping authority, and relationship to setup; no caller-selected recipient."
+                ]
+              },
+              "product": {
+                "presence": "input-authority-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "role",
+                    "id": "Investor"
+                  }
+                ],
+                "gaps": [
+                  "Show an authorized account selection/context, not arbitrary account IDs; define unauthorized, unavailable and stale mapping feedback."
+                ]
+              },
+              "technical": {
+                "presence": "authentication-and-resolution-pending",
+                "evidenceRefs": [
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseSettlement"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  }
+                ],
+                "gaps": [
+                  "Enforce ownership and eligible collection server-side for requests and detail queries, including cross-resource negative cases."
+                ]
+              },
+              "owner": "bank-wealth application/auth owner and domain owner",
+              "iteration": "I0-S02 then cash-payment-vertical-slice"
+            },
+            {
+              "id": "I0-C03",
+              "topic": "Internal account transfer and simple receipts/payments beyond cash purchase",
+              "scope": "undecided",
+              "scopeBasis": "CreditBalance TCC capabilities are evidence of primitives, not approval of a separate internal-transfer product or story.",
+              "design": "open",
+              "business": {
+                "presence": "primitives-declared-product-undecided",
+                "evidenceRefs": [
+                  {
+                    "kind": "aggregate",
+                    "id": "CreditBalance"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "context.ledger"
+                  }
+                ],
+                "gaps": [
+                  "Decide if this demo needs an independent transfer story; do not infer one from debit/credit command names."
+                ]
+              },
+              "product": {
+                "presence": "separate-journey-not-decided",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.scope"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.strategy"
+                  }
+                ],
+                "gaps": [
+                  "No approved recipient selection, transfer confirmation, or transfer history requirements."
+                ]
+              },
+              "technical": {
+                "presence": "potential-reuse-not-qualified",
+                "evidenceRefs": [
+                  {
+                    "kind": "command",
+                    "id": "CreditBalance.ReserveFunds"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "CreditBalance.CommitIncomingCredits"
+                  }
+                ],
+                "gaps": [
+                  "If selected, define separate source operation, result correlation, authorization and replay; do not reuse cash purchase identity."
+                ]
+              },
+              "owner": "bank-wealth domain/product owner",
+              "iteration": "I0-S03 before any additional story"
+            },
+            {
+              "id": "I0-C04",
+              "topic": "External-bank top-up, settlement and ambiguous outcomes",
+              "scope": "deferred",
+              "scopeBasis": "Keep existing source preview and its capability decision; real integration requires evidence and new authorization, and no external bank mock is authorized.",
+              "design": "open",
+              "business": {
+                "presence": "local-declarations-remote-capability-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "story",
+                    "id": "TopUpFromExternalBank"
+                  },
+                  {
+                    "kind": "aggregate",
+                    "id": "ExternalTransferOrder"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "decision.external-bank"
+                  }
+                ],
+                "gaps": [
+                  "Actual remote APIs, ownership, idempotency, settlement, reversals and query evidence unknown; local TCC does not establish remote TCC."
+                ]
+              },
+              "product": {
+                "presence": "legacy-preview-only",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.scope"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.structure"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.skeleton"
+                  }
+                ],
+                "gaps": [
+                  "Request receipt is not incoming funds; bank linkage UI and correlated final result view remain gaps."
+                ]
+              },
+              "technical": {
+                "presence": "source-preview-not-integrated",
+                "evidenceRefs": [
+                  {
+                    "kind": "external-system",
+                    "id": "InterbankClearingGateway"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "CreditBalance.StartExternalTopUp"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "decision.external-bank"
+                  }
+                ],
+                "gaps": [
+                  "No external mock, no adapter/remote tests, no automatic resolution of timeouts."
+                ]
+              },
+              "owner": "bank-wealth payments boundary owner",
+              "iteration": "separate external-capability decision after bounded local cash"
+            },
+            {
+              "id": "I0-C05",
+              "topic": "Cash purchase request, retained resource/amount and legacy isolation",
+              "scope": "required",
+              "scopeBasis": "First approved implementation direction is source-driven cash design; existing cash-purchase-v2 remains the sole business contract.",
+              "design": "declared",
+              "business": {
+                "presence": "cash-source-declared",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseSettlement"
+                  },
+                  {
+                    "kind": "event",
+                    "id": "FundOrder.FundPurchaseSettlementRequested"
+                  }
+                ],
+                "gaps": [
+                  "Request validation/default state and resource association must be exercised in generated and runtime consumers."
+                ]
+              },
+              "product": {
+                "presence": "cash-experience-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "story",
+                    "id": "CashFundPurchaseLifecycle"
+                  }
+                ],
+                "gaps": [
+                  "Product review and actual request/detail UI are pending; repeat submission must reuse retained identity, not start a new debit."
+                ]
+              },
+              "technical": {
+                "presence": "endpoint-and-consumer-pending",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "flow.cash-v2"
+                  }
+                ],
+                "gaps": [
+                  "Authenticated public request adapter, exact Money codec, identity persistence and legacy routing exclusion not verified."
+                ]
+              },
+              "owner": "bank-wealth cash use-case and product owners",
+              "iteration": "cash-payment-vertical-slice"
+            },
+            {
+              "id": "I0-C06",
+              "topic": "Three-participant payment, cash cancellation fence and conservation",
+              "scope": "required",
+              "scopeBasis": "Cash contract already declares investor, collection and order responsibilities; I0 indexes it rather than redefining barriers, amounts or compensation.",
+              "design": "declared",
+              "business": {
+                "presence": "cash-contract-declared",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "aggregate",
+                    "id": "CreditBalance"
+                  },
+                  {
+                    "kind": "aggregate",
+                    "id": "FundOrder"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.CancelCashFundSubscription"
+                  }
+                ],
+                "gaps": [
+                  "An order marker alone does not prove investor debit and collection credit; before-Prepare cancellation must fence late Prepare."
+                ]
+              },
+              "product": {
+                "presence": "payment-versus-final-success-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "flow.cash-v2"
+                  }
+                ],
+                "gaps": [
+                  "Distinguish request, payment facts, rejected-before-effects, compensated, unresolved recovery and awaiting TA."
+                ]
+              },
+              "technical": {
+                "presence": "source-not-funds-execution",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "state-field",
+                    "id": "FundOrder.committedSubscriptions"
+                  },
+                  {
+                    "kind": "state-field",
+                    "id": "FundOrder.compensatedSubscriptions"
+                  }
+                ],
+                "gaps": [
+                  "X01-X04 and generic host, durable decisions, exact receipts, same-identity retries and crash recovery need actual qualification."
+                ]
+              },
+              "owner": "bank-wealth host owner; metarch-truthsrc extension owner",
+              "iteration": "cash-payment-vertical-slice"
+            },
+            {
+              "id": "I0-C07",
+              "topic": "Payment outcome publication, early association and reconciliation",
+              "scope": "required",
+              "scopeBasis": "Five-kind cash payment contract and current/final ledgers already separate observation from terminal evidence.",
+              "design": "declared",
+              "business": {
+                "presence": "result-progress-declared",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "event",
+                    "id": "FundOrder.FundCashPaymentSucceeded"
+                  },
+                  {
+                    "kind": "event",
+                    "id": "FundOrder.FundCashPaymentOutcomeUnknown"
+                  }
+                ],
+                "gaps": [
+                  "First rejected/compensated result may precede order Prepare/Commit; trusted start association is not enforced by txid-only schema."
+                ]
+              },
+              "product": {
+                "presence": "evidence-aware-feedback-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "read-model",
+                    "id": "FundCashPurchaseLifecycle"
+                  }
+                ],
+                "gaps": [
+                  "Never treat transport errors as business refusal or unknown as permission for another payment; later authenticated final must supersede stale observation."
+                ]
+              },
+              "technical": {
+                "presence": "durable-authenticated-bridge-pending",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "state-field",
+                    "id": "FundOrder.cashPaymentResults"
+                  },
+                  {
+                    "kind": "state-field",
+                    "id": "FundOrder.cashPaymentFinalResults"
+                  }
+                ],
+                "gaps": [
+                  "Bind original authorized source and start, definition/version, exact args and all effects; terminal conflicts and same-final replay need runtime tests."
+                ]
+              },
+              "owner": "bank-wealth result bridge owner",
+              "iteration": "cash-payment-vertical-slice"
+            },
+            {
+              "id": "I0-C08",
+              "topic": "TA submission, accepted/confirmed/rejected/unknown and exact receipts",
+              "scope": "required",
+              "scopeBasis": "Fund-company simulation is authorized; source coverage must include all cash TA outcomes, with integrated execution following the payment slice.",
+              "design": "declared",
+              "business": {
+                "presence": "TA-contract-declared",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "external-system",
+                    "id": "FundTARegistry"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RegisterFundTASubmission"
+                  },
+                  {
+                    "kind": "event",
+                    "id": "FundOrder.FundTASharesConfirmed"
+                  }
+                ],
+                "gaps": [
+                  "Submission requires verified successful payment; accepted is not confirmed shares; unknown preserves prior lifecycle."
+                ]
+              },
+              "product": {
+                "presence": "TA-progress-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "flow.cash-v2"
+                  },
+                  {
+                    "kind": "read-model",
+                    "id": "FundCashPurchaseLifecycle"
+                  }
+                ],
+                "gaps": [
+                  "Final customer purchase success requires correlated TA confirmation, not accepted response or payment marker; fixtures need clear demo labeling."
+                ]
+              },
+              "technical": {
+                "presence": "standalone-simulator-existing-integration-pending",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "mock-ta.registry"
+                  }
+                ],
+                "gaps": [
+                  "Canonical receipt bytes must match every typed slot and retained request; receiptId differs from TA reference; simulator reload is not order/Saga recovery."
+                ]
+              },
+              "owner": "bank-wealth fund boundary and TA bridge owners",
+              "iteration": "TA-holdings-and-independent-refund"
+            },
+            {
+              "id": "I0-C09",
+              "topic": "Confirmed holdings versus per-order FundShare evidence",
+              "scope": "undecided",
+              "scopeBasis": "Actual FundShare and order/read-model declarations exist, but an account-level holdings model and aggregation semantics have not been selected.",
+              "design": "open",
+              "business": {
+                "presence": "per-order-shares-declared-holdings-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "event",
+                    "id": "FundOrder.FundTASharesConfirmed"
+                  },
+                  {
+                    "kind": "read-model",
+                    "id": "InvestorWealthOverview"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "decision.settlement-refund"
+                  }
+                ],
+                "gaps": [
+                  "Decide per-order share confirmation only versus holdings across orders; no sale, redemption, valuation, return or position lifecycle inferred."
+                ]
+              },
+              "product": {
+                "presence": "confirmation-view-proposed-holdings-view-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.skeleton"
+                  }
+                ],
+                "gaps": [
+                  "Do not label a latest order fixture as total holding or current market value; resolve empty, stale and partial positions."
+                ]
+              },
+              "technical": {
+                "presence": "projection-join-unverified",
+                "evidenceRefs": [
+                  {
+                    "kind": "read-model",
+                    "id": "FundCashPurchaseLifecycle"
+                  },
+                  {
+                    "kind": "read-model",
+                    "id": "InvestorWealthOverview"
+                  }
+                ],
+                "gaps": [
+                  "Replay-safe aggregation, dedupe by source identity and account/fund ownership need a contract if holdings are selected."
+                ]
+              },
+              "owner": "bank-wealth fund domain/product and read-side owners",
+              "iteration": "I0-S04 then TA-holdings-and-independent-refund"
+            },
+            {
+              "id": "I0-C10",
+              "topic": "Post-payment TA rejection and independent refund",
+              "scope": "required",
+              "scopeBasis": "Existing cash contract exclusively governs eligibility, original resources/principal and independent refund; I0 adds no financial configuration.",
+              "design": "declared",
+              "business": {
+                "presence": "independent-refund-declared",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseRefund"
+                  },
+                  {
+                    "kind": "event",
+                    "id": "FundOrder.FundRefundCompleted"
+                  }
+                ],
+                "gaps": [
+                  "Only explicit correlated rejection after successful payment authorizes this path; unknown/compensation are not refund authorization/completion."
+                ]
+              },
+              "product": {
+                "presence": "refund-progress-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "flow.cash-v2"
+                  }
+                ],
+                "gaps": [
+                  "Present refund request, unresolved observation and final receipt separately; customer cannot supply amount, beneficiary or result."
+                ]
+              },
+              "technical": {
+                "presence": "refund-identity-and-result-bridge-pending",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "state-field",
+                    "id": "FundOrder.refundFinalResults"
+                  }
+                ],
+                "gaps": [
+                  "Handler-generated refundTxId, sole start owner and authenticated durable reconciliation must be verified; old collection write-once result is not sole authority."
+                ]
+              },
+              "owner": "bank-wealth refund bridge and use-case owners",
+              "iteration": "TA-holdings-and-independent-refund"
+            },
+            {
+              "id": "I0-C11",
+              "topic": "SIP plan configuration, pause and migration to cash lifecycle",
+              "scope": "required",
+              "scopeBasis": "Plan/cycle source coverage belongs to the bounded wealth demo; runtime migration follows payment/TA and does not approve new pause/resume policies.",
+              "design": "proposed",
+              "business": {
+                "presence": "legacy-plan-declared-new-path-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "aggregate",
+                    "id": "SipPlan"
+                  },
+                  {
+                    "kind": "story",
+                    "id": "CreateAndRunSipPlan"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "decision.sip-integrity"
+                  }
+                ],
+                "gaps": [
+                  "Retained fund/account/amount consistency, in-flight pause policy and migration to cash-v2 not settled; no invented resume/cancel feature."
+                ]
+              },
+              "product": {
+                "presence": "plan-and-cycle-preview-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.scope"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.structure"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.skeleton"
+                  }
+                ],
+                "gaps": [
+                  "Separate plan status from installment outcomes and ownership; no automatic investment returns or operational scheduling claim."
+                ]
+              },
+              "technical": {
+                "presence": "legacy-source-not-migrated",
+                "evidenceRefs": [
+                  {
+                    "kind": "command",
+                    "id": "SipPlan.CreateSipPlan"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "SipPlan.TriggerSipInstallment"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "SipPlan.PauseSipPlan"
+                  },
+                  {
+                    "kind": "read-model",
+                    "id": "SipPlanExecutionView"
+                  }
+                ],
+                "gaps": [
+                  "Scheduled request→cash payment→TA result linkage needs stable identity, trusted adapters and replay tests."
+                ]
+              },
+              "owner": "bank-wealth SIP domain/product and scheduling owners",
+              "iteration": "SIP-cycles"
+            },
+            {
+              "id": "I0-C12",
+              "topic": "SIP business clock, calendar, cutoff and missed occurrences",
+              "scope": "undecided",
+              "scopeBasis": "Timer proposal and manual simulation do not settle timezone, trading calendar, catch-up or a deadline guarantee.",
+              "design": "open",
+              "business": {
+                "presence": "calendar-policy-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "decision.sip-integrity"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "timer.sip"
+                  }
+                ],
+                "gaps": [
+                  "Timezone, business/trading days, holiday/cutoff, next occurrence and missed-cycle policy require domain decision."
+                ]
+              },
+              "product": {
+                "presence": "schedule-explanation-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.skeleton"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.strategy"
+                  }
+                ],
+                "gaps": [
+                  "Friendly scheduling and next-date copy cannot promise cron semantics or T+1 SLA without an approved calendar."
+                ]
+              },
+              "technical": {
+                "presence": "clock-binding-proposal-only",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "timer.sip"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "SipPlan.TriggerSipInstallment"
+                  }
+                ],
+                "gaps": [
+                  "Portable clock/occurrence inputs, restart/watermark, virtual-clock tests and safe catch-up require public and bank contracts."
+                ]
+              },
+              "owner": "bank-wealth domain/product scheduling owner",
+              "iteration": "I0-S05 before SIP-cycles"
+            },
+            {
+              "id": "I0-C13",
+              "topic": "SIP operation/occurrence identity and terminal exclusivity",
+              "scope": "undecided",
+              "scopeBasis": "Existing operation ledger is evidence, not a complete approved plan-to-cycle identity and contradictory callback policy.",
+              "design": "open",
+              "business": {
+                "presence": "ledger-declared-identity-policy-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "state-field",
+                    "id": "SipPlan.installmentLedger"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "decision.sip-integrity"
+                  }
+                ],
+                "gaps": [
+                  "Choose plan revision/occurrence identity, stable fundOrderId and old/new cash correlation; duplicate success/failure and paused in-flight behavior need explicit rules."
+                ]
+              },
+              "product": {
+                "presence": "cycle-trace-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "read-model",
+                    "id": "SipPlanExecutionView"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.structure"
+                  }
+                ],
+                "gaps": [
+                  "Expose plan versus occurrence and observed versus terminal result without suggesting scheduler attempts are new business cycles."
+                ]
+              },
+              "technical": {
+                "presence": "runtime-cycle-bridge-pending",
+                "evidenceRefs": [
+                  {
+                    "kind": "event",
+                    "id": "SipPlan.SipInstallmentTriggered"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "SipPlan.RecordSipInstallmentSucceeded"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "SipPlan.RecordSipInstallmentFailed"
+                  }
+                ],
+                "gaps": [
+                  "Same-identity replay, terminal conflicts and out-of-order delivery need domain and adapter tests before migration."
+                ]
+              },
+              "owner": "bank-wealth SIP domain and application owners",
+              "iteration": "I0-S06 before SIP-cycles"
+            },
+            {
+              "id": "I0-C14",
+              "topic": "SIP counters, consecutive failures and automatic pause",
+              "scope": "undecided",
+              "scopeBasis": "Existing integrity decision leaves counting/reset/threshold open; historical three-failure wording is not new approval.",
+              "design": "open",
+              "business": {
+                "presence": "counter-policy-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "decision.sip-integrity"
+                  },
+                  {
+                    "kind": "aggregate",
+                    "id": "SipPlan"
+                  }
+                ],
+                "gaps": [
+                  "Total versus consecutive, source of counts, success reset, duplicate/out-of-order handling, and whether any threshold pause is wanted."
+                ]
+              },
+              "product": {
+                "presence": "counter-presentation-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "read-model",
+                    "id": "SipPlanExecutionView"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.strategy"
+                  }
+                ],
+                "gaps": [
+                  "Label counts only after semantics are approved; never invent automatic three-failure pause or imply recovery/resume."
+                ]
+              },
+              "technical": {
+                "presence": "count-reducer-unqualified",
+                "evidenceRefs": [
+                  {
+                    "kind": "command",
+                    "id": "SipPlan.RecordSipInstallmentSucceeded"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "SipPlan.RecordSipInstallmentFailed"
+                  }
+                ],
+                "gaps": [
+                  "Event ordering and exactly-once terminal counting need replayable semantics; transport retries must not change counters."
+                ]
+              },
+              "owner": "bank-wealth SIP domain/product owner",
+              "iteration": "I0-S07 before SIP-cycles"
+            },
+            {
+              "id": "I0-C15",
+              "topic": "Batch/streaming top-up and purchase context",
+              "scope": "undecided",
+              "scopeBasis": "Batch streaming is a candidate demo extension, not an approved expansion or a consequence of Monarch availability.",
+              "design": "open",
+              "business": {
+                "presence": "batch-business-boundary-open",
+                "evidenceRefs": [
+                  {
+                    "kind": "story",
+                    "id": "TopUpFromExternalBank"
+                  },
+                  {
+                    "kind": "story",
+                    "id": "CashFundPurchaseLifecycle"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.scope"
+                  }
+                ],
+                "gaps": [
+                  "Choose whether any batch is needed, its items/resources and per-item versus whole-batch acceptance; external bank mock remains forbidden."
+                ]
+              },
+              "product": {
+                "presence": "batch-journey-not-selected",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.scope"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.strategy"
+                  }
+                ],
+                "gaps": [
+                  "Upload, progress, cancellation, partial outcomes and retry ownership require a decision before UI or policy creation."
+                ]
+              },
+              "technical": {
+                "presence": "engine-reuse-not-a-batch-contract",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "flow.cash-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  }
+                ],
+                "gaps": [
+                  "Bounded admission/backpressure and durable item identities may reuse public orchestration, but Saga and Monarch have different responsibilities."
+                ]
+              },
+              "owner": "bank-wealth domain/product owner",
+              "iteration": "I0-S08 before any batch package"
+            },
+            {
+              "id": "I0-C16",
+              "topic": "Demo financial conventions versus product rules",
+              "scope": "required",
+              "scopeBasis": "Current demo conventions remain solely in contract.cash-purchase-v2; I0 must keep their scope and remaining production questions explicit.",
+              "design": "declared",
+              "business": {
+                "presence": "demo-contract-only",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "decision.settlement-refund"
+                  }
+                ],
+                "gaps": [
+                  "Real product minimums, eligibility, fees, NAV formula, precision/rounding and trading calendar are unapproved; positivity is not product minimum."
+                ]
+              },
+              "product": {
+                "presence": "fixture-disclaimer-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.strategy"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.surface"
+                  }
+                ],
+                "gaps": [
+                  "Display amount/confirmed shares without claiming investment return, current valuation or production financial advice."
+                ]
+              },
+              "technical": {
+                "presence": "exact-value-codec-pending",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "event",
+                    "id": "FundOrder.FundTASharesConfirmed"
+                  }
+                ],
+                "gaps": [
+                  "X03 must distinguish domain Decimal and wire Money without lossy conversion; no copied CNY/fee/fixture configuration in I0."
+                ]
+              },
+              "owner": "bank-wealth domain/product owner; exact-value extension owner",
+              "iteration": "cash codecs then financial decisions only if separately authorized"
+            },
+            {
+              "id": "I0-C17",
+              "topic": "Five product planes and customer/operator/machine separation",
+              "scope": "required",
+              "scopeBasis": "Approved direction includes a complete product design perspective, not mapping read models to pages or treating backend markers as customer outcomes.",
+              "design": "proposed",
+              "business": {
+                "presence": "actor-and-business-boundaries-declared",
+                "evidenceRefs": [
+                  {
+                    "kind": "role",
+                    "id": "Investor"
+                  },
+                  {
+                    "kind": "role",
+                    "id": "WealthOpsOfficer"
+                  },
+                  {
+                    "kind": "role",
+                    "id": "SipScheduler"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  }
+                ],
+                "gaps": [
+                  "User outcome and exception obligations require product review independently of code availability."
+                ]
+              },
+              "product": {
+                "presence": "five-plane-proposals-existing",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.strategy"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.scope"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.structure"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.skeleton"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.surface"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  }
+                ],
+                "gaps": [
+                  "Intent, explicit release scope, navigation, form/detail feedback and accessible surface must all retain authority/evidence distinctions."
+                ]
+              },
+              "technical": {
+                "presence": "public-UX-consumer-not-implemented",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "read-model",
+                    "id": "FundCashPurchaseLifecycle"
+                  }
+                ],
+                "gaps": [
+                  "Public component/UX binding remains proposed; endpoint and projection do not automatically produce working UI or an accessibility audit."
+                ]
+              },
+              "owner": "bank-wealth product/UX owner",
+              "iteration": "cash product review then integrated observation"
+            },
+            {
+              "id": "I0-C18",
+              "topic": "Public request/query endpoints and trusted machine adapters",
+              "scope": "required",
+              "scopeBasis": "The first cash consumer needs authenticated boundaries without opening TCC/results/pipelines as public endpoints.",
+              "design": "proposed",
+              "business": {
+                "presence": "input-authority-declared-enforcement-pending",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseSettlement"
+                  }
+                ],
+                "gaps": [
+                  "Account context and machine receipt authority cannot be supplied by a browser or an actor name."
+                ]
+              },
+              "product": {
+                "presence": "public-versus-operator-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "role",
+                    "id": "Investor"
+                  },
+                  {
+                    "kind": "role",
+                    "id": "WealthOpsOfficer"
+                  }
+                ],
+                "gaps": [
+                  "Detail ownership, deep links, pending/error, safe refresh and operator-only review need UX contracts."
+                ]
+              },
+              "technical": {
+                "presence": "route-auth-codec-bindings-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.GetFundOrderState"
+                  },
+                  {
+                    "kind": "read-model",
+                    "id": "FundCashPurchaseLifecycle"
+                  }
+                ],
+                "gaps": [
+                  "Endpoint/query codecs, host-generated IDs, server authorization and adapters need X07/X08; no new public schema assumed."
+                ]
+              },
+              "owner": "bank-wealth API/auth owner",
+              "iteration": "cash-payment-vertical-slice"
+            },
+            {
+              "id": "I0-C19",
+              "topic": "Generated/manual separation and reusable public extension intake",
+              "scope": "required",
+              "scopeBasis": "Complete bank truth should expose reusable needs upstream, not resume the bank-local normalization/generation shim.",
+              "design": "proposed",
+              "business": {
+                "presence": "domain-authority-bank-local",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "context-map.wealth"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  }
+                ],
+                "gaps": [
+                  "Bank domain/assertions remain local; public runtime mechanics must not invent financial decisions."
+                ]
+              },
+              "product": {
+                "presence": "product-proposals-not-machine-certified",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.strategy"
+                  }
+                ],
+                "gaps": [
+                  "Bank product review remains distinct from plugin support and generated file existence."
+                ]
+              },
+              "technical": {
+                "presence": "source-blockers-observed-no-public-change",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "state-field",
+                    "id": "FundOrder.committedSubscriptions"
+                  }
+                ],
+                "gaps": [
+                  "X01-X10 require owner authorization and second-domain tests; reuse core plan/apply and one-to-many anchors rather than parallel mechanisms."
+                ]
+              },
+              "owner": "metarch-truthsrc owners and bank-wealth consumer owner",
+              "iteration": "I0 boundary proposal then separately authorized X01-X04"
+            },
+            {
+              "id": "I0-C20",
+              "topic": "Read-side evidence, replay, watermark and resource chronology",
+              "scope": "required",
+              "scopeBasis": "Declared event slots do not implement a latest-order state, holdings join or a runtime CQRS projection.",
+              "design": "proposed",
+              "business": {
+                "presence": "event-evidence-declared",
+                "evidenceRefs": [
+                  {
+                    "kind": "read-model",
+                    "id": "FundCashPurchaseLifecycle"
+                  },
+                  {
+                    "kind": "read-model",
+                    "id": "InvestorWealthOverview"
+                  },
+                  {
+                    "kind": "read-model",
+                    "id": "SipPlanExecutionView"
+                  }
+                ],
+                "gaps": [
+                  "Resource-scoped chronology and correlated business evidence must determine visible state; no nonexistent event.status assumptions."
+                ]
+              },
+              "product": {
+                "presence": "stale-and-unknown-feedback-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.skeleton"
+                  }
+                ],
+                "gaps": [
+                  "Distinguish absent, unavailable, stale, pending and unknown; late unknown cannot overwrite confirmed/refunded terminal evidence."
+                ]
+              },
+              "technical": {
+                "presence": "runtime-projection-and-query-pending",
+                "evidenceRefs": [
+                  {
+                    "kind": "read-model",
+                    "id": "FundCashPurchaseLifecycle"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  }
+                ],
+                "gaps": [
+                  "Event dedupe, transactional watermark, replay/rebuild, owner-scoped reads and reconciliation joins need actual tests."
+                ]
+              },
+              "owner": "bank-wealth read-side owner",
+              "iteration": "cash-payment-vertical-slice then TA/holdings"
+            },
+            {
+              "id": "I0-C21",
+              "topic": "Persistence, serialization and recovery across business effects",
+              "scope": "required",
+              "scopeBasis": "A bounded business demonstration must eventually prove safe replay/restart; existing source lowering and simulator recovery are lower evidence layers.",
+              "design": "proposed",
+              "business": {
+                "presence": "same-operation-safety-declared",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "flow.cash-v2"
+                  }
+                ],
+                "gaps": [
+                  "Unknown/recovery requires reconciliation, not new debit/refund identity; order, account and TA facts have distinct authority."
+                ]
+              },
+              "product": {
+                "presence": "resume-observation-not-reissue-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.strategy"
+                  }
+                ],
+                "gaps": [
+                  "After refresh/restart recover the same operation/detail, preserving confirmed evidence and safe next-step explanation."
+                ]
+              },
+              "technical": {
+                "presence": "application-recovery-unverified",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "aggregate",
+                    "id": "CreditBalance"
+                  },
+                  {
+                    "kind": "aggregate",
+                    "id": "FundOrder"
+                  }
+                ],
+                "gaps": [
+                  "Generated case classes/proto/converters/registration, durable start, phase evidence, injected failures and actual JVM restart require joint qualification."
+                ]
+              },
+              "owner": "bank-wealth persistence/host owner",
+              "iteration": "each vertical slice then bounded-demo-qualification"
+            },
+            {
+              "id": "I0-C22",
+              "topic": "Observability, deployment composition and evidence publication",
+              "scope": "required",
+              "scopeBasis": "Eventual bounded-demo acceptance needs explicit generated/manual composition and layer-specific measured receipts; I0 records obligations only.",
+              "design": "proposed",
+              "business": {
+                "presence": "acceptance-layers-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "flow.cash-v2"
+                  }
+                ],
+                "gaps": [
+                  "Observe account conservation and customer finality, not merely transport/code availability; compliance/audit remains outside evidence."
+                ]
+              },
+              "product": {
+                "presence": "demo-surface-and-operator-evidence-proposed",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  },
+                  {
+                    "kind": "role",
+                    "id": "WealthOpsOfficer"
+                  }
+                ],
+                "gaps": [
+                  "Business versus technical outcome labels and authorized troubleshooting need review; no public financial receipt secrets."
+                ]
+              },
+              "technical": {
+                "presence": "deploy-and-telemetry-pending",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "context-map.wealth"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  }
+                ],
+                "gaps": [
+                  "Owned target/config namespaces, health, admission, journal/projection lag, structured correlation/redaction and failure records need authorized packages."
+                ]
+              },
+              "owner": "bank-wealth application/operations owner",
+              "iteration": "bounded-demo-qualification after all selected slices"
+            },
+            {
+              "id": "I0-C23",
+              "topic": "Whole-bank expansion, real integration and production certification",
+              "scope": "excluded",
+              "scopeBasis": "User approved the bounded wealth source/design direction, not a whole-bank system, live external connections or financial/regulatory assurance.",
+              "design": "open",
+              "business": {
+                "presence": "out-of-current-boundary",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "decision.external-bank"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "decision.settlement-refund"
+                  }
+                ],
+                "gaps": [
+                  "No lending, cards, deposits product suite, trading/redemption, live settlement, KYC/AML implementation or compliance certification added."
+                ]
+              },
+              "product": {
+                "presence": "not-a-production-product",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "ux.strategy"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "ux.cash-v2"
+                  }
+                ],
+                "gaps": [
+                  "No investment advice, real returns, production visual approval, real calendar guarantee or accessibility audit claimed."
+                ]
+              },
+              "technical": {
+                "presence": "no-execution-authority",
+                "evidenceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "artifact",
+                    "id": "context-map.wealth"
+                  }
+                ],
+                "gaps": [
+                  "No sibling code/build/service/shared-app changes, no generator execution or runtime certification in I0."
+                ]
+              },
+              "owner": "bank-wealth scope owner",
+              "iteration": "only a separate explicit authorization may reconsider"
+            }
+          ],
+          "scopeDecisions": [
+            {
+              "id": "I0-S01-account-setup",
+              "question": "Is the bounded demo account setup fixture-only, or does it include a minimal account lifecycle and funded-state creation?",
+              "status": "open",
+              "owner": "bank-wealth domain/product owner",
+              "sourceRefs": [
+                {
+                  "kind": "aggregate",
+                  "id": "CreditBalance"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "context.ledger"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "contract.cash-purchase-v2"
+                }
+              ],
+              "choices": [
+                "Explicit owned seeded accounts with disclosed fixture provenance",
+                "Minimal separately specified opening/funding/freeze lifecycle",
+                "Defer runtime until setup authority exists"
+              ],
+              "recommendation": "Propose the smallest explicit prerequisite compatible with the cash slice; do not select opening, closing, freeze, regulatory or seed policy automatically."
+            },
+            {
+              "id": "I0-S02-account-ownership",
+              "question": "Which trusted authority resolves investor ownership and fund collection mapping, including changes or revoked eligibility?",
+              "status": "open",
+              "owner": "bank-wealth domain/auth owner",
+              "sourceRefs": [
+                {
+                  "kind": "artifact",
+                  "id": "contract.cash-purchase-v2"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "ux.cash-v2"
+                },
+                {
+                  "kind": "aggregate",
+                  "id": "CreditBalance"
+                }
+              ],
+              "choices": [
+                "Owned demo mapping with explicit setup provenance",
+                "Minimal persistent account/collection relationship",
+                "Defer consumer pending approved authority"
+              ],
+              "recommendation": "Always require server-verified ownership and collection eligibility, but leave the source/provisioning lifecycle open."
+            },
+            {
+              "id": "I0-S03-internal-transfer",
+              "question": "Is an independent internal transfer/simple receipt-payment story required beyond cash fund payment/refund?",
+              "status": "open",
+              "owner": "bank-wealth domain/product owner",
+              "sourceRefs": [
+                {
+                  "kind": "aggregate",
+                  "id": "CreditBalance"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "ux.scope"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "context.ledger"
+                }
+              ],
+              "choices": [
+                "Keep only the existing cash payment/refund business",
+                "Add separately specified bounded transfer story later",
+                "Defer transfer product scope"
+              ],
+              "recommendation": "Do not expand first cash scope merely because debit/credit primitives exist."
+            },
+            {
+              "id": "I0-S04-holdings",
+              "question": "Does TA confirmation end at per-order FundShare evidence or require account/fund holdings aggregation?",
+              "status": "open",
+              "owner": "bank-wealth fund domain/product owner",
+              "sourceRefs": [
+                {
+                  "kind": "event",
+                  "id": "FundOrder.FundTASharesConfirmed"
+                },
+                {
+                  "kind": "read-model",
+                  "id": "InvestorWealthOverview"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "decision.settlement-refund"
+                }
+              ],
+              "choices": [
+                "Per-order confirmed shares only",
+                "Replay-safe account/fund holdings after explicit contract",
+                "Defer portfolio view"
+              ],
+              "recommendation": "First payment slice remains awaiting-TA; later confirmation must not claim holdings totals without the selected aggregation contract."
+            },
+            {
+              "id": "I0-S05-sip-clock",
+              "question": "What calendar/timezone/cutoff/catch-up policy and business clock should generate SIP occurrences?",
+              "status": "open",
+              "owner": "bank-wealth scheduling domain/product owner",
+              "sourceRefs": [
+                {
+                  "kind": "artifact",
+                  "id": "decision.sip-integrity"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "timer.sip"
+                }
+              ],
+              "choices": [
+                "Explicit deterministic demo clock/occurrences with no production date guarantee",
+                "Approved calendar/cutoff model",
+                "Keep scheduler source-only"
+              ],
+              "recommendation": "Manual TA simulation is not a decision about SIP calendar; leave every production date/catch-up rule open."
+            },
+            {
+              "id": "I0-S06-sip-occurrence",
+              "question": "How do plan configuration/revision, occurrence, order and cash transaction identity correlate and reconcile contradictory callbacks?",
+              "status": "open",
+              "owner": "bank-wealth SIP domain/application owner",
+              "sourceRefs": [
+                {
+                  "kind": "artifact",
+                  "id": "decision.sip-integrity"
+                },
+                {
+                  "kind": "state-field",
+                  "id": "SipPlan.installmentLedger"
+                },
+                {
+                  "kind": "event",
+                  "id": "SipPlan.SipInstallmentTriggered"
+                }
+              ],
+              "choices": [
+                "Stable plan-revision/occurrence identity with one cash lifecycle per occurrence",
+                "Different explicit approved identity recipe",
+                "Defer migration until terminal/identity contract exists"
+              ],
+              "recommendation": "Reject attempts/clock as business identity; final recipe and in-flight pause behavior still require decision."
+            },
+            {
+              "id": "I0-S07-sip-counters",
+              "question": "Which counts are business-visible, how does success reset them, and is any automatic pause threshold wanted?",
+              "status": "open",
+              "owner": "bank-wealth SIP domain/product owner",
+              "sourceRefs": [
+                {
+                  "kind": "artifact",
+                  "id": "decision.sip-integrity"
+                },
+                {
+                  "kind": "read-model",
+                  "id": "SipPlanExecutionView"
+                }
+              ],
+              "choices": [
+                "Terminal-deduped totals only",
+                "Explicit consecutive/reset rules and optional separately approved pause",
+                "No counters or automatic policy yet"
+              ],
+              "recommendation": "Keep consecutive/total/reset/threshold and out-of-order semantics open; do not duplicate automatic three-failure pause."
+            },
+            {
+              "id": "I0-S08-batch-scope",
+              "question": "Is batch/streaming recharge or purchase part of this bounded demo, and what are per-item/whole-batch outcomes?",
+              "status": "open",
+              "owner": "bank-wealth domain/product owner",
+              "sourceRefs": [
+                {
+                  "kind": "story",
+                  "id": "TopUpFromExternalBank"
+                },
+                {
+                  "kind": "story",
+                  "id": "CashFundPurchaseLifecycle"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "ux.scope"
+                }
+              ],
+              "choices": [
+                "Exclude batch from the first cash slice and revisit later",
+                "Select bounded local cash purchase batch with explicit item identity/outcomes",
+                "Select top-up batch only after external-capability authorization"
+              ],
+              "recommendation": "Do not turn a candidate context into an approved batch product; external-bank mock remains not authorized."
+            },
+            {
+              "id": "I0-S09-cash-entry-owner",
+              "question": "Will the cash consumer use the direct persisted event Saga entry or the declared single-invoke pipeline as the sole start owner?",
+              "status": "open",
+              "owner": "bank-wealth application host owner",
+              "sourceRefs": [
+                {
+                  "kind": "artifact",
+                  "id": "contract.cash-purchase-v2"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "flow.cash-v2"
+                },
+                {
+                  "kind": "event",
+                  "id": "FundOrder.FundPurchaseSettlementRequested"
+                }
+              ],
+              "choices": [
+                "Direct persisted source-event owner",
+                "Single-invoke durable pipeline owner"
+              ],
+              "recommendation": "Choose exactly one, then prove source-event and durable-stage identity equivalence before any generated or runtime debit; neither is selected here."
+            },
+            {
+              "id": "I0-S10-consumer-stack",
+              "question": "Which isolated generated target, endpoint/query adapter, UI component stack and deployment composition will consume this proposal?",
+              "status": "open",
+              "owner": "bank-wealth application/product owner with metarch-truthsrc plugin owners",
+              "sourceRefs": [
+                {
+                  "kind": "artifact",
+                  "id": "context-map.wealth"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "ux.cash-v2"
+                },
+                {
+                  "kind": "read-model",
+                  "id": "FundCashPurchaseLifecycle"
+                }
+              ],
+              "choices": [
+                "Minimal separately authorized bank-owned vertical target",
+                "Review a reusable public plugin/binding first",
+                "Remain source/design only pending public blockers"
+              ],
+              "recommendation": "No public schema or target/runtime is selected or generated by I0; preserve manual/auth/bridge boundaries."
+            },
+            {
+              "id": "I0-S11-financial-rules",
+              "question": "Are any real product minimum, fee, NAV/share precision/rounding, eligibility or trading-date rules needed beyond the existing demo contract?",
+              "status": "open",
+              "owner": "bank-wealth fund domain/product owner",
+              "sourceRefs": [
+                {
+                  "kind": "artifact",
+                  "id": "contract.cash-purchase-v2"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "decision.settlement-refund"
+                },
+                {
+                  "kind": "artifact",
+                  "id": "ux.strategy"
+                }
+              ],
+              "choices": [
+                "Keep current contract as explicitly demo-only",
+                "Review authoritative product rules in a separate batch",
+                "Defer production conventions entirely"
+              ],
+              "recommendation": "Reuse existing demo conventions by reference; no new configuration or financial rule is approved here."
+            }
+          ]
+        }
+      }
+    },
+    "links": []
+  }

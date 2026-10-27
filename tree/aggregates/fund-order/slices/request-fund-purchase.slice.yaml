@@ -36,6 +36,13 @@ payload:
     ],
     "guards": [
       {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-NO-RECREATE",
+        "errCode": "62100",
+        "cond": "state.status.isEmpty && state.contractVersion.isEmpty && state.reservedSubscriptions.isEmpty && state.committedSubscriptions.isEmpty && state.compensatedSubscriptions.isEmpty",
+        "desc": "A purchase request is creation-only: neither the legacy nor cash entry can reset/recreate an existing FundOrder."
+      },
+      {
         "ruleId": "IR-FO-RESERVE-002",
         "errCode": "62004",
         "onFail": "reject",
@@ -169,6 +176,10 @@ payload:
           }
         }
       }
+    },
+    "changeProvenance": {
+      "baselineCommit": "dda2f24f4569bc4e6468b4339dcea9fdb983a63d",
+      "source": "Approved no-reset compatibility guard and legacy contract marker; old parameters/event slots unchanged"
     }
   }
 events:
@@ -250,6 +261,10 @@ events:
         {
           "slot": "amount",
           "expr": "event.amount"
+        },
+        {
+          "slot": "contractVersion",
+          "expr": "literal:legacy-v1"
         }
       ]
     }

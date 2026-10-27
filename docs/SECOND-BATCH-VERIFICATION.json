@@ -1,0 +1,245 @@
+{
+  "schemaVersion": "bank-wealth.second-batch-verification/v1",
+  "date": "2026-10-25",
+  "baseCommit": "dda2f24",
+  "acceptanceScope": "source declarations, local semantic checks, deterministic knowledge projections and independent MockTA behavior only",
+  "canonicalSha256": "33cecabd584746905a06482f6279ea8853fcce3522b91d4313487e45bc871658",
+  "sourceFingerprint": "f11f95648d64aad163877b24f87cef4645a9a80ac2e053f17e1217402d6df543",
+  "tool": {
+    "head": "cb2d23342619af3f5d27e5df2361e88fe6d54fb3",
+    "sha256": "ec3e87ab91a9994100e00985c153580b436259c4653ba53cdedf336a82f6edcb",
+    "sources": [
+      {
+        "file": "lib/compile.mjs",
+        "sha256": "f07d66330cfed23b7c0394208c73f27850ee197f679b9d938c4f372136f2a939"
+      },
+      {
+        "file": "lib/decompose.mjs",
+        "sha256": "8761949205ada61b23a1474ec8268736c24d9838c477c8f0f3406f4524171a83"
+      },
+      {
+        "file": "lib/execution/compile.mjs",
+        "sha256": "1b3ce854694aab37211c58d5ab4635d882438f81766cd5340ffb910edc03eca6"
+      },
+      {
+        "file": "lib/saga/compile.mjs",
+        "sha256": "3ed660a3eaedfbbcb3e27f139170656154bc4700dee546fd5650c6a6ceb8f083"
+      },
+      {
+        "file": "lib/saga/runtime-binding.mjs",
+        "sha256": "99b7ab6ac4348a10bc425a3691503dd1363936db65b39c88cdaa9d9679f6a013"
+      },
+      {
+        "file": "lib/shared.mjs",
+        "sha256": "2dbe8089157cd43859e50daa8e1bbf918fbd4b17fa89d883df36f96af87b2539"
+      },
+      {
+        "file": "lib/validate.mjs",
+        "sha256": "b9d89bddc842bbc1a9d7580da2a5b05bd9cd744fda6b62203c91bf0a6e5c311b"
+      },
+      {
+        "file": "schema/execution-ir-v1.schema.json",
+        "sha256": "950a9c7b4b13e2eb158789d0bbcbadee268575f07e0e20ec4c612c096d08b5b9"
+      },
+      {
+        "file": "schema/saga-ir-v1.schema.json",
+        "sha256": "f94eeead3a956f4ce54b002d942e6b2a1f3fe49008cf738b15da10e0ad8ea46c"
+      }
+    ]
+  },
+  "localFiles": [
+    {
+      "file": "tools/artifacts.mjs",
+      "sha256": "2f3e2fd33524745314a213c990f9269d263d63a92c383c7a1cc07bf3a8e46b94"
+    },
+    {
+      "file": "tools/cash-contract.mjs",
+      "sha256": "4cb72bb54138e4d5793ccd6439a443c05983fa746fbc4aae5526b88e6fbe4566"
+    },
+    {
+      "file": "tools/mock-ta.mjs",
+      "sha256": "ac1c404d09d0c979bff59ebe673f2d94193a022c919ec8a3f3321d8c5d4feb6a"
+    },
+    {
+      "file": "tools/project.mjs",
+      "sha256": "01564303fa16a54282011ebd39452dea1b56959135e32d7300fd0bc242f01795"
+    },
+    {
+      "file": "tools/truth-source.mjs",
+      "sha256": "b8f76e9166456a1c7578a57f574f220b19654522b026748cd801500b02742f39"
+    },
+    {
+      "file": "tools/validate.mjs",
+      "sha256": "7a6b8e930629aa809f3b752e4f4a6adaa71f2c28ae491e9f6ffb8ae7e4507ac6"
+    },
+    {
+      "file": "test/cash-contract.test.mjs",
+      "sha256": "de13097658b6fb1ab01ca905c0af224017e5258e3d8d5fec83b906da9b05140f"
+    },
+    {
+      "file": "test/mock-ta.test.mjs",
+      "sha256": "c5f1facea2c739748d4916cfdba0e489e2c20b32d3e0879966427f6544bfe912"
+    },
+    {
+      "file": "test/projections.test.mjs",
+      "sha256": "387856a52bcd2980e05a4650a7e448195770acd4b58047f7ab6c7fa0a47c1c8e"
+    },
+    {
+      "file": "test/truth.test.mjs",
+      "sha256": "d559896187b3ed0b4ebc95f110f8cb571cdee0fb6732e563708425c2da0d384f"
+    },
+    {
+      "file": "simulator/contract.mjs",
+      "sha256": "19d6fa131f05ca23ea01e916c6149f26cc3d78124f0bd555c094d9d4eeee456f"
+    },
+    {
+      "file": "simulator/journal.mjs",
+      "sha256": "4401bda39344b46451f114978dd7dc2109ef6c86d2d294435784b21134817581"
+    },
+    {
+      "file": "simulator/mock-ta.mjs",
+      "sha256": "e390a7dcff5054c468f92d942f0953fc418fd8760aada5bb4793c03a8e7ba0cd"
+    }
+  ],
+  "structure": {
+    "hard": [],
+    "notices": [
+      "[RF5] command \"GetBalance\" declares no parameters (explicit parameterless? confirm)",
+      "[RF5] command \"GetExternalTransferState\" declares no parameters (explicit parameterless? confirm)",
+      "[RF5] command \"GetFundOrderState\" declares no parameters (explicit parameterless? confirm)",
+      "[V2] commandStorming|imported-external-systems: origin.seq not contiguous 0..n-1 (got 3 at position 0) — compiler densifies; do not renumber by hand",
+      "[V2] commandStorming|imported-external-systems: origin.seq not contiguous 0..n-1 (got 4 at position 1) — compiler densifies; do not renumber by hand",
+      "[V2] commandStorming|imported-policy-hypotheses: origin.seq not contiguous 0..n-1 (got 10 at position 0) — compiler densifies; do not renumber by hand",
+      "[SA0] sagas/external-bank-transfer.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+      "[SA0] sagas/fund-purchase-payment-v2.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+      "[SA0] sagas/fund-purchase-refund.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+      "[SA0] sagas/fund-subscription-pay.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+      "[ES4] possible solution language: \"SipPlanCreated\" — confirm this is a business fact, not an implementation",
+      "[CS1] event \"DeductFundsConfirmed\" has no trigger source (command/timer/externalSystem/event link): event-es-deduct-funds-confirmed-2.yaml",
+      "[CS3] command \"PrepareExternalDebit\" has no initiating role and no policy invocation: command-cs-prepare-external-debit-1.yaml",
+      "[CS3] command \"RecordTAShareConfirmation\" has no initiating role and no policy invocation: command-cs-record-ta-share-confirmation-3.yaml",
+      "[CS6] timer \"SipBusinessClockDesignProposal\" triggers no event (dangling): inbox/commandStorming/timer-cs-sip-business-clock-design-proposal-1.yaml",
+      "[CS6] externalSystem \"WealthMockTARegistryDesignProposal\" triggers no event (dangling): inbox/refining/externalSystem-rf-wealth-mock-ta-registry-design-proposal-1.yaml"
+    ]
+  },
+  "declarations": {
+    "errors": [],
+    "notices": []
+  },
+  "proposals": {
+    "errors": [],
+    "notices": [
+      "Legacy MockTA scenario registry is a first-batch proposal; cash-v2 simulator configuration is in contract.cash-purchase-v2. This declaration check executes no service or settlement/refund.",
+      "Context/UX references are validated locally; the portable context target index and UI generation are not extended."
+    ],
+    "artifacts": 27,
+    "entities": 200
+  },
+  "cashContract": {
+    "errors": [],
+    "notices": [
+      "Declaration checks only: authenticated first-publication association, durable reconciliation, exact receipt codecs and mixed-guard evaluation order remain unimplemented/unverified host obligations."
+    ],
+    "readiness": "declaration-only",
+    "runnable": false,
+    "runtimeBindingVerified": false,
+    "checkedResultKinds": [
+      "succeeded",
+      "rejected-before-effects",
+      "compensated",
+      "recovery-required",
+      "outcome-unknown"
+    ]
+  },
+  "strictSaga": {
+    "ok": true,
+    "diagnostics": []
+  },
+  "strictExecution": {
+    "ok": true,
+    "diagnostics": []
+  },
+  "runtimeLowering": {
+    "ok": true,
+    "diagnostics": [],
+    "readiness": "lowered-contract-only",
+    "runnable": false,
+    "runtimeBindingVerified": false
+  },
+  "roundtrip": {
+    "ok": true,
+    "atoms": 131
+  },
+  "projections": {
+    "ok": true,
+    "differences": [],
+    "files": 9
+  },
+  "protection": {
+    "ok": true,
+    "originalFiles": 13,
+    "addedFiles": 4,
+    "changed": [],
+    "unauthorized": [],
+    "missing": []
+  },
+  "tests": {
+    "command": "npm test",
+    "passed": 186,
+    "failed": 0,
+    "skipped": 0,
+    "families": {
+      "cashDeclarations": 108,
+      "mockTA": 47,
+      "projections": 8,
+      "truthAndBindings": 23
+    },
+    "declarationInterpreterIsRuntime": false
+  },
+  "mockCLI": {
+    "evidence": ".scratch/cli-observation-CvYAji/observation.json",
+    "independentInvocations": 5,
+    "statusBeforeAdvance": "accepted",
+    "statusAfterAdvance": "confirmed",
+    "businessTickBefore": 0,
+    "businessTickAfter": 1,
+    "uniqueReceiptCountAfter": 2,
+    "requestResubmitAddsRecords": false,
+    "journalRecords": 3,
+    "scope": "simulator reopen only; no cash/Saga/order bridge/JVM recovery"
+  },
+  "independentReview": {
+    "paymentOutcomeRepair": "retrieved review findings repaired with complete guard/fold and cancellation-fence regressions",
+    "simulator": "retrieved review findings repaired with replay fsync, lock cleanup/retry, original-input validation, BOM, CLI identity and live-path regressions",
+    "finalIndependentSignoff": "not-obtained: review agents hit quota errors; remaining source reviewer stopped; no audit certification claimed"
+  },
+  "acceptanceStatus": "verified-local-source-and-simulator-scope",
+  "storageLimits": {
+    "maxStringUTF8Bytes": 4096,
+    "maxJournalBytes": 16777216,
+    "wholeLineValidPrefixRollbackDetected": false,
+    "lockMode": "cooperative O_EXCL plus sequential identity checks; not kernel/distributed fencing",
+    "activeRotationSupported": false,
+    "crashLockAutomaticallyStolen": false
+  },
+  "generation": "not-run",
+  "runtime": "not-run",
+  "applicationRecovery": "not-run",
+  "codeBackAnchoring": "not-run",
+  "knownBlockers": [
+    "mixed guard generation order",
+    "FundOrder phase marker mapping",
+    "bankwealth host instead of Fab-specific composition host",
+    "authenticated durable payment/TA/refund bridges and exact codecs",
+    "unique source-event/pipeline start ownership and identity equivalence",
+    "handler-computed refundTxId generation",
+    "legacy TA path exclusion for cash-v2",
+    "refund reconciliation cannot rely on old write-once account completion ledger",
+    "query/projection chronology and UI/accessibility implementation",
+    "real external bank, complete SIP, production financial policies",
+    "full application/JVM recovery and code certification/back-anchoring"
+  ],
+  "diffCheck": {
+    "ok": true
+  }
+}

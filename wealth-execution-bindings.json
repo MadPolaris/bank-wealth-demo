@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "truthsrc.execution-binding/v1",
+  "pipelines": [
+    {
+      "pipelineId": "fund-purchase-cash-payment",
+      "engine": "monarch-persistence/0.2.1",
+      "module": "fixture.wealth.pay.PipelineModule",
+      "codec": {
+        "id": "CashPurchasePipelineCodec",
+        "version": "pipeline-v2",
+        "compatibleVersions": [
+          "pipeline-v2"
+        ]
+      },
+      "types": [
+        {
+          "id": "TxId",
+          "implementation": "fixture.types.TxId"
+        },
+        {
+          "id": "OperationId",
+          "implementation": "fixture.types.OperationId"
+        },
+        {
+          "id": "AccountId",
+          "implementation": "fixture.types.AccountId"
+        },
+        {
+          "id": "ExternalOrderId",
+          "implementation": "fixture.types.ExternalOrderId"
+        },
+        {
+          "id": "FundOrderId",
+          "implementation": "fixture.types.FundOrderId"
+        },
+        {
+          "id": "SipPlanId",
+          "implementation": "fixture.types.SipPlanId"
+        },
+        {
+          "id": "Money",
+          "implementation": "fixture.types.Money"
+        },
+        {
+          "id": "FundShare",
+          "implementation": "fixture.types.FundShare"
+        }
+      ],
+      "ports": [],
+      "invocations": [
+        {
+          "stepId": "pay-cash-purchase",
+          "ref": {
+            "sagaId": "fund-purchase-payment-v2",
+            "version": "v2"
+          },
+          "adapter": "fixture.wealth.pay.StrictSagaAdapter",
+          "runtime": {
+            "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+            "apiMode": "strict",
+            "entrypoint": "fixture.wealth.pay.SagaEntry"
+          },
+          "argsCodec": {
+            "id": "CashPurchaseV2ArgsCodec",
+            "version": "codec-v1",
+            "mapper": "fixture.wealth.pay.ArgsCodec"
+          },
+          "resultCodec": {
+            "id": "SagaResultCodec",
+            "version": "codec-v1",
+            "mapper": "fixture.wealth.pay.SagaResultCodec"
+          },
+          "transactionIdentity": {
+            "mapper": "fixture.wealth.pay.DurableSourceStageIdentity",
+            "derivation": "durable-source-stage",
+            "payloadCompatibility": "exact"
+          }
+        }
+      ]
+    },
+    {
+      "pipelineId": "fund-purchase-cash-refund",
+      "engine": "monarch-persistence/0.2.1",
+      "module": "fixture.wealth.refund.PipelineModule",
+      "codec": {
+        "id": "CashRefundPipelineCodec",
+        "version": "pipeline-v2",
+        "compatibleVersions": [
+          "pipeline-v2"
+        ]
+      },
+      "types": [
+        {
+          "id": "TxId",
+          "implementation": "fixture.types.TxId"
+        },
+        {
+          "id": "OperationId",
+          "implementation": "fixture.types.OperationId"
+        },
+        {
+          "id": "AccountId",
+          "implementation": "fixture.types.AccountId"
+        },
+        {
+          "id": "ExternalOrderId",
+          "implementation": "fixture.types.ExternalOrderId"
+        },
+        {
+          "id": "FundOrderId",
+          "implementation": "fixture.types.FundOrderId"
+        },
+        {
+          "id": "SipPlanId",
+          "implementation": "fixture.types.SipPlanId"
+        },
+        {
+          "id": "Money",
+          "implementation": "fixture.types.Money"
+        },
+        {
+          "id": "FundShare",
+          "implementation": "fixture.types.FundShare"
+        }
+      ],
+      "ports": [],
+      "invocations": [
+        {
+          "stepId": "refund-cash-purchase",
+          "ref": {
+            "sagaId": "fund-purchase-refund",
+            "version": "v1"
+          },
+          "adapter": "fixture.wealth.refund.StrictSagaAdapter",
+          "runtime": {
+            "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+            "apiMode": "strict",
+            "entrypoint": "fixture.wealth.refund.SagaEntry"
+          },
+          "argsCodec": {
+            "id": "CashRefundArgsCodec",
+            "version": "codec-v1",
+            "mapper": "fixture.wealth.refund.ArgsCodec"
+          },
+          "resultCodec": {
+            "id": "SagaResultCodec",
+            "version": "codec-v1",
+            "mapper": "fixture.wealth.refund.SagaResultCodec"
+          },
+          "transactionIdentity": {
+            "mapper": "fixture.wealth.refund.DurableSourceStageIdentity",
+            "derivation": "durable-source-stage",
+            "payloadCompatibility": "exact"
+          }
+        }
+      ]
+    }
+  ]
+}

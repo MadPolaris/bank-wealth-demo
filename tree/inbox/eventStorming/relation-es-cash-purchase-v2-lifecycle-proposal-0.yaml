@@ -1,0 +1,387 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: relation
+name: CashPurchaseV2LifecycleProposal
+origin:
+  stage: eventStorming
+  board: wealth-cash-v2
+  seq: 0
+payload:
+  {
+    "type": "relation",
+    "name": "CashPurchaseV2LifecycleProposal",
+    "stage": "eventStorming",
+    "description": "Explicit source-level cash participant, TA observation and independent refund graph; trusted joins and effects are not implemented.",
+    "info": {
+      "artifact": {
+        "id": "flow.cash-v2",
+        "category": "cash-flow",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted proposal",
+          "workshopHeld": false,
+          "scopeAuthorization": "Approved bankwealth second batch source and MockTA only",
+          "date": "2026-10-25"
+        },
+        "references": [
+          {
+            "kind": "artifact",
+            "id": "contract.cash-purchase-v2"
+          },
+          {
+            "kind": "artifact",
+            "id": "ux.cash-v2"
+          }
+        ],
+        "body": {
+          "entities": [
+            {
+              "id": "cash-flow.request",
+              "kind": "event",
+              "label": "现金申购申请已记录",
+              "eventRef": "FundOrder.FundPurchaseSettlementRequested",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.outgoing",
+              "kind": "collaboration",
+              "label": "投资人账户：预留／扣款",
+              "aggregateRef": "CreditBalance",
+              "commandRef": "CreditBalance.DeductFunds",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.incoming",
+              "kind": "collaboration",
+              "label": "募集账户：incoming登记／入账",
+              "aggregateRef": "CreditBalance",
+              "commandRef": "CreditBalance.CommitIncomingCredits",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.order",
+              "kind": "collaboration",
+              "label": "订单TCC：最后commit",
+              "aggregateRef": "FundOrder",
+              "commandRef": "FundOrder.ConfirmFundSubscriptionPayment",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.payment-succeeded",
+              "kind": "event",
+              "label": "现金付款成功已记录",
+              "eventRef": "FundOrder.FundCashPaymentSucceeded",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.payment-rejected",
+              "kind": "event",
+              "label": "现金付款无效果拒绝",
+              "eventRef": "FundOrder.FundCashPaymentRejectedBeforeEffects",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.payment-compensated",
+              "kind": "event",
+              "label": "现金付款已补偿，非支付后退款",
+              "eventRef": "FundOrder.FundCashPaymentCompensated",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.payment-recovery",
+              "kind": "event",
+              "label": "现金付款待恢复，同一身份",
+              "eventRef": "FundOrder.FundCashPaymentRecoveryRequired",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.payment-unknown",
+              "kind": "event",
+              "label": "现金付款未知，不授权新扣款/退款",
+              "eventRef": "FundOrder.FundCashPaymentOutcomeUnknown",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.payment-evidence",
+              "kind": "gate",
+              "label": "可信桥核实同一付款成功与三参与者证据",
+              "obligation": "strict Saga id/version/args digest plus authenticated committed receipts and cash-v2 succeeded outcome; bridge pending",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.submit",
+              "kind": "event",
+              "label": "已记录TA提交",
+              "eventRef": "FundOrder.FundTASubmissionRegistered",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.accepted",
+              "kind": "event",
+              "label": "TA受理不是份额确认",
+              "eventRef": "FundOrder.FundTAAccepted",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.confirmed",
+              "kind": "event",
+              "label": "关联份额已确认",
+              "eventRef": "FundOrder.FundTASharesConfirmed",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.unknown",
+              "kind": "event",
+              "label": "TA未知：观测，不授权退款",
+              "eventRef": "FundOrder.FundTAOutcomeUnknownObserved",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.rejected",
+              "kind": "event",
+              "label": "TA明确拒绝",
+              "eventRef": "FundOrder.FundTARejected",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.refund-gate",
+              "kind": "gate",
+              "label": "付款成功＋关联拒绝＋原本金／账户授权",
+              "commandRef": "FundOrder.RequestFundPurchaseRefund",
+              "obligation": "actual rejection and successful original cash payment; never UNKNOWN or user-selected target/amount",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.refund-request",
+              "kind": "event",
+              "label": "独立退款申请，不是到账",
+              "eventRef": "FundOrder.FundPurchaseRefundRequested",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.refund-outgoing",
+              "kind": "collaboration",
+              "label": "募集账户：新交易预留／扣款",
+              "commandRef": "CreditBalance.DeductFunds",
+              "aggregateRef": "CreditBalance",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.refund-incoming",
+              "kind": "collaboration",
+              "label": "原投资人账户：新incoming／入账",
+              "commandRef": "CreditBalance.CommitIncomingCredits",
+              "aggregateRef": "CreditBalance",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.refund-evidence",
+              "kind": "gate",
+              "label": "可信桥核实独立退款终态",
+              "obligation": "fund-purchase-refund/v1, original paymentTxId, refundOperationId/refundTxId, accounts/principal and durable proof; bridge pending",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.refunded",
+              "kind": "event",
+              "label": "退款成功证据已记录",
+              "eventRef": "FundOrder.FundRefundCompleted",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.refund-rejected",
+              "kind": "event",
+              "label": "退款无效果拒绝：非退款成功",
+              "eventRef": "FundOrder.FundPurchaseRefundRejected",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.refund-compensated",
+              "kind": "event",
+              "label": "退款已补偿：非本金到账",
+              "eventRef": "FundOrder.FundPurchaseRefundCompensated",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.refund-recovery",
+              "kind": "event",
+              "label": "退款待恢复：同一身份核实",
+              "eventRef": "FundOrder.FundPurchaseRefundRecoveryRequired",
+              "status": "demo-proposal"
+            },
+            {
+              "id": "cash-flow.refund-unknown",
+              "kind": "event",
+              "label": "退款未知：同一身份核实",
+              "eventRef": "FundOrder.FundPurchaseRefundOutcomeUnknownObserved",
+              "status": "demo-proposal"
+            }
+          ],
+          "edges": [
+            {
+              "from": "cash-flow.request",
+              "to": "cash-flow.outgoing",
+              "label": "payment-v2：三singleton Prepare barriers与durable decision"
+            },
+            {
+              "from": "cash-flow.outgoing",
+              "to": "cash-flow.incoming",
+              "label": "Commit序1→2；资金实际收款方"
+            },
+            {
+              "from": "cash-flow.incoming",
+              "to": "cash-flow.order",
+              "label": "Commit序2→3"
+            },
+            {
+              "from": "cash-flow.request",
+              "to": "cash-flow.payment-rejected",
+              "label": "订单Prepare/Commit前可能无效果拒绝；须可信start关联"
+            },
+            {
+              "from": "cash-flow.request",
+              "to": "cash-flow.payment-compensated",
+              "label": "付款提交前补偿；非独立退款"
+            },
+            {
+              "from": "cash-flow.request",
+              "to": "cash-flow.payment-recovery",
+              "label": "等待同一付款持久化核实"
+            },
+            {
+              "from": "cash-flow.request",
+              "to": "cash-flow.payment-unknown",
+              "label": "未知观测；不换身份"
+            },
+            {
+              "from": "cash-flow.order",
+              "to": "cash-flow.payment-succeeded",
+              "label": "关联账户/订单精确回执后可信结果发布"
+            },
+            {
+              "from": "cash-flow.payment-recovery",
+              "to": "cash-flow.payment-succeeded",
+              "label": "认证同身份reconciliation；并核实成功回执"
+            },
+            {
+              "from": "cash-flow.payment-unknown",
+              "to": "cash-flow.payment-succeeded",
+              "label": "认证同身份reconciliation；并核实成功回执"
+            },
+            {
+              "from": "cash-flow.payment-succeeded",
+              "to": "cash-flow.payment-evidence",
+              "label": "专用terminal账本与实际三方回执共同核实"
+            },
+            {
+              "from": "cash-flow.order",
+              "to": "cash-flow.payment-evidence",
+              "label": "订单标记不是完整现金成功"
+            },
+            {
+              "from": "cash-flow.payment-evidence",
+              "to": "cash-flow.submit",
+              "label": "成功证据后，可信桥尚未实现"
+            },
+            {
+              "from": "cash-flow.submit",
+              "to": "cash-flow.accepted",
+              "label": "独立受理回执"
+            },
+            {
+              "from": "cash-flow.accepted",
+              "to": "cash-flow.confirmed",
+              "label": "不同receiptId的最终确认"
+            },
+            {
+              "from": "cash-flow.submit",
+              "to": "cash-flow.unknown",
+              "label": "观测可发生，保持先前生命周期"
+            },
+            {
+              "from": "cash-flow.unknown",
+              "to": "cash-flow.confirmed",
+              "label": "后续核实，不用unknown覆盖终态"
+            },
+            {
+              "from": "cash-flow.submit",
+              "to": "cash-flow.rejected",
+              "label": "明确关联拒绝"
+            },
+            {
+              "from": "cash-flow.accepted",
+              "to": "cash-flow.rejected",
+              "label": "不同receiptId的最终拒绝"
+            },
+            {
+              "from": "cash-flow.unknown",
+              "to": "cash-flow.rejected",
+              "label": "后续核实才产生拒绝事实"
+            },
+            {
+              "from": "cash-flow.rejected",
+              "to": "cash-flow.refund-gate",
+              "label": "非所有异常；只明确拒绝"
+            },
+            {
+              "from": "cash-flow.refund-gate",
+              "to": "cash-flow.refund-request",
+              "label": "原账户／原本金，新operation/txid"
+            },
+            {
+              "from": "cash-flow.refund-request",
+              "to": "cash-flow.refund-outgoing",
+              "label": "独立refund Saga，不释放旧付款预留"
+            },
+            {
+              "from": "cash-flow.refund-outgoing",
+              "to": "cash-flow.refund-incoming",
+              "label": "募集→原投资人，新TCC交易"
+            },
+            {
+              "from": "cash-flow.refund-incoming",
+              "to": "cash-flow.refund-evidence",
+              "label": "核实Saga结果而非pipeline技术成功"
+            },
+            {
+              "from": "cash-flow.refund-evidence",
+              "to": "cash-flow.refunded",
+              "label": "相应5kind结果，不推断成功"
+            },
+            {
+              "from": "cash-flow.refund-evidence",
+              "to": "cash-flow.refund-rejected",
+              "label": "相应5kind结果，不推断成功"
+            },
+            {
+              "from": "cash-flow.refund-evidence",
+              "to": "cash-flow.refund-compensated",
+              "label": "相应5kind结果，不推断成功"
+            },
+            {
+              "from": "cash-flow.refund-evidence",
+              "to": "cash-flow.refund-recovery",
+              "label": "相应5kind结果，不推断成功"
+            },
+            {
+              "from": "cash-flow.refund-evidence",
+              "to": "cash-flow.refund-unknown",
+              "label": "相应5kind结果，不推断成功"
+            }
+          ],
+          "paymentSaga": "fund-purchase-payment-v2@v2",
+          "refundSaga": "fund-purchase-refund@v1",
+          "interpretation": "Source narrative/knowledge projection only, not observed event timeline or CQRS handler implementation.",
+          "forbiddenShortcuts": [
+            "TA_UNKNOWN→refund request without rejection",
+            "PAYMENT_SETTLED marker→share success",
+            "refund request→refunded",
+            "post-payment refund→release original payment reservation",
+            "pipeline technical completion→fund purchase final success"
+          ]
+        }
+      }
+    },
+    "links": []
+  }

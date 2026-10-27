@@ -1,0 +1,1357 @@
+{
+  "schemaVersion": "truthsrc.saga-binding/v1",
+  "sagas": [
+    {
+      "sagaId": "fund-purchase-payment-v2",
+      "version": "v2",
+      "module": "fixture.wealth.pay.SagaModule",
+      "engine": {
+        "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+        "apiMode": "strict",
+        "entrypoint": "fixture.wealth.pay.SagaEntry",
+        "capabilities": {
+          "required": [
+            "durable-commit-decision",
+            "durable-abort-decision",
+            "typed-nonterminal-unknown",
+            "safe-status-reattach",
+            "receipt-reconciliation",
+            "participant-idempotency-query",
+            "pinned-definition-codec",
+            "manual-evidence-authorization",
+            "cancel-before-prepare-fencing",
+            "durable-manifest"
+          ]
+        }
+      },
+      "codec": {
+        "id": "CashPurchaseV2ArgsCodec",
+        "version": "codec-v1",
+        "compatibleVersions": [
+          "codec-v1"
+        ],
+        "mapper": "fixture.wealth.pay.ArgsCodec"
+      },
+      "types": [
+        {
+          "id": "TxId",
+          "canonicalType": "TxId",
+          "implementation": "fixture.types.TxId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "OperationId",
+          "canonicalType": "OperationId",
+          "implementation": "fixture.types.OperationId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "AccountId",
+          "canonicalType": "AccountId",
+          "implementation": "fixture.types.AccountId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "ExternalOrderId",
+          "canonicalType": "ExternalOrderId",
+          "implementation": "fixture.types.ExternalOrderId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "FundOrderId",
+          "canonicalType": "FundOrderId",
+          "implementation": "fixture.types.FundOrderId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "SipPlanId",
+          "canonicalType": "SipPlanId",
+          "implementation": "fixture.types.SipPlanId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "Money",
+          "canonicalType": "Money",
+          "implementation": "fixture.types.Money",
+          "kind": "money",
+          "currency": "ISO-4217",
+          "amountEncoding": "minor-unit-string",
+          "scale": 2,
+          "precision": 38,
+          "codec": "fixture.ExactMoneyCodec"
+        }
+      ],
+      "participants": [
+        {
+          "participantId": "investorCreditBalance",
+          "addressing": {
+            "resolver": "fixture.wealth.pay.investorCreditBalanceResolver",
+            "aggregate": "CreditBalance",
+            "resourceType": "AccountId",
+            "mode": "exact-resource"
+          }
+        },
+        {
+          "participantId": "collectionCreditBalance",
+          "addressing": {
+            "resolver": "fixture.wealth.pay.collectionCreditBalanceResolver",
+            "aggregate": "CreditBalance",
+            "resourceType": "AccountId",
+            "mode": "exact-resource"
+          }
+        },
+        {
+          "participantId": "orderFundOrderTCC",
+          "addressing": {
+            "resolver": "fixture.wealth.pay.orderFundOrderTCCResolver",
+            "aggregate": "FundOrder",
+            "resourceType": "FundOrderId",
+            "mode": "exact-resource"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "stepId": "reserve-investor-funds",
+          "phases": {
+            "prepare": {
+              "kind": "command",
+              "port": "fixture.wealth.pay.reserve_investor_funds_prepare_port",
+              "commandMapper": "fixture.wealth.pay.reserve_investor_funds_prepare_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "ReserveFundsConfirmed"
+                },
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_prepare_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  },
+                  {
+                    "slot": "amount",
+                    "type": "Money",
+                    "ref": "receipt:amount"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_prepare_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_prepare_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_prepare_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            },
+            "commit": {
+              "kind": "command",
+              "port": "fixture.wealth.pay.reserve_investor_funds_commit_port",
+              "commandMapper": "fixture.wealth.pay.reserve_investor_funds_commit_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "DeductFundsConfirmed"
+                },
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_commit_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_commit_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_commit_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_commit_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            },
+            "compensate": {
+              "kind": "command",
+              "port": "fixture.wealth.pay.reserve_investor_funds_compensate_port",
+              "commandMapper": "fixture.wealth.pay.reserve_investor_funds_compensate_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "ReleaseReservedFundsConfirmed"
+                },
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_compensate_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_compensate_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_compensate_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.pay.reserve_investor_funds_compensate_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            }
+          }
+        },
+        {
+          "stepId": "credit-fund-collection",
+          "phases": {
+            "prepare": {
+              "kind": "command",
+              "port": "fixture.wealth.pay.credit_fund_collection_prepare_port",
+              "commandMapper": "fixture.wealth.pay.credit_fund_collection_prepare_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "RecordIncomingCreditsConfirmed"
+                },
+                "mapper": "fixture.wealth.pay.credit_fund_collection_prepare_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  },
+                  {
+                    "slot": "amount",
+                    "type": "Money",
+                    "ref": "receipt:amount"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.pay.credit_fund_collection_prepare_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.pay.credit_fund_collection_prepare_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.pay.credit_fund_collection_prepare_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            },
+            "commit": {
+              "kind": "command",
+              "port": "fixture.wealth.pay.credit_fund_collection_commit_port",
+              "commandMapper": "fixture.wealth.pay.credit_fund_collection_commit_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "CommitIncomingCreditsConfirmed"
+                },
+                "mapper": "fixture.wealth.pay.credit_fund_collection_commit_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.pay.credit_fund_collection_commit_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.pay.credit_fund_collection_commit_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.pay.credit_fund_collection_commit_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            },
+            "compensate": {
+              "kind": "command",
+              "port": "fixture.wealth.pay.credit_fund_collection_compensate_port",
+              "commandMapper": "fixture.wealth.pay.credit_fund_collection_compensate_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "CancelIncomingCreditConfirmed"
+                },
+                "mapper": "fixture.wealth.pay.credit_fund_collection_compensate_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.pay.credit_fund_collection_compensate_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.pay.credit_fund_collection_compensate_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.pay.credit_fund_collection_compensate_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            }
+          }
+        },
+        {
+          "stepId": "reserve-cash-fund-order",
+          "phases": {
+            "prepare": {
+              "kind": "command",
+              "port": "fixture.wealth.pay.reserve_cash_fund_order_prepare_port",
+              "commandMapper": "fixture.wealth.pay.reserve_cash_fund_order_prepare_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "FundOrder",
+                  "name": "ReserveFundSubscriptionConfirmed"
+                },
+                "mapper": "fixture.wealth.pay.reserve_cash_fund_order_prepare_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  },
+                  {
+                    "slot": "amount",
+                    "type": "Money",
+                    "ref": "receipt:amount"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.pay.reserve_cash_fund_order_prepare_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.pay.reserve_cash_fund_order_prepare_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.pay.reserve_cash_fund_order_prepare_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            },
+            "commit": {
+              "kind": "command",
+              "port": "fixture.wealth.pay.reserve_cash_fund_order_commit_port",
+              "commandMapper": "fixture.wealth.pay.reserve_cash_fund_order_commit_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "FundOrder",
+                  "name": "FundSubscriptionPaymentConfirmed"
+                },
+                "mapper": "fixture.wealth.pay.reserve_cash_fund_order_commit_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.pay.reserve_cash_fund_order_commit_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.pay.reserve_cash_fund_order_commit_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.pay.reserve_cash_fund_order_commit_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            },
+            "compensate": {
+              "kind": "command",
+              "port": "fixture.wealth.pay.reserve_cash_fund_order_compensate_port",
+              "commandMapper": "fixture.wealth.pay.CancelCashFundSubscriptionCommandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "FundOrder",
+                  "name": "FundCashSubscriptionCanceled"
+                },
+                "mapper": "fixture.wealth.pay.FundCashSubscriptionCanceledConfirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.pay.reserve_cash_fund_order_compensate_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.pay.FundCashSubscriptionCanceledReceiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.pay.reserve_cash_fund_order_compensate_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            }
+          }
+        }
+      ],
+      "triggerMappers": [
+        {
+          "triggerId": "from-event",
+          "argsMapper": "fixture.wealth.pay.TriggerArgsMapper",
+          "idempotencyMapper": "fixture.wealth.pay.TriggerIdempotencyMapper"
+        }
+      ],
+      "completionMappers": [
+        {
+          "kind": "succeeded",
+          "mapper": "fixture.wealth.pay.RecordFundCashPaymentSucceededCompletionMapper"
+        },
+        {
+          "kind": "rejected-before-effects",
+          "mapper": "fixture.wealth.pay.RecordFundCashPaymentRejectedBeforeEffectsCompletionMapper"
+        },
+        {
+          "kind": "compensated",
+          "mapper": "fixture.wealth.pay.RecordFundCashPaymentCompensatedCompletionMapper"
+        },
+        {
+          "kind": "recovery-required",
+          "mapper": "fixture.wealth.pay.RecordFundCashPaymentRecoveryRequiredCompletionMapper"
+        },
+        {
+          "kind": "outcome-unknown",
+          "mapper": "fixture.wealth.pay.RecordFundCashPaymentOutcomeUnknownCompletionMapper"
+        }
+      ]
+    },
+    {
+      "sagaId": "fund-purchase-refund",
+      "version": "v1",
+      "module": "fixture.wealth.refund.SagaModule",
+      "engine": {
+        "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+        "apiMode": "strict",
+        "entrypoint": "fixture.wealth.refund.SagaEntry",
+        "capabilities": {
+          "required": [
+            "durable-commit-decision",
+            "durable-abort-decision",
+            "typed-nonterminal-unknown",
+            "safe-status-reattach",
+            "receipt-reconciliation",
+            "participant-idempotency-query",
+            "pinned-definition-codec",
+            "manual-evidence-authorization",
+            "cancel-before-prepare-fencing",
+            "durable-manifest"
+          ]
+        }
+      },
+      "codec": {
+        "id": "CashRefundArgsCodec",
+        "version": "codec-v1",
+        "compatibleVersions": [
+          "codec-v1"
+        ],
+        "mapper": "fixture.wealth.refund.ArgsCodec"
+      },
+      "types": [
+        {
+          "id": "TxId",
+          "canonicalType": "TxId",
+          "implementation": "fixture.types.TxId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "OperationId",
+          "canonicalType": "OperationId",
+          "implementation": "fixture.types.OperationId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "AccountId",
+          "canonicalType": "AccountId",
+          "implementation": "fixture.types.AccountId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "ExternalOrderId",
+          "canonicalType": "ExternalOrderId",
+          "implementation": "fixture.types.ExternalOrderId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "FundOrderId",
+          "canonicalType": "FundOrderId",
+          "implementation": "fixture.types.FundOrderId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "SipPlanId",
+          "canonicalType": "SipPlanId",
+          "implementation": "fixture.types.SipPlanId",
+          "kind": "id",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "id": "Money",
+          "canonicalType": "Money",
+          "implementation": "fixture.types.Money",
+          "kind": "money",
+          "currency": "ISO-4217",
+          "amountEncoding": "minor-unit-string",
+          "scale": 2,
+          "precision": 38,
+          "codec": "fixture.ExactMoneyCodec"
+        }
+      ],
+      "participants": [
+        {
+          "participantId": "collectionCreditBalance",
+          "addressing": {
+            "resolver": "fixture.wealth.refund.collectionCreditBalanceResolver",
+            "aggregate": "CreditBalance",
+            "resourceType": "AccountId",
+            "mode": "exact-resource"
+          }
+        },
+        {
+          "participantId": "investorCreditBalance",
+          "addressing": {
+            "resolver": "fixture.wealth.refund.investorCreditBalanceResolver",
+            "aggregate": "CreditBalance",
+            "resourceType": "AccountId",
+            "mode": "exact-resource"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "stepId": "debit-fund-collection",
+          "phases": {
+            "prepare": {
+              "kind": "command",
+              "port": "fixture.wealth.refund.debit_fund_collection_prepare_port",
+              "commandMapper": "fixture.wealth.refund.debit_fund_collection_prepare_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "ReserveFundsConfirmed"
+                },
+                "mapper": "fixture.wealth.refund.debit_fund_collection_prepare_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  },
+                  {
+                    "slot": "amount",
+                    "type": "Money",
+                    "ref": "receipt:amount"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.refund.debit_fund_collection_prepare_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.refund.debit_fund_collection_prepare_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.refund.debit_fund_collection_prepare_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            },
+            "commit": {
+              "kind": "command",
+              "port": "fixture.wealth.refund.debit_fund_collection_commit_port",
+              "commandMapper": "fixture.wealth.refund.debit_fund_collection_commit_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "DeductFundsConfirmed"
+                },
+                "mapper": "fixture.wealth.refund.debit_fund_collection_commit_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.refund.debit_fund_collection_commit_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.refund.debit_fund_collection_commit_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.refund.debit_fund_collection_commit_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            },
+            "compensate": {
+              "kind": "command",
+              "port": "fixture.wealth.refund.debit_fund_collection_compensate_port",
+              "commandMapper": "fixture.wealth.refund.debit_fund_collection_compensate_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "ReleaseReservedFundsConfirmed"
+                },
+                "mapper": "fixture.wealth.refund.debit_fund_collection_compensate_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.refund.debit_fund_collection_compensate_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.refund.debit_fund_collection_compensate_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.refund.debit_fund_collection_compensate_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            }
+          }
+        },
+        {
+          "stepId": "credit-original-investor",
+          "phases": {
+            "prepare": {
+              "kind": "command",
+              "port": "fixture.wealth.refund.credit_original_investor_prepare_port",
+              "commandMapper": "fixture.wealth.refund.credit_original_investor_prepare_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "RecordIncomingCreditsConfirmed"
+                },
+                "mapper": "fixture.wealth.refund.credit_original_investor_prepare_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  },
+                  {
+                    "slot": "amount",
+                    "type": "Money",
+                    "ref": "receipt:amount"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.refund.credit_original_investor_prepare_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.refund.credit_original_investor_prepare_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.refund.credit_original_investor_prepare_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            },
+            "commit": {
+              "kind": "command",
+              "port": "fixture.wealth.refund.credit_original_investor_commit_port",
+              "commandMapper": "fixture.wealth.refund.credit_original_investor_commit_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "CommitIncomingCreditsConfirmed"
+                },
+                "mapper": "fixture.wealth.refund.credit_original_investor_commit_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.refund.credit_original_investor_commit_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.refund.credit_original_investor_commit_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.refund.credit_original_investor_commit_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            },
+            "compensate": {
+              "kind": "command",
+              "port": "fixture.wealth.refund.credit_original_investor_compensate_port",
+              "commandMapper": "fixture.wealth.refund.credit_original_investor_compensate_commandMapper",
+              "confirmation": {
+                "kind": "durable-receipt",
+                "eventRef": {
+                  "aggregate": "CreditBalance",
+                  "name": "CancelIncomingCreditConfirmed"
+                },
+                "mapper": "fixture.wealth.refund.credit_original_investor_compensate_confirmationMapper",
+                "outputs": [
+                  {
+                    "slot": "txid",
+                    "type": "TxId",
+                    "ref": "receipt:txid"
+                  }
+                ]
+              },
+              "query": {
+                "mapper": "fixture.wealth.refund.credit_original_investor_compensate_queryMapper",
+                "mode": "read-only",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "resultKinds": [
+                  "confirmed",
+                  "not-executed",
+                  "unknown"
+                ]
+              },
+              "receipt": {
+                "mapper": "fixture.wealth.refund.credit_original_investor_compensate_receiptMapper",
+                "version": "receipt-v1",
+                "durable": true,
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "args-digest",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadCompatibility": "exact",
+                "evidence": "reservation-decision-effect-reconciliation"
+              },
+              "idempotency": {
+                "mapper": "fixture.wealth.refund.credit_original_investor_compensate_idempotencyMapper",
+                "identity": [
+                  "txid",
+                  "definition-version",
+                  "participant",
+                  "resource",
+                  "step",
+                  "phase"
+                ],
+                "payloadConflict": "reject",
+                "attemptIdentity": "excluded"
+              }
+            }
+          }
+        }
+      ],
+      "triggerMappers": [
+        {
+          "triggerId": "from-event",
+          "argsMapper": "fixture.wealth.refund.TriggerArgsMapper",
+          "idempotencyMapper": "fixture.wealth.refund.TriggerIdempotencyMapper"
+        }
+      ],
+      "completionMappers": [
+        {
+          "kind": "succeeded",
+          "mapper": "fixture.wealth.refund.CompletionMapper"
+        },
+        {
+          "kind": "rejected-before-effects",
+          "mapper": "fixture.wealth.refund.CompletionMapper"
+        },
+        {
+          "kind": "compensated",
+          "mapper": "fixture.wealth.refund.CompletionMapper"
+        },
+        {
+          "kind": "recovery-required",
+          "mapper": "fixture.wealth.refund.CompletionMapper"
+        },
+        {
+          "kind": "outcome-unknown",
+          "mapper": "fixture.wealth.refund.CompletionMapper"
+        }
+      ]
+    }
+  ]
+}

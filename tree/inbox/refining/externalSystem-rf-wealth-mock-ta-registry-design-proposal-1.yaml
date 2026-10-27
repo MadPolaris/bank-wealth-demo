@@ -340,7 +340,14 @@ payload:
             "New runtime command/event",
             "Certified financial calculation",
             "Pretending rejected/unknown responses already trigger refunds"
-          ]
+          ],
+          "contractScope": {
+            "baseline": "first-batch legacy-v1/source-design history",
+            "cashVariantArtifact": "ux.cash-v2",
+            "cashAuthorityArtifact": "contract.cash-purchase-v2",
+            "appliesToCashV2": false,
+            "note": "Original declarations/fixtures/missing statements below describe the first-batch variant, not current cash-v2 authority. For cash-v2 use the separate experience and contract artifact; simulator configuration has exactly one authority in contract.cash-purchase-v2. No dual dispatch or legacy TA bypass."
+          }
         }
       }
     },

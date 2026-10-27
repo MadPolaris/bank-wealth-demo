@@ -4,8 +4,8 @@ kind: aggregate
 name: FundOrder
 seq: 2
 order:
-  commands: ["RequestFundPurchase","ReserveFundSubscription","ConfirmFundSubscriptionPayment","CancelFundSubscription","RecordTAShareConfirmation","GetFundOrderState","RecordResultSucceeded","RecordResultRejectedBeforeEffects","RecordResultCompensated","RecordResultRecoveryRequired","RecordResultOutcomeUnknown"]
-  events: ["FundPurchaseRequested","ReserveFundSubscriptionConfirmed","FundSubscriptionPaymentConfirmed","FundSubscriptionCanceled","FundSharesConfirmed","result-succeeded","result-rejected-before-effects","result-compensated","result-recovery-required","result-outcome-unknown"]
+  commands: ["RequestFundPurchase","ReserveFundSubscription","ConfirmFundSubscriptionPayment","CancelFundSubscription","RecordTAShareConfirmation","GetFundOrderState","RecordResultSucceeded","RecordResultRejectedBeforeEffects","RecordResultCompensated","RecordResultRecoveryRequired","RecordResultOutcomeUnknown","RequestFundPurchaseSettlement","RegisterFundTASubmission","RecordFundTAAccepted","RecordFundTAConfirmed","RecordFundTARejected","RecordFundTAUnknown","RequestFundPurchaseRefund","RecordFundRefundCompleted","RecordFundPurchaseRefundRejected","RecordFundPurchaseRefundCompensated","RecordFundPurchaseRefundRecoveryRequired","RecordFundPurchaseRefundOutcomeUnknown","RecordFundCashPaymentSucceeded","RecordFundCashPaymentRejectedBeforeEffects","RecordFundCashPaymentCompensated","RecordFundCashPaymentRecoveryRequired","RecordFundCashPaymentOutcomeUnknown","CancelCashFundSubscription"]
+  events: ["FundPurchaseRequested","ReserveFundSubscriptionConfirmed","FundSubscriptionPaymentConfirmed","FundSubscriptionCanceled","FundSharesConfirmed","result-succeeded","result-rejected-before-effects","result-compensated","result-recovery-required","result-outcome-unknown","FundPurchaseSettlementRequested","FundTASubmissionRegistered","FundTAAccepted","FundTASharesConfirmed","FundTARejected","FundTAOutcomeUnknownObserved","FundPurchaseRefundRequested","FundRefundCompleted","FundPurchaseRefundRejected","FundPurchaseRefundCompensated","FundPurchaseRefundRecoveryRequired","FundPurchaseRefundOutcomeUnknownObserved","FundCashPaymentSucceeded","FundCashPaymentRejectedBeforeEffects","FundCashPaymentCompensated","FundCashPaymentRecoveryRequired","FundCashPaymentOutcomeUnknown","FundCashSubscriptionCanceled"]
 payload:
   {
     "name": "FundOrder",
@@ -15,13 +15,19 @@ payload:
       "origin": "BUSINESS_INPUT"
     },
     "entity": "FundOrderEntity",
-    "description": "Mutual fund subscription order lifecycle: TCC payment reservation/confirmation with CreditBalance followed by T+1 TA share confirmation.",
+    "description": "Legacy subscription declaration retained; independent cash-purchase-v2 retains investor/collection cash instructions, selected payment, correlated TA receipts and separate refund facts. Runtime bridges remain pending.",
     "statusEnum": [
       "REQUESTED",
       "SUBSCRIPTION_RESERVED",
       "PAYMENT_SETTLED",
       "SHARES_CONFIRMED",
-      "CANCELED"
+      "CANCELED",
+      "TA_SUBMITTED",
+      "TA_ACCEPTED",
+      "TA_REJECTED",
+      "REFUND_REQUESTED",
+      "REFUNDED",
+      "REFUND_FAILED"
     ],
     "stateFields": [
       {
@@ -34,7 +40,17 @@ payload:
           "ReserveFundSubscriptionConfirmed",
           "FundSubscriptionPaymentConfirmed",
           "FundSharesConfirmed",
-          "FundSubscriptionCanceled"
+          "FundSubscriptionCanceled",
+          "FundPurchaseSettlementRequested",
+          "FundTASubmissionRegistered",
+          "FundTAAccepted",
+          "FundTASharesConfirmed",
+          "FundTARejected",
+          "FundPurchaseRefundRequested",
+          "FundRefundCompleted",
+          "FundPurchaseRefundRejected",
+          "FundPurchaseRefundCompensated",
+          "FundCashSubscriptionCanceled"
         ],
         "role": "State"
       },
@@ -44,7 +60,8 @@ payload:
         "description": "Operation identity retained from the submitted fund purchase request.",
         "origin": "BUSINESS_INPUT",
         "writtenBy": [
-          "FundPurchaseRequested.operationId"
+          "FundPurchaseRequested.operationId",
+          "FundPurchaseSettlementRequested.operationId"
         ],
         "role": "State"
       },
@@ -54,7 +71,8 @@ payload:
         "description": "Investor account retained from the submitted fund purchase request.",
         "origin": "BUSINESS_INPUT",
         "writtenBy": [
-          "FundPurchaseRequested.investorAccountId"
+          "FundPurchaseRequested.investorAccountId",
+          "FundPurchaseSettlementRequested.investorAccountId"
         ],
         "role": "State"
       },
@@ -64,7 +82,8 @@ payload:
         "description": "Requested fund code retained from the submitted fund purchase request.",
         "origin": "BUSINESS_INPUT",
         "writtenBy": [
-          "FundPurchaseRequested.fundCode"
+          "FundPurchaseRequested.fundCode",
+          "FundPurchaseSettlementRequested.fundCode"
         ],
         "role": "State"
       },
@@ -74,7 +93,8 @@ payload:
         "description": "Requested subscription amount retained from the submitted fund purchase request.",
         "origin": "BUSINESS_INPUT",
         "writtenBy": [
-          "FundPurchaseRequested.amount"
+          "FundPurchaseRequested.amount",
+          "FundPurchaseSettlementRequested.amount"
         ],
         "role": "State"
       },
@@ -85,7 +105,8 @@ payload:
         "writtenBy": [
           "ReserveFundSubscriptionConfirmed.txid",
           "FundSubscriptionPaymentConfirmed.txid",
-          "FundSubscriptionCanceled.txid"
+          "FundSubscriptionCanceled.txid",
+          "FundCashSubscriptionCanceled.txid"
         ],
         "role": "State"
       },
@@ -103,7 +124,8 @@ payload:
         "dataType": "Map[TxId, Money]",
         "description": "Durable compensate-phase marker keyed by transaction identity for canceled subscriptions.",
         "writtenBy": [
-          "FundSubscriptionCanceled.txid"
+          "FundSubscriptionCanceled.txid",
+          "FundCashSubscriptionCanceled.txid"
         ],
         "role": "State"
       },
@@ -126,6 +148,230 @@ payload:
           "result-compensated.txid",
           "result-recovery-required.txid",
           "result-outcome-unknown.txid"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "contractVersion",
+        "dataType": "String",
+        "description": "Request contract family; legacy-v1 cannot enter cash-v2 lifecycle.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundPurchaseRequested",
+          "FundPurchaseSettlementRequested"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "fundCollectionAccountId",
+        "dataType": "AccountId",
+        "description": "Original authorized fund collection account; immutable after request.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundPurchaseSettlementRequested.fundCollectionAccountId"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "selectedPaymentTxId",
+        "dataType": "TxId",
+        "description": "Selected original payment identity retained from the existing TCC confirmation event.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundSubscriptionPaymentConfirmed.txid"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "taRequestId",
+        "dataType": "String",
+        "description": "Registered stable TA submission identity, distinct from TA reference and receipt identity.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundTASubmissionRegistered.taRequestId"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "taReference",
+        "dataType": "String",
+        "description": "Correlated TA business reference, pinned after first receipt.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundTAAccepted.taReference",
+          "FundTASharesConfirmed.taReference",
+          "FundTARejected.taReference",
+          "FundTAOutcomeUnknownObserved.taReference"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "taStatus",
+        "dataType": "String",
+        "description": "TA lifecycle is independent of unknown observations.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundTASubmissionRegistered",
+          "FundTAAccepted",
+          "FundTASharesConfirmed",
+          "FundTARejected"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "taObservation",
+        "dataType": "String",
+        "description": "Latest correlated TA observation; UNKNOWN never implies rejection.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundTAAccepted",
+          "FundTASharesConfirmed",
+          "FundTARejected",
+          "FundTAOutcomeUnknownObserved"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "taReceipts",
+        "dataType": "Map[String, String]",
+        "description": "Exact receiptId to receiptBody ledger; conflicting exact String body rejects.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundTAAccepted.receiptId",
+          "FundTASharesConfirmed.receiptId",
+          "FundTARejected.receiptId",
+          "FundTAOutcomeUnknownObserved.receiptId"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "taConfirmedShares",
+        "dataType": "FundShare",
+        "description": "Actual confirmed shares/nav with fundCode matching retained original fund.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundTASharesConfirmed.shares"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "taRejectionReason",
+        "dataType": "String",
+        "description": "Explicit correlated TA rejection reason.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundTARejected.reason"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "refundOperationId",
+        "dataType": "OperationId",
+        "description": "New independent refund operation, never the payment operation.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundPurchaseRefundRequested.refundOperationId"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "refundTxId",
+        "dataType": "TxId",
+        "description": "Stable derived fund-purchase-refund/v1 transaction identity distinct from payment.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundPurchaseRefundRequested.refundTxId"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "refundOutcome",
+        "dataType": "String",
+        "description": "Refund requested/succeeded/rejected/compensated/recovery-required/outcome-unknown are distinct facts.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundPurchaseRefundRequested",
+          "FundRefundCompleted",
+          "FundPurchaseRefundRejected",
+          "FundPurchaseRefundCompensated",
+          "FundPurchaseRefundRecoveryRequired",
+          "FundPurchaseRefundOutcomeUnknownObserved"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "refundResultReceipts",
+        "dataType": "Map[String, String]",
+        "description": "Exact receipt identity/body ledger for trusted refund-result bridge.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundRefundCompleted.receiptId",
+          "FundPurchaseRefundRejected.receiptId",
+          "FundPurchaseRefundCompensated.receiptId",
+          "FundPurchaseRefundRecoveryRequired.receiptId",
+          "FundPurchaseRefundOutcomeUnknownObserved.receiptId"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "taRequests",
+        "dataType": "Map[String, TxId]",
+        "description": "Registered TA request identity to selected payment txid; exact immutable association and structured duplicate guard.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundTASubmissionRegistered.taRequestId"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "cashPaymentResults",
+        "dataType": "Map[TxId, String]",
+        "description": "Cash-v2 current outcome ledger, single source-associated txid; recoverable observations may advance to an authenticated terminal kind, never legacy sagaResults.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundCashPaymentSucceeded.txid",
+          "FundCashPaymentRejectedBeforeEffects.txid",
+          "FundCashPaymentCompensated.txid",
+          "FundCashPaymentRecoveryRequired.txid",
+          "FundCashPaymentOutcomeUnknown.txid"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "cashPaymentFinalResults",
+        "dataType": "Map[TxId, String]",
+        "description": "Cash-v2 terminal-only immutable ledger; recoverable/unknown kinds do not block later succeeded/rejected/compensated.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundCashPaymentSucceeded.txid",
+          "FundCashPaymentRejectedBeforeEffects.txid",
+          "FundCashPaymentCompensated.txid"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "refundFinalResults",
+        "dataType": "Map[TxId, String]",
+        "description": "Independent refund terminal-only ledger, keyed by the retained distinct refundTxId; same final empty-success, conflicting final reject.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundRefundCompleted.refundTxId",
+          "FundPurchaseRefundRejected.refundTxId",
+          "FundPurchaseRefundCompensated.refundTxId"
+        ],
+        "role": "State"
+      },
+      {
+        "name": "refundResultReceiptKinds",
+        "dataType": "Map[String, String]",
+        "description": "Refund receiptId to resultKind association, paired with exact body ledger to prevent cross-kind duplicate bypass.",
+        "origin": "PROPAGATED",
+        "writtenBy": [
+          "FundRefundCompleted.receiptId",
+          "FundPurchaseRefundRejected.receiptId",
+          "FundPurchaseRefundCompensated.receiptId",
+          "FundPurchaseRefundRecoveryRequired.receiptId",
+          "FundPurchaseRefundOutcomeUnknownObserved.receiptId"
         ],
         "role": "State"
       }
@@ -160,6 +406,246 @@ payload:
         "ruleId": "IR-FO-TA-CONFIRM-001",
         "errCode": "62011",
         "desc": "TA share confirmation requires PAYMENT_SETTLED before transitioning to SHARES_CONFIRMED. Duplicate terminal confirmations are rejected; this is not an idempotent success rule."
+      },
+      {
+        "ruleId": "IR-FO-CASH-NO-RECREATE",
+        "errCode": "62100",
+        "desc": "A purchase request is creation-only: neither the legacy nor cash entry can reset/recreate an existing FundOrder."
+      },
+      {
+        "ruleId": "IR-FO-CASH-REQUEST-ID",
+        "errCode": "62101",
+        "desc": "Request must address this order and investor/collection accounts must differ."
+      },
+      {
+        "ruleId": "IR-FO-CASH-CNY",
+        "errCode": "62102",
+        "desc": "Demo cash amount must be exactly CNY; canonical Money.amount remains decimal, not wire minorUnitsString."
+      },
+      {
+        "ruleId": "IR-FO-CASH-FUND",
+        "errCode": "62103",
+        "desc": "Original fund code must be nonempty; real product eligibility is not certified."
+      },
+      {
+        "ruleId": "IR-FO-CASH-V2-ONLY",
+        "errCode": "62104",
+        "desc": "New TA/refund lifecycle requires the cash-purchase-v2 request contract; legacy PAYMENT_SETTLED is insufficient."
+      },
+      {
+        "ruleId": "IR-FO-CASH-RESOURCE",
+        "errCode": "62105",
+        "desc": "Command must address the retained original FundOrder identity."
+      },
+      {
+        "ruleId": "IR-FO-CASH-PAYMENT",
+        "errCode": "62106",
+        "desc": "Payment correlation must exactly match the selected original committed payment transaction."
+      },
+      {
+        "ruleId": "IR-FO-CASH-COMMITTED",
+        "errCode": "62107",
+        "desc": "Selected payment requires durable FundOrder committedSubscriptions evidence."
+      },
+      {
+        "ruleId": "IR-FO-CASH-SUCCEEDED",
+        "errCode": "62108",
+        "desc": "Selected cash payment requires succeeded evidence; collection receipt and exact Saga identity/version/args digest still require a trusted host bridge."
+      },
+      {
+        "ruleId": "IR-FO-TA-REQUEST-NONEMPTY",
+        "errCode": "62109",
+        "desc": "TA request identity must be nonempty."
+      },
+      {
+        "ruleId": "IR-FO-TA-REQUEST-CONFLICT",
+        "errCode": "62110",
+        "desc": "A different TA request identity cannot replace an existing submission."
+      },
+      {
+        "ruleId": "IR-FO-TA-REQUEST-ONCE",
+        "errCode": "62111",
+        "desc": "Registered TA request key already exists: map-absent succeed-empty follows exact payment/request conflict checks and precedes lifecycle guard."
+      },
+      {
+        "ruleId": "IR-FO-TA-SUBMIT-PHASE",
+        "errCode": "62112",
+        "desc": "First TA registration requires payment settled, not merely reserved or canceled."
+      },
+      {
+        "ruleId": "IR-FO-TA-CORRELATION",
+        "errCode": "62113",
+        "desc": "TA order/payment/request/reference/fund/currency association must match the retained cash purchase."
+      },
+      {
+        "ruleId": "IR-FO-TA-RECEIPT-NONEMPTY",
+        "errCode": "62114",
+        "desc": "Exact TA receipt identity/body must be nonempty; trusted canonical codec must additionally validate body against every typed slot."
+      },
+      {
+        "ruleId": "IR-FO-TA-RECEIPT-CONFLICT",
+        "errCode": "62115",
+        "desc": "An existing receiptId with a different exact String body is a conflict, even after terminal phase."
+      },
+      {
+        "ruleId": "IR-FO-TA-RECEIPT-ONCE",
+        "errCode": "62116",
+        "desc": "Identical receipt body under the same receiptId is empty success before TA phase guards; authored mixed guard order must be enforced by a future generator/host."
+      },
+      {
+        "ruleId": "IR-FO-TA-ACCEPTED-PHASE",
+        "errCode": "62117",
+        "desc": "Only a submitted/accepted unresolved TA lifecycle may accept a new receipt of this kind."
+      },
+      {
+        "ruleId": "IR-FO-TA-CONFIRMED-PHASE",
+        "errCode": "62118",
+        "desc": "Only a submitted/accepted unresolved TA lifecycle may accept a new receipt of this kind."
+      },
+      {
+        "ruleId": "IR-FO-TA-SHARES",
+        "errCode": "62119",
+        "desc": "Confirmed FundShare uses its actual fields fundCode/shares/nav; fund must match and both exact decimals must be positive. Fixture is not a certified amount/share/NAV formula."
+      },
+      {
+        "ruleId": "IR-FO-TA-REJECTED-PHASE",
+        "errCode": "62120",
+        "desc": "Only a submitted/accepted unresolved TA lifecycle may accept a new receipt of this kind."
+      },
+      {
+        "ruleId": "IR-FO-TA-REASON",
+        "errCode": "62121",
+        "desc": "A TA rejection requires an explicit nonempty reason; timeout/UNKNOWN is not rejection."
+      },
+      {
+        "ruleId": "IR-FO-TA-UNKNOWN-PHASE",
+        "errCode": "62122",
+        "desc": "UNKNOWN is a correlated observation during submitted/accepted, never TA_REJECTED and never refund permission."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-TA-REJECTED",
+        "errCode": "62123",
+        "desc": "Only explicit correlated TA rejection after settled cash payment permits new refund request; UNKNOWN does not."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-PAYMENT-EVIDENCE",
+        "errCode": "62124",
+        "desc": "Original payment committed and succeeded evidence is mandatory; host must verify exact cash Saga and collection evidence."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-NEW-OP",
+        "errCode": "62125",
+        "desc": "Refund operation must be new and distinct from payment source operation."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-ONE-REQUEST",
+        "errCode": "62126",
+        "desc": "Do not start another refund after a refund has been requested; UNKNOWN/recovery requires reconciliation, not a fresh debit."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-CORRELATION",
+        "errCode": "62127",
+        "desc": "Original payment, retained refund operation and previously derived independent refund txid must all match."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-RECEIPT",
+        "errCode": "62128",
+        "desc": "Result receipt identity/body is mandatory; trusted host must verify exact cash Saga kind/version/args/evidence, not treat arbitrary body as success proof."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-RECEIPT-CONFLICT",
+        "errCode": "62129",
+        "desc": "Same refund receipt identity with conflicting exact String body rejects before duplicate success."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-RECEIPT-ONCE",
+        "errCode": "62130",
+        "desc": "Same refund receipt/body is empty success before phase checks."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-RESULT-PHASE",
+        "errCode": "62131",
+        "desc": "Only an authorized unresolved independent refund can record a new result; recovery/unknown are nonterminal observations, not another refund authorization."
+      },
+      {
+        "ruleId": "IR-FO-CASH-TCC-PREPARE",
+        "errCode": "62180",
+        "desc": "For cash-v2 only: subscription phase must address this order, exact original Money, unresolved request, and a single stable prepared txid; reject different args before existing duplicate empty success. Legacy TCC behavior remains unchanged."
+      },
+      {
+        "ruleId": "IR-FO-CASH-TCC-COMMIT",
+        "errCode": "62181",
+        "desc": "For cash-v2 only: confirm only this order and exact retained reservation once; payment confirmation cannot reset a later TA/refund lifecycle or select another payment. Collection receipt/order-last sequencing is a trusted host requirement."
+      },
+      {
+        "ruleId": "IR-FO-CASH-TCC-COMPENSATE",
+        "errCode": "62182",
+        "desc": "For cash-v2 only: compensation belongs to unresolved original request/reservation and exact order; never use cancellation as a post-settlement refund."
+      },
+      {
+        "ruleId": "IR-FO-CASH-RESULT-ASSOCIATION",
+        "errCode": "62140",
+        "desc": "Cash result txid must be the sole cash payment identity across outcome and order phase evidence. First publication additionally requires the trusted durable start/source-event association; no commit is required for rejected/compensated/nonterminal kinds. Schema cannot authenticate that association."
+      },
+      {
+        "ruleId": "IR-FO-CASH-RESULT-FINAL-CONFLICT",
+        "errCode": "62141",
+        "desc": "An established terminal cash outcome is immutable: a different terminal or any later nonterminal result rejects before duplicate success."
+      },
+      {
+        "ruleId": "IR-FO-CASH-RESULT-FINAL-ONCE",
+        "errCode": "62142",
+        "desc": "Same authenticated terminal kind for the bound txid is empty success; recoverable/unknown observations do not occupy this terminal map."
+      },
+      {
+        "ruleId": "IR-FO-CASH-RESULT-SUCCESS-EVIDENCE",
+        "errCode": "62143",
+        "desc": "Cash succeeded requires exact original Money in the order committed marker. Trusted host must also verify both cash participants, durable commit decision and original source/args association."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-RECEIPT-KIND",
+        "errCode": "62132",
+        "desc": "Receipt identity binds exact body AND refund result kind; reusing a receipt under another kind is a conflict before any empty success."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-FINAL-CONFLICT",
+        "errCode": "62133",
+        "desc": "Independent refund terminal kind is immutable; reject conflicting finals and nonterminal regressions before receipt duplicate handling."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-FINAL-ONCE",
+        "errCode": "62134",
+        "desc": "Same authenticated refund terminal kind under the retained refundTxId is empty success even with a new delivery receipt; unresolved observations never occupy this final ledger."
+      },
+      {
+        "ruleId": "IR-FO-CASH-RESULT-NO-COMMIT",
+        "errCode": "62144",
+        "desc": "Rejected-before-effects/compensated final cash outcomes cannot contradict an already committed order; forward recovery after durable commit is not compensation."
+      },
+      {
+        "ruleId": "IR-FO-CASH-CANCEL-RESOURCE",
+        "errCode": "62183",
+        "desc": "Cancellation must target the original order, not an arbitrary resource."
+      },
+      {
+        "ruleId": "IR-FO-CASH-CANCEL-ASSOCIATION",
+        "errCode": "62184",
+        "desc": "Bind the sole original cash txid and Money; first delivery needs authenticated persisted source/start association, not schema authentication."
+      },
+      {
+        "ruleId": "IR-FO-CASH-CANCEL-NO-COMMIT",
+        "errCode": "62185",
+        "desc": "No post-commit cancellation; only identical persisted compensation may be re-acknowledged after its terminal result."
+      },
+      {
+        "ruleId": "IR-FO-CASH-CANCEL-ONCE",
+        "errCode": "62186",
+        "desc": "Same txid and original Money is already canceled/fenced; empty success only after resource and conflict checks."
+      },
+      {
+        "ruleId": "IR-FO-CASH-CANCEL-PHASE",
+        "errCode": "62187",
+        "desc": "First cancellation must be pre-commit and unresolved; an absent reservation is deliberately allowed and fenced."
       }
     ],
     "stateGates": {
@@ -168,6 +654,64 @@ payload:
           "PAYMENT_SETTLED"
         ],
         "toState": "SHARES_CONFIRMED"
+      },
+      "RequestFundPurchaseSettlement": {
+        "initial": true,
+        "toState": "REQUESTED"
+      },
+      "RegisterFundTASubmission": {
+        "fromStates": [
+          "PAYMENT_SETTLED"
+        ],
+        "toState": "TA_SUBMITTED"
+      },
+      "RecordFundTAAccepted": {
+        "fromStates": [
+          "TA_SUBMITTED"
+        ],
+        "toState": "TA_ACCEPTED"
+      },
+      "RecordFundTAConfirmed": {
+        "fromStates": [
+          "TA_SUBMITTED",
+          "TA_ACCEPTED"
+        ],
+        "toState": "SHARES_CONFIRMED"
+      },
+      "RecordFundTARejected": {
+        "fromStates": [
+          "TA_SUBMITTED",
+          "TA_ACCEPTED"
+        ],
+        "toState": "TA_REJECTED"
+      },
+      "RequestFundPurchaseRefund": {
+        "fromStates": [
+          "TA_REJECTED"
+        ],
+        "toState": "REFUND_REQUESTED"
+      },
+      "RecordFundRefundCompleted": {
+        "fromStates": [
+          "REFUND_REQUESTED"
+        ],
+        "toState": "REFUNDED"
+      },
+      "RecordFundPurchaseRefundRejected": {
+        "fromStates": [
+          "REFUND_REQUESTED"
+        ],
+        "toState": "REFUND_FAILED"
+      },
+      "RecordFundPurchaseRefundCompensated": {
+        "fromStates": [
+          "REFUND_REQUESTED"
+        ],
+        "toState": "REFUND_FAILED"
+      },
+      "RequestFundPurchase": {
+        "initial": true,
+        "toState": "REQUESTED"
       }
     },
     "sourceCapture": {
@@ -316,5 +860,11 @@ payload:
           ]
         }
       }
+    },
+    "changeProvenance": {
+      "baselineCommit": "dda2f24f4569bc4e6468b4339dcea9fdb983a63d",
+      "source": "Approved second batch source-side proposal",
+      "workshopHeld": false,
+      "priorSourceCapture": "Preserved verbatim without recursively archiving captured atoms"
     }
   }

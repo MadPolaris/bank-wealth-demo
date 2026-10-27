@@ -1,0 +1,1164 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: question
+name: PublicX02WorkPackagesProposal
+origin:
+  stage: refining
+  board: wealth-cash-next-design-v1
+  seq: 2
+payload:
+  {
+    "type": "question",
+    "name": "PublicX02WorkPackagesProposal",
+    "stage": "refining",
+    "description": "Executable public ordered decision/dependency/event-fold/plugin work-package specifications with two-domain behavior gates and explicit blockers.",
+    "info": {
+      "curator": "agent-assisted bank next-design author",
+      "artifact": {
+        "id": "decision.public-x02-work-packages",
+        "category": "decision",
+        "status": "demo-proposal",
+        "provenance": {
+          "source": "agent-assisted design under user-approved next-design plan",
+          "workshopHeld": false,
+          "scopeAuthorization": "bank-source-design-and-local-acceptance-only",
+          "basis": "Three selected demo prerequisite designs and public work-package handoff only; no public implementation, production approval or runtime proof."
+        },
+        "references": [
+          {
+            "kind": "artifact",
+            "id": "decision.i0-boundary-ownership"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.public-x01-work-packages"
+          },
+          {
+            "kind": "artifact",
+            "id": "decision.cash-entry-prerequisites"
+          },
+          {
+            "kind": "artifact",
+            "id": "contract.cash-purchase-v2"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RequestFundPurchaseSettlement"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.CancelCashFundSubscription"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RequestFundPurchaseRefund"
+          },
+          {
+            "kind": "command",
+            "id": "FundOrder.RecordFundTAConfirmed"
+          },
+          {
+            "kind": "event",
+            "id": "FundOrder.FundPurchaseRefundRequested"
+          },
+          {
+            "kind": "event",
+            "id": "CreditBalance.CommitIncomingCreditsConfirmed"
+          }
+        ],
+        "body": {
+          "entities": [],
+          "edges": [],
+          "decisionStatus": "proposal-public-implementation-not-authorized",
+          "extensionId": "X02",
+          "upstreamSpecification": {
+            "artifact": "decision.i0-boundary-ownership",
+            "pointer": "/payload/info/artifact/body/publicExtensions/1"
+          },
+          "authorization": {
+            "source": "user-approved-bank-next-design-plan",
+            "scope": "bank-owned-public-work-package-specification-only",
+            "publicExecutionAuthorized": false,
+            "publicEPExists": false
+          },
+          "implementation": "not-started",
+          "owner": "metarch-truthsrc",
+          "packages": [
+            {
+              "id": "X02-A",
+              "title": "Authored ordered bounded decision admission",
+              "owner": "metarch-truthsrc",
+              "ownerLayer": "public-portable-semantic-product-owner",
+              "status": "proposal",
+              "implementation": "not-started",
+              "publicExecutionAuthorized": false,
+              "authorizationGate": "separate named public owner authorization and its own owned checkout/EP before any public file write or generated target application",
+              "dependsOn": [
+                "X01-A"
+              ],
+              "input": "Complete original command guard sequence with supported legacy cond and structured when/onFail, rule identity, error and source pointer.",
+              "output": "One source-mapped ordered decision product or diagnostics; reject/no-event-success semantics represented explicitly, no source rewriting.",
+              "sourceReadSet": [
+                {
+                  "file": "metarch-truthsrc/generators/run-all.mjs",
+                  "lines": "169-187,641-749,893-946",
+                  "observation": "Structured guards are appended after original guards; heuristic parameter subset does not cover arbitrary guard cond; rule/event ports depend on subsets."
+                },
+                {
+                  "file": "metarch-truthsrc/generators/invariant-dsl/emit.mjs",
+                  "lines": "350-530,719-759,1109-1125,1362-1468",
+                  "observation": "Bindings/heuristic constructors, supplied guard order, target alias emission and top-level CLI writes are separate from a pure admitted decision producer."
+                },
+                {
+                  "file": "metarch-truthsrc/src/core/manifest.mjs",
+                  "lines": "owner-reviewed-proposed-surface",
+                  "observation": "Existing adjacent API/CLI/helper/test selection surface allocated to this package; owner revalidates exact code before implementation."
+                }
+              ],
+              "futureWriteSet": [
+                "metarch-truthsrc/generators/run-all.mjs",
+                "metarch-truthsrc/generators/invariant-dsl/emit.mjs",
+                "metarch-truthsrc/src/core/manifest.mjs"
+              ],
+              "tasks": [
+                "Lower each original guard in place exactly once; do not retain an ignored original then append translated copies.",
+                "Admit known kinds/forms and bounded typed expressions, preserving author error/body/resource/duplicate/lifecycle ordering.",
+                "Specify nonempty-success/reject condition polarity and exact duplicate behavior; reject unconditional shortcut semantics.",
+                "Keep semantic product target-independent; target parameter alias and Money implementation belong to plugins/X03.",
+                "Implement and register the allocated target-neutral product API/shape and explicitly consume it through X01; emitter patches alone do not fulfill the public product contract."
+              ],
+              "bankFixture": {
+                "domain": "bank-wealth-cash",
+                "scenario": "original cash contract and complete canonical command/event/fold inputs plus explicitly merged supplemental bindings; no local spec normalizer",
+                "status": "proposed",
+                "sourceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseSettlement"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.CancelCashFundSubscription"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseRefund"
+                  }
+                ],
+                "implemented": false,
+                "executed": false
+              },
+              "secondDomainFixture": {
+                "domain": "travel-booking",
+                "scenario": "Cancel a booking with customerId used only in authorization guard, bookingId in event, exact-body idempotency and stable host-provided cancellation receipt identity; admit/reject missing host computation without guessing defaults.",
+                "status": "proposed",
+                "implemented": false,
+                "executed": false
+              },
+              "positiveTests": [
+                {
+                  "id": "X02-A-P1",
+                  "assertion": "Both bank/travel retain resource/body conflicts before exact duplicate empty success and later phase gates.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-A-P2",
+                  "assertion": "A valid exact terminal replay succeeds without new event, while a conflicting body/resource rejects.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "generatedDomainBehavior"
+                },
+                {
+                  "id": "X02-A-P3",
+                  "assertion": "Every emitted decision node has the original guard index/rule/source pointer.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                }
+              ],
+              "negativeTests": [
+                {
+                  "id": "X02-A-N1",
+                  "assertion": "Appending structured guards after legacy, dropping/duplicating/reordering a guard or flipping condition polarity rejects.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-A-N2",
+                  "assertion": "Unsupported form/operator/kind and unconditional empty-success shortcut reject before apply.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-A-N3",
+                  "assertion": "Body conflict placed after duplicate cannot be accepted as exact replay.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                }
+              ],
+              "compatibility": [
+                {
+                  "id": "X02-A-COMP1",
+                  "assertion": "Feature-absent legacy guard semantics/golden bytes remain unchanged or versioned migration is explicit.",
+                  "evidenceLevel": "future-compatibility",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "X02-A-COMP2",
+                  "assertion": "Canonical expressions and guard sequence are not edited to fit a plugin.",
+                  "evidenceLevel": "future-compatibility",
+                  "execution": "not-run"
+                }
+              ],
+              "migration": "public owner versions admission and target contracts; feature-absent legacy bytes remain stable unless an explicitly approved migration receipt documents divergence",
+              "exitGates": [
+                "independent-owner-authorization",
+                "versioned-input-output-and-source-pointer-diagnostics",
+                "both-domain-positive-negative-evidence",
+                "feature-absent-legacy-golden-and-migration-gate",
+                "public-test-receipt-not-a-bank-design-test",
+                "affected-feature-present-and-absent-compatibility-baseline",
+                "explicit-product-api-producer-host-port-test-fixture-allocation",
+                "phase-qualified-portable-versus-blocked-generated-bank-evidence"
+              ],
+              "nonGoals": [
+                "no bank names or finance/authority policy in core",
+                "no bank-local generation/host/qualification shim",
+                "no new apply/ledger/anchor engine",
+                "no public implementation or executed fixture claim in this note"
+              ],
+              "semantics": {
+                "authorOrder": "exact-once-in-place",
+                "reject": "failed-pass-condition",
+                "succeedEmpty": "matched-declared-duplicate-condition",
+                "unsupported": "diagnostic-no-apply"
+              },
+              "proposedCreateSet": [
+                {
+                  "file": "metarch-truthsrc/lib/domain-products/decision.mjs",
+                  "purpose": "Pure target-neutral ordered decision builder and versioned source-map product.",
+                  "status": "proposed-not-created",
+                  "kind": "product-api"
+                },
+                {
+                  "file": "metarch-truthsrc/test/domain-decision.test.mjs",
+                  "purpose": "Author-order/polarity/duplicate/source-pointer positive and mutation negatives.",
+                  "status": "proposed-not-created",
+                  "kind": "test"
+                }
+              ],
+              "futureWritePolicy": "modify listed existing files or create listed proposed API/test/fixture locations only after named owner approval; final names may be relocated by an explicit documented package revision, never silently widened",
+              "publicApiContract": {
+                "proposedEntry": "buildOrderedDecision(canonicalCommand, sourceMap, supportedCapabilities)",
+                "implementationAllocation": [
+                  "metarch-truthsrc/lib/domain-products/decision.mjs"
+                ],
+                "inputShape": "complete guards/required parameters/rule IDs and canonical pointers",
+                "outputShape": "proposed domain-decision/v1 envelope with command identity, ordered typed reject/no-event-success nodes, dependencies and diagnostics",
+                "registration": "declare/review identity/schema in X01-A product registry; plugin consumes product explicitly, never reconstructs from run-all heuristics",
+                "purity": "target-neutral; no fs/argv/Scala identifiers/source expression rewriting"
+              },
+              "compatibilityBaseline": {
+                "status": "proposed-to-pin-at-public-implementation",
+                "execution": "not-run",
+                "affectedSurfaces": [
+                  "API/CLI snapshot and binding admission",
+                  "binding-present type/guard normalization",
+                  "command parameter/helper/event signature order",
+                  "aggregate/rule/value/proto output",
+                  "strict Saga/Fab/composition generated surfaces"
+                ],
+                "minimumExistingSuites": [
+                  "test/generate.test.mjs",
+                  "test/generate-cli.test.mjs",
+                  "test/generate-anchors.test.mjs",
+                  "test/run-all-anchors.test.mjs",
+                  "test/saga-generator.test.mjs",
+                  "test/saga-generator-safety.test.mjs",
+                  "test/saga-fab-runtime-binding-v3.test.mjs",
+                  "test/invocation-recovery-emission.test.mjs"
+                ],
+                "corpus": [
+                  "feature-absent active golden output",
+                  "existing binding-present Saga/money/Fab/composition fixtures and generated surface evidence"
+                ],
+                "migrationExceptions": "each intentional changed surface requires source/golden delta and owner-approved versioned migration; missing feature-present baseline blocks compatibility exit"
+              },
+              "gatePhases": {
+                "portableContract": {
+                  "status": "future-required",
+                  "execution": "not-run",
+                  "requiredEvidence": [
+                    "bank and independent second-domain admitted inputs or explicit capability diagnostics",
+                    "pure product and producer tests",
+                    "negative unsupported/missing capability tests before apply",
+                    "affected API/CLI/feature-present-and-absent compatibility matrix"
+                  ],
+                  "supportsIndependentClosure": true,
+                  "doesNotQualify": "positive exact-bank generated behavior, bootstrap/authority/runtime/recovery"
+                },
+                "generatedDomainBehavior": {
+                  "status": "future-capability-gated",
+                  "execution": "not-run",
+                  "evidence": "generated integer/map inventory/travel compilation and replay plus exact bank generated-domain behavior only when declared dependencies are admitted",
+                  "bankPrerequisites": [
+                    "X03",
+                    "X04",
+                    "X07",
+                    "X08"
+                  ],
+                  "bankExecution": "not-run-blocked-until-prerequisites",
+                  "diagnosticsDoNotCountAsPositiveBankBehavior": true
+                },
+                "finalQualification": {
+                  "status": "future-required",
+                  "execution": "not-run",
+                  "rule": "portable completion receipt may mark generated-bank gates blocked; whole extension generated-bank qualification is not passed until all mandatory positive gates have real evidence",
+                  "runtimeCertification": false
+                }
+              }
+            },
+            {
+              "id": "X02-B",
+              "title": "Complete typed parameter and event-binding closure",
+              "owner": "metarch-truthsrc",
+              "ownerLayer": "public-semantic-resolver-owner",
+              "status": "proposal",
+              "implementation": "not-started",
+              "publicExecutionAuthorized": false,
+              "authorizationGate": "separate named public owner authorization and its own owned checkout/EP before any public file write or generated target application",
+              "dependsOn": [
+                "X02-A"
+              ],
+              "input": "Full declared command parameters/types/origins plus every guard/when, event payload/binding and declared host computation requirement.",
+              "output": "Complete typed dependency/source map and event construction coverage; unresolved required inputs or host computation are explicit diagnostics, not defaults.",
+              "sourceReadSet": [
+                {
+                  "file": "metarch-truthsrc/generators/run-all.mjs",
+                  "lines": "169-187,641-749,893-946",
+                  "observation": "Structured guards are appended after original guards; heuristic parameter subset does not cover arbitrary guard cond; rule/event ports depend on subsets."
+                },
+                {
+                  "file": "metarch-truthsrc/generators/invariant-dsl/emit.mjs",
+                  "lines": "350-530,719-759,1109-1125,1362-1468",
+                  "observation": "Bindings/heuristic constructors, supplied guard order, target alias emission and top-level CLI writes are separate from a pure admitted decision producer."
+                },
+                {
+                  "file": "metarch-truthsrc/src/core/manifest.mjs",
+                  "lines": "owner-reviewed-proposed-surface",
+                  "observation": "Existing adjacent API/CLI/helper/test selection surface allocated to this package; owner revalidates exact code before implementation."
+                },
+                {
+                  "file": "metarch-truthsrc/generators/command-dsl/emit.mjs",
+                  "lines": "owner-reviewed-proposed-surface",
+                  "observation": "Existing adjacent API/CLI/helper/test selection surface allocated to this package; owner revalidates exact code before implementation."
+                }
+              ],
+              "futureWriteSet": [
+                "metarch-truthsrc/generators/run-all.mjs",
+                "metarch-truthsrc/generators/invariant-dsl/emit.mjs",
+                "metarch-truthsrc/src/core/manifest.mjs",
+                "metarch-truthsrc/generators/command-dsl/emit.mjs"
+              ],
+              "tasks": [
+                "Walk all admitted cond/when expressions, not only rule suffixes/descriptions/event same-name heuristics.",
+                "Preserve every declared required input/type/order and derive used dependency closure; source-map aliases to plugin parameters.",
+                "Resolve param/state/literal and propagated values explicitly; require declared stable host computation for SYSTEM_INJECTED slots.",
+                "Reject unknown/duplicate event slots, wrong types and ambiguous producing commands; no silent state/default fallback.",
+                "Implement and register the allocated target-neutral product API/shape and explicitly consume it through X01; emitter patches alone do not fulfill the public product contract."
+              ],
+              "bankFixture": {
+                "domain": "bank-wealth-cash",
+                "scenario": "original cash contract and complete canonical command/event/fold inputs plus explicitly merged supplemental bindings; no local spec normalizer",
+                "status": "proposed",
+                "sourceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseSettlement"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.CancelCashFundSubscription"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseRefund"
+                  }
+                ],
+                "implemented": false,
+                "executed": false
+              },
+              "secondDomainFixture": {
+                "domain": "travel-booking",
+                "scenario": "Cancel a booking with customerId used only in authorization guard, bookingId in event, exact-body idempotency and stable host-provided cancellation receipt identity; admit/reject missing host computation without guessing defaults.",
+                "status": "proposed",
+                "implemented": false,
+                "executed": false
+              },
+              "positiveTests": [
+                {
+                  "id": "X02-B-P1",
+                  "assertion": "Guard-only bank resource and travel customerId retain exact types in rules/helpers.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-B-P2",
+                  "assertion": "Event constructor parameters, helper order and source maps agree with full declared signature.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-B-P3",
+                  "assertion": "Explicit stable host computation admits; missing computation yields source-pointed diagnostic before entries apply.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                }
+              ],
+              "negativeTests": [
+                {
+                  "id": "X02-B-N1",
+                  "assertion": "Dropping guard-only field, emitting dangling param. under p, wrong type or unknown slot rejects.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-B-N2",
+                  "assertion": "Unbound refundTxId/cancellation identity cannot become random/time/default or synthetic command parameter.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-B-N3",
+                  "assertion": "Ambiguous producer/same-name mismatch or fallback state/default is not resolved admission.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                }
+              ],
+              "compatibility": [
+                {
+                  "id": "X02-B-COMP1",
+                  "assertion": "Do not reorder legacy parameter lists absent a versioned migration.",
+                  "evidenceLevel": "future-compatibility",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "X02-B-COMP2",
+                  "assertion": "Do not relabel BUSINESS_INPUT as browser authority; source lineage and input binding authority are distinct.",
+                  "evidenceLevel": "future-compatibility",
+                  "execution": "not-run"
+                }
+              ],
+              "migration": "public owner versions admission and target contracts; feature-absent legacy bytes remain stable unless an explicitly approved migration receipt documents divergence",
+              "exitGates": [
+                "independent-owner-authorization",
+                "versioned-input-output-and-source-pointer-diagnostics",
+                "both-domain-positive-negative-evidence",
+                "feature-absent-legacy-golden-and-migration-gate",
+                "public-test-receipt-not-a-bank-design-test",
+                "affected-feature-present-and-absent-compatibility-baseline",
+                "explicit-product-api-producer-host-port-test-fixture-allocation",
+                "phase-qualified-portable-versus-blocked-generated-bank-evidence"
+              ],
+              "nonGoals": [
+                "no bank names or finance/authority policy in core",
+                "no bank-local generation/host/qualification shim",
+                "no new apply/ledger/anchor engine",
+                "no public implementation or executed fixture claim in this note"
+              ],
+              "dependencyPolicy": {
+                "guardOnlyInputs": "complete-typed",
+                "eventSlots": "complete-explicit",
+                "missingHostComputation": "diagnostic-no-apply",
+                "requiredDefaultFallbackAllowed": false,
+                "canonicalMutationAllowed": false
+              },
+              "proposedCreateSet": [
+                {
+                  "file": "metarch-truthsrc/lib/domain-products/dependencies.mjs",
+                  "purpose": "Pure typed all-expression/parameter/event-binding and host-computation descriptor resolver.",
+                  "status": "proposed-not-created",
+                  "kind": "product-api"
+                },
+                {
+                  "file": "metarch-truthsrc/test/domain-dependencies.test.mjs",
+                  "purpose": "Guard-only input/full signature/missing stable computation/type/slot failures.",
+                  "status": "proposed-not-created",
+                  "kind": "test"
+                }
+              ],
+              "futureWritePolicy": "modify listed existing files or create listed proposed API/test/fixture locations only after named owner approval; final names may be relocated by an explicit documented package revision, never silently widened",
+              "publicApiContract": {
+                "proposedEntry": "resolveCommandDependencies(decision, declaredCommand, events, state, hostComputationDescriptors)",
+                "implementationAllocation": [
+                  "metarch-truthsrc/lib/domain-products/dependencies.mjs"
+                ],
+                "inputShape": "complete typed parameters/guards/bindings and explicit producer descriptors for command/state/host/propagated origins",
+                "outputShape": "proposed domain-dependencies/v1 closure, exact signature order, complete event slot producers, typed host ports/source pointers or diagnostics",
+                "registration": "X01-A registry admits versioned dependency product; command/invariant plugin consume same product",
+                "purity": "no invented parameters/defaults/random/time; missing descriptor rejects"
+              },
+              "compatibilityBaseline": {
+                "status": "proposed-to-pin-at-public-implementation",
+                "execution": "not-run",
+                "affectedSurfaces": [
+                  "API/CLI snapshot and binding admission",
+                  "binding-present type/guard normalization",
+                  "command parameter/helper/event signature order",
+                  "aggregate/rule/value/proto output",
+                  "strict Saga/Fab/composition generated surfaces"
+                ],
+                "minimumExistingSuites": [
+                  "test/generate.test.mjs",
+                  "test/generate-cli.test.mjs",
+                  "test/generate-anchors.test.mjs",
+                  "test/run-all-anchors.test.mjs",
+                  "test/saga-generator.test.mjs",
+                  "test/saga-generator-safety.test.mjs",
+                  "test/saga-fab-runtime-binding-v3.test.mjs",
+                  "test/invocation-recovery-emission.test.mjs"
+                ],
+                "corpus": [
+                  "feature-absent active golden output",
+                  "existing binding-present Saga/money/Fab/composition fixtures and generated surface evidence"
+                ],
+                "migrationExceptions": "each intentional changed surface requires source/golden delta and owner-approved versioned migration; missing feature-present baseline blocks compatibility exit"
+              },
+              "gatePhases": {
+                "portableContract": {
+                  "status": "future-required",
+                  "execution": "not-run",
+                  "requiredEvidence": [
+                    "bank and independent second-domain admitted inputs or explicit capability diagnostics",
+                    "pure product and producer tests",
+                    "negative unsupported/missing capability tests before apply",
+                    "affected API/CLI/feature-present-and-absent compatibility matrix"
+                  ],
+                  "supportsIndependentClosure": true,
+                  "doesNotQualify": "positive exact-bank generated behavior, bootstrap/authority/runtime/recovery"
+                },
+                "generatedDomainBehavior": {
+                  "status": "future-capability-gated",
+                  "execution": "not-run",
+                  "evidence": "generated integer/map inventory/travel compilation and replay plus exact bank generated-domain behavior only when declared dependencies are admitted",
+                  "bankPrerequisites": [
+                    "X03",
+                    "X04",
+                    "X07",
+                    "X08"
+                  ],
+                  "bankExecution": "not-run-blocked-until-prerequisites",
+                  "diagnosticsDoNotCountAsPositiveBankBehavior": true
+                },
+                "finalQualification": {
+                  "status": "future-required",
+                  "execution": "not-run",
+                  "rule": "portable completion receipt may mark generated-bank gates blocked; whole extension generated-bank qualification is not passed until all mandatory positive gates have real evidence",
+                  "runtimeCertification": false
+                }
+              }
+            },
+            {
+              "id": "X02-C",
+              "title": "Complete typed pre-event fold admission",
+              "owner": "metarch-truthsrc",
+              "ownerLayer": "public-event-fold-semantic-product-owner",
+              "status": "proposal",
+              "implementation": "not-started",
+              "publicExecutionAuthorized": false,
+              "authorizationGate": "separate named public owner authorization and its own owned checkout/EP before any public file write or generated target application",
+              "dependsOn": [
+                "X02-A",
+                "X02-B"
+              ],
+              "input": "Full declared event payloads and state fields with all fold assignments/put/remove/literal/read and explicitly required exact-money operations.",
+              "output": "Typed complete assignment set whose RHS reads one pre-event state; conflicting/unknown/missing operation or state/event dependency diagnoses before apply.",
+              "sourceReadSet": [
+                {
+                  "file": "metarch-truthsrc/lib/compile.mjs",
+                  "lines": "derived aggregate event model",
+                  "observation": "Use authored full event foldAssignments as the semantic source; do not reconstruct from writtenBy prose."
+                },
+                {
+                  "file": "metarch-truthsrc/generators/aggregate-dsl/emit.mjs",
+                  "lines": "event-application face",
+                  "observation": "Target fold lowering must match the complete admitted pre-event product, not a heuristic subset."
+                },
+                {
+                  "file": "metarch-truthsrc/src/core/manifest.mjs",
+                  "lines": "owner-reviewed-proposed-surface",
+                  "observation": "Existing adjacent API/CLI/helper/test selection surface allocated to this package; owner revalidates exact code before implementation."
+                }
+              ],
+              "futureWriteSet": [
+                "metarch-truthsrc/lib/compile.mjs",
+                "metarch-truthsrc/generators/aggregate-dsl/emit.mjs",
+                "metarch-truthsrc/src/core/manifest.mjs"
+              ],
+              "tasks": [
+                "Admit full assignment set, target uniqueness/types and every state/event reference; command param is unavailable during replay.",
+                "Specify simultaneous pre-event reads before applying any target mutation; map removal must not invalidate another RHS.",
+                "Cover put/remove/literal/read and declare money-apply capabilities explicitly; exact value semantics depend on X03.",
+                "Reject omissions, additional contradictory writes, unsupported operator and inferred convenience fold.",
+                "Implement and register the allocated target-neutral product API/shape and explicitly consume it through X01; emitter patches alone do not fulfill the public product contract."
+              ],
+              "bankFixture": {
+                "domain": "bank-wealth-cash",
+                "scenario": "original cash contract and complete canonical command/event/fold inputs plus explicitly merged supplemental bindings; no local spec normalizer",
+                "status": "proposed",
+                "sourceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseSettlement"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.CancelCashFundSubscription"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseRefund"
+                  }
+                ],
+                "implemented": false,
+                "executed": false
+              },
+              "secondDomainFixture": {
+                "domain": "travel-booking",
+                "scenario": "Cancel a booking with customerId used only in authorization guard, bookingId in event, exact-body idempotency and stable host-provided cancellation receipt identity; admit/reject missing host computation without guessing defaults.",
+                "status": "proposed",
+                "implemented": false,
+                "executed": false
+              },
+              "positiveTests": [
+                {
+                  "id": "X02-C-P1",
+                  "assertion": "Bank CommitIncomingCredits reads incomingCredits amount before removal; committed marker and balance delta use the same old state.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "generatedDomainBehavior"
+                },
+                {
+                  "id": "X02-C-P2",
+                  "assertion": "Inventory/travel list/map cancellation fixtures exercise put/remove/literal/read with persisted event replay.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "generatedDomainBehavior"
+                },
+                {
+                  "id": "X02-C-P3",
+                  "assertion": "Full folds replay identically and typed targets/source pointers are preserved.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "generatedDomainBehavior"
+                }
+              ],
+              "negativeTests": [
+                {
+                  "id": "X02-C-N1",
+                  "assertion": "Missing/extra conflicting assignment, state-after-mutation RHS, unknown operator or absent event slot rejects.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-C-N2",
+                  "assertion": "Fold containing vanished param. command input rejects.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-C-N3",
+                  "assertion": "Money arithmetic cannot coerce Decimal to double or borrow unresolved wire shape.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                }
+              ],
+              "compatibility": [
+                {
+                  "id": "X02-C-COMP1",
+                  "assertion": "Event fields and fold definitions are not changed to make generated code compile.",
+                  "evidenceLevel": "future-compatibility",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "X02-C-COMP2",
+                  "assertion": "Existing supported no-feature folds retain behavior; unsafe heuristic fallback is quarantined with explicit migration.",
+                  "evidenceLevel": "future-compatibility",
+                  "execution": "not-run"
+                }
+              ],
+              "migration": "public owner versions admission and target contracts; feature-absent legacy bytes remain stable unless an explicitly approved migration receipt documents divergence",
+              "exitGates": [
+                "independent-owner-authorization",
+                "versioned-input-output-and-source-pointer-diagnostics",
+                "both-domain-positive-negative-evidence",
+                "feature-absent-legacy-golden-and-migration-gate",
+                "public-test-receipt-not-a-bank-design-test",
+                "affected-feature-present-and-absent-compatibility-baseline",
+                "explicit-product-api-producer-host-port-test-fixture-allocation",
+                "phase-qualified-portable-versus-blocked-generated-bank-evidence"
+              ],
+              "nonGoals": [
+                "no bank names or finance/authority policy in core",
+                "no bank-local generation/host/qualification shim",
+                "no new apply/ledger/anchor engine",
+                "no public implementation or executed fixture claim in this note"
+              ],
+              "foldPolicy": {
+                "coverage": "complete-authored-set",
+                "rhsState": "single-pre-event-state",
+                "supportedOperators": [
+                  "put",
+                  "remove",
+                  "literal",
+                  "read",
+                  "money-apply-with-declared-exact-capability"
+                ],
+                "commandInputsDuringReplayAllowed": false
+              },
+              "blockedExactMoneyBy": [
+                "X03"
+              ],
+              "proposedCreateSet": [
+                {
+                  "file": "metarch-truthsrc/lib/domain-products/folds.mjs",
+                  "purpose": "Pure complete pre-event typed fold builder.",
+                  "status": "proposed-not-created",
+                  "kind": "product-api"
+                },
+                {
+                  "file": "metarch-truthsrc/test/domain-folds.test.mjs",
+                  "purpose": "Full set/types/pre-event RHS/unsupported operator and replay contracts.",
+                  "status": "proposed-not-created",
+                  "kind": "test"
+                }
+              ],
+              "futureWritePolicy": "modify listed existing files or create listed proposed API/test/fixture locations only after named owner approval; final names may be relocated by an explicit documented package revision, never silently widened",
+              "publicApiContract": {
+                "proposedEntry": "buildPreEventFolds(eventDefinition, declaredState, capabilities)",
+                "implementationAllocation": [
+                  "metarch-truthsrc/lib/domain-products/folds.mjs"
+                ],
+                "inputShape": "complete authored foldAssignments and event/state types",
+                "outputShape": "proposed domain-folds/v1 typed complete assignment set with single pre-event reads/source map or diagnostics",
+                "registration": "X01-A registry admits versioned fold product, target aggregate plugin consumes it explicitly",
+                "purity": "target-neutral; pure integer/map fixture worker and exact Money capability boundary distinct"
+              },
+              "compatibilityBaseline": {
+                "status": "proposed-to-pin-at-public-implementation",
+                "execution": "not-run",
+                "affectedSurfaces": [
+                  "API/CLI snapshot and binding admission",
+                  "binding-present type/guard normalization",
+                  "command parameter/helper/event signature order",
+                  "aggregate/rule/value/proto output",
+                  "strict Saga/Fab/composition generated surfaces"
+                ],
+                "minimumExistingSuites": [
+                  "test/generate.test.mjs",
+                  "test/generate-cli.test.mjs",
+                  "test/generate-anchors.test.mjs",
+                  "test/run-all-anchors.test.mjs",
+                  "test/saga-generator.test.mjs",
+                  "test/saga-generator-safety.test.mjs",
+                  "test/saga-fab-runtime-binding-v3.test.mjs",
+                  "test/invocation-recovery-emission.test.mjs"
+                ],
+                "corpus": [
+                  "feature-absent active golden output",
+                  "existing binding-present Saga/money/Fab/composition fixtures and generated surface evidence"
+                ],
+                "migrationExceptions": "each intentional changed surface requires source/golden delta and owner-approved versioned migration; missing feature-present baseline blocks compatibility exit"
+              },
+              "gatePhases": {
+                "portableContract": {
+                  "status": "future-required",
+                  "execution": "not-run",
+                  "requiredEvidence": [
+                    "bank and independent second-domain admitted inputs or explicit capability diagnostics",
+                    "pure product and producer tests",
+                    "negative unsupported/missing capability tests before apply",
+                    "affected API/CLI/feature-present-and-absent compatibility matrix"
+                  ],
+                  "supportsIndependentClosure": true,
+                  "doesNotQualify": "positive exact-bank generated behavior, bootstrap/authority/runtime/recovery"
+                },
+                "generatedDomainBehavior": {
+                  "status": "future-capability-gated",
+                  "execution": "not-run",
+                  "evidence": "generated integer/map inventory/travel compilation and replay plus exact bank generated-domain behavior only when declared dependencies are admitted",
+                  "bankPrerequisites": [
+                    "X03"
+                  ],
+                  "bankExecution": "not-run-blocked-until-prerequisites",
+                  "diagnosticsDoNotCountAsPositiveBankBehavior": true
+                },
+                "finalQualification": {
+                  "status": "future-required",
+                  "execution": "not-run",
+                  "rule": "portable completion receipt may mark generated-bank gates blocked; whole extension generated-bank qualification is not passed until all mandatory positive gates have real evidence",
+                  "runtimeCertification": false
+                }
+              }
+            },
+            {
+              "id": "X02-D",
+              "title": "Target alias lowering and two-domain generated behavior",
+              "owner": "metarch-truthsrc",
+              "ownerLayer": "public-target-plugin-and-domain-qualification-owners",
+              "status": "proposal",
+              "implementation": "not-started",
+              "publicExecutionAuthorized": false,
+              "authorizationGate": "separate named public owner authorization and its own owned checkout/EP before any public file write or generated target application",
+              "dependsOn": [
+                "X01-C",
+                "X02-A",
+                "X02-B",
+                "X02-C"
+              ],
+              "input": "Admitted X02 decision/dependency/fold products, pure X01 producers, pinned target types/codecs and bank/travel expected behavior cases.",
+              "output": "Actual generated target surface, compile and domain replay/negative evidence in public owned targets, with blocked finance/runtime capabilities explicit.",
+              "sourceReadSet": [
+                {
+                  "file": "metarch-truthsrc/generators/run-all.mjs",
+                  "lines": "169-187,641-749,893-946",
+                  "observation": "Structured guards are appended after original guards; heuristic parameter subset does not cover arbitrary guard cond; rule/event ports depend on subsets."
+                },
+                {
+                  "file": "metarch-truthsrc/generators/invariant-dsl/emit.mjs",
+                  "lines": "350-530,719-759,1109-1125,1362-1468",
+                  "observation": "Bindings/heuristic constructors, supplied guard order, target alias emission and top-level CLI writes are separate from a pure admitted decision producer."
+                },
+                {
+                  "file": "metarch-truthsrc/generators/aggregate-dsl/emit.mjs",
+                  "lines": "27-33,1133-1150",
+                  "observation": "Active CLI reader/writer; importing it is not a pure producer."
+                },
+                {
+                  "file": "metarch-truthsrc/generators/command-dsl/emit.mjs",
+                  "lines": "owner-reviewed-proposed-surface",
+                  "observation": "Existing adjacent API/CLI/helper/test selection surface allocated to this package; owner revalidates exact code before implementation."
+                },
+                {
+                  "file": "metarch-truthsrc/test/saga-generator.test.mjs",
+                  "lines": "owner-reviewed-proposed-surface",
+                  "observation": "Existing adjacent API/CLI/helper/test selection surface allocated to this package; owner revalidates exact code before implementation."
+                },
+                {
+                  "file": "metarch-truthsrc/test/saga-generator-safety.test.mjs",
+                  "lines": "owner-reviewed-proposed-surface",
+                  "observation": "Existing adjacent API/CLI/helper/test selection surface allocated to this package; owner revalidates exact code before implementation."
+                },
+                {
+                  "file": "metarch-truthsrc/test/saga-fab-runtime-binding-v3.test.mjs",
+                  "lines": "owner-reviewed-proposed-surface",
+                  "observation": "Existing adjacent API/CLI/helper/test selection surface allocated to this package; owner revalidates exact code before implementation."
+                },
+                {
+                  "file": "metarch-truthsrc/test/invocation-recovery-emission.test.mjs",
+                  "lines": "owner-reviewed-proposed-surface",
+                  "observation": "Existing adjacent API/CLI/helper/test selection surface allocated to this package; owner revalidates exact code before implementation."
+                },
+                {
+                  "file": "metarch-truthsrc/package.json",
+                  "lines": "owner-reviewed-proposed-surface",
+                  "observation": "Existing adjacent API/CLI/helper/test selection surface allocated to this package; owner revalidates exact code before implementation."
+                }
+              ],
+              "futureWriteSet": [
+                "metarch-truthsrc/generators/run-all.mjs",
+                "metarch-truthsrc/generators/invariant-dsl/emit.mjs",
+                "metarch-truthsrc/generators/aggregate-dsl/emit.mjs",
+                "metarch-truthsrc/generators/command-dsl/emit.mjs",
+                "metarch-truthsrc/test/saga-generator.test.mjs",
+                "metarch-truthsrc/test/saga-generator-safety.test.mjs",
+                "metarch-truthsrc/test/saga-fab-runtime-binding-v3.test.mjs",
+                "metarch-truthsrc/test/invocation-recovery-emission.test.mjs",
+                "metarch-truthsrc/package.json"
+              ],
+              "tasks": [
+                "Lower typed refs to actual p/state/event identifiers structurally without modifying canonical or applying bank regex.",
+                "Generate RuleParams/helpers/event constructors/folds from the same complete typed products.",
+                "Compile both fixtures and execute mixed guard/idempotent/conflict/pre-event fold behavior; source-string checks alone cannot pass.",
+                "Publish public compatibility/migration receipts; mark exact bank generation blocked until X03 and separate marker/host admission is supported.",
+                "Implement and register the allocated target-neutral product API/shape and explicitly consume it through X01; emitter patches alone do not fulfill the public product contract.",
+                "Own command-dsl helper lowering and typed stable host-computation injection port; compile a fixture implementation, keep actual bank host blocked and separately owned.",
+                "Implement listed two-domain fixture bodies and generated compile/replay test harness; own explicit public test selection and affected feature-present compatibility receipt."
+              ],
+              "bankFixture": {
+                "domain": "bank-wealth-cash",
+                "scenario": "original cash contract and complete canonical command/event/fold inputs plus explicitly merged supplemental bindings; no local spec normalizer",
+                "status": "proposed",
+                "sourceRefs": [
+                  {
+                    "kind": "artifact",
+                    "id": "contract.cash-purchase-v2"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseSettlement"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.CancelCashFundSubscription"
+                  },
+                  {
+                    "kind": "command",
+                    "id": "FundOrder.RequestFundPurchaseRefund"
+                  }
+                ],
+                "implemented": false,
+                "executed": false
+              },
+              "secondDomainFixture": {
+                "domain": "travel-booking",
+                "scenario": "Cancel a booking with customerId used only in authorization guard, bookingId in event, exact-body idempotency and stable host-provided cancellation receipt identity; admit/reject missing host computation without guessing defaults.",
+                "status": "proposed",
+                "implemented": false,
+                "executed": false
+              },
+              "positiveTests": [
+                {
+                  "id": "X02-D-P1",
+                  "assertion": "Generated terminal duplicate emits no event; body/resource conflict and phase tests follow authored order.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "generatedDomainBehavior"
+                },
+                {
+                  "id": "X02-D-P2",
+                  "assertion": "Both fixture guard-only parameters and stable host identities compile with exact declared types.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "generatedDomainBehavior"
+                },
+                {
+                  "id": "X02-D-P3",
+                  "assertion": "Real generated fold replay and helper/event constructor binding coverage agree in both domains.",
+                  "evidenceLevel": "future-public-contract",
+                  "execution": "not-run",
+                  "phase": "generatedDomainBehavior"
+                }
+              ],
+              "negativeTests": [
+                {
+                  "id": "X02-D-N1",
+                  "assertion": "Dangling param., incomplete helper signature, silent required default or inconsistent binding/fold code fails.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-D-N2",
+                  "assertion": "No second domain, only emitted string comparison, or missing host computation prevents qualification.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                },
+                {
+                  "id": "X02-D-N3",
+                  "assertion": "Money/marker/auth/host blockers cannot be bypassed by feature success or bank-local shim.",
+                  "evidenceLevel": "future-fail-closed",
+                  "execution": "not-run",
+                  "phase": "portableContract"
+                }
+              ],
+              "compatibility": [
+                {
+                  "id": "X02-D-COMP1",
+                  "assertion": "Public owner documents any intentional old-emission migration; source definitions remain untouched.",
+                  "evidenceLevel": "future-compatibility",
+                  "execution": "not-run"
+                },
+                {
+                  "id": "X02-D-COMP2",
+                  "assertion": "Portable admission and nonfinancial fixtures can complete before exact bank behavior; blocked gates are visible, not silently sampled.",
+                  "evidenceLevel": "future-compatibility",
+                  "execution": "not-run"
+                }
+              ],
+              "migration": "public owner versions admission and target contracts; feature-absent legacy bytes remain stable unless an explicitly approved migration receipt documents divergence",
+              "exitGates": [
+                "independent-owner-authorization",
+                "versioned-input-output-and-source-pointer-diagnostics",
+                "both-domain-positive-negative-evidence",
+                "feature-absent-legacy-golden-and-migration-gate",
+                "public-test-receipt-not-a-bank-design-test",
+                "affected-feature-present-and-absent-compatibility-baseline",
+                "explicit-product-api-producer-host-port-test-fixture-allocation",
+                "phase-qualified-portable-versus-blocked-generated-bank-evidence"
+              ],
+              "nonGoals": [
+                "no bank names or finance/authority policy in core",
+                "no bank-local generation/host/qualification shim",
+                "no new apply/ledger/anchor engine",
+                "no public implementation or executed fixture claim in this note"
+              ],
+              "additionalJointGates": [
+                "X01-D"
+              ],
+              "blockedBankBehaviorBy": [
+                "X03",
+                "X04",
+                "X07",
+                "X08"
+              ],
+              "qualifiesBankRuntime": false,
+              "proposedCreateSet": [
+                {
+                  "file": "metarch-truthsrc/test/public-domain-generated-behavior.test.mjs",
+                  "purpose": "Compile generated RuleParams/helper/event/fold code and execute both-domain behavior under declared capability phases.",
+                  "status": "proposed-not-created",
+                  "kind": "test"
+                },
+                {
+                  "file": "metarch-truthsrc/test/fixtures/public-travel-products.mjs",
+                  "purpose": "Travel customer guard-only/stable host cancellation identity fixture and exact expectations.",
+                  "status": "proposed-not-created",
+                  "kind": "fixture"
+                },
+                {
+                  "file": "metarch-truthsrc/generators/command-dsl/host-computation-port.mjs",
+                  "purpose": "Typed plugin injection-port contract/rendering; no concrete bank host implementation.",
+                  "status": "proposed-not-created",
+                  "kind": "plugin-port"
+                }
+              ],
+              "futureWritePolicy": "modify listed existing files or create listed proposed API/test/fixture locations only after named owner approval; final names may be relocated by an explicit documented package revision, never silently widened",
+              "publicApiContract": {
+                "proposedEntry": "target lowering consumes decision/dependencies/folds plus declared host computation port",
+                "implementationAllocation": [
+                  "metarch-truthsrc/generators/command-dsl/emit.mjs",
+                  "metarch-truthsrc/generators/command-dsl/host-computation-port.mjs",
+                  "metarch-truthsrc/generators/invariant-dsl/emit.mjs",
+                  "metarch-truthsrc/generators/aggregate-dsl/emit.mjs"
+                ],
+                "inputShape": "admitted typed product envelopes and target stable host-computation descriptor",
+                "outputShape": "compileable rules/helpers/event constructors/folds and typed injection-port contract; concrete bank implementation deferred",
+                "hostComputationPort": {
+                  "descriptorFields": [
+                    "id",
+                    "version",
+                    "outputType",
+                    "inputDependencies",
+                    "sourcePointer",
+                    "stableIdentityContract"
+                  ],
+                  "pluginOwnership": "command-dsl owns generated helper toParam/typed injection port; invariant-dsl consumes declared result",
+                  "bankOwnership": "concrete bank stable recipe/auth/durable association remains separately authorized host work",
+                  "fallback": "missing descriptor/implementation proof fails relevant capability gate; no command.<system-field> assumption or synthetic field"
+                }
+              },
+              "compatibilityBaseline": {
+                "status": "proposed-to-pin-at-public-implementation",
+                "execution": "not-run",
+                "affectedSurfaces": [
+                  "API/CLI snapshot and binding admission",
+                  "binding-present type/guard normalization",
+                  "command parameter/helper/event signature order",
+                  "aggregate/rule/value/proto output",
+                  "strict Saga/Fab/composition generated surfaces"
+                ],
+                "minimumExistingSuites": [
+                  "test/generate.test.mjs",
+                  "test/generate-cli.test.mjs",
+                  "test/generate-anchors.test.mjs",
+                  "test/run-all-anchors.test.mjs",
+                  "test/saga-generator.test.mjs",
+                  "test/saga-generator-safety.test.mjs",
+                  "test/saga-fab-runtime-binding-v3.test.mjs",
+                  "test/invocation-recovery-emission.test.mjs"
+                ],
+                "corpus": [
+                  "feature-absent active golden output",
+                  "existing binding-present Saga/money/Fab/composition fixtures and generated surface evidence"
+                ],
+                "migrationExceptions": "each intentional changed surface requires source/golden delta and owner-approved versioned migration; missing feature-present baseline blocks compatibility exit"
+              },
+              "gatePhases": {
+                "portableContract": {
+                  "status": "future-required",
+                  "execution": "not-run",
+                  "requiredEvidence": [
+                    "bank and independent second-domain admitted inputs or explicit capability diagnostics",
+                    "pure product and producer tests",
+                    "negative unsupported/missing capability tests before apply",
+                    "affected API/CLI/feature-present-and-absent compatibility matrix"
+                  ],
+                  "supportsIndependentClosure": true,
+                  "doesNotQualify": "positive exact-bank generated behavior, bootstrap/authority/runtime/recovery"
+                },
+                "generatedDomainBehavior": {
+                  "status": "future-capability-gated",
+                  "execution": "not-run",
+                  "evidence": "generated integer/map inventory/travel compilation and replay plus exact bank generated-domain behavior only when declared dependencies are admitted",
+                  "bankPrerequisites": [
+                    "X03",
+                    "X04",
+                    "X07",
+                    "X08"
+                  ],
+                  "bankExecution": "not-run-blocked-until-prerequisites",
+                  "diagnosticsDoNotCountAsPositiveBankBehavior": true
+                },
+                "finalQualification": {
+                  "status": "future-required",
+                  "execution": "not-run",
+                  "rule": "portable completion receipt may mark generated-bank gates blocked; whole extension generated-bank qualification is not passed until all mandatory positive gates have real evidence",
+                  "runtimeCertification": false
+                }
+              }
+            }
+          ],
+          "executionProtocol": [
+            "Public owner grants separate named write/EP/target scope and rechecks its latest checkout.",
+            "Pin read/write sets and source/product/producer revisions; do not copy or overwrite other agents dirty work.",
+            "Run package positive/negative and both-domain compatibility evidence; missing capability blocks, never silently defaults.",
+            "Return semantic/API/CLI/fixture/migration receipt to bank consumer; public success does not approve bank domain policies.",
+            "Deprecate direct-writing compatibility path only after parity and owner migration decision; keep bank paused qualifier untouched."
+          ],
+          "readiness": {
+            "packageSpecifications": "authored-design",
+            "publicImplementation": "not-started",
+            "publicTests": "not-run",
+            "applicationGeneration": "not-run",
+            "runtimeBindingVerified": false,
+            "runnable": false
+          },
+          "parallelSourceObservation": "Public generate/anchors/run-all/invocation files were already dirty before this bank increment; exact machine fingerprints/status belong only to the new verification receipt. Source citations must be revalidated by public owner.",
+          "retainedBoundaries": [
+            "X03-X10 remain original proposal-only specifications, not implicitly authorized",
+            "reuse existing applyEntries/preflight/merge/ledger/concerns/one-to-many anchors",
+            "no bank-local normalizer, generation runner, runtime host or qualifier shim"
+          ]
+        }
+      }
+    }
+  }

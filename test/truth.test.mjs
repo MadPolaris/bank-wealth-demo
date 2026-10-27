@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { ROOT, loadSnapshot, sourceGates, protectedFiles, roundtripLocal, declarationIndex, assertSnapshotStable } from '../tools/truth-source.mjs';
+import { ROOT, loadSnapshot, sourceGates, loadBindings, mergeBindings, protectedFiles, protectionReport, roundtripLocal, declarationIndex, assertSnapshotStable } from '../tools/truth-source.mjs';
 import { validateDeclarations, validateArtifacts, extractArtifacts } from '../tools/artifacts.mjs';
 
 const snapshot = loadSnapshot();
@@ -13,6 +13,10 @@ test('portable structure, strict Saga and strict Execution admit the current tru
   assert.deepEqual(result.structure.hard, []);
   assert.equal(result.saga.ok, true, JSON.stringify(result.saga.diagnostics));
   assert.equal(result.execution.ok, true, JSON.stringify(result.execution.diagnostics));
+  assert.equal(result.lowering.ok, true, JSON.stringify(result.lowering.diagnostics));
+  assert.equal(result.lowering.readiness, 'lowered-contract-only');
+  assert.equal(result.lowering.runnable, false);
+  assert.equal(result.lowering.runtimeBindingVerified, false);
 });
 test('owned declarations and proposal references close without invented fields', () => {
   assert.deepEqual(validateDeclarations(snapshot).errors, []);
@@ -20,7 +24,8 @@ test('owned declarations and proposal references close without invented fields',
 });
 test('protected contracts and historical examples remain byte-identical', () => {
   const baseline = JSON.parse(readFileSync(join(ROOT, 'docs/BASELINE.json'), 'utf8'));
-  assert.deepEqual(protectedFiles(), baseline.protectedFiles);
+  assert.deepEqual(protectedFiles(ROOT, baseline.protectedFiles), baseline.protectedFiles);
+  assert.equal(protectionReport().ok, true, JSON.stringify(protectionReport()));
 });
 test('original numerical capture positions survive address correction', () => {
   let originals = 0;
@@ -58,6 +63,12 @@ test('SIP duplicate handling precedes ACTIVE gate; TA confirmation is payment-ga
 });
 test('unconditional three-failure policy is not retained as an executable invocation', () => {
   assert.ok(!snapshot.atoms.some(({ doc }) => doc.kind === 'policy' && doc.name === 'AutoPauseSipOnThreeFailures'));
+});
+test('artifact inspection returns detached data without mutating the verified snapshot', () => {
+  const before = JSON.stringify(snapshot.atoms);
+  const artifacts = extractArtifacts(snapshot);
+  artifacts.find((artifact) => artifact.id === 'ux.cash-v2').body.states[0].evidence.eventRef = 'invented';
+  assert.equal(JSON.stringify(snapshot.atoms), before);
 });
 test('negative: nonexistent read-model event slot is rejected', () => {
   const broken = mutate();
@@ -158,4 +169,22 @@ test('negative: scenario summary labels cannot replace actual MockTA outcome con
 });
 test('stale truth/binding fingerprint cannot be reported as the current snapshot', () => {
   assert.throws(() => assertSnapshotStable({ ...snapshot, sourceFingerprint: 'stale' }), /Concurrent bank-wealth truth/);
+});
+test('supplemental bindings close uniquely without mutating historical authority', () => {
+  const saga = JSON.parse(readFileSync(join(ROOT, 'bindings.json'), 'utf8'));
+  const supplemental = JSON.parse(readFileSync(join(ROOT, 'wealth-bindings.json'), 'utf8'));
+  const before = structuredClone(saga);
+  const combined = loadBindings();
+  assert.deepEqual(saga, before);
+  assert.equal(combined.saga.sagas.length, 4);
+  assert.equal(combined.execution.pipelines.length, 4);
+  assert.equal(combined.runtime.sagas.length, 4);
+  assert.deepEqual(combined.execution.sagaBindings, combined.saga);
+  for (const entry of supplemental.sagas) assert.equal(combined.saga.sagas.filter((row) => row.sagaId === entry.sagaId).length, 1);
+});
+test('negative: duplicate supplemental identities, schema and runtime target drift fail closed', () => {
+  const base = { schemaVersion: 'v1', sagas: [{ sagaId: 'one' }] };
+  assert.throws(() => mergeBindings(base, { schemaVersion: 'v1', sagas: [{ sagaId: 'one' }] }, 'sagas', 'sagaId'), /Duplicate supplemental/);
+  assert.throws(() => mergeBindings(base, { schemaVersion: 'v2', sagas: [] }, 'sagas', 'sagaId'), /Incompatible supplemental/);
+  assert.throws(() => mergeBindings({ ...base, target: { runtime: 'x' } }, { ...base, target: { runtime: 'y' }, sagas: [] }, 'sagas', 'sagaId'), /target differs/);
 });

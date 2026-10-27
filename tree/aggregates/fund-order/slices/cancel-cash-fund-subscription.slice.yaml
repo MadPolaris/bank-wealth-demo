@@ -1,0 +1,115 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: CancelCashFundSubscription
+payload:
+  {
+    "name": "CancelCashFundSubscription",
+    "description": "Cash-only cancel-before-Prepare empty-release-and-fence or release of a known original reservation. Does not move cash; durable order fence prevents a late Prepare.",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-V2-ONLY",
+        "errCode": "62104",
+        "cond": "state.contractVersion == \"cash-purchase-v2\"",
+        "desc": "Only the isolated cash-v2 cancellation can release-and-fence without a prior Prepare."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-CANCEL-RESOURCE",
+        "errCode": "62183",
+        "cond": "param.resource == state.id",
+        "desc": "Cancellation must target the original order, not an arbitrary resource."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-CANCEL-ASSOCIATION",
+        "errCode": "62184",
+        "cond": "state.cashPaymentResults.keys.forall(_ == param.txid) && state.cashPaymentFinalResults.keys.forall(_ == param.txid) && state.reservedSubscriptions.keys.forall(_ == param.txid) && state.compensatedSubscriptions.keys.forall(_ == param.txid) && (!state.reservedSubscriptions.contains(param.txid) || state.reservedSubscriptions(param.txid) == state.amount) && (!state.compensatedSubscriptions.contains(param.txid) || state.compensatedSubscriptions(param.txid) == state.amount)",
+        "desc": "Bind the sole original cash txid and Money; first delivery needs authenticated persisted source/start association, not schema authentication."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-CANCEL-NO-COMMIT",
+        "errCode": "62185",
+        "cond": "state.committedSubscriptions.isEmpty && (state.cashPaymentFinalResults.isEmpty || state.cashPaymentFinalResults.get(param.txid).contains(\"compensated\"))",
+        "desc": "No post-commit cancellation; only identical persisted compensation may be re-acknowledged after its terminal result."
+      },
+      {
+        "ruleId": "IR-FO-CASH-CANCEL-ONCE",
+        "errCode": "62186",
+        "onFail": "succeed-empty",
+        "when": {
+          "form": "map-absent",
+          "map": "compensatedSubscriptions",
+          "key": "param.txid"
+        },
+        "desc": "Same txid and original Money is already canceled/fenced; empty success only after resource and conflict checks."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-CANCEL-PHASE",
+        "errCode": "62187",
+        "cond": "state.cashPaymentFinalResults.isEmpty && (state.status == \"REQUESTED\" || state.status == \"SUBSCRIPTION_RESERVED\")",
+        "desc": "First cancellation must be pre-commit and unresolved; an absent reservation is deliberately allowed and fenced."
+      }
+    ],
+    "produces": [
+      "FundCashSubscriptionCanceled"
+    ],
+    "provenance": {
+      "source": "Approved second batch independent review repair",
+      "workshopHeld": false,
+      "contractVersion": "cash-purchase-v2"
+    }
+  }
+events:
+  {
+    "FundCashSubscriptionCanceled": {
+      "name": "FundCashSubscriptionCanceled",
+      "description": "Cash-only cancel-before-Prepare empty-release-and-fence or release of a known original reservation. Does not move cash; durable order fence prevents a late Prepare.",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "compensatedSubscriptions",
+          "op": "put",
+          "key": "event.txid",
+          "value": "state.amount"
+        },
+        {
+          "slot": "reservedSubscriptions",
+          "op": "remove",
+          "key": "event.txid"
+        },
+        {
+          "slot": "status",
+          "expr": "literal:CANCELED"
+        }
+      ]
+    }
+  }

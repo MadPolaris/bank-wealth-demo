@@ -1,11 +1,11 @@
 import { declarationIndex, sha256, STAGE_CODE, slug, NOTE_TYPES, ATOM_KINDS } from './truth-source.mjs';
 
 export const CATEGORIES = ['event-flow', 'actor-command-map', 'timer', 'aggregate-boundary', 'subdomain', 'context',
-  'context-map', 'traceability', 'mock-ta', 'decision', 'ux-strategy', 'ux-scope', 'ux-structure', 'ux-skeleton', 'ux-surface'];
+  'context-map', 'traceability', 'mock-ta', 'decision', 'ux-strategy', 'ux-scope', 'ux-structure', 'ux-skeleton', 'ux-surface', 'cash-purchase-contract', 'cash-experience', 'cash-flow'];
 
 export function extractArtifacts(snapshot) {
   return snapshot.atoms.filter(({ doc }) => doc.kind === 'note' && doc.payload?.info?.artifact)
-    .map(({ doc, file }) => ({ ...doc.payload.info.artifact,
+    .map(({ doc, file }) => ({ ...structuredClone(doc.payload.info.artifact),
       source: { file: `tree/${file}`, pointer: '/payload/info/artifact', stage: doc.origin.stage,
         board: doc.origin.board, seq: doc.origin.seq, note: `${doc.type}:${doc.name}` },
     })).sort((a, b) => a.id.localeCompare(b.id, 'en'));
@@ -145,7 +145,11 @@ export function validateArtifacts(snapshot, artifacts = extractArtifacts(snapsho
   }
   for (const id of entityIds) if (artifactIds.has(id)) fail(`Identity collision between entity and artifact ${id}`);
   const hasEntity = (id) => entityIds.has(id) || artifactIds.has(id);
-  const resolves = (kind, id) => kind === 'artifact' ? artifactIds.has(id) : kind === 'entity' ? hasEntity(id) : index.has(`${kind}:${id}`);
+  const resolves = (kind, id) => kind === 'artifact' ? artifactIds.has(id) : kind === 'entity' ? hasEntity(id)
+    : index.has(`${kind}:${id}`) || (kind === 'state-field' && typeof id === 'string' && (() => {
+      const dot = id.lastIndexOf('.');
+      return dot > 0 && index.get(`aggregate:${id.slice(0, dot)}`)?.identifier?.name === id.slice(dot + 1);
+    })());
   const typed = (id, kind) => entityRecords.get(id)?.kind === kind;
   const actionTargets = new Map();
   for (const artifact of artifacts) for (const screen of artifact.body?.screens || []) for (const action of screen.actions || []) {
@@ -163,6 +167,7 @@ export function validateArtifacts(snapshot, artifacts = extractArtifacts(snapsho
       if (!typed(journey.id, 'journey')) fail(`${artifact.id}: journey record has wrong identity type ${journey.id}`);
       for (const step of journey.steps || []) {
         if (!typed(step.id, 'stage')) fail(`${artifact.id}: journey step has wrong identity type ${step.id}`);
+        if (!index.has(`role:${step.actor}`)) fail(`${artifact.id}: journey actor must resolve to declared role ${step.actor}`);
         const kind = entityRecords.get(step.action)?.kind;
         if (!['action', 'timer'].includes(kind)) fail(`${artifact.id}: journey action does not resolve to action/timer ${step.action}`);
         if (actionTargets.has(step.action) && step.screenId !== actionTargets.get(step.action)) fail(`${artifact.id}: journey action ${step.action} targets ${actionTargets.get(step.action)}, not ${step.screenId}`);
@@ -178,22 +183,24 @@ export function validateArtifacts(snapshot, artifacts = extractArtifacts(snapsho
         if (!Array.isArray(object.edges)) fail(`${artifact.id}${path}: edges must be an array`);
         else for (const edge of object.edges) if (typeof edge.from !== 'string' || !edge.from || typeof edge.to !== 'string' || !edge.to) fail(`${artifact.id}${path}: malformed explicit edge endpoints`);
       }
-      const refKinds = { commandRef: 'command', existingCommandRef: 'command', eventRef: 'event', eventFieldRef: 'event-field', storyRef: 'story',
+      const refKinds = { commandRef: 'command', existingCommandRef: 'command', aggregateRef: 'aggregate', sourceEvent: 'event', sourceEventRef: 'event', sourceEventFieldRef: 'event-field', stateFieldRef: 'state-field', eventRef: 'event', eventFieldRef: 'event-field', storyRef: 'story',
         roleRef: 'role', externalSystemRef: 'external-system',
         screenId: 'entity', targetScreenId: 'entity', activityId: 'entity', releaseId: 'entity', taskId: 'entity', stageId: 'entity', stateId: 'entity', messageId: 'entity' };
       for (const [key, kind] of Object.entries(refKinds)) if (object[key] && !resolves(kind, object[key])) fail(`${artifact.id}${path}: unresolved ${key} ${object[key]}`);
       for (const [key, kind] of [['screenId', 'screen'], ['targetScreenId', 'screen'], ['activityId', 'activity'], ['releaseId', 'release'], ['stateId', 'state'], ['messageId', 'message']]) {
         if (object[key] && !typed(object[key], kind)) fail(`${artifact.id}${path}: ${key} must resolve to ${kind}`);
       }
-      for (const [key, kind] of [['readModelRefs', 'read-model'], ['messageIds', 'entity'], ['feedbackStateIds', 'entity'], ['stateFieldRefs', 'state-field'], ['backbone', 'entity']]) {
+      for (const [key, kind] of [['readModelRefs', 'read-model'], ['alternativeEventRefs', 'event'], ['messageIds', 'entity'], ['actionIds', 'entity'], ['feedbackStateIds', 'entity'], ['stateFieldRefs', 'state-field'], ['backbone', 'entity']]) {
         for (const id of object[key] || []) if (!resolves(kind, id)) fail(`${artifact.id}${path}: unresolved ${key} ${id}`);
       }
+      for (const id of object.actionIds || []) if (!typed(id, 'action')) fail(`${artifact.id}${path}: actionIds needs action ${id}`);
       for (const id of object.messageIds || []) if (!typed(id, 'message')) fail(`${artifact.id}${path}: messageIds needs message ${id}`);
       for (const id of [...(object.feedbackStateIds || []), ...(Array.isArray(object.states) ? object.states.filter((id) => typeof id === 'string') : [])]) if (!typed(id, 'state')) fail(`${artifact.id}${path}: state list needs state ${id}`);
       if (object.commandRef && object.parameters !== undefined) {
         const command = index.get(`command:${object.commandRef}`);
+        const wireMap = artifact.category === 'cash-purchase-contract' && /^\/sourceRuntimeBoundaries\/taTypedSlotBridge\/receiptMapping\/\d+$/.test(path);
         const array = Array.isArray(object.parameters);
-        const parameters = array ? object.parameters : object.parameters && typeof object.parameters === 'object'
+        const parameters = array ? (wireMap ? object.parameters.map((row) => ({ ...row, name: row.commandParameter })) : object.parameters) : object.parameters && typeof object.parameters === 'object'
           ? Object.keys(object.parameters).map((name) => ({ name })) : null;
         if (!parameters) fail(`${artifact.id}${path}: parameters must be an array or descriptive object`);
         const names = new Set();
@@ -201,11 +208,12 @@ export function validateArtifacts(snapshot, artifacts = extractArtifacts(snapsho
           if (names.has(parameter.name)) fail(`${artifact.id}${path}: duplicate parameter ${parameter.name}`);
           names.add(parameter.name);
           if (!command?.parameters?.some((slot) => slot.name === parameter.name)) fail(`${artifact.id}${path}: form binding uses unknown parameter ${parameter.name}`);
-          if (array && !['user', 'trusted-context', 'host-generated', 'propagated'].includes(parameter.source)) fail(`${artifact.id}${path}: missing explicit input authority for ${parameter.name}`);
+          if (array && !wireMap && !['user', 'trusted-context', 'host-generated', 'propagated'].includes(parameter.source)) fail(`${artifact.id}${path}: missing explicit input authority for ${parameter.name}`);
         }
         for (const slot of command?.parameters || []) if (!slot.optional && !names.has(slot.name)) fail(`${artifact.id}${path}: mapping omits required parameter ${slot.name}`);
       }
-      if (object.commandParameter !== undefined) {
+      const bridgeSlot = artifact.category === 'cash-purchase-contract' && /^\/sourceRuntimeBoundaries\/(?:taTypedSlotBridge\/receiptMapping\/\d+\/parameters|refundResultReconciliation\/identityMapping)\/\d+$/.test(path);
+      if (object.commandParameter !== undefined && !bridgeSlot) {
         const command = index.get(`command:${object.commandRef}`);
         const event = index.get(`event:${object.eventRef}`);
         const parameter = command?.parameters?.find((slot) => slot.name === object.commandParameter);
@@ -213,7 +221,8 @@ export function validateArtifacts(snapshot, artifacts = extractArtifacts(snapsho
         if (!parameter) fail(`${artifact.id}${path}: trace command parameter does not exist ${object.commandParameter}`);
         if (!object.eventFieldRef?.startsWith(`${object.eventRef}.`)) fail(`${artifact.id}${path}: trace event field has wrong owner`);
         if (command && event && !(command.produces || []).map(eventName).includes(event.name)) fail(`${artifact.id}${path}: trace command does not produce referenced event`);
-        if (object.binding && !event?.bindings?.some((binding) => JSON.stringify(binding) === JSON.stringify(object.binding))) fail(`${artifact.id}${path}: copied binding differs from declared event binding`);
+        const completionPin = artifact.category === 'cash-purchase-contract' && /^\/paymentResultBridge\/mapping\/\d+$/.test(path);
+        if (object.binding && !completionPin && !event?.bindings?.some((binding) => JSON.stringify(binding) === JSON.stringify(object.binding))) fail(`${artifact.id}${path}: copied binding differs from declared event binding`);
         if (object.sourceIndicators?.commandParameterOrigin !== parameter?.origin || object.sourceIndicators?.eventFieldOrigin !== slot?.origin) fail(`${artifact.id}${path}: copied origin evidence differs from declaration`);
         for (const fold of object.foldAssignments || []) if (!event?.foldAssignments?.some((entry) => JSON.stringify(entry) === JSON.stringify(fold))) fail(`${artifact.id}${path}: copied fold differs from declaration`);
       }
@@ -235,7 +244,41 @@ export function validateArtifacts(snapshot, artifacts = extractArtifacts(snapsho
     for (const scenario of ['accepted', 'confirmed', 'rejected', 'delayed', 'unknown', 'duplicate-identical', 'duplicate-conflicting']) {
       if (!outcomes.has(scenario)) fail(`${mock.id}: missing simulated outcome ${scenario}`);
     }
-    notices.push('MockTA scenarios are design contracts; no simulated service or settlement/refund execution was run.');
+    notices.push('Legacy MockTA scenario registry is a first-batch proposal; cash-v2 simulator configuration is in contract.cash-purchase-v2. This declaration check executes no service or settlement/refund.');
+  }
+  const cash = artifacts.find((artifact) => artifact.category === 'cash-experience');
+  if (cash) {
+    if (cash.body?.contractVersion !== 'cash-purchase-v2') fail(`${cash.id}: cash experience needs explicit contract version`);
+    const actions = (cash.body?.screens || []).flatMap((screen) => screen.actions || []);
+    const requests = actions.filter((action) => action.commandRef === 'FundOrder.RequestFundPurchaseSettlement');
+    if (requests.length !== 1) fail(`${cash.id}: cash experience must expose one settlement request action`);
+    for (const action of actions) {
+      if (['FundOrder.RequestFundPurchase', 'FundOrder.RecordTAShareConfirmation', 'FundOrder.RequestFundPurchaseRefund'].includes(action.commandRef)) fail(`${cash.id}: legacy or direct refund action cannot be cash customer entry`);
+      if (action.availability?.runtimeEnabled !== false) fail(`${cash.id}: cash UI/bridge is not runtime enabled`);
+    }
+    for (const name of ['investorAccountId', 'fundCollectionAccountId']) {
+      if (requests[0]?.parameters?.find((parameter) => parameter.name === name)?.source !== 'trusted-context') fail(`${cash.id}: cash account authority must be trusted-context for ${name}`);
+    }
+    for (const name of ['operationId', 'fundOrderId']) {
+      if (requests[0]?.parameters?.find((parameter) => parameter.name === name)?.source !== 'host-generated') fail(`${cash.id}: cash identity must be host-generated for ${name}`);
+    }
+    const feedbackEvents = new Set((cash.body?.states || []).map((state) => state.evidence?.eventRef));
+    for (const event of ['FundPurchaseSettlementRequested', 'FundSubscriptionPaymentConfirmed', 'FundCashPaymentSucceeded', 'FundCashPaymentRejectedBeforeEffects', 'FundCashPaymentCompensated', 'FundCashPaymentRecoveryRequired', 'FundCashPaymentOutcomeUnknown', 'FundTASubmissionRegistered', 'FundTAAccepted', 'FundTASharesConfirmed', 'FundTARejected', 'FundTAOutcomeUnknownObserved', 'FundPurchaseRefundRequested', 'FundRefundCompleted', 'FundPurchaseRefundRejected', 'FundPurchaseRefundCompensated', 'FundPurchaseRefundRecoveryRequired', 'FundPurchaseRefundOutcomeUnknownObserved']) {
+      if (!feedbackEvents.has(`FundOrder.${event}`)) fail(`${cash.id}: cash feedback missing explicit event ${event}`);
+    }
+    for (const state of cash.body?.states || []) if (state.evidence?.contractVersion !== 'cash-purchase-v2' || !state.evidence?.authority || !state.evidence?.freshness) fail(`${cash.id}: cash feedback needs version, authority and freshness`);
+  }
+  const cashFlow = artifacts.find((artifact) => artifact.category === 'cash-flow');
+  if (cashFlow) {
+    const required = new Map([
+      ['cash-flow.request', 'FundOrder.FundPurchaseSettlementRequested'],
+      ['cash-flow.unknown', 'FundOrder.FundTAOutcomeUnknownObserved'],
+      ['cash-flow.rejected', 'FundOrder.FundTARejected'],
+      ['cash-flow.refund-request', 'FundOrder.FundPurchaseRefundRequested'],
+      ['cash-flow.refunded', 'FundOrder.FundRefundCompleted'],
+    ]);
+    for (const [id, event] of required) if (cashFlow.body?.entities?.find((node) => node.id === id)?.eventRef !== event) fail(`${cashFlow.id}: cash graph fact ${id} needs ${event}`);
+    for (const edge of cashFlow.body?.edges || []) if (['cash-flow.unknown', 'cash-flow.payment-unknown', 'cash-flow.payment-recovery', 'cash-flow.confirmed'].includes(edge.from) && ['cash-flow.refund-gate', 'cash-flow.refund-request', 'cash-flow.refunded'].includes(edge.to)) fail(`${cashFlow.id}: unknown, unresolved payment or confirmed TA cannot authorize refund`);
   }
   notices.push('Context/UX references are validated locally; the portable context target index and UI generation are not extended.');
   return { errors, notices, artifacts: artifacts.length, entities: entityIds.size };
@@ -287,15 +330,28 @@ export function renderProjections(snapshot) {
   const byCategory = (...categories) => model.artifacts.filter((artifact) => categories.includes(artifact.category));
   const output = new Map([['index.json', `${JSON.stringify(model, null, 2)}\n`]]);
   output.set('context-map.md', diagram(byCategory('context-map', 'context'), '候选上下文地图'));
-  output.set('event-flow.md', diagram(byCategory('event-flow'), '事件风暴业务叙事与缺口'));
-  let journeys = diagram(byCategory('ux-structure'), '用户旅程与信息架构');
-  for (const artifact of byCategory('ux-structure')) for (const journey of artifact.body?.journeys || []) {
+  output.set('event-flow.md', diagram(byCategory('event-flow'), '原导入事件风暴业务叙事与缺口'));
+  const cashFlow = byCategory('cash-flow');
+  let cashLifecycle = diagram(cashFlow, 'cash-v2：现金付款、TA观测与独立退款');
+  cashLifecycle += '\n## 显式事实与桥接义务\n\n| 节点 | 来源/命令 | 含义或义务 |\n|---|---|---|\n';
+  for (const artifact of cashFlow) for (const node of artifact.body?.entities || []) cashLifecycle += `| ${md(node.label)} | ${md(node.eventRef || node.commandRef || '可信宿主门禁')} | ${md(node.obligation || node.kind)} |\n`;
+  output.set('cash-lifecycle.md', cashLifecycle);
+  let journeys = diagram(byCategory('ux-structure', 'cash-experience'), '用户旅程与信息架构');
+  for (const artifact of byCategory('ux-structure', 'cash-experience')) for (const journey of artifact.body?.journeys || []) {
     journeys += `\n## ${md(journey.label)} — ${md(journey.storyRef)}\n\n| 阶段 | 参与者 | 动作 | 触点 | 信息需求 | 实现状态 |\n|---|---|---|---|---|---|\n`;
     for (const step of journey.steps || []) journeys += `| ${md(step.label)} | ${md(step.actor)} | ${md(step.action)} | ${md(step.screenId || '系统触点')} | ${md((step.informationNeeds || []).join('；'))} | ${md(step.implementation)} |\n`;
   }
   output.set('journeys.md', journeys);
-  output.set('screen-flow.md', diagram(byCategory('ux-structure', 'ux-skeleton'), '界面与导航设计提议'));
-  const scope = byCategory('ux-scope');
+  output.set('screen-flow.md', diagram(byCategory('ux-structure', 'ux-skeleton', 'cash-experience'), '界面与导航设计提议：legacy与cash-v2隔离'));
+  let cashExperience = diagram(byCategory('cash-experience'), '现金申购体验与证据反馈');
+  for (const artifact of byCategory('cash-experience')) {
+    cashExperience += '\n## 反馈状态（历史观测须按关联和水位合并，不直接覆盖终态）\n\n| 状态 | 事件证据 | 文案 |\n|---|---|---|\n';
+    const messages = new Map((artifact.body?.messages || []).map((message) => [message.id, message.text]));
+    for (const state of artifact.body?.states || []) cashExperience += `| ${md(state.label)} | ${md(state.evidence?.eventRef)} | ${md((state.messageIds || []).map((id) => messages.get(id)).join('；'))} |\n`;
+    cashExperience += '\n## 反馈与无障碍约束\n\n' + [...(artifact.body?.feedbackRules || []), ...(artifact.body?.accessibility?.requirements || [])].map((rule) => `- ${md(rule)}`).join('\n') + '\n';
+  }
+  output.set('cash-experience.md', cashExperience);
+  const scope = byCategory('ux-scope', 'cash-experience');
   let storyMap = diagram(scope, '用户故事地图：活动、任务与发布切片');
   for (const artifact of scope) {
     storyMap += '\n## 显式故事映射\n\n| 活动 | 任务 | 故事 | 发布切片 |\n|---|---|---|---|\n';

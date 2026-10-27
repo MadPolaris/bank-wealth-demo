@@ -1,0 +1,1180 @@
+{
+  "schemaVersion": "bank-wealth.i0-verification/v1",
+  "planningDate": "2026-10-26",
+  "observedAt": "2026-10-25T22:29:20.066Z",
+  "timestampBasis": "raw host UTC clock; planning date is session-supplied and not a clock measurement",
+  "acceptanceStatus": "verified-I0-source-and-design-proposal-scope",
+  "acceptanceScope": "Three design proposal notes, coverage and ownership navigation, selected bank-specific design acceptance; no public capability or application implementation.",
+  "branch": "feature/bank-wealth-truth-preview",
+  "head": "dda2f24f4569bc4e6468b4339dcea9fdb983a63d",
+  "preEditEvidence": ".scratch/i0-evidence-VMl6Jf/pre-edit.json",
+  "historicalSecondBatch": {
+    "file": "docs/SECOND-BATCH-VERIFICATION.json",
+    "sha256": "adc8bf5d930c5059af24066fc87dcffdbd6527bb9b3db2b0f910948f5daee475",
+    "applicability": "historical second-batch snapshot only; not current acceptance"
+  },
+  "canonicalSha256": "645fe65c8e37f7777b8bab4e9ddf1438ec34cfc680169338d43490ef07969f55",
+  "sourceFingerprint": "ef752e94ca6213cbc7d80e3b29fb952b7620f5b41f95ca6910a56ee0364dfff1",
+  "tool": {
+    "head": "cb2d23342619af3f5d27e5df2361e88fe6d54fb3",
+    "sha256": "ec3e87ab91a9994100e00985c153580b436259c4653ba53cdedf336a82f6edcb",
+    "sources": [
+      {
+        "file": "lib/compile.mjs",
+        "sha256": "f07d66330cfed23b7c0394208c73f27850ee197f679b9d938c4f372136f2a939"
+      },
+      {
+        "file": "lib/decompose.mjs",
+        "sha256": "8761949205ada61b23a1474ec8268736c24d9838c477c8f0f3406f4524171a83"
+      },
+      {
+        "file": "lib/execution/compile.mjs",
+        "sha256": "1b3ce854694aab37211c58d5ab4635d882438f81766cd5340ffb910edc03eca6"
+      },
+      {
+        "file": "lib/saga/compile.mjs",
+        "sha256": "3ed660a3eaedfbbcb3e27f139170656154bc4700dee546fd5650c6a6ceb8f083"
+      },
+      {
+        "file": "lib/saga/runtime-binding.mjs",
+        "sha256": "99b7ab6ac4348a10bc425a3691503dd1363936db65b39c88cdaa9d9679f6a013"
+      },
+      {
+        "file": "lib/shared.mjs",
+        "sha256": "2dbe8089157cd43859e50daa8e1bbf918fbd4b17fa89d883df36f96af87b2539"
+      },
+      {
+        "file": "lib/validate.mjs",
+        "sha256": "b9d89bddc842bbc1a9d7580da2a5b05bd9cd744fda6b62203c91bf0a6e5c311b"
+      },
+      {
+        "file": "schema/execution-ir-v1.schema.json",
+        "sha256": "950a9c7b4b13e2eb158789d0bbcbadee268575f07e0e20ec4c612c096d08b5b9"
+      },
+      {
+        "file": "schema/saga-ir-v1.schema.json",
+        "sha256": "f94eeead3a956f4ce54b002d942e6b2a1f3fe49008cf738b15da10e0ad8ea46c"
+      }
+    ]
+  },
+  "verificationScript": {
+    "file": ".scratch/verify-i0.mjs",
+    "sha256": "728c2c8dd15b74ce238732c50611f86a283eb8c018cb1bdc5eb093005b7e843b"
+  },
+  "node": {
+    "version": "v22.23.4",
+    "executable": "/Users/zhongdj/.nvm/versions/node/v22.23.4/bin/node",
+    "sha256": "e55a748c81980fda1399e65b686708960d6bb9b7e8ea5913d85a97c6a19e7a7b"
+  },
+  "currentInputFiles": [
+    {
+      "file": ".DS_Store",
+      "sha256": "7999eaef3db546902511a16afa1f529261d1ff5608f5476d105bfc330bc952bb"
+    },
+    {
+      "file": ".gitignore",
+      "sha256": "f52f6d62b422ebffec15740d7e6b750567a81f0f5210dd616d29f25173cabc35"
+    },
+    {
+      "file": "bindings.json",
+      "sha256": "c5a3f342b2ef77714f287d17305067e2cd165e262dd697161b51b6264fa95853"
+    },
+    {
+      "file": "compiled/execution-ir.json",
+      "sha256": "e6762547b98eacb92b536714a0696c85a2bdd791d7a5189c4e64629f0b6dec1e"
+    },
+    {
+      "file": "compiled/saga-ir.json",
+      "sha256": "22a2ef1c3e6ad4783b89655d265effb75e5ae85edb7297fae00f8ee5b4a3b396"
+    },
+    {
+      "file": "docs/BASELINE.json",
+      "sha256": "fbdc7885cd68646e420ecb6f9ae4f584891562c26b7dfd94fc36d6ef39c4f681"
+    },
+    {
+      "file": "docs/CASH-FIRST-SLICE.md",
+      "sha256": "d539bc75bd87c261f5dfb058218b2206ee92cbb14299ce1837022a4b4836068d"
+    },
+    {
+      "file": "docs/HANDOFF.md",
+      "sha256": "724c0300eb23312afd373acd199c8e4a33d9225f511e3703cf0edd33037ea94a"
+    },
+    {
+      "file": "docs/I0-BASELINE.md",
+      "sha256": "acca00974e5ad75ecbecc85a65bcb0339e98774ec9eb2bfd3dfdcc113ae7a6ae"
+    },
+    {
+      "file": "docs/IMPLEMENTATION-STATUS.md",
+      "sha256": "81c1e0d1618fdbc7407c94a4e5ae133efc8c11ccdc70305ba2942a5c92e52de1"
+    },
+    {
+      "file": "docs/PUBLIC-EXTENSIONS.md",
+      "sha256": "323f48ead2bef9876fa72121fd12c71b30a6bd9d8deb1c96fb4a406325326166"
+    },
+    {
+      "file": "docs/SECOND-BATCH-CHECKPOINT.md",
+      "sha256": "43bbe00357ce49e43af18f4cf9bb5a353366faefa96aca521808405c9ffc6ed5"
+    },
+    {
+      "file": "docs/SECOND-BATCH-INCREMENT.json",
+      "sha256": "c1fc9eb4cbbaec1f5759819a4e0f5df48670e295b5e323533dcc5724745df421"
+    },
+    {
+      "file": "docs/SECOND-BATCH-VERIFICATION.json",
+      "sha256": "adc8bf5d930c5059af24066fc87dcffdbd6527bb9b3db2b0f910948f5daee475"
+    },
+    {
+      "file": "docs/VERIFICATION.json",
+      "sha256": "e4228c2bf3c85327a1364f289f8462e2be92a3151bab10d7a8bf375d256bf8fc"
+    },
+    {
+      "file": "execution-bindings.json",
+      "sha256": "f092d665bde69aaa666fbbae1db7c61da7f449dde690fbadbb92eef48d4de044"
+    },
+    {
+      "file": "isolation-zone/BACK_ANCHORING_WALKTHROUGH.md",
+      "sha256": "312c83f0cd95e1cb7dc2b93977c792b7e35934539acb5771c6880fdd9fa38e25"
+    },
+    {
+      "file": "isolation-zone/generated-scaffold/FundOrderGeneratedContract.scala",
+      "sha256": "6be4d460fcf28ba61e5d4586b1394d90f87df5aabaac6c0532a089eb6d47320e"
+    },
+    {
+      "file": "isolation-zone/handwritten-adapter/FundOrderIsolationAdapter.scala",
+      "sha256": "a545dce9d9304c8ecbc844e8f2d30046bbe9649d70a38e60d4b07dae5867821e"
+    },
+    {
+      "file": "package.json",
+      "sha256": "0b1f6d0ee67aaa8026c0915cdd669dfa734c2963fa82a7f48d6d7f793079d3bc"
+    },
+    {
+      "file": "projections/cash-experience.md",
+      "sha256": "c4f606a4587a70a2a6ed9eb32ce6dfef7e02b15430a42f7e4d27b9dc6645519d"
+    },
+    {
+      "file": "projections/cash-lifecycle.md",
+      "sha256": "bc4e1ef828fad2d190e8c0ba03ba035270b87667d4660587ad32a1a52ccd4e3d"
+    },
+    {
+      "file": "projections/context-map.md",
+      "sha256": "c7b66f57e3e6b8e83b5b8a22b153c10cb9cb3dc88238da62ec8e7d2bddb793cf"
+    },
+    {
+      "file": "projections/event-flow.md",
+      "sha256": "18fbb082325d0deae319b6f6cbcb109af629911a3ca86c07f3040818eefd4537"
+    },
+    {
+      "file": "projections/index.json",
+      "sha256": "0249a0b8a2f97301b32939584966a66117f19218c26ba7b81fb691f174565f5e"
+    },
+    {
+      "file": "projections/journeys.md",
+      "sha256": "8a16fa2df267e049b971e22bf24acc8d68b37a8ec87ccdbba7208627c37ececc"
+    },
+    {
+      "file": "projections/README.md",
+      "sha256": "5ed34ef6f41beddf520b8250b02c84efef29e70605c46e9480debc9288124dbe"
+    },
+    {
+      "file": "projections/screen-flow.md",
+      "sha256": "0325af99fb9fb37a3a7065feb44bc1d07deea417a74317318eb1aaab3b4b098a"
+    },
+    {
+      "file": "projections/story-map.md",
+      "sha256": "b987b8918545c54fe759ee4d72330e4d69f9fadecbd03952f4f7b2207c8b991a"
+    },
+    {
+      "file": "qualification/fund-order-cash/build.sbt",
+      "sha256": "2c426244afafad5b5b5c77b1b726fcfe758c42b5f03cf1de9ec828fd6cfb18ea"
+    },
+    {
+      "file": "qualification/fund-order-cash/handwritten/main/fixture/wealth/qualification/ExactDomainJacksonModule.scala",
+      "sha256": "3c0dc37952d0c27e1db733bf4f190e65b24206a88f616fc9ac73380c51f10c3d"
+    },
+    {
+      "file": "qualification/fund-order-cash/handwritten/main/fixture/wealth/qualification/ExactMoneyCodec.scala",
+      "sha256": "61b5bf1e80001029f2440a375e67cf6888526d002ae4bc243b414b6f388742cf"
+    },
+    {
+      "file": "qualification/fund-order-cash/handwritten/main/fixture/wealth/qualification/FundOrderActor.scala",
+      "sha256": "3735d35318a7863209e20fa376f2437598271efe26a17b8ac107ffe4aec3ac23"
+    },
+    {
+      "file": "qualification/fund-order-cash/handwritten/resources/application.conf",
+      "sha256": "3319b4be505a1cf5f10793983dd541511164c37deb86d2524d4710c4cf10b276"
+    },
+    {
+      "file": "qualification/fund-order-cash/project/build.properties",
+      "sha256": "ef0027fa322ca439f465803fdfa777a1216a4ed32e8fcaea3e7b038b4510e632"
+    },
+    {
+      "file": "qualification/fund-order-cash/src/test/scala/fixture/wealth/qualification/ExactMoneyCodecSpec.scala",
+      "sha256": "d813ded14485e60b5fe9a9c76c88ef8aef0b617e193b45e63e311f90790c75a2"
+    },
+    {
+      "file": "qualification/fund-order-cash/src/test/scala/fixture/wealth/qualification/GeneratedPersistenceSpec.scala",
+      "sha256": "cf0aeff5be72be90c984c94b733a37ad4eb7f9952635d4577ef48da10659f7cd"
+    },
+    {
+      "file": "qualification/fund-order-cash/src/test/scala/fixture/wealth/qualification/GeneratedRulesSpec.scala",
+      "sha256": "1e253f3a961f6b23107039192fd0e788c9893953ef1e14adc7170200367ba4a9"
+    },
+    {
+      "file": "qualification/fund-order-cash/src/test/scala/fixture/wealth/qualification/GeneratedSerializationSpec.scala",
+      "sha256": "21836c69a5d94ee4d1e631883ce57b8a22949e381f51d53d306451149ff9fb0c"
+    },
+    {
+      "file": "qualification/fund-order-cash/src/test/scala/fixture/wealth/qualification/QualificationTestSupport.scala",
+      "sha256": "88bd8c2cd90e227d2e773f7da2155a18f07cc2e6ea4f25c95c6ecf3bb82ef4d8"
+    },
+    {
+      "file": "README.md",
+      "sha256": "34f5c0545eb2550ac97fd88557522a6c5e1025fc03b9d40d3527172950b8dc8d"
+    },
+    {
+      "file": "runtime-binding.json",
+      "sha256": "9ad06930de5a8eb1af16188844b39d2f18e84dd32512f8a4853c0f8dc39e7a07"
+    },
+    {
+      "file": "simulator/contract.mjs",
+      "sha256": "19d6fa131f05ca23ea01e916c6149f26cc3d78124f0bd555c094d9d4eeee456f"
+    },
+    {
+      "file": "simulator/journal.mjs",
+      "sha256": "4401bda39344b46451f114978dd7dc2109ef6c86d2d294435784b21134817581"
+    },
+    {
+      "file": "simulator/mock-ta.mjs",
+      "sha256": "e390a7dcff5054c468f92d942f0953fc418fd8760aada5bb4793c03a8e7ba0cd"
+    },
+    {
+      "file": "test/cash-contract.test.mjs",
+      "sha256": "de13097658b6fb1ab01ca905c0af224017e5258e3d8d5fec83b906da9b05140f"
+    },
+    {
+      "file": "test/domain-runner.test.mjs",
+      "sha256": "28f194f2a92e1858a3bf94a1badff079e21fcbc9aa55ff71b851517bce63f3c2"
+    },
+    {
+      "file": "test/i0-design.test.mjs",
+      "sha256": "84791adffde052eeace6f1b594976b3e709eca1dc66cbbef2152662bffe6132d"
+    },
+    {
+      "file": "test/mock-ta.test.mjs",
+      "sha256": "c5f1facea2c739748d4916cfdba0e489e2c20b32d3e0879966427f6544bfe912"
+    },
+    {
+      "file": "test/projections.test.mjs",
+      "sha256": "387856a52bcd2980e05a4650a7e448195770acd4b58047f7ab6c7fa0a47c1c8e"
+    },
+    {
+      "file": "test/truth.test.mjs",
+      "sha256": "d559896187b3ed0b4ebc95f110f8cb571cdee0fb6732e563708425c2da0d384f"
+    },
+    {
+      "file": "tools/artifacts.mjs",
+      "sha256": "2f3e2fd33524745314a213c990f9269d263d63a92c383c7a1cc07bf3a8e46b94"
+    },
+    {
+      "file": "tools/cash-contract.mjs",
+      "sha256": "4cb72bb54138e4d5793ccd6439a443c05983fa746fbc4aae5526b88e6fbe4566"
+    },
+    {
+      "file": "tools/mock-ta.mjs",
+      "sha256": "ac1c404d09d0c979bff59ebe673f2d94193a022c919ec8a3f3321d8c5d4feb6a"
+    },
+    {
+      "file": "tools/project.mjs",
+      "sha256": "01564303fa16a54282011ebd39452dea1b56959135e32d7300fd0bc242f01795"
+    },
+    {
+      "file": "tools/qualify-domain.mjs",
+      "sha256": "4e01557c79ff030471d04e1b4854a69864d21af68181937e6f6d4d2367edb99e"
+    },
+    {
+      "file": "tools/truth-source.mjs",
+      "sha256": "b8f76e9166456a1c7578a57f574f220b19654522b026748cd801500b02742f39"
+    },
+    {
+      "file": "tools/validate.mjs",
+      "sha256": "7a6b8e930629aa809f3b752e4f4a6adaa71f2c28ae491e9f6ffb8ae7e4507ac6"
+    },
+    {
+      "file": "tree/.DS_Store",
+      "sha256": "99ec0d07ffe4dbc0238d074984748e73d99b8404e6eaf2e997aa18f08c93cfb5"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/aggregate.yaml",
+      "sha256": "db9088ba54a67c9aaa0f573154e7a3af3b3b347f1d46465ae94afeab90f86e61"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/notes/command-cs-start-external-top-up-0.yaml",
+      "sha256": "f317a65bbe43b15ebaf826e6e13501bfb0c87a20345bb24d2902394e621016f9"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/notes/event-es-commit-incoming-credits-confirmed-1.yaml",
+      "sha256": "5dab5d52f71a65b5c8c90659fac7e4b93a0c42fe610fa6fe45841bda17e86819"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/notes/event-es-deduct-funds-confirmed-2.yaml",
+      "sha256": "4946533924ead1140691df5bfee26f6d5aa39acbc1b23f73d2a3aeb42556813f"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/notes/event-es-external-top-up-requested-0.yaml",
+      "sha256": "8a901fb7b995083b8a29539384addd5971c15a37896c20ead3bf7344fdb735f6"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/cancel-incoming-credit.slice.yaml",
+      "sha256": "6ffe6fb362538c2c82058a3b4bb6fb9f265d0ecefc2661ee793e5bc0dfa70cf6"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/commit-incoming-credits.slice.yaml",
+      "sha256": "2271e91afb7693ab7c82a7a706e2e74d474550ab29a5d662d40d963076b68a60"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/deduct-funds.slice.yaml",
+      "sha256": "fe63cc4b59071e7f193b69abad4172c83f71379236379685c69e8d672c0aaed3"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/get-balance.slice.yaml",
+      "sha256": "486bca708d0599e26510ba4575c53a0a7018e4f547c527eaae62345ac75ebb68"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/record-incoming-credits.slice.yaml",
+      "sha256": "6418ca7be5273b06d64033a82b15a07c908424885432668dfbfc475cb8fc26ac"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/record-result-compensated.slice.yaml",
+      "sha256": "7326512859d5c0c8918722d52114c77d3a7a999e46638a35532b9bfad81472ac"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/record-result-outcome-unknown.slice.yaml",
+      "sha256": "a4da42c9a3d074c168a4d8883c427be278b007621b2f3710b5f8f54dbeac8b8e"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/record-result-recovery-required.slice.yaml",
+      "sha256": "9e940e8171e879257f657f53ba78fdab1264748527e08a7999eae8a4fb741a20"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/record-result-rejected-before-effects.slice.yaml",
+      "sha256": "1c938e7969be5666591bf14052cbfd2b8987ffdd9d124492e7c39fae07873837"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/record-result-succeeded.slice.yaml",
+      "sha256": "d0033504b3dfaac9b2cde51fbb20b5ac493ac0e5d99179e5802d91139a1e83c6"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/release-reserved-funds.slice.yaml",
+      "sha256": "f75c9b9c801b02e4160717c8d1db75d6994dda55ccacc8230c83e24fa55cc458"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/reserve-funds.slice.yaml",
+      "sha256": "891e3833e651a956ded17ffcf24bb939b10bcaebf70ab707a98c1cdb237243f1"
+    },
+    {
+      "file": "tree/aggregates/credit-balance/slices/start-external-top-up.slice.yaml",
+      "sha256": "68f6d8bf078b4bbe0cb486f318911ff77f6b1f27b71fef7c5a73fc37af48ffcd"
+    },
+    {
+      "file": "tree/aggregates/external-transfer-order/aggregate.yaml",
+      "sha256": "fad00e30d4b478e7a67ff94598b753bafa96f0be09aea61ac6a21457df296406"
+    },
+    {
+      "file": "tree/aggregates/external-transfer-order/notes/command-cs-prepare-external-debit-1.yaml",
+      "sha256": "c8309015ab0fa9dd63e3377acce2d2b4b936373300a2bf054fe2c93b43ba2a68"
+    },
+    {
+      "file": "tree/aggregates/external-transfer-order/notes/event-es-external-debit-committed-4.yaml",
+      "sha256": "6af5da234b944d9122ddd77839b3e9deaf5cbb5c4874fb35ee751cb97395d1a9"
+    },
+    {
+      "file": "tree/aggregates/external-transfer-order/notes/event-es-external-debit-prepared-3.yaml",
+      "sha256": "b1c6e7f78cf9f397aaf68c9167b408d8d61a1e6e8db4f74e2a7f24f3ddf29728"
+    },
+    {
+      "file": "tree/aggregates/external-transfer-order/slices/commit-external-debit.slice.yaml",
+      "sha256": "617f36d90117a44ac00e02398517b444ae02ed9d6c4244de8ed90503dcf00cbd"
+    },
+    {
+      "file": "tree/aggregates/external-transfer-order/slices/compensate-external-debit.slice.yaml",
+      "sha256": "04ac2aec07181f34c570e9c8842875271e68b55b6860c44e787ed99727b05f16"
+    },
+    {
+      "file": "tree/aggregates/external-transfer-order/slices/get-external-transfer-state.slice.yaml",
+      "sha256": "f8a3945855e6b2de6198518b26dd68b885f291fefd1eb219d36836ff789f45dc"
+    },
+    {
+      "file": "tree/aggregates/external-transfer-order/slices/prepare-external-debit.slice.yaml",
+      "sha256": "91470ad0b97d251c88db51112a013bf0329fd98a3d4be8bd9220262bec3f960d"
+    },
+    {
+      "file": "tree/aggregates/fund-order/aggregate.yaml",
+      "sha256": "80561a9c7ac837ff1fde13f5bb19812838c9c1121377e32a7491cf16fa96ff1d"
+    },
+    {
+      "file": "tree/aggregates/fund-order/notes/command-cs-record-ta-share-confirmation-3.yaml",
+      "sha256": "a081eaf221358c6e74f4e10c6c858dd2258dc10fb91db86cd3ba0c4a4e03552a"
+    },
+    {
+      "file": "tree/aggregates/fund-order/notes/command-cs-request-fund-purchase-2.yaml",
+      "sha256": "dde8c3c2d0ea99323a9c0d0303df87520377c8be47f6d7f1f906c22942929e3d"
+    },
+    {
+      "file": "tree/aggregates/fund-order/notes/event-es-fund-purchase-requested-5.yaml",
+      "sha256": "40bf3bc426ed7d99aaab003170b309d968cf528e9871b0c6a1d12183f9432348"
+    },
+    {
+      "file": "tree/aggregates/fund-order/notes/event-es-fund-shares-confirmed-7.yaml",
+      "sha256": "e3506f99f43762ee8c1a0b8be10d2f8ab479ea6d21fa1438c0e9154123b01f44"
+    },
+    {
+      "file": "tree/aggregates/fund-order/notes/event-es-fund-subscription-payment-confirmed-6.yaml",
+      "sha256": "663e8cc0acbd3819fd4b9316860d7e429ec62a10c6c4bfc9967fbfde0a9fbc05"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/cancel-cash-fund-subscription.slice.yaml",
+      "sha256": "7bb9eb822678d5bb9149521f8f5e3cee798356973eab49cff3133019f81b84cb"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/cancel-fund-subscription.slice.yaml",
+      "sha256": "09404c606deaba380f4d43c5d6d6d7f239ae7cc9db916726f74c8ebc2eb4dd92"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/confirm-fund-subscription-payment.slice.yaml",
+      "sha256": "e82aeb42186a7ed5affbdb2489a7140ebc31dbf9c740d68509d2d65100ef06dc"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/get-fund-order-state.slice.yaml",
+      "sha256": "7cff78c00e11c40dacb93d4d0b65b8d486bfd97af8a4db7a001c08d63a3a287a"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-cash-payment-compensated.slice.yaml",
+      "sha256": "dfd6b5aa91c6eb01ad607b5b70a568591b6ad39b7c7ddf3ed4436d6dac067ae2"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-cash-payment-outcome-unknown.slice.yaml",
+      "sha256": "ef1729084a3332479eaeb55159498c384ebaf3aecf48b5e272bbece807e92f28"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-cash-payment-recovery-required.slice.yaml",
+      "sha256": "205e1259b6f8a08d337321cc1934777033cd31a6372bb7077703ee25a88cd092"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-cash-payment-rejected-before-effects.slice.yaml",
+      "sha256": "8da3397745e98e552e8a8ba65b14570e46d28d68a8d02b5b9bebc0ef09a5b11a"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+      "sha256": "36f2161ec62aa77b34ff1fe31ad6ec328d958f0c9b14edcab160924b2e98e202"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-purchase-refund-compensated.slice.yaml",
+      "sha256": "666b9be8c4238a7e1cc0f250fd7e88ddeb8c8b08fcd0668810861a3bb9c24bd7"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-purchase-refund-outcome-unknown.slice.yaml",
+      "sha256": "61ec4b07bbd53a4d57bc4dc6862e8816fd576bac99bd38616d43f9cf74e6c7ed"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-purchase-refund-recovery-required.slice.yaml",
+      "sha256": "14c9bc58dcc2a50337debfd3103e7cceb2554c9384c9d9304bc756f352a022cf"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-purchase-refund-rejected.slice.yaml",
+      "sha256": "f2b43e1498e368f723948af040255421fe0ea8b5523b83b0d1fe2a579a1416a7"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-refund-completed.slice.yaml",
+      "sha256": "2a5804ed373c6a4750ea63290a36e96f08deab8871d81ba98bcabbe91bf530e6"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+      "sha256": "22aa7761f5d7b0071cbdd00e7091279e53aefb3d86e0c610f06bdf3296217959"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+      "sha256": "104c8e691d87ddfd302dc877ee75b669ce598233ab050f1da9ba4ddb15913939"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+      "sha256": "4622b426fd65dddd6cf1242d31285554bebc6b9285864f92071565a9047335c9"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+      "sha256": "6aa183d7247f22f2ab011beba3605d40a7c05138b715465569e9a6c29e84bab2"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-result-compensated.slice.yaml",
+      "sha256": "0cf64790d2320a9c542d10427d1caedce77867eeeade7d7991a7568aee00bdd7"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-result-outcome-unknown.slice.yaml",
+      "sha256": "52a05d69ec6f9a5cc235f76fb10655e977179dbf946681233c304811ecc1be2f"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-result-recovery-required.slice.yaml",
+      "sha256": "a9270383ed257b852a98e9e7a35802559583432da764da64f624393f5b961dfd"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-result-rejected-before-effects.slice.yaml",
+      "sha256": "ce9eade4daf5eac43d2c4ceaa1c7010693d22928617be7ddb6466a2ef09a4baf"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-result-succeeded.slice.yaml",
+      "sha256": "84b19145b71633f432aec39fd0b7363583e10af8fa641235bad20e0968b9cc94"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/record-ta-share-confirmation.slice.yaml",
+      "sha256": "c4c418e9434c8d7bb18bd4646291f37ffb3b8cf2d636f8c552dc8c5640f25787"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+      "sha256": "1438a1edae4ab987728b8dac51b0cb41fa2a7d77744ca87578c434c552e8eedd"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+      "sha256": "7dccc2c0076bbd3b105c98082304c5123aafbfab968f59d1abafcc212f679e26"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/request-fund-purchase-settlement.slice.yaml",
+      "sha256": "5f9a0e9268b047f862da188e42dafffc5b575321cfc3af74397c1e7e5f1902cf"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/request-fund-purchase.slice.yaml",
+      "sha256": "eba009468c81b7dab0f9bef095fda3cfdbf3de56d3bc3441ec0fdd4aa8fa558b"
+    },
+    {
+      "file": "tree/aggregates/fund-order/slices/reserve-fund-subscription.slice.yaml",
+      "sha256": "bea67f643ecedc1a8d0720ddbd4197d9429a2b72f1fd6663aef7b94309ab9a8d"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/aggregate.yaml",
+      "sha256": "017b12f1da7e37fa81057195297bd38840465cffb4b916c9f897921e0d18ff3a"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/notes/command-cs-create-sip-plan-4.yaml",
+      "sha256": "7176f859995fa0286cc4adfea1c30461faa66d56092dd1caefbe0653e4cab622"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/notes/command-cs-trigger-sip-installment-5.yaml",
+      "sha256": "83e09e16cabf4cdcfea290f9fa756334bfa76bb848b7ac077f33fcfac6c32993"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/notes/event-es-sip-installment-failed-10.yaml",
+      "sha256": "6af6c754d1ad2b5a7aed6cc83766550841ed729a85756adfb22dc48ea42f7214"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/notes/event-es-sip-installment-triggered-9.yaml",
+      "sha256": "18d02d6958a0f1eb3da846cc8911207f15f422b821248e5d97447a3bb0a70aa0"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/notes/event-es-sip-plan-created-8.yaml",
+      "sha256": "f1f65feb2cc2c72ed2cc58de0d13a55c81a08164f2b8fe9c1ba7fb8c92f1e639"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/slices/create-sip-plan.slice.yaml",
+      "sha256": "65f9bb2d8cc079bc80172590f2a578e0eb9bdedeb891ebd8b6253a56a5d24ed6"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/slices/pause-sip-plan.slice.yaml",
+      "sha256": "f73345c469307cabb9bc2b7b7976f761c808bcef911dec3bc03deb848b981f30"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+      "sha256": "9e61b9e9f3d1ef1bf612a4bc132e547f0aed172e0a81e7783f2c9d9b4476c628"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
+      "sha256": "1e210e0cbe59056ac4b190f3ff5fba1cfc1210606417447855b5fb1954934069"
+    },
+    {
+      "file": "tree/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+      "sha256": "d9db2399e2ad58c630abc885d39b20d7c2976816a7d2ada581a17290620c9317"
+    },
+    {
+      "file": "tree/inbox/.DS_Store",
+      "sha256": "2e1a49129543fdac203e3c80d3f3c96819c2a7feb6c2c01fd856382b2068eb6e"
+    },
+    {
+      "file": "tree/inbox/aggregateDiscovery/aggregate-ad-wealth-credit-balance-boundary-design-proposal-0.yaml",
+      "sha256": "4543f8b4289a98c926223815db540807da7e2fe956c2a6ea4bf184d6980563e6"
+    },
+    {
+      "file": "tree/inbox/aggregateDiscovery/aggregate-ad-wealth-external-transfer-order-boundary-design-proposal-1.yaml",
+      "sha256": "6b676e1979a427ca43fbcbe69970705b7bd018ecc64a37b76aff1372110f00fc"
+    },
+    {
+      "file": "tree/inbox/aggregateDiscovery/aggregate-ad-wealth-fund-order-boundary-design-proposal-2.yaml",
+      "sha256": "8c12a2eb4da30c3dd8b751978fe88e7b19f1dc87886cd75cd8bfc0fe927ac768"
+    },
+    {
+      "file": "tree/inbox/aggregateDiscovery/aggregate-ad-wealth-sip-plan-boundary-design-proposal-3.yaml",
+      "sha256": "fe4c2e60a91effd07c3f92958a965fa8404ac1c1287e2b29483a8dd55fb26b63"
+    },
+    {
+      "file": "tree/inbox/commandStorming/externalSystem-cs-fund-ta-registry-4.yaml",
+      "sha256": "c281d37b0e7f036aa6bb48652ddd82ed5126600e6f05d7ed0120173ca3981f2b"
+    },
+    {
+      "file": "tree/inbox/commandStorming/externalSystem-cs-interbank-clearing-gateway-3.yaml",
+      "sha256": "a326b7b3d386a4a89abdae3d5c35719ae43b077b3c2fbf89f9ab0a867fad178c"
+    },
+    {
+      "file": "tree/inbox/commandStorming/question-cs-auto-pause-sip-on-three-failures-10.yaml",
+      "sha256": "958101ade7c2ffac8b57978bc2a1dd4f5973e1464b588184272f16188fa5c871"
+    },
+    {
+      "file": "tree/inbox/commandStorming/relation-cs-wealth-actor-command-design-proposal-0.yaml",
+      "sha256": "1409d52ad163f30ae50bcedc92cf38d061a7628b0dad4dd4efaa11278cc4141c"
+    },
+    {
+      "file": "tree/inbox/commandStorming/role-cs-investor-0.yaml",
+      "sha256": "f533a38e5ec622a504a22fb0def76f901ddbb433c4c948a07802c29f152eae7f"
+    },
+    {
+      "file": "tree/inbox/commandStorming/role-cs-sip-scheduler-1.yaml",
+      "sha256": "8edc2f01e33d96e20d80f102aff49dda00a4d8e053d3e8dbb86b9b3e923d3944"
+    },
+    {
+      "file": "tree/inbox/commandStorming/role-cs-wealth-ops-officer-2.yaml",
+      "sha256": "072548936c0525d237729d5340574383021aba324c7e5bb433c3ea921c5fed1d"
+    },
+    {
+      "file": "tree/inbox/commandStorming/timer-cs-sip-business-clock-design-proposal-1.yaml",
+      "sha256": "fdeb66f42f177cefd9a307caac4f4dda1f77cbe5e0e0ad2003f52450dcd18d6d"
+    },
+    {
+      "file": "tree/inbox/contextMapping/context-cm-wealth-fund-context-design-proposal-2.yaml",
+      "sha256": "f69b15da0f1f5dc0e453d91f5982a03936f22e69850434236e3115af35ee756c"
+    },
+    {
+      "file": "tree/inbox/contextMapping/context-cm-wealth-ledger-context-design-proposal-0.yaml",
+      "sha256": "53a827e8b5410a2acf98d1bd283b11ba87f10508f08b58aa47a154334bab93b0"
+    },
+    {
+      "file": "tree/inbox/contextMapping/context-cm-wealth-payments-context-design-proposal-1.yaml",
+      "sha256": "8ccf9af38d90eafb97583b713879411ba09485dd3d0989bb6e6029e4c5d9a350"
+    },
+    {
+      "file": "tree/inbox/contextMapping/relation-cm-wealth-context-map-design-proposal-3.yaml",
+      "sha256": "716f70913b5d002caba3868c41fe1d6c7c9c4ed02bc1b1f96e91ce2723c903cc"
+    },
+    {
+      "file": "tree/inbox/eventStorming/question-es-how-is-an-interbank-clearing-timeout-reconciled--0.yaml",
+      "sha256": "b443d3675e632038f14e4cbc192545b3f8ef842dfa5bc28cc6c5e2ad766671a4"
+    },
+    {
+      "file": "tree/inbox/eventStorming/question-es-how-to-prevent-duplicate-sip-cron-triggers-for-the-same-cycle--3.yaml",
+      "sha256": "0938758e6573be9e690f6889b03877da33dcfa2df7943e139285912160170775"
+    },
+    {
+      "file": "tree/inbox/eventStorming/question-es-is-the-minimum-fund-subscription-amount-enforced-in-the-aggregate--4.yaml",
+      "sha256": "4b2d7cd5bc6f3b41bd30d061ba2466c91d00d002a852fde5ac1b66a8359188de"
+    },
+    {
+      "file": "tree/inbox/eventStorming/question-es-wealth-ux-strategy-design-proposal-1.yaml",
+      "sha256": "6e805c4f14cd10172ed7e7ca7c921d9bfe76df461388a4d9215c734b5378b26c"
+    },
+    {
+      "file": "tree/inbox/eventStorming/question-es-what-happens-when-a-sip-installment-encounters-insufficient-balance--2.yaml",
+      "sha256": "46b20cd39a1954a94507626072e41fbf1c17f28c15200e2cbe384b769f28d203"
+    },
+    {
+      "file": "tree/inbox/eventStorming/question-es-what-if-fund-ta-share-confirmation-is-asynchronous--t-1---1.yaml",
+      "sha256": "128bddad8546b217c1764d2f0146c30e85ac0be785c93cfb3c451f5c1763d525"
+    },
+    {
+      "file": "tree/inbox/eventStorming/relation-es-cash-purchase-v2-lifecycle-proposal-0.yaml",
+      "sha256": "5bc231afff567a99213aa520295638475666f1af55efe30f4da5b7ebd4f35553"
+    },
+    {
+      "file": "tree/inbox/eventStorming/relation-es-wealth-event-flow-design-proposal-0.yaml",
+      "sha256": "22730858a3afe0b60524d194bfd5d41c2d3ee82f10212578b67d0b1e7841f8db"
+    },
+    {
+      "file": "tree/inbox/refining/externalSystem-rf-wealth-mock-ta-registry-design-proposal-1.yaml",
+      "sha256": "5d3851b52cef81409e9a869980ea34365523b02425081e5782435f330521194e"
+    },
+    {
+      "file": "tree/inbox/refining/field-rf-wealth-ux-surface-design-proposal-6.yaml",
+      "sha256": "9a9a650b9ca07de9bcd3e558ed07f81319a16adcaf71fe538c0f7d9f946ba845"
+    },
+    {
+      "file": "tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml",
+      "sha256": "653c9bdcf41356d9c2fbb7e9edded43ff2794220a23abda4a5032fcde2607296"
+    },
+    {
+      "file": "tree/inbox/refining/question-rf-cash-purchase-v2-contract-0.yaml",
+      "sha256": "d2fe1a3f07225963f19a811b3aacbcddad841c7382263c600ab1c93d40ed6992"
+    },
+    {
+      "file": "tree/inbox/refining/question-rf-external-bank-capability-decision-proposal-2.yaml",
+      "sha256": "3d1069d284cd92388b7311c8425bf86c16e1d0cbe74e594bd27743a4b7c36350"
+    },
+    {
+      "file": "tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml",
+      "sha256": "52b9cbfea934889376349e21f0c9c8041c9632c81b5136fc6f96dddf0a1e5f44"
+    },
+    {
+      "file": "tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml",
+      "sha256": "775d9388be9c158bed58a4060dbda9b79c000142e830707e79a6bbd468eab92f"
+    },
+    {
+      "file": "tree/inbox/refining/question-rf-settlement-and-refund-decision-proposal-3.yaml",
+      "sha256": "d7193fe349561c2446987ecd1c1bd32accc48dab7b1fe41ddf648130a8a53733"
+    },
+    {
+      "file": "tree/inbox/refining/question-rf-sip-integrity-decision-proposal-4.yaml",
+      "sha256": "c8e75efcaed191776ceab7b287379a288ac6ca4c7e93e1fd6fb7d2ba212550a4"
+    },
+    {
+      "file": "tree/inbox/refining/readModel-rf-wealth-ux-skeleton-design-proposal-5.yaml",
+      "sha256": "294a46f604da8bfbfaed2a3f34620b52c7fd013ab05494b5d4e75ddaba195e47"
+    },
+    {
+      "file": "tree/inbox/refining/relation-rf-wealth-field-traceability-design-proposal-0.yaml",
+      "sha256": "c9b41b61a96c506bd0c56fe4cde16504457c875f87d9d49f751efdd24bc55b6c"
+    },
+    {
+      "file": "tree/inbox/storyMapping/relation-sm-cash-purchase-v2-experience-proposal-0.yaml",
+      "sha256": "32e356990259bfb12d71245fb151b09b706a0a823a92a0908a22d0ae1e1b6d1b"
+    },
+    {
+      "file": "tree/inbox/storyMapping/relation-sm-wealth-ux-structure-design-proposal-1.yaml",
+      "sha256": "3e30bff4bd75577cb9113cdafec18e77ef6cf13be81ffb3730b777e1a3410c73"
+    },
+    {
+      "file": "tree/inbox/storyMapping/story-sm-wealth-ux-scope-design-proposal-0.yaml",
+      "sha256": "399893c566c9c0edbe3f4a9ee9a6425ed912c37a3f9fe255bf2af6ae57e9c32b"
+    },
+    {
+      "file": "tree/inbox/subdomainExploration/subdomain-sd-wealth-fund-subdomain-design-proposal-2.yaml",
+      "sha256": "06ef8ae29af4edc5d78c2c5d4125925c24cf51150b4ca45c561325e0790a5827"
+    },
+    {
+      "file": "tree/inbox/subdomainExploration/subdomain-sd-wealth-ledger-subdomain-design-proposal-0.yaml",
+      "sha256": "c8f38aab8074863c55d7ae757b72795943ce53488173201c2895f9dcb1bd6049"
+    },
+    {
+      "file": "tree/inbox/subdomainExploration/subdomain-sd-wealth-payments-subdomain-design-proposal-1.yaml",
+      "sha256": "979a00ef23b651948f36ebba0909f9df08ee2aa49c14eb0291d9454e556b32d6"
+    },
+    {
+      "file": "tree/pipelines/fund-purchase-cash-payment.pipeline.yaml",
+      "sha256": "95e0e686846af6bb6bb43cd1b9846bb942f4c78d2d6261368e4968b396dea093"
+    },
+    {
+      "file": "tree/pipelines/fund-purchase-cash-refund.pipeline.yaml",
+      "sha256": "4a36c980ae43803ef96b21a30fe5b2720a60afca85ce1a28635c246523aba0c0"
+    },
+    {
+      "file": "tree/pipelines/fund-purchase-invoke.pipeline.yaml",
+      "sha256": "a0cfa2540b86c8a3e91244ed1b4d8b43b8f51b33ca224847a08fb89af7799810"
+    },
+    {
+      "file": "tree/pipelines/fund-ta-settlement.pipeline.yaml",
+      "sha256": "74b53c73bc8a27db0033f519dba18b29676fc3d6f18ab257118f6b7e4edf48f0"
+    },
+    {
+      "file": "tree/pipelines/sip-cross-bank-design-boundary.pipeline.yaml",
+      "sha256": "209bc8f47c20b0453734a84417fb2c5f28a3d4670707c4d8cc3a376eee0f1105"
+    },
+    {
+      "file": "tree/pipelines/sip-installment-execution.pipeline.yaml",
+      "sha256": "7b89bda9b3c63b7a6ee953985ca385c36e43d1a3e045445726742d961be78090"
+    },
+    {
+      "file": "tree/read-models/read-model-fund-cash-purchase-lifecycle.rm.yaml",
+      "sha256": "52c268abbdbd12d3789d0519ce5721215753a7c3c4f9960c6f80627b5528c6f8"
+    },
+    {
+      "file": "tree/read-models/read-model-investor-wealth-overview.rm.yaml",
+      "sha256": "f5a1ce8fb687c4d20504ae3c8ef0efc52db504f154bd6e94dea7e593ab5e84ca"
+    },
+    {
+      "file": "tree/read-models/read-model-sip-plan-execution-view.rm.yaml",
+      "sha256": "d19966f9427eb0d3c3dd54e89f14f28156c4137eeae5fddab8d332b425ff91c1"
+    },
+    {
+      "file": "tree/sagas/external-bank-transfer.saga.yaml",
+      "sha256": "b52872b8d43253dcd1b32b861530d6c6010a31b4b285b2976444783fa3e1f549"
+    },
+    {
+      "file": "tree/sagas/fund-purchase-payment-v2.saga.yaml",
+      "sha256": "a3544a20628cbb5835a19b1ab3f401ec8d2f8a4deb4d1149b367aaa7bd92380a"
+    },
+    {
+      "file": "tree/sagas/fund-purchase-refund.saga.yaml",
+      "sha256": "da6280c4729b824977f7a9a1f12095d091df696396f78f5373ff4f476058db8f"
+    },
+    {
+      "file": "tree/sagas/fund-subscription-pay.saga.yaml",
+      "sha256": "51e4508d37f2aa4669e6e280e95eeb366986ca3c42b0b1313bc1452c17efe49f"
+    },
+    {
+      "file": "tree/stories/story-cash-fund-purchase-lifecycle.story.yaml",
+      "sha256": "f35062423ba2cbb09c312d744adf5bea404e77dc3a0796767bdc817bad9094d3"
+    },
+    {
+      "file": "tree/stories/story-create-and-run-sip-plan.story.yaml",
+      "sha256": "14f7844b23771cee5a709fda513aabe42add90b606abbe251af3bd268e18349a"
+    },
+    {
+      "file": "tree/stories/story-purchase-fund.story.yaml",
+      "sha256": "b9266d020457b1771165d2838915987d06c6de74d9e303360f7a9d25a17d6600"
+    },
+    {
+      "file": "tree/stories/story-top-up-from-external-bank.story.yaml",
+      "sha256": "bd346043287ef30a593237da37fa7c8085a94a347044ff9f4d42e2f8b19318d4"
+    },
+    {
+      "file": "tree/use-cases.yaml",
+      "sha256": "b7b776ed447d8f95428adbb4e418a910bfcce03cdde558a8462c28e3c18be808"
+    },
+    {
+      "file": "tree/value-objects/fund-share.vo.yaml",
+      "sha256": "09c9db8beb775f87ed749adac4b483720f5306d10f3c35c8c216b55946f2d9ae"
+    },
+    {
+      "file": "tree/value-objects/money.vo.yaml",
+      "sha256": "67e2fedfbded1685d7fa035d6e9c6bd5ba4950d77053fadd1cff8f4ef4deb8b8"
+    },
+    {
+      "file": "tree/workshop.yaml",
+      "sha256": "20071154e69229bc2c5f18d62eccb6aae4187d73df0dc845f59301e1d92199bc"
+    },
+    {
+      "file": "wealth-bindings.json",
+      "sha256": "a13089ae8396936afc8d55958c039bb5648fc310cb4454db5b844bd794c879e7"
+    },
+    {
+      "file": "wealth-execution-bindings.json",
+      "sha256": "80efe3bc15d219c8a7dc8eafd0e1a6421c091ad4334b21830dae400ab8802827"
+    },
+    {
+      "file": "wealth-runtime-binding.json",
+      "sha256": "de6f8c77a59d2f153974d8ef50ebfdf8575995c25bf8ff066130d4e1f254c55f"
+    }
+  ],
+  "inputInventoryExcludes": [
+    "docs/I0-VERIFICATION.json",
+    ".git/",
+    ".scratch/",
+    ".local/",
+    "node_modules/"
+  ],
+  "localInputSha256": "ea8418e73f1f8cac2aef14eae6bb3f55e58ad252db0ef7a3b9df032b1fb714cd",
+  "preservation": {
+    "ok": true,
+    "comparedPreExistingFiles": 190,
+    "allowedUpdatedFiles": [
+      "README.md",
+      "docs/HANDOFF.md",
+      "docs/IMPLEMENTATION-STATUS.md",
+      "package.json",
+      "projections/cash-experience.md",
+      "projections/cash-lifecycle.md",
+      "projections/context-map.md",
+      "projections/event-flow.md",
+      "projections/index.json",
+      "projections/journeys.md",
+      "projections/README.md",
+      "projections/screen-flow.md",
+      "projections/story-map.md"
+    ],
+    "actualUpdatedFiles": [
+      "docs/HANDOFF.md",
+      "docs/IMPLEMENTATION-STATUS.md",
+      "package.json",
+      "projections/index.json",
+      "projections/README.md",
+      "README.md"
+    ],
+    "actualAddedFiles": [
+      "docs/CASH-FIRST-SLICE.md",
+      "docs/I0-BASELINE.md",
+      "docs/PUBLIC-EXTENSIONS.md",
+      "test/i0-design.test.mjs",
+      "tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml",
+      "tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml",
+      "tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml"
+    ],
+    "unauthorizedChanges": [],
+    "unauthorizedAdditions": [],
+    "pausedFilesUnchanged": [
+      {
+        "file": "qualification/fund-order-cash/build.sbt",
+        "sha256": "2c426244afafad5b5b5c77b1b726fcfe758c42b5f03cf1de9ec828fd6cfb18ea"
+      },
+      {
+        "file": "qualification/fund-order-cash/handwritten/main/fixture/wealth/qualification/ExactDomainJacksonModule.scala",
+        "sha256": "3c0dc37952d0c27e1db733bf4f190e65b24206a88f616fc9ac73380c51f10c3d"
+      },
+      {
+        "file": "qualification/fund-order-cash/handwritten/main/fixture/wealth/qualification/ExactMoneyCodec.scala",
+        "sha256": "61b5bf1e80001029f2440a375e67cf6888526d002ae4bc243b414b6f388742cf"
+      },
+      {
+        "file": "qualification/fund-order-cash/handwritten/main/fixture/wealth/qualification/FundOrderActor.scala",
+        "sha256": "3735d35318a7863209e20fa376f2437598271efe26a17b8ac107ffe4aec3ac23"
+      },
+      {
+        "file": "qualification/fund-order-cash/handwritten/resources/application.conf",
+        "sha256": "3319b4be505a1cf5f10793983dd541511164c37deb86d2524d4710c4cf10b276"
+      },
+      {
+        "file": "qualification/fund-order-cash/project/build.properties",
+        "sha256": "ef0027fa322ca439f465803fdfa777a1216a4ed32e8fcaea3e7b038b4510e632"
+      },
+      {
+        "file": "qualification/fund-order-cash/src/test/scala/fixture/wealth/qualification/ExactMoneyCodecSpec.scala",
+        "sha256": "d813ded14485e60b5fe9a9c76c88ef8aef0b617e193b45e63e311f90790c75a2"
+      },
+      {
+        "file": "qualification/fund-order-cash/src/test/scala/fixture/wealth/qualification/GeneratedPersistenceSpec.scala",
+        "sha256": "cf0aeff5be72be90c984c94b733a37ad4eb7f9952635d4577ef48da10659f7cd"
+      },
+      {
+        "file": "qualification/fund-order-cash/src/test/scala/fixture/wealth/qualification/GeneratedRulesSpec.scala",
+        "sha256": "1e253f3a961f6b23107039192fd0e788c9893953ef1e14adc7170200367ba4a9"
+      },
+      {
+        "file": "qualification/fund-order-cash/src/test/scala/fixture/wealth/qualification/GeneratedSerializationSpec.scala",
+        "sha256": "21836c69a5d94ee4d1e631883ce57b8a22949e381f51d53d306451149ff9fb0c"
+      },
+      {
+        "file": "qualification/fund-order-cash/src/test/scala/fixture/wealth/qualification/QualificationTestSupport.scala",
+        "sha256": "88bd8c2cd90e227d2e773f7da2155a18f07cc2e6ea4f25c95c6ecf3bb82ef4d8"
+      },
+      {
+        "file": "test/domain-runner.test.mjs",
+        "sha256": "28f194f2a92e1858a3bf94a1badff079e21fcbc9aa55ff71b851517bce63f3c2"
+      },
+      {
+        "file": "tools/qualify-domain.mjs",
+        "sha256": "4e01557c79ff030471d04e1b4854a69864d21af68181937e6f6d4d2367edb99e"
+      }
+    ],
+    "historicalFilesUnchanged": [
+      {
+        "file": "docs/BASELINE.json",
+        "sha256": "fbdc7885cd68646e420ecb6f9ae4f584891562c26b7dfd94fc36d6ef39c4f681"
+      },
+      {
+        "file": "docs/SECOND-BATCH-CHECKPOINT.md",
+        "sha256": "43bbe00357ce49e43af18f4cf9bb5a353366faefa96aca521808405c9ffc6ed5"
+      },
+      {
+        "file": "docs/SECOND-BATCH-INCREMENT.json",
+        "sha256": "c1fc9eb4cbbaec1f5759819a4e0f5df48670e295b5e323533dcc5724745df421"
+      },
+      {
+        "file": "docs/SECOND-BATCH-VERIFICATION.json",
+        "sha256": "adc8bf5d930c5059af24066fc87dcffdbd6527bb9b3db2b0f910948f5daee475"
+      },
+      {
+        "file": "docs/VERIFICATION.json",
+        "sha256": "e4228c2bf3c85327a1364f289f8462e2be92a3151bab10d7a8bf375d256bf8fc"
+      }
+    ],
+    "truthsrcTrackedUnchanged": {
+      "repository": "/Users/zhongdj/Workspaces/mad-polaris/metarch-truthsrc",
+      "ok": true
+    }
+  },
+  "proposalsAdded": [
+    {
+      "id": "decision.i0-baseline-coverage",
+      "source": {
+        "file": "tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml",
+        "pointer": "/payload/info/artifact",
+        "stage": "refining",
+        "board": "wealth-i0-design-v1",
+        "seq": 0,
+        "note": "question:I0BaselineCoverageDesignProposal"
+      },
+      "status": "demo-proposal"
+    },
+    {
+      "id": "decision.i0-boundary-ownership",
+      "source": {
+        "file": "tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml",
+        "pointer": "/payload/info/artifact",
+        "stage": "refining",
+        "board": "wealth-i0-design-v1",
+        "seq": 1,
+        "note": "question:I0BoundaryOwnershipDesignProposal"
+      },
+      "status": "demo-proposal"
+    },
+    {
+      "id": "decision.cash-first-slice-design",
+      "source": {
+        "file": "tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml",
+        "pointer": "/payload/info/artifact",
+        "stage": "refining",
+        "board": "wealth-i0-design-v1",
+        "seq": 2,
+        "note": "question:CashFirstSliceDesignProposal"
+      },
+      "status": "demo-proposal"
+    }
+  ],
+  "tests": {
+    "baseline": {
+      "command": [
+        "npm",
+        "run",
+        "test:baseline"
+      ],
+      "exitCode": 0,
+      "evidence": ".scratch/i0-evidence-VMl6Jf/acceptance-Nn0XVZ/baseline-tests.log",
+      "tests": 186,
+      "passed": 186,
+      "failed": 0,
+      "skipped": 0,
+      "canceled": 0
+    },
+    "design": {
+      "command": [
+        "npm",
+        "run",
+        "test:design"
+      ],
+      "exitCode": 0,
+      "evidence": ".scratch/i0-evidence-VMl6Jf/acceptance-Nn0XVZ/design-tests.log",
+      "tests": 28,
+      "passed": 28,
+      "failed": 0,
+      "skipped": 0,
+      "canceled": 0
+    },
+    "active": {
+      "command": [
+        "npm",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "evidence": ".scratch/i0-evidence-VMl6Jf/acceptance-Nn0XVZ/active-tests.log",
+      "tests": 214,
+      "passed": 214,
+      "failed": 0,
+      "skipped": 0,
+      "canceled": 0
+    }
+  },
+  "activeTestScript": "node --test test/truth.test.mjs test/projections.test.mjs test/cash-contract.test.mjs test/mock-ta.test.mjs test/i0-design.test.mjs",
+  "excludedSuites": [
+    {
+      "file": "test/domain-runner.test.mjs",
+      "reason": "paused, unfinished third-increment qualifier; preserved unchanged; not an executed skip or qualified runtime suite"
+    }
+  ],
+  "structure": {
+    "hard": [],
+    "notices": [
+      "[RF5] command \"GetBalance\" declares no parameters (explicit parameterless? confirm)",
+      "[RF5] command \"GetExternalTransferState\" declares no parameters (explicit parameterless? confirm)",
+      "[RF5] command \"GetFundOrderState\" declares no parameters (explicit parameterless? confirm)",
+      "[V2] commandStorming|imported-external-systems: origin.seq not contiguous 0..n-1 (got 3 at position 0) — compiler densifies; do not renumber by hand",
+      "[V2] commandStorming|imported-external-systems: origin.seq not contiguous 0..n-1 (got 4 at position 1) — compiler densifies; do not renumber by hand",
+      "[V2] commandStorming|imported-policy-hypotheses: origin.seq not contiguous 0..n-1 (got 10 at position 0) — compiler densifies; do not renumber by hand",
+      "[SA0] sagas/external-bank-transfer.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+      "[SA0] sagas/fund-purchase-payment-v2.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+      "[SA0] sagas/fund-purchase-refund.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+      "[SA0] sagas/fund-subscription-pay.saga.yaml: basic tree fidelity only; payload and additional headers are preserved, not execution-validated — unknown Saga execution keys/capabilities require the strict Saga semantic gate; this is not runnable certification",
+      "[ES4] possible solution language: \"SipPlanCreated\" — confirm this is a business fact, not an implementation",
+      "[CS1] event \"DeductFundsConfirmed\" has no trigger source (command/timer/externalSystem/event link): event-es-deduct-funds-confirmed-2.yaml",
+      "[CS3] command \"PrepareExternalDebit\" has no initiating role and no policy invocation: command-cs-prepare-external-debit-1.yaml",
+      "[CS3] command \"RecordTAShareConfirmation\" has no initiating role and no policy invocation: command-cs-record-ta-share-confirmation-3.yaml",
+      "[CS6] timer \"SipBusinessClockDesignProposal\" triggers no event (dangling): inbox/commandStorming/timer-cs-sip-business-clock-design-proposal-1.yaml",
+      "[CS6] externalSystem \"WealthMockTARegistryDesignProposal\" triggers no event (dangling): inbox/refining/externalSystem-rf-wealth-mock-ta-registry-design-proposal-1.yaml"
+    ]
+  },
+  "declarations": {
+    "errors": [],
+    "notices": []
+  },
+  "proposals": {
+    "errors": [],
+    "notices": [
+      "Legacy MockTA scenario registry is a first-batch proposal; cash-v2 simulator configuration is in contract.cash-purchase-v2. This declaration check executes no service or settlement/refund.",
+      "Context/UX references are validated locally; the portable context target index and UI generation are not extended."
+    ],
+    "artifacts": 30,
+    "entities": 200
+  },
+  "cashContract": {
+    "errors": [],
+    "notices": [
+      "Declaration checks only: authenticated first-publication association, durable reconciliation, exact receipt codecs and mixed-guard evaluation order remain unimplemented/unverified host obligations."
+    ],
+    "readiness": "declaration-only",
+    "runnable": false,
+    "runtimeBindingVerified": false,
+    "checkedResultKinds": [
+      "succeeded",
+      "rejected-before-effects",
+      "compensated",
+      "recovery-required",
+      "outcome-unknown"
+    ]
+  },
+  "strictSaga": {
+    "ok": true,
+    "diagnostics": []
+  },
+  "strictExecution": {
+    "ok": true,
+    "diagnostics": []
+  },
+  "runtimeLowering": {
+    "ok": true,
+    "diagnostics": [],
+    "readiness": "lowered-contract-only",
+    "runnable": false,
+    "runtimeBindingVerified": false
+  },
+  "roundtrip": {
+    "ok": true,
+    "atoms": 134
+  },
+  "projections": {
+    "ok": true,
+    "differences": [],
+    "files": 9,
+    "deterministic": true
+  },
+  "protection": {
+    "ok": true,
+    "originalFiles": 13,
+    "addedFiles": 4,
+    "changed": [],
+    "unauthorized": [],
+    "missing": []
+  },
+  "verificationCommand": {
+    "command": [
+      "npm",
+      "run",
+      "verify"
+    ],
+    "exitCode": 0,
+    "evidence": ".scratch/i0-evidence-VMl6Jf/acceptance-Nn0XVZ/source-verification.log"
+  },
+  "diffCheck": {
+    "ok": true,
+    "evidence": ".scratch/i0-evidence-VMl6Jf/acceptance-Nn0XVZ/diff-check.log"
+  },
+  "publicToolchainExtension": "proposal-only-not-implemented",
+  "applicationGeneration": "not-run",
+  "scalaQualification": "not-run",
+  "fundsRuntime": "not-run",
+  "applicationRecovery": "not-run",
+  "codeBackAnchoring": "not-run",
+  "runtimeBindingVerified": false,
+  "runnable": false,
+  "newBusinessPoliciesApproved": false,
+  "independentAudit": "not-performed"
+}

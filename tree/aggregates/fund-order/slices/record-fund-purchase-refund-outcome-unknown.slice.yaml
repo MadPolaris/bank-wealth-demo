@@ -1,0 +1,236 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RecordFundPurchaseRefundOutcomeUnknown
+payload:
+  {
+    "name": "RecordFundPurchaseRefundOutcomeUnknown",
+    "description": "Trusted-host-only bridge for independent refund outcome-unknown; matching retained identities is necessary but schema alone cannot authenticate receipt evidence. No automatic policy from generic account result events is declared.",
+    "parameters": [
+      {
+        "name": "fundOrderId",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "paymentTxId",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "refundOperationId",
+        "dataType": "OperationId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "refundTxId",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "receiptId",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "receiptBody",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-V2-ONLY",
+        "errCode": "62104",
+        "cond": "state.contractVersion == \"cash-purchase-v2\"",
+        "desc": "New TA/refund lifecycle requires the cash-purchase-v2 request contract; legacy PAYMENT_SETTLED is insufficient."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-RESOURCE",
+        "errCode": "62105",
+        "cond": "param.fundOrderId == state.id",
+        "desc": "Command must address the retained original FundOrder identity."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-PAYMENT",
+        "errCode": "62106",
+        "cond": "param.paymentTxId == state.selectedPaymentTxId",
+        "desc": "Payment correlation must exactly match the selected original committed payment transaction."
+      },
+      {
+        "ruleId": "IR-FO-CASH-COMMITTED",
+        "errCode": "62107",
+        "onFail": "reject",
+        "when": {
+          "form": "map-contains",
+          "map": "committedSubscriptions",
+          "key": "param.paymentTxId"
+        },
+        "desc": "Selected payment requires durable FundOrder committedSubscriptions evidence."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-SUCCEEDED",
+        "errCode": "62108",
+        "cond": "state.cashPaymentFinalResults.get(param.paymentTxId).contains(\"succeeded\")",
+        "desc": "Selected cash payment requires succeeded evidence; collection receipt and exact Saga identity/version/args digest still require a trusted host bridge."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-REFUND-CORRELATION",
+        "errCode": "62127",
+        "cond": "param.refundOperationId == state.refundOperationId && param.refundTxId == state.refundTxId && param.refundTxId != state.selectedPaymentTxId",
+        "desc": "Original payment, retained refund operation and previously derived independent refund txid must all match."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-REFUND-RECEIPT",
+        "errCode": "62128",
+        "cond": "param.receiptId.nonEmpty && param.receiptBody.nonEmpty",
+        "desc": "Result receipt identity/body is mandatory; trusted host must verify exact cash Saga kind/version/args/evidence, not treat arbitrary body as success proof."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-REFUND-RECEIPT-CONFLICT",
+        "errCode": "62129",
+        "cond": "!state.refundResultReceipts.contains(param.receiptId) || state.refundResultReceipts(param.receiptId) == param.receiptBody",
+        "desc": "Same refund receipt identity with conflicting exact String body rejects before duplicate success."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-REFUND-RECEIPT-KIND",
+        "errCode": "62132",
+        "cond": "!state.refundResultReceipts.contains(param.receiptId) || state.refundResultReceiptKinds.get(param.receiptId).contains(\"outcome-unknown\")",
+        "desc": "Receipt identity binds exact body AND refund result kind; reusing a receipt under another kind is a conflict before any empty success."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-REFUND-FINAL-CONFLICT",
+        "errCode": "62133",
+        "cond": "!state.refundFinalResults.contains(param.refundTxId)",
+        "desc": "Independent refund terminal kind is immutable; reject conflicting finals and nonterminal regressions before receipt duplicate handling."
+      },
+      {
+        "ruleId": "IR-FO-REFUND-RECEIPT-ONCE",
+        "errCode": "62130",
+        "onFail": "succeed-empty",
+        "when": {
+          "form": "map-absent",
+          "map": "refundResultReceipts",
+          "key": "param.receiptId"
+        },
+        "desc": "Same refund receipt/body is empty success before phase checks."
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "IR-FO-REFUND-RESULT-PHASE",
+        "errCode": "62131",
+        "cond": "state.status == \"REFUND_REQUESTED\" && state.taStatus == \"TA_REJECTED\" && (state.refundOutcome == \"requested\" || state.refundOutcome == \"recovery-required\" || state.refundOutcome == \"outcome-unknown\")",
+        "desc": "Only an authorized unresolved independent refund can record a new result; recovery/unknown are nonterminal observations, not another refund authorization."
+      }
+    ],
+    "produces": [
+      "FundPurchaseRefundOutcomeUnknownObserved"
+    ],
+    "provenance": {
+      "source": "Approved second batch agent-assisted proposal",
+      "workshopHeld": false,
+      "contractVersion": "cash-purchase-v2"
+    }
+  }
+events:
+  {
+    "FundPurchaseRefundOutcomeUnknownObserved": {
+      "name": "FundPurchaseRefundOutcomeUnknownObserved",
+      "description": "Trusted-host-only bridge for independent refund outcome-unknown; matching retained identities is necessary but schema alone cannot authenticate receipt evidence. No automatic policy from generic account result events is declared.",
+      "payloads": [
+        {
+          "name": "fundOrderId",
+          "dataType": "FundOrderId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "paymentTxId",
+          "dataType": "TxId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "refundOperationId",
+          "dataType": "OperationId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "refundTxId",
+          "dataType": "TxId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "receiptId",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "receiptBody",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "resultKind",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "fundOrderId",
+          "expr": "param.fundOrderId"
+        },
+        {
+          "slot": "paymentTxId",
+          "expr": "param.paymentTxId"
+        },
+        {
+          "slot": "refundOperationId",
+          "expr": "param.refundOperationId"
+        },
+        {
+          "slot": "refundTxId",
+          "expr": "param.refundTxId"
+        },
+        {
+          "slot": "receiptId",
+          "expr": "param.receiptId"
+        },
+        {
+          "slot": "receiptBody",
+          "expr": "param.receiptBody"
+        },
+        {
+          "slot": "resultKind",
+          "expr": "literal:outcome-unknown"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "refundResultReceipts",
+          "op": "put",
+          "key": "event.receiptId",
+          "value": "event.receiptBody"
+        },
+        {
+          "slot": "refundOutcome",
+          "expr": "literal:outcome-unknown"
+        },
+        {
+          "slot": "refundResultReceiptKinds",
+          "op": "put",
+          "key": "event.receiptId",
+          "value": "event.resultKind"
+        }
+      ]
+    }
+  }

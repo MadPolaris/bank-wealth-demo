@@ -25,7 +25,7 @@ function gitHead(directory) {
 // Fingerprint the local import closure, including schemas read at module initialization.
 // Never imports a CLI, generator, cache synchronizer, or runtime host.
 const entrypoints = ['lib/shared.mjs', 'lib/compile.mjs', 'lib/validate.mjs', 'lib/decompose.mjs',
-  'lib/saga/compile.mjs', 'lib/execution/compile.mjs'];
+  'lib/saga/compile.mjs', 'lib/execution/compile.mjs', 'lib/saga/runtime-binding.mjs'];
 function dependencyPaths() {
   const visited = new Set();
   function visit(file) {
@@ -50,7 +50,7 @@ export function toolFingerprint() {
 
 const loadedFingerprint = toolFingerprint();
 const load = (path) => import(pathToFileURL(join(TOOL_ROOT, path)).href);
-const [shared, compiler, validator, decomposer, sagaCompiler, executionCompiler] = await Promise.all(entrypoints.map(load));
+const [shared, compiler, validator, decomposer, sagaCompiler, executionCompiler, runtimeCompiler] = await Promise.all(entrypoints.map(load));
 if (toolFingerprint().sha256 !== loadedFingerprint.sha256) throw new Error('Truthsrc sources changed while importing; retry against a stable snapshot.');
 export const { parseDoc, emitDoc, slug, STAGE_CODE, listInboxStages, NOTE_TYPES, ATOM_KINDS } = shared;
 
@@ -62,7 +62,10 @@ export function assertToolStable() {
 
 export function sourceFingerprint(tree = TREE, root = ROOT) {
   const files = filesUnder(tree, (name) => name.endsWith('.yaml'));
-  for (const binding of ['bindings.json', 'execution-bindings.json', 'runtime-binding.json']) files.push(join(root, binding));
+  for (const binding of ['bindings.json', 'execution-bindings.json', 'runtime-binding.json',
+    'wealth-bindings.json', 'wealth-execution-bindings.json', 'wealth-runtime-binding.json']) {
+    if (existsSync(join(root, binding))) files.push(join(root, binding));
+  }
   return sha256(JSON.stringify(files.sort().map((file) => [relative(root, file), sha256(readFileSync(file))])));
 }
 
@@ -86,13 +89,42 @@ export function loadSnapshot(tree = TREE, root = ROOT) {
   return snapshot;
 }
 
+export function mergeBindings(base, supplemental, family, key) {
+  if (!supplemental) return structuredClone(base);
+  if (base.schemaVersion !== supplemental.schemaVersion) throw new Error(`Incompatible supplemental ${family} schema`);
+  if (family === 'sagas' && base.target && JSON.stringify(base.target) !== JSON.stringify(supplemental.target)) throw new Error('Supplemental runtime target differs from protected target');
+  const ids = new Set();
+  const rows = [...base[family], ...supplemental[family]].map((entry) => {
+    if (ids.has(entry[key])) throw new Error(`Duplicate supplemental ${family} identity ${entry[key]}`);
+    ids.add(entry[key]);
+    return structuredClone(entry);
+  });
+  return { ...structuredClone(base), [family]: rows };
+}
+
+export function loadBindings(root = ROOT) {
+  const read = (name) => JSON.parse(readFileSync(join(root, name), 'utf8'));
+  const optional = (name) => existsSync(join(root, name)) ? read(name) : null;
+  const oldSaga = read('bindings.json');
+  const oldExecution = read('execution-bindings.json');
+  if (oldExecution.sagaBindings && JSON.stringify(oldExecution.sagaBindings) !== JSON.stringify(oldSaga)) throw new Error('Protected execution Saga binding copy drifted from bindings.json');
+  const saga = mergeBindings(oldSaga, optional('wealth-bindings.json'), 'sagas', 'sagaId');
+  const execution = mergeBindings(oldExecution, optional('wealth-execution-bindings.json'), 'pipelines', 'pipelineId');
+  execution.sagaBindings = saga;
+  const runtime = mergeBindings(read('runtime-binding.json'), optional('wealth-runtime-binding.json'), 'sagas', 'sagaId');
+  return { saga, execution, runtime };
+}
+
 export function sourceGates(snapshot, root = ROOT) {
   assertSnapshotStable(snapshot, root);
   const structure = validator.validateTree(snapshot.tree);
-  const saga = sagaCompiler.compileSagas(snapshot.canonical, JSON.parse(readFileSync(join(root, 'bindings.json'), 'utf8')));
-  const execution = executionCompiler.compileExecution(snapshot.canonical, JSON.parse(readFileSync(join(root, 'execution-bindings.json'), 'utf8')));
+  const bindings = loadBindings(root);
+  const saga = sagaCompiler.compileSagas(snapshot.canonical, bindings.saga);
+  const execution = executionCompiler.compileExecution(snapshot.canonical, bindings.execution);
+  const lowering = runtimeCompiler.lowerSagaRuntimeBindingV3({ canonical: snapshot.canonical, binding: bindings.saga, runtimeBinding: bindings.runtime });
   assertSnapshotStable(snapshot, root);
-  return { structure, saga: { ok: !!saga.ir, diagnostics: saga.diagnostics }, execution: { ok: !!execution.ir, diagnostics: execution.diagnostics } };
+  return { structure, saga: { ok: !!saga.ir, diagnostics: saga.diagnostics }, execution: { ok: !!execution.ir, diagnostics: execution.diagnostics },
+    lowering: { ok: !!lowering.ir, diagnostics: lowering.diagnostics, readiness: lowering.ir?.readiness || null, runnable: false, runtimeBindingVerified: false } };
 }
 
 export function roundtripLocal(snapshot) {
@@ -116,13 +148,30 @@ export function roundtripLocal(snapshot) {
   } finally { rmSync(temp, { recursive: true, force: true }); }
 }
 
-export function protectedFiles(root = ROOT) {
+export function protectedFiles(root = ROOT, inventory) {
   const directories = ['tree/sagas', 'tree/pipelines', 'compiled'];
-  const files = directories.flatMap((directory) => filesUnder(join(root, directory)));
-  for (const file of ['bindings.json', 'execution-bindings.json', 'runtime-binding.json',
+  const files = inventory ? inventory.map((entry) => join(root, entry.file))
+    : directories.flatMap((directory) => filesUnder(join(root, directory)));
+  for (const file of inventory ? [] : ['bindings.json', 'execution-bindings.json', 'runtime-binding.json',
     'isolation-zone/generated-scaffold/FundOrderGeneratedContract.scala',
     'isolation-zone/handwritten-adapter/FundOrderIsolationAdapter.scala']) files.push(join(root, file));
   return files.sort().map((file) => ({ file: relative(root, file), sha256: sha256(readFileSync(file)) }));
+}
+
+export function protectionReport(root = ROOT) {
+  const baseline = JSON.parse(readFileSync(join(root, 'docs/BASELINE.json'), 'utf8'));
+  const actual = protectedFiles(root);
+  const recorded = new Map(actual.map((entry) => [entry.file, entry.sha256]));
+  const changed = baseline.protectedFiles.filter((entry) => recorded.get(entry.file) !== entry.sha256).map((entry) => entry.file);
+  const oldPaths = new Set(baseline.protectedFiles.map((entry) => entry.file));
+  const added = actual.filter((entry) => !oldPaths.has(entry.file)).map((entry) => entry.file);
+  const incrementFile = join(root, 'docs/SECOND-BATCH-INCREMENT.json');
+  const authorized = existsSync(incrementFile)
+    ? JSON.parse(readFileSync(incrementFile, 'utf8')).newProtectedFamilyFiles : [];
+  const unauthorized = added.filter((file) => !authorized.includes(file));
+  const missing = authorized.filter((file) => !recorded.has(file));
+  return { ok: !changed.length && !unauthorized.length && !missing.length,
+    originalFiles: baseline.protectedFiles.length, addedFiles: added.length, changed, unauthorized, missing };
 }
 
 export function declarationIndex(canonical) {

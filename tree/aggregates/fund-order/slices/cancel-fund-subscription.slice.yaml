@@ -23,6 +23,13 @@ payload:
     ],
     "guards": [
       {
+        "kind": "invariantRef",
+        "ref": "IR-FO-CASH-TCC-COMPENSATE",
+        "errCode": "62182",
+        "desc": "For cash-v2 only: compensation belongs to unresolved original request/reservation and exact order; never use cancellation as a post-settlement refund.",
+        "cond": "state.contractVersion != \"cash-purchase-v2\" || (param.resource == state.id && state.cashPaymentFinalResults.isEmpty && state.cashPaymentResults.keys.forall(_ == param.txid) && (state.status == \"REQUESTED\" || state.status == \"SUBSCRIPTION_RESERVED\") && state.committedSubscriptions.isEmpty && state.reservedSubscriptions.keys.forall(_ == param.txid))"
+      },
+      {
         "ruleId": "IR-FO-CANCEL-001",
         "errCode": "62009",
         "onFail": "reject",
@@ -34,7 +41,11 @@ payload:
         "desc": "Prepared subscription cannot be found or already canceled."
       }
     ],
-    "description": "TCC Compensate phase on FundOrder: cancel prepared subscription reservation."
+    "description": "TCC Compensate phase on FundOrder: cancel prepared subscription reservation.",
+    "changeProvenance": {
+      "baselineCommit": "dda2f24f4569bc4e6468b4339dcea9fdb983a63d",
+      "source": "Approved cash-only compatibility conditions; existing TCC parameters/event slots unchanged; retained sourceCapture not recursively copied"
+    }
   }
 events:
   {

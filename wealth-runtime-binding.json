@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "truthsrc.saga-runtime-binding/v2",
+  "target": {
+    "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+    "artifactStatus": "unpublished-candidate",
+    "apiMode": "strict",
+    "definitionApi": "net.imadz.infra.saga.strict.StrictSagaDefinition",
+    "coordinatorApi": "net.imadz.infra.saga.strict.StrictSagaCoordinator",
+    "executionMode": "static-serial-allTCC",
+    "capabilities": [
+      "positive-int-definition-version",
+      "static-participants",
+      "serial-all-tcc",
+      "fresh-canonical-args",
+      "pinned-args-codec",
+      "pinned-phase-receipt-codecs",
+      "minor-unit-string-money",
+      "singleton-serial-barriers",
+      "confirmed-receipt-context",
+      "fresh-receipt-decode"
+    ]
+  },
+  "sagas": [
+    {
+      "sagaId": "fund-purchase-payment-v2",
+      "definitionVersion": "v2",
+      "runtimeVersion": 2,
+      "argsCodec": {
+        "id": "CashPurchaseV2ArgsCodec",
+        "version": "codec-v1",
+        "runtimeVersion": 1
+      },
+      "receiptCodecs": [
+        {
+          "stepId": "reserve-investor-funds",
+          "phase": "prepare",
+          "id": "wealth-pay-v2-reserve-investor-funds-prepare-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "reserve-investor-funds",
+          "phase": "commit",
+          "id": "wealth-pay-v2-reserve-investor-funds-commit-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "reserve-investor-funds",
+          "phase": "compensate",
+          "id": "wealth-pay-v2-reserve-investor-funds-compensate-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "credit-fund-collection",
+          "phase": "prepare",
+          "id": "wealth-pay-v2-credit-fund-collection-prepare-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "credit-fund-collection",
+          "phase": "commit",
+          "id": "wealth-pay-v2-credit-fund-collection-commit-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "credit-fund-collection",
+          "phase": "compensate",
+          "id": "wealth-pay-v2-credit-fund-collection-compensate-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "reserve-cash-fund-order",
+          "phase": "prepare",
+          "id": "wealth-pay-v2-reserve-cash-fund-order-prepare-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "reserve-cash-fund-order",
+          "phase": "commit",
+          "id": "wealth-pay-v2-reserve-cash-fund-order-commit-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "reserve-cash-fund-order",
+          "phase": "compensate",
+          "id": "wealth-pay-v2-cash-cancel-fence-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        }
+      ]
+    },
+    {
+      "sagaId": "fund-purchase-refund",
+      "definitionVersion": "v1",
+      "runtimeVersion": 1,
+      "argsCodec": {
+        "id": "CashRefundArgsCodec",
+        "version": "codec-v1",
+        "runtimeVersion": 1
+      },
+      "receiptCodecs": [
+        {
+          "stepId": "debit-fund-collection",
+          "phase": "prepare",
+          "id": "wealth-refund-v1-debit-fund-collection-prepare-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "debit-fund-collection",
+          "phase": "commit",
+          "id": "wealth-refund-v1-debit-fund-collection-commit-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "debit-fund-collection",
+          "phase": "compensate",
+          "id": "wealth-refund-v1-debit-fund-collection-compensate-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "credit-original-investor",
+          "phase": "prepare",
+          "id": "wealth-refund-v1-credit-original-investor-prepare-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "credit-original-investor",
+          "phase": "commit",
+          "id": "wealth-refund-v1-credit-original-investor-commit-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        },
+        {
+          "stepId": "credit-original-investor",
+          "phase": "compensate",
+          "id": "wealth-refund-v1-credit-original-investor-compensate-receipt",
+          "version": "receipt-v1",
+          "runtimeVersion": 1
+        }
+      ]
+    }
+  ]
+}

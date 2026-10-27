@@ -2,7 +2,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { ROOT, loadSnapshot, assertSnapshotStable } from './truth-source.mjs';
-import { renderProjections, validateArtifacts } from './artifacts.mjs';
+import { renderProjections, validateArtifacts, validateDeclarations } from './artifacts.mjs';
+import { validateCashContract } from './cash-contract.mjs';
 
 export function checkProjections(snapshot) {
   assertSnapshotStable(snapshot);
@@ -19,8 +20,8 @@ function main() {
   const args = process.argv.slice(2);
   if (args.some((arg) => !['--check', '--write'].includes(arg)) || args.length > 1) throw new Error('Usage: node tools/project.mjs [--check|--write]');
   const snapshot = loadSnapshot();
-  const validation = validateArtifacts(snapshot);
-  if (validation.errors.length) { console.error(JSON.stringify(validation, null, 2)); process.exitCode = 1; return; }
+  const validation = { proposals: validateArtifacts(snapshot), declarations: validateDeclarations(snapshot), cashContract: validateCashContract(snapshot) };
+  if (Object.values(validation).some((report) => report.errors.length)) { console.error(JSON.stringify(validation, null, 2)); process.exitCode = 1; return; }
   if (args[0] === '--write') {
     const outputs = renderProjections(snapshot);
     assertSnapshotStable(snapshot);
