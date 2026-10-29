@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "truthsrc.product-input-files/v1",
+  "documents": [
+    { "id": "bank-canonical", "schemaVersion": "truthsrc/v1", "file": "canonical.json" },
+    { "id": "saga-base", "schemaVersion": "truthsrc.saga-binding/v1", "file": "../../bindings.json" },
+    { "id": "saga-wealth", "schemaVersion": "truthsrc.saga-binding/v1", "file": "../../wealth-bindings.json" },
+    { "id": "runtime-base", "schemaVersion": "truthsrc.saga-runtime-binding/v2", "file": "../../runtime-binding.json" },
+    { "id": "runtime-wealth", "schemaVersion": "truthsrc.saga-runtime-binding/v2", "file": "../../wealth-runtime-binding.json" },
+    { "id": "execution-base", "schemaVersion": "truthsrc.execution-binding/v1", "file": "../../execution-bindings.json" },
+    { "id": "execution-wealth", "schemaVersion": "truthsrc.execution-binding/v1", "file": "../../wealth-execution-bindings.json" }
+  ],
+  "assemblies": [
+    { "id": "bank-sagas", "kind": "saga-bindings-union", "sources": ["saga-base", "saga-wealth"] },
+    { "id": "bank-runtime", "kind": "runtime-bindings-union", "sources": ["runtime-base", "runtime-wealth"] },
+    { "id": "bank-execution", "kind": "execution-bindings-union", "sources": ["execution-base", "execution-wealth"], "sagaBinding": "bank-sagas" }
+  ],
+  "requirements": [
+    {
+      "id": "saga-contract", "version": "1", "payloadSchemaVersion": "truthsrc.saga-ir/v1",
+      "capabilities": [{ "id": "saga-static-contract", "version": "1" }],
+      "inputRoles": { "canonical": "bank-canonical", "sagaBinding": "bank-sagas" },
+      "requires": []
+    },
+    {
+      "id": "execution-contract", "version": "1", "payloadSchemaVersion": "truthsrc.execution/v1",
+      "capabilities": [{ "id": "execution-static-contract", "version": "1" }],
+      "inputRoles": { "canonical": "bank-canonical", "sagaBinding": "bank-sagas", "executionBinding": "bank-execution" },
+      "requires": [{ "id": "saga-contract", "version": "1" }]
+    },
+    {
+      "id": "saga-runtime-contract", "version": "1", "payloadSchemaVersion": "truthsrc.saga-runtime-contract/v3",
+      "capabilities": [{ "id": "saga-runtime-lowering", "version": "3" }],
+      "inputRoles": { "canonical": "bank-canonical", "sagaBinding": "bank-sagas", "runtimeBinding": "bank-runtime" },
+      "requires": [{ "id": "saga-contract", "version": "1" }]
+    }
+  ],
+  "options": {}
+}

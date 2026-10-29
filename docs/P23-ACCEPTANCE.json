@@ -1,0 +1,215 @@
+{
+  "schemaVersion": "bank-p23-stage-acceptance/v1",
+  "acceptedAt": "2026-10-27T15:45:10.445069+00:00",
+  "milestone": "P23",
+  "status": "passed",
+  "completeP23": true,
+  "acceptanceScope": "P23 four existing source/design/consumption/artifact readiness packages; not V1 business runtime completion",
+  "bankHead": "5bf91e0eb6fc841c571a4c459f0ad9411b150c95",
+  "includesUncommittedSources": true,
+  "artifact": {
+    "id": "decision.p23-bank-v1-handoff",
+    "designVersion": "bank-v1-p23-design-2",
+    "supersedesDesignVersion": "bank-v1-p23-design-1",
+    "source": {
+      "file": "tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml",
+      "sha256": "91570f32088b4a9ef50adc851102e25ef1b337304c2e8bede12e9162a3908e86",
+      "bytes": 220980
+    }
+  },
+  "packages": [
+    {
+      "id": "P23-1",
+      "title": "完成合同覆盖",
+      "status": "passed",
+      "evidenceLevel": "source-and-design-or-explicit-artifact-receipt",
+      "exitObservation": "23覆盖与40包无required孤项",
+      "sourcePointer": "/payload/info/artifact/body/acceptancePackages/0",
+      "proof": {
+        "coverageRows": 23,
+        "acceptancePackages": 40,
+        "requiredCoverageHasOracle": true,
+        "knownContractGapsClosed": 6,
+        "contractTests": 109
+      }
+    },
+    {
+      "id": "P23-2",
+      "title": "已选政策正式引用",
+      "status": "passed",
+      "evidenceLevel": "source-and-design-or-explicit-artifact-receipt",
+      "exitObservation": "已选政策原来源和supersession可追溯",
+      "sourcePointer": "/payload/info/artifact/body/acceptancePackages/1",
+      "proof": {
+        "inheritedSelectedDecisions": 3,
+        "selectedResolutions": 10,
+        "sourceAndSupersessionPointersValidatedByCurrentByteTests": true,
+        "policiesRedecided": false
+      }
+    },
+    {
+      "id": "P23-3",
+      "title": "公共消费与runtime制品",
+      "status": "passed",
+      "evidenceLevel": "source-and-design-or-explicit-artifact-receipt",
+      "exitObservation": "当前源码消费认证与runtime来源依赖许可分别有回执",
+      "sourcePointer": "/payload/info/artifact/body/acceptancePackages/2",
+      "proof": {
+        "sourceConsumptionReceipt": {
+          "file": "docs/P23-DESIGN-2-VERIFICATION.json",
+          "sha256": "07eaaeba1b68bf748177448ae981d373bd8fbdd626e7e0f3786dc0bed5348bfa"
+        },
+        "sourceWindowReturn": {
+          "file": ".scratch/p23-bank-handoff-pxzkgeyq/SOURCE-CONSUMPTION-WINDOW-RETURN.json",
+          "sha256": "77c538724bcf021b62c2710211db05eae2f6b202986d6c9533603bcc3b447c42"
+        },
+        "finiteConsumptionCompletion": {
+          "file": ".scratch/p23-repair-design2-zpcoj_ho/CONSUMPTION-FINISHED.json",
+          "sha256": "3aff607c334a9a4d726cc7cb0b97669199ce1628a4ed91c8ed92ebdf6762c6a5"
+        },
+        "runtimeAcceptance": {
+          "file": "docs/P23-3-RUNTIME-ACCEPTANCE.json",
+          "sha256": "e6ef93eaddf627a5ba16ff57deb1c639063e9d40e889a0ab5a02acf50fb066dd"
+        },
+        "bankConsumerTests": 5
+      }
+    },
+    {
+      "id": "P23-4",
+      "title": "可实施库存与目标边界",
+      "status": "passed",
+      "evidenceLevel": "source-and-design-or-explicit-artifact-receipt",
+      "exitObservation": "目标栈页面机器权限手写边界明确",
+      "sourcePointer": "/payload/info/artifact/body/acceptancePackages/3",
+      "proof": {
+        "scopePointer": "/payload/info/artifact/body/productAndTechnicalScope",
+        "stack": {
+          "jdk": "11",
+          "scala": "2.13.14",
+          "akka": "2.6.20",
+          "play": "2.8.18",
+          "api": "Play JSON API",
+          "ui": "simple-server-rendered-pages",
+          "journal": "MongoDB",
+          "readSide": "MySQL JDBC",
+          "nodeVerificationBaseline": "22.23.4",
+          "developmentTarget": "target/bank-wealth-release-v1/<owned-round>/{bc,js}-app",
+          "finalTarget": "bank-wealth-demo/dist/v1/{bc,js}-app",
+          "serviceLifecycleAuthorized": false,
+          "sharedTargetsAllowed": false,
+          "targetCreationStage": "P25-owned-generation-and-P32-final-delivery"
+        },
+        "flowVersionsAndPendingRequirementsExplicit": true,
+        "requiredExecutableV1BindingsPretendedComplete": false
+      }
+    }
+  ],
+  "sourceDesignAccepted": true,
+  "fullIndependentSignoff": false,
+  "independentAuditRequiredByTheseExitCriteria": false,
+  "currentByteEvidence": {
+    "designReceipt": {
+      "file": "docs/P23-DESIGN-2-VERIFICATION.json",
+      "sha256": "07eaaeba1b68bf748177448ae981d373bd8fbdd626e7e0f3786dc0bed5348bfa"
+    },
+    "source": {
+      "file": "tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml",
+      "sha256": "91570f32088b4a9ef50adc851102e25ef1b337304c2e8bede12e9162a3908e86"
+    },
+    "test": {
+      "file": "test/p23-finish-contract.test.mjs",
+      "sha256": "ea5950e38db442160df72505090baeff2b9d4c5afcb6e3ad54f4dffcaed388b8",
+      "bytes": 43065
+    },
+    "inputFilesChecked": 149,
+    "testAndToolAndProjectionFilesChecked": 178,
+    "existingTestsReauthenticated": {
+      "p23-final": {
+        "tests": 109,
+        "pass": 109,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "v1-final": {
+        "tests": 489,
+        "pass": 489,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "default-final": {
+        "tests": 285,
+        "pass": 285,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "verify-final": {}
+    },
+    "nodeTestsRerunDuringSignoff": false,
+    "runtimeAcceptance": {
+      "file": "docs/P23-3-RUNTIME-ACCEPTANCE.json",
+      "sha256": "e6ef93eaddf627a5ba16ff57deb1c639063e9d40e889a0ab5a02acf50fb066dd"
+    },
+    "runtimeLock": {
+      "file": "docs/P23-RUNTIME-LOCK.json",
+      "sha256": "18f348f1ffb3fe1eaaba0417d7428e8679afc23a14fe836f5c0d4cb437e39fb7"
+    }
+  },
+  "remainingP23Blockers": [],
+  "knownP23ContractFindingsRemaining": [],
+  "historicalReceiptPolicy": "Prior completeP23:false and runtime blocked values remain historical/single-scope; this receipt composes the current stage status without rewriting them.",
+  "publicSourceWindow": {
+    "thisBankConsumerFinished": true,
+    "oldReturn": {
+      "file": ".scratch/p23-bank-handoff-pxzkgeyq/SOURCE-CONSUMPTION-WINDOW-RETURN.json",
+      "sha256": "77c538724bcf021b62c2710211db05eae2f6b202986d6c9533603bcc3b447c42"
+    },
+    "design2Finish": {
+      "file": ".scratch/p23-repair-design2-zpcoj_ho/CONSUMPTION-FINISHED.json",
+      "sha256": "3aff607c334a9a4d726cc7cb0b97669199ce1628a4ed91c8ed92ebdf6762c6a5"
+    },
+    "newWindowRequested": false,
+    "otherConsumersReleased": false,
+    "publicSourceWriteAuthorization": false
+  },
+  "next": {
+    "publicOwner": "complete-generated-file-anchors",
+    "publicStages": [
+      "P24",
+      "P25"
+    ],
+    "publicHandoffObserved": {
+      "file": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p24-public-products-main-20261027/CONTEXT-HANDOFF.md",
+      "sha256": "fb366906cf442efd14113e2117e723887d23c8ca5cae256f2f22330a1782e56f"
+    },
+    "observedState": "BC typed partial implementation, not complete JS products or full bank generation",
+    "bankAction": "consume formal public contracts and add concrete four-flow bindings/ports without bank compiler/generator/host shim",
+    "bankRuntimeStages": [
+      "P26",
+      "P27",
+      "P28",
+      "P29",
+      "P30",
+      "P31",
+      "P32"
+    ],
+    "newMilestonesAdded": 0
+  },
+  "futureWorkNotRetroactiveP23Blockers": [
+    "complete public semantic products and BC/JS formal producer-plan",
+    "complete V1 concrete TA/SIP bindings",
+    "generated runnable bank application",
+    "bank payment/TA/refund/SIP actual funds and lifecycle",
+    "Mongo/JDBC integration, actual bank JVM recovery and file anchors"
+  ],
+  "completeV1": false,
+  "applicationGeneration": false,
+  "bankFundsRuntimeAccepted": false,
+  "bankRecoveryAccepted": false,
+  "allV1BindingsComplete": false,
+  "publicImplementationAuthorized": false,
+  "committed": false,
+  "pushed": false
+}

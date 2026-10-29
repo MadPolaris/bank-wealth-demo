@@ -1,7 +1,7 @@
 {
   "schemaVersion": "bank-wealth.design-projection/v1",
   "readiness": "design-proposal-only",
-  "sourceDigest": "6c921cecd0c6725977dcc282be1ce73194e1d02c800025811cbe2aa2b6c850fa",
+  "sourceDigest": "572723ba4bdc42f39b9a3bb92d09e9dc7fa8bdb59fb16b565fbc856971cc4578",
   "toolDigest": "315bb736c8c29060f4bac2cc9234b756cd5802efa72ea0578923c69942725a73",
   "artifacts": [
     {
@@ -10606,7 +10606,8 @@
       "body": {
         "entities": [],
         "edges": [],
-        "designVersion": "bank-v1-p23-design-1",
+        "designVersion": "bank-v1-p23-design-2",
+        "supersedesDesignVersion": "bank-v1-p23-design-1",
         "decisionStatus": "selected-bounded-v1-design-not-runtime-qualification",
         "authorization": {
           "source": "user-approved-bounded-v1-and-bank-p23-plan",
@@ -10801,9 +10802,14 @@
               "dedupeBy": "occurrenceId",
               "successEvidence": "correlated-TAConfirmed",
               "failureEvidence": [
-                "known-no-effects-rejection",
+                "correlated-original-payment-rejected-before-effects",
                 "completed-payment-compensation",
                 "TARejected-and-independent-refund-completed"
+              ],
+              "refundNonCompletionEvidence": [
+                "refund-rejected-before-effects",
+                "refund-compensated",
+                "refund-unknown"
               ],
               "uncounted": [
                 "pending",
@@ -13799,7 +13805,7 @@
                   "occurrenceId",
                   "source-lifecycle-evidence"
                 ],
-                "invariant": "unknown-pending-do-not-count-terminal"
+                "invariant": "unknown-pending-do-not-count-terminal; existing-trusted-terminal-blocks-progress-regression-and-recovery-reopening"
               },
               {
                 "designEvent": "first-trusted-terminal-recorded",
@@ -13815,7 +13821,7 @@
               "exact-retained-configuration-and-resource-match",
               "existing-association-reuses-original-identities",
               "new-slot-owned-by-one-effective-revision",
-              "pause-classification-before-new-request",
+              "while-paused-retain-uncreated-backlog-no-new-cash-request-until-resume-inflight-continues",
               "terminal-evidence-correlated-with-occurrence",
               "same-terminal-idempotent-conflicting-terminal-rejected"
             ],
@@ -13826,7 +13832,8 @@
               "record-skipped-without-cash-effect",
               "record-first-trusted-terminal-once",
               "increment-only-matching-total-on-first-terminal",
-              "never-reset-failures-on-success-or-auto-pause"
+              "never-reset-failures-on-success-or-auto-pause",
+              "preserve-terminal-occurrenceProgress-and-firstTerminalLedger-on-late-nonterminal"
             ],
             "lifecycle": [
               "retain-finite-plan-revision-and-due-slot",
@@ -13836,16 +13843,21 @@
               "submit/query-same-TA-request",
               "TAConfirmed=>succeeded",
               "TARejected=>one-independent-refund=>failed-only-after-refund-completed",
-              "known-no-effects-or-completed-payment-compensation=>failed"
+              "correlated-original-payment-rejected-before-effects-or-completed-payment-compensation=>failed"
             ],
             "completion": {
               "mode": "first-trusted-business-terminal-totals",
               "dedupeBy": "occurrenceId",
               "successEvidence": "correlated-TAConfirmed",
               "failureEvidence": [
-                "known-no-effects-rejection",
+                "correlated-original-payment-rejected-before-effects",
                 "completed-payment-compensation",
                 "TARejected-and-independent-refund-completed"
+              ],
+              "refundNonCompletionEvidence": [
+                "refund-rejected-before-effects",
+                "refund-compensated",
+                "refund-unknown"
               ],
               "uncounted": [
                 "pending",
@@ -14934,13 +14946,12 @@
               },
               "paymentTxId": "retained-payment-tx-p23",
               "taRequestId": "retained-ta-request-p23",
-              "receiptId": "ta-confirmed-receipt-p23",
+              "receiptId": "ta-accepted-receipt-p23",
               "taReference": "ta-business-reference-p23",
-              "receiptBody": "{\"taRequestId\":\"retained-ta-request-p23\",\"status\":\"confirmed\",\"shares\":\"80.0000\",\"nav\":\"1.2345\"}",
+              "receiptBody": "{\"taRequestId\":\"retained-ta-request-p23\",\"outcome\":\"accepted\"}",
               "receiptBodyRole": "illustrative-exact-bytes-without-asserting-final-TA-codec-schema",
               "expectedTypedValues": {
-                "shares": "80.0000",
-                "nav": "1.2345"
+                "observationKind": "ACCEPTED"
               }
             },
             "sequence": [
@@ -14957,6 +14968,26 @@
                 "kind": "state",
                 "subject": "confirmed-shares",
                 "expected": "not-created"
+              },
+              {
+                "kind": "event",
+                "subject": "FundTAAccepted",
+                "expected": {
+                  "count": 1,
+                  "fundOrderId": "demo-order-p23",
+                  "paymentTxId": "retained-payment-tx-p23",
+                  "taRequestId": "retained-ta-request-p23",
+                  "taReference": "ta-business-reference-p23",
+                  "receiptId": "ta-accepted-receipt-p23",
+                  "receiptBody": "{\"taRequestId\":\"retained-ta-request-p23\",\"outcome\":\"accepted\"}",
+                  "observationKind": "ACCEPTED"
+                },
+                "afterStep": "RecordFundTAAccepted"
+              },
+              {
+                "kind": "state",
+                "subject": "taStatus",
+                "expected": "TA_ACCEPTED"
               }
             ],
             "forbiddenEffects": [
@@ -15747,7 +15778,7 @@
             ],
             "preconditions": [
               "trusted-occurrence",
-              "known-rejected-before-effects"
+              "correlated-original-payment-rejected-before-effects"
             ],
             "inputs": {
               "fixture": "finite-SIP-representative-not-executed",
@@ -15770,7 +15801,7 @@
               "fundCollectionAccountId": "demo-collection-account-p23"
             },
             "sequence": [
-              "consume-correlated-no-effects-result",
+              "consume-correlated-original-payment-no-effects-result",
               "record-first-failed-terminal"
             ],
             "expectedObservations": [
@@ -15842,10 +15873,12 @@
               "investorAccountId": "demo-investor-account-p23",
               "fundCollectionAccountId": "demo-collection-account-p23",
               "pauseTick": 15,
+              "pausedTriggerTick": 16,
               "resumeTick": 25
             },
             "sequence": [
               "retain-slot10-backlog",
+              "catch-up-and-retrigger-slot10-at-tick16-while-paused",
               "record-slot20-skipped",
               "resume",
               "create-slot10-original-revision",
@@ -15871,9 +15904,16 @@
                 "kind": "counter",
                 "subject": "skipped-terminal-total-delta",
                 "expected": 0
+              },
+              {
+                "kind": "event",
+                "subject": "slot10-new-cash-request-count-while-paused",
+                "expected": 0,
+                "afterStep": "catch-up-and-retrigger-slot10-at-tick16-while-paused"
               }
             ],
             "forbiddenEffects": [
+              "start-prepause-backlog-while-still-paused",
               "drop-prepause-obligation",
               "catch-up-debit-paused-slot",
               "count-skipped-as-failed"
@@ -16113,9 +16153,22 @@
                 "kind": "state",
                 "subject": "trusted-terminal",
                 "expected": "unchanged"
+              },
+              {
+                "kind": "state",
+                "subject": "occurrenceProgress",
+                "expected": "succeeded",
+                "afterStep": "deliver-stale-unknown"
+              },
+              {
+                "kind": "state",
+                "subject": "recovery-reopened",
+                "expected": false,
+                "afterStep": "deliver-stale-unknown"
               }
             ],
             "forbiddenEffects": [
+              "regress-terminal-progress-or-reopen-recovery",
               "failure-reset-on-success",
               "terminal-overwrite",
               "double-count"
@@ -16169,13 +16222,21 @@
                 "currency": "CNY"
               },
               "investorAccountId": "demo-investor-account-p23",
-              "fundCollectionAccountId": "demo-collection-account-p23"
+              "fundCollectionAccountId": "demo-collection-account-p23",
+              "nonCompletionEvidenceCases": [
+                "refund-rejected-before-effects",
+                "refund-compensated",
+                "refund-unknown"
+              ],
+              "nonCompletionEvidenceRole": "independent-negative-branches-stop-without-completion; main-sequence-continues-from-refund-unknown-only"
             },
             "sequence": [
               "refund-in-progress",
+              "observe-each-noncompletion-case-in-independent-negative-branch-without-terminal-upgrade",
               "refund-unknown",
               "same-identity-refund-completes",
-              "record-first-failed-terminal"
+              "record-first-failed-terminal",
+              "redeliver-same-refund-completion-identity-and-evidence"
             ],
             "expectedObservations": [
               {
@@ -16191,10 +16252,27 @@
               {
                 "kind": "counter",
                 "subject": "on-duplicate-refund-completed-delta",
-                "expected": 0
+                "expected": 0,
+                "afterStep": "redeliver-same-refund-completion-identity-and-evidence"
+              },
+              {
+                "kind": "counter",
+                "subject": "per-refund-noncompletion-case-failure-delta",
+                "expected": {
+                  "refund-rejected-before-effects": 0,
+                  "refund-compensated": 0,
+                  "refund-unknown": 0
+                },
+                "afterStep": "observe-each-noncompletion-case-in-independent-negative-branch-without-terminal-upgrade"
+              },
+              {
+                "kind": "state",
+                "subject": "failed-terminal-before-refund-completed",
+                "expected": "absent"
               }
             ],
             "forbiddenEffects": [
+              "refund-rejection-compensation-or-unknown-as-completed-refund",
               "count-TA-reject-before-money-return",
               "automatic-three-failure-pause"
             ],

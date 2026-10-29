@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "bank-p23-3-runtime-acceptance/v1",
+  "acceptedAt": "2026-10-27T15:41:09.427755+00:00",
+  "status": "accepted",
+  "package": "P23-3",
+  "runtimeArtifactGate": "passed",
+  "packageAccepted": true,
+  "bankHead": "5bf91e0eb6fc841c571a4c459f0ad9411b150c95",
+  "bankBranch": "feature/bank-wealth-truth-preview",
+  "includesUncommittedAcceptanceFiles": true,
+  "runtimeLock": {
+    "file": "docs/P23-RUNTIME-LOCK.json",
+    "sha256": "18f348f1ffb3fe1eaaba0417d7428e8679afc23a14fe836f5c0d4cb437e39fb7"
+  },
+  "gates": {
+    "sourceBinaryProvenance": "passed",
+    "pomAndLicenseEvidence": "passed",
+    "fixedDependencyResolution": "passed",
+    "supplierIndependentConsumer": "passed",
+    "bankIndependentOfflineConsumer": "passed",
+    "publicSourceConsumptionReceipt": "passed-historical-window-closed"
+  },
+  "supplierVerification": {
+    "file": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/VERIFICATION.json",
+    "sha256": "89cfa5810f708961b678008f087e4ad365d87109748e4c8015ef608f71af423e"
+  },
+  "supplierHandoff": {
+    "file": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/HANDOFF.md",
+    "sha256": "df212db2b7eb0a2700ac2505eaf4dbe1b8695a053c0fba5cec801bfde7035b16"
+  },
+  "supplyCheck": {
+    "file": ".scratch/p23-runtime-acceptance-b41gt8w9/SUPPLY-CHECK.json",
+    "sha256": "f75b2f6db639235f4f5a2b35fd6b8b2a912dba35bcc5d7d745440bb36826cd4b"
+  },
+  "sourceCommitChecks": [
+    {
+      "name": "monarch-core",
+      "sourceCommit": "3109a440c0e88a35cdcfb8986b60bea84c107464",
+      "commitSourceFilesVerified": 21,
+      "buildReceipt": "core-final-02.json"
+    },
+    {
+      "name": "monarch-persistence",
+      "sourceCommit": "9facddd1e1c7bfc1c3cffa5777b8957f6a4e8e56",
+      "commitSourceFilesVerified": 28,
+      "buildReceipt": "persistence-final-04.json"
+    },
+    {
+      "name": "saga-core",
+      "sourceCommit": "4352a3173ee4e812762dcaa9c1aad58ff1551417",
+      "commitSourceFilesVerified": 46,
+      "buildReceipt": "saga-final-06.json"
+    }
+  ],
+  "supplierTestsRecheckedNotRerun": [
+    {
+      "tag": "core-final-02",
+      "tests": {
+        "passed": 34,
+        "failed": 0,
+        "canceled": 0,
+        "ignored": 0,
+        "pending": 0
+      },
+      "receiptSha256": "c263351116d3f8794bad5cf83959667bd32fe830eea4cedcc8ad52ed5fa5b21b"
+    },
+    {
+      "tag": "persistence-final-04",
+      "tests": {
+        "passed": 33,
+        "failed": 0,
+        "canceled": 1,
+        "ignored": 0,
+        "pending": 0
+      },
+      "receiptSha256": "b9183a21b7e93654ab923a958d389df5c42506952f0115d8324b4f8cd0ea3c9f"
+    },
+    {
+      "tag": "saga-final-06",
+      "tests": {
+        "passed": 118,
+        "failed": 0,
+        "canceled": 0,
+        "ignored": 0,
+        "pending": 0
+      },
+      "receiptSha256": "d887ad9c4381d870b1f90fdf6b79505749695c7656b9da21d1116e88e11a50cc"
+    },
+    {
+      "tag": "consumer-online-07",
+      "tests": {
+        "passed": 5,
+        "failed": 0,
+        "canceled": 0,
+        "ignored": 0,
+        "pending": 0
+      },
+      "receiptSha256": "9f51dbafc5b4bc895170e43fac4ce5d9bd25e73db3fd514470a3b54e8cde55a7"
+    },
+    {
+      "tag": "consumer-offline-08",
+      "tests": {
+        "passed": 5,
+        "failed": 0,
+        "canceled": 0,
+        "ignored": 0,
+        "pending": 0
+      },
+      "receiptSha256": "3e6ccbab818c86e9f90fe60920a4f1dec677c18ff6b4450eabfaead4a78c76ca"
+    }
+  ],
+  "bankConsumer": {
+    "status": "bank-independent-offline-consumer-passed",
+    "tag": "bank-check-01",
+    "tests": {
+      "passed": 5,
+      "failed": 0,
+      "canceled": 0,
+      "ignored": 0,
+      "pending": 0
+    },
+    "receiptSha256": "90ad75b4d3514ab2413aa0754593b7ff562438ac15411a73bda25b71aeb19572",
+    "stdoutSha256": "53a54fa954079c69cf52f906447f976fd6f7b2f7af4bfda4f20805fc09ed4cf9",
+    "stderrSha256": "14a1a88deb2e1a5d24c2baacf8f1aa8c151ab7bc2c9326acba73beb9ec913421",
+    "initialApplicationDependencyCachesEmpty": true,
+    "onlyFileRepository": "[repositories]\np23: file:///Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/offline-maven\n",
+    "dependencyOverrides": [],
+    "consumerSourceMatchesSuppliedFixture": true,
+    "sourceDrift": false,
+    "runtimeOrigins": [
+      {
+        "name": "monarch-core",
+        "sha256": "046ce5a54d4900674b9d87396bd57aefd93070e74e00b90820147c043c506b09",
+        "path": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/offline-maven/net/imadz/monarch-core_2.13/0.2.1-p23.20261027.1/monarch-core_2.13-0.2.1-p23.20261027.1.jar"
+      },
+      {
+        "name": "monarch-persistence",
+        "sha256": "5cf3dd2784fad05fe42102b1c5df16685bc814318e2a21121c458eb26e8205bd",
+        "path": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/offline-maven/net/imadz/monarch-persistence_2.13/0.2.1-p23.20261027.1/monarch-persistence_2.13-0.2.1-p23.20261027.1.jar"
+      },
+      {
+        "name": "saga-core",
+        "sha256": "f20ad61eba670d2766cd39a1f75bd236351d0069b0480bb85d7335ffff93f8cf",
+        "path": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/offline-maven/net/imadz/saga-core_2.13/0.2.1-p23.20261027.1/saga-core_2.13-0.2.1-p23.20261027.1.jar"
+      }
+    ],
+    "dependencyComparison": {
+      "rawRows": 708,
+      "uniqueRows": 706,
+      "duplicateRowsRetained": 2,
+      "runtimeModules": 109,
+      "allConsumerModules": 133,
+      "sameConfigurationsCoordinatesBytesCallersAndMultiplicityAcrossThreeRuns": true,
+      "semanticRowsSha256": "4e419587832f41d22f708eb17d0f1b82188d8613cfc3ab44a2e1dfc51c3189cd",
+      "rowsWithMultiplicitySha256": "9860388fedd620ba12fb89cefd0af0c1b848bffd071426531e928b9b9f307dac",
+      "normalizedRowsFile": "DEPENDENCY-REPLAY-ROWS.json",
+      "reportFiles": [
+        {
+          "file": "consumer-runs/consumer-online-07/project/target/resolved-artifacts.tsv",
+          "sha256": "192eae6deea158b4042113949d4772ba45b70bbb3b571d566612dcdabc7edb67"
+        },
+        {
+          "file": "consumer-runs/consumer-offline-08/project/target/resolved-artifacts.tsv",
+          "sha256": "e3903ea4c3f459a38710eafbc5ffea9283c65e043f334857b8a47f76cbf99100"
+        },
+        {
+          "file": "consumer-runs/bank-check-01/project/target/resolved-artifacts.tsv",
+          "sha256": "e3903ea4c3f459a38710eafbc5ffea9283c65e043f334857b8a47f76cbf99100"
+        }
+      ]
+    },
+    "toolchainBootReused": "/Users/zhongdj/.sbt/boot",
+    "ownedProcessWaited": true,
+    "ownedProcessAbsentAtCheck": true,
+    "bankInputAndHistoricalEvidenceDrift": [],
+    "supplyFileDrift": [],
+    "warningsRetained": {
+      "legacyAkkaEvictions": true,
+      "SLF4JNop": true
+    },
+    "mongoJdbcIntegrationQualified": false,
+    "bankFundsRuntimeQualified": false,
+    "completeP23": false
+  },
+  "bankConsumerCommand": [
+    "/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home/bin/java",
+    "-Xmx2G",
+    "-Dsbt.server.autostart=false",
+    "-Dsbt.supershell=false",
+    "-Dsbt.log.noformat=true",
+    "-Dsbt.boot.directory=/Users/zhongdj/.sbt/boot",
+    "-Dsbt.global.base=/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/consumer-runs/bank-check-01/global",
+    "-Dsbt.ivy.home=/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/consumer-runs/bank-check-01/ivy",
+    "-Dsbt.repository.config=/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/consumer-runs/bank-check-01/repositories",
+    "-Dsbt.override.build.repos=true",
+    "-Dcoursier.cache=/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/consumer-runs/bank-check-01/coursier",
+    "-Djava.io.tmpdir=/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/consumer-runs/bank-check-01/tmp",
+    "-Ddelivery.artifacts=monarch-core=046ce5a54d4900674b9d87396bd57aefd93070e74e00b90820147c043c506b09;monarch-persistence=5cf3dd2784fad05fe42102b1c5df16685bc814318e2a21121c458eb26e8205bd;saga-core=f20ad61eba670d2766cd39a1f75bd236351d0069b0480bb85d7335ffff93f8cf",
+    "-jar",
+    "/usr/local/Cellar/sbt/1.10.4/libexec/bin/sbt-launch.jar",
+    "show externalResolvers",
+    "show csrCacheDirectory",
+    "show dependencyOverrides",
+    "update",
+    "evicted",
+    "compile",
+    "Test / compile",
+    "test",
+    "deliveryReport"
+  ],
+  "bankConsumerSource": [
+    {
+      "file": "build.sbt",
+      "sha256": "1a56ae58f38b4df3b3d5e10355d71d22042bffbb7153750eabe195da3ba6525b"
+    },
+    {
+      "file": "project/build.properties",
+      "sha256": "ef0027fa322ca439f465803fdfa777a1216a4ed32e8fcaea3e7b038b4510e632"
+    },
+    {
+      "file": "src/test/scala/delivery/RuntimeDeliverySpec.scala",
+      "sha256": "e297ee2e1482bdbf049a0b97a2fd0ba0ccab9e948e944e6490ac714b185a4615"
+    }
+  ],
+  "bankConsumerExecution": {
+    "receipt": {
+      "file": ".scratch/p23-runtime-acceptance-b41gt8w9/bank-check-01.json",
+      "sha256": "90ad75b4d3514ab2413aa0754593b7ff562438ac15411a73bda25b71aeb19572"
+    },
+    "stdout": {
+      "file": ".scratch/p23-runtime-acceptance-b41gt8w9/bank-check-01.stdout.log",
+      "sha256": "53a54fa954079c69cf52f906447f976fd6f7b2f7af4bfda4f20805fc09ed4cf9"
+    },
+    "stderr": {
+      "file": ".scratch/p23-runtime-acceptance-b41gt8w9/bank-check-01.stderr.log",
+      "sha256": "14a1a88deb2e1a5d24c2baacf8f1aa8c151ab7bc2c9326acba73beb9ec913421"
+    },
+    "pid": 60641,
+    "waited": true,
+    "exitCode": 0,
+    "timedOut": false
+  },
+  "historicalSourceConsumption": {
+    "verification": {
+      "file": "docs/P23-DESIGN-2-VERIFICATION.json",
+      "sha256": "07eaaeba1b68bf748177448ae981d373bd8fbdd626e7e0f3786dc0bed5348bfa"
+    },
+    "completion": {
+      "file": ".scratch/p23-repair-design2-zpcoj_ho/CONSUMPTION-FINISHED.json",
+      "sha256": "3aff607c334a9a4d726cc7cb0b97669199ce1628a4ed91c8ed92ebdf6762c6a5"
+    },
+    "currentBankInputFilesMatch": true,
+    "historicalToolVersion": "b621ac057f1c8bd135d1ff08626314f428f8858a",
+    "publicCompilerRerunThisRound": false,
+    "newStableSourceWindowRequested": false
+  },
+  "supersedesStatusOnly": [
+    {
+      "file": "docs/P23-VERIFICATION.json",
+      "field": "stages.runtimeArtifactClosure"
+    },
+    {
+      "file": "docs/P23-DESIGN-2-VERIFICATION.json",
+      "field": "remainingBlockers[P23-runtime-artifact-closure]"
+    }
+  ],
+  "historicalFilesRewritten": false,
+  "bankTruthOrBindingsChangedThisRound": false,
+  "bankNodeTestsRerunThisRound": false,
+  "warningsAndLimits": [
+    "Akka legacy transitive eviction warnings retained; no complete Mongo/JDBC integration certification.",
+    "SLF4J NOP warnings retained; application logging backend still required.",
+    "Preinstalled JDK/sbt boot reused; empty application caches, not empty OS installation or firewall isolation.",
+    "Supplier opt-in capacity test canceled, not counted as pass; source tests185 and bank consumer5 are distinct scopes.",
+    "License-material review is not legal approval.",
+    "Standalone artifact consumer does not certify bank funds, TA, refund, SIP or JVM recovery."
+  ],
+  "completeP23": false,
+  "completeP23Reason": "This receipt closes P23-3 only; combine P23-1/2/4 evidence in stage signoff, not a remaining artifact blocker.",
+  "bankBusinessRuntimeAccepted": false,
+  "publicImplementationAuthorized": false,
+  "committed": false,
+  "pushed": false,
+  "evidenceDirectory": ".scratch/p23-runtime-acceptance-b41gt8w9"
+}

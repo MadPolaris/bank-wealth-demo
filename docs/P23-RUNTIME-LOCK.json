@@ -1,0 +1,284 @@
+{
+  "schemaVersion": "bank-runtime-artifact-lock/v1",
+  "version": "0.2.1-p23.20261027.1",
+  "status": "accepted-local-pre-release",
+  "repository": {
+    "id": "p23-runtime-delivery",
+    "url": "file:///Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/offline-maven/",
+    "format": "maven",
+    "onlyRepositoryUsedInBankAcceptance": true,
+    "relocationPolicy": "location may change only with exact artifact verification; published coordinates and bytes must not be overwritten"
+  },
+  "artifacts": [
+    {
+      "name": "monarch-core",
+      "group": "net.imadz",
+      "artifact": "monarch-core_2.13",
+      "version": "0.2.1-p23.20261027.1",
+      "sourceCommit": "3109a440c0e88a35cdcfb8986b60bea84c107464",
+      "repositoryRelativeJar": "net/imadz/monarch-core_2.13/0.2.1-p23.20261027.1/monarch-core_2.13-0.2.1-p23.20261027.1.jar",
+      "jarSha256": "046ce5a54d4900674b9d87396bd57aefd93070e74e00b90820147c043c506b09",
+      "repositoryRelativePom": "net/imadz/monarch-core_2.13/0.2.1-p23.20261027.1/monarch-core_2.13-0.2.1-p23.20261027.1.pom",
+      "pomSha256": "b2cdec24e04948dd8a887ffcb509f486bb7fe3558412c6adb685b774ea39b0d8",
+      "licenseSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "dependencies": [
+        {
+          "groupId": "org.scala-lang",
+          "artifactId": "scala-library",
+          "version": "2.13.14",
+          "scope": null
+        },
+        {
+          "groupId": "org.scalatest",
+          "artifactId": "scalatest_2.13",
+          "version": "3.2.15",
+          "scope": "test"
+        }
+      ]
+    },
+    {
+      "name": "monarch-persistence",
+      "group": "net.imadz",
+      "artifact": "monarch-persistence_2.13",
+      "version": "0.2.1-p23.20261027.1",
+      "sourceCommit": "9facddd1e1c7bfc1c3cffa5777b8957f6a4e8e56",
+      "repositoryRelativeJar": "net/imadz/monarch-persistence_2.13/0.2.1-p23.20261027.1/monarch-persistence_2.13-0.2.1-p23.20261027.1.jar",
+      "jarSha256": "5cf3dd2784fad05fe42102b1c5df16685bc814318e2a21121c458eb26e8205bd",
+      "repositoryRelativePom": "net/imadz/monarch-persistence_2.13/0.2.1-p23.20261027.1/monarch-persistence_2.13-0.2.1-p23.20261027.1.pom",
+      "pomSha256": "d1414fd774f4e1c576844ba428599180b70696d860a6958abc91fe9112004bf4",
+      "licenseSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "dependencies": [
+        {
+          "groupId": "org.scala-lang",
+          "artifactId": "scala-library",
+          "version": "2.13.14",
+          "scope": null
+        },
+        {
+          "groupId": "com.thesamet.scalapb",
+          "artifactId": "scalapb-runtime_2.13",
+          "version": "0.11.14",
+          "scope": null
+        },
+        {
+          "groupId": "net.imadz",
+          "artifactId": "monarch-core_2.13",
+          "version": "0.2.1-p23.20261027.1",
+          "scope": null
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-actor-typed_2.13",
+          "version": "2.6.20",
+          "scope": null
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-persistence-typed_2.13",
+          "version": "2.6.20",
+          "scope": null
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-serialization-jackson_2.13",
+          "version": "2.6.20",
+          "scope": null
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-cluster-sharding-typed_2.13",
+          "version": "2.6.20",
+          "scope": null
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-actor-testkit-typed_2.13",
+          "version": "2.6.20",
+          "scope": "test"
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-persistence-testkit_2.13",
+          "version": "2.6.20",
+          "scope": "test"
+        },
+        {
+          "groupId": "org.scalatest",
+          "artifactId": "scalatest_2.13",
+          "version": "3.2.18",
+          "scope": "test"
+        },
+        {
+          "groupId": "ch.qos.logback",
+          "artifactId": "logback-classic",
+          "version": "1.2.13",
+          "scope": "test"
+        }
+      ]
+    },
+    {
+      "name": "saga-core",
+      "group": "net.imadz",
+      "artifact": "saga-core_2.13",
+      "version": "0.2.1-p23.20261027.1",
+      "sourceCommit": "4352a3173ee4e812762dcaa9c1aad58ff1551417",
+      "repositoryRelativeJar": "net/imadz/saga-core_2.13/0.2.1-p23.20261027.1/saga-core_2.13-0.2.1-p23.20261027.1.jar",
+      "jarSha256": "f20ad61eba670d2766cd39a1f75bd236351d0069b0480bb85d7335ffff93f8cf",
+      "repositoryRelativePom": "net/imadz/saga-core_2.13/0.2.1-p23.20261027.1/saga-core_2.13-0.2.1-p23.20261027.1.pom",
+      "pomSha256": "8117458e992085da2f106a4913429c6a8449ae1699218ffac52b54d784dd7555",
+      "licenseSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "dependencies": [
+        {
+          "groupId": "org.scala-lang",
+          "artifactId": "scala-library",
+          "version": "2.13.14",
+          "scope": null
+        },
+        {
+          "groupId": "com.thesamet.scalapb",
+          "artifactId": "scalapb-runtime_2.13",
+          "version": "0.11.14",
+          "scope": null
+        },
+        {
+          "groupId": "net.imadz",
+          "artifactId": "common-core_2.13",
+          "version": "0.2",
+          "scope": null
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-actor-typed_2.13",
+          "version": "2.6.20",
+          "scope": null
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-persistence-typed_2.13",
+          "version": "2.6.20",
+          "scope": null
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-cluster-sharding-typed_2.13",
+          "version": "2.6.20",
+          "scope": null
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-actor-testkit-typed_2.13",
+          "version": "2.6.20",
+          "scope": "test"
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-persistence-testkit_2.13",
+          "version": "2.6.20",
+          "scope": "test"
+        },
+        {
+          "groupId": "com.typesafe.akka",
+          "artifactId": "akka-serialization-jackson_2.13",
+          "version": "2.6.20",
+          "scope": "test"
+        },
+        {
+          "groupId": "org.scalatest",
+          "artifactId": "scalatest_2.13",
+          "version": "3.2.15",
+          "scope": "test"
+        },
+        {
+          "groupId": "ch.qos.logback",
+          "artifactId": "logback-classic",
+          "version": "1.4.5",
+          "scope": "test"
+        },
+        {
+          "groupId": "com.google.protobuf",
+          "artifactId": "protobuf-java",
+          "version": "3.15.6",
+          "scope": null
+        },
+        {
+          "groupId": "com.typesafe.play",
+          "artifactId": "play-json_2.13",
+          "version": "2.9.3",
+          "scope": null
+        },
+        {
+          "groupId": "javax.inject",
+          "artifactId": "javax.inject",
+          "version": "1",
+          "scope": null
+        },
+        {
+          "groupId": "com.google.inject",
+          "artifactId": "guice",
+          "version": "5.1.0",
+          "scope": null
+        }
+      ]
+    }
+  ],
+  "scalaVersion": "2.13.14",
+  "scalaBinaryVersion": "2.13",
+  "jdkMajor": 11,
+  "sbtVersion": "1.4.9",
+  "dependencyOverrides": [],
+  "dependencyGraph": {
+    "rawRows": 708,
+    "uniqueRows": 706,
+    "duplicateRowsRetained": 2,
+    "runtimeModules": 109,
+    "allConsumerModules": 133,
+    "sameConfigurationsCoordinatesBytesCallersAndMultiplicityAcrossThreeRuns": true,
+    "semanticRowsSha256": "4e419587832f41d22f708eb17d0f1b82188d8613cfc3ab44a2e1dfc51c3189cd",
+    "rowsWithMultiplicitySha256": "9860388fedd620ba12fb89cefd0af0c1b848bffd071426531e928b9b9f307dac",
+    "normalizedRowsFile": "DEPENDENCY-REPLAY-ROWS.json",
+    "reportFiles": [
+      {
+        "file": "consumer-runs/consumer-online-07/project/target/resolved-artifacts.tsv",
+        "sha256": "192eae6deea158b4042113949d4772ba45b70bbb3b571d566612dcdabc7edb67"
+      },
+      {
+        "file": "consumer-runs/consumer-offline-08/project/target/resolved-artifacts.tsv",
+        "sha256": "e3903ea4c3f459a38710eafbc5ffea9283c65e043f334857b8a47f76cbf99100"
+      },
+      {
+        "file": "consumer-runs/bank-check-01/project/target/resolved-artifacts.tsv",
+        "sha256": "e3903ea4c3f459a38710eafbc5ffea9283c65e043f334857b8a47f76cbf99100"
+      }
+    ]
+  },
+  "dependencyGraphScope": "supplied standalone consumer, not future full bank application",
+  "dependencyLock": {
+    "file": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/DEPENDENCY-LOCK.json",
+    "sha256": "96c215ca01333784eca47dd55849c21c569665bd431a642d9ec556f3a57a4071"
+  },
+  "finalSupplyReplay": {
+    "file": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/DEPENDENCY-REPLAY.json",
+    "sha256": "84bcceca8faa65313d33c1ebdc023665ce95b8b1c8b52db7f3e1fe34f7ab62ad"
+  },
+  "offlineRepositoryInventory": {
+    "file": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/OFFLINE-REPOSITORY.json",
+    "sha256": "eb182c2debb57d159df8aac43599cb13bac70a9ff14676b13220758dc87d7468"
+  },
+  "licenseReview": {
+    "file": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/LICENSE-REVIEW.json",
+    "sha256": "e54c966f38b547522afab8cf6239c2fefd2d427303af9d5a09c9f8df6ff217cd"
+  },
+  "supplierManifest": {
+    "file": "/Users/zhongdj/Workspaces/mad-polaris/backkend-codegen/.rounds/p23-runtime-delivery-main-20261027/ARTIFACT-MANIFEST.json",
+    "sha256": "a118c5c74a4c4e1da7ba6f1dfb8e5df6dd0cb3af6d8a9e3148801e7f8496eb6f"
+  },
+  "bankConsumerCheck": {
+    "file": ".scratch/p23-runtime-acceptance-b41gt8w9/BANK-CONSUMER-CHECK.json",
+    "sha256": "04283494acba2db60d0719009230a45fae2bd0a0feb6eafa33b2603f778824ab"
+  },
+  "applicationIntegrationApplied": false,
+  "automaticallyLoadedByBuildTool": false,
+  "futureConsumerObligation": "Use exact coordinates and validate selected JAR SHA plus that application dependency graph; no sibling source or unmanaged-JAR substitution.",
+  "remotePublication": false,
+  "licenseLegalApproval": false
+}

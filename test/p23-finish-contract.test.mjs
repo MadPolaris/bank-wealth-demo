@@ -51,6 +51,65 @@ const resolution = (body, id) => body.resolutions?.find(row => row.id === id)?.d
 const flow = (body, id) => body.flows?.find(row => row.id === id);
 const scenario = (body, id) => body.scenarios?.find(row => row.id === id);
 const observed = (body, id, kind, subject, expected) => scenario(body, id)?.expectedObservations?.some(row => row.kind === kind && row.subject === subject && same(row.expected, expected));
+const NOT_RUN_FIELDS = ['applicationGeneration','fundsRuntime','applicationRecovery','codeBackAnchoring'];
+const FAILURE_EVIDENCE = ['correlated-original-payment-rejected-before-effects','completed-payment-compensation','TARejected-and-independent-refund-completed'];
+const REFUND_NONCOMPLETION = ['refund-rejected-before-effects','refund-compensated','refund-unknown'];
+const PAUSED_TRIGGER = 'catch-up-and-retrigger-slot10-at-tick16-while-paused';
+const REFUND_REPEAT = 'redeliver-same-refund-completion-identity-and-evidence';
+
+function repairErrors(body) {
+  const errors = [];
+  const check = (ok, id, message) => { if (!ok) errors.push(`${id}: ${message}`); };
+  const sip = flow(body,'sip'), counters = resolution(body,'I0-S07-sip-counters');
+  check(same(counters?.failureEvidence, FAILURE_EVIDENCE) && same(sip?.completion.failureEvidence, FAILURE_EVIDENCE), 'R01', 'no-effects evidence is correlated original payment only');
+  check(same(counters?.refundNonCompletionEvidence, REFUND_NONCOMPLETION) && same(sip?.completion.refundNonCompletionEvidence, REFUND_NONCOMPLETION), 'R01', 'refund rejection/compensation/unknown cannot certify money returned');
+  check(sip?.lifecycle.includes('correlated-original-payment-rejected-before-effects-or-completed-payment-compensation=>failed'), 'R01', 'lifecycle must retain original-payment scope');
+  const noEffects = scenario(body,'SIP-no-effects-failure');
+  check(noEffects?.preconditions.includes('correlated-original-payment-rejected-before-effects') && noEffects?.sequence.includes('consume-correlated-original-payment-no-effects-result'), 'R01', 'positive no-effects stimulus belongs to original payment');
+  const refund = scenario(body,'SIP-refund-count-boundary');
+  const noncompletionStep = 'observe-each-noncompletion-case-in-independent-negative-branch-without-terminal-upgrade';
+  check(same(refund?.inputs.nonCompletionEvidenceCases, REFUND_NONCOMPLETION) && refund?.sequence.includes(noncompletionStep), 'R01', 'refund noncompletion cases are alternative stimuli, not completed refund');
+  check(refund?.inputs.nonCompletionEvidenceRole === 'independent-negative-branches-stop-without-completion; main-sequence-continues-from-refund-unknown-only', 'R01', 'terminal refund rejection/compensation is not resumed as success');
+  check(refund?.expectedObservations.some(row => row.subject === 'per-refund-noncompletion-case-failure-delta' && row.kind === 'counter' && row.afterStep === noncompletionStep && same(row.expected,Object.fromEntries(REFUND_NONCOMPLETION.map(key => [key,0])))), 'R01', 'no failure increment for any refund noncompletion case');
+  check(observed(body,'SIP-refund-count-boundary','state','failed-terminal-before-refund-completed','absent'), 'R01', 'no failed terminal before money return');
+
+  check(sip?.guardObligations.includes('while-paused-retain-uncreated-backlog-no-new-cash-request-until-resume-inflight-continues'), 'R02', 'pause blocks new backlog requests but not in-flight lifecycle');
+  const pause = scenario(body,'SIP-pause-backlog');
+  check(pause?.inputs.pausedTriggerTick === 16 && pause?.inputs.pauseTick === 15 && pause?.inputs.resumeTick === 25, 'R02', 'trigger is inside pause interval');
+  const trigger = pause?.sequence.indexOf(PAUSED_TRIGGER), resume = pause?.sequence.indexOf('resume');
+  check(trigger >= 0 && resume > trigger && pause?.sequence.indexOf('create-slot10-original-revision') > resume, 'R02', 'paused stimulus precedes resume and backlog creation');
+  check(pause?.expectedObservations.some(row => row.subject === 'slot10-new-cash-request-count-while-paused' && row.kind === 'event' && row.expected === 0 && row.afterStep === PAUSED_TRIGGER), 'R02', 'zero new request bound to paused stimulus');
+  check(pause?.forbiddenEffects.includes('start-prepause-backlog-while-still-paused'), 'R02', 'explicit forbidden paused backlog start');
+
+  check(sip?.eventObligations.find(row => row.designEvent === 'progress-observed')?.invariant === 'unknown-pending-do-not-count-terminal; existing-trusted-terminal-blocks-progress-regression-and-recovery-reopening', 'R03', 'late progress cannot reopen terminal occurrence');
+  check(sip?.foldObligations.includes('preserve-terminal-occurrenceProgress-and-firstTerminalLedger-on-late-nonterminal'), 'R03', 'terminal progress and ledger survive late nonterminal');
+  const late = scenario(body,'SIP-late-terminal');
+  check(late?.sequence.includes('deliver-stale-unknown'), 'R03', 'late nonterminal stimulus is present');
+  for (const [subject, expected] of [['occurrenceProgress','succeeded'], ['recovery-reopened',false]]) {
+    check(late?.expectedObservations.some(row => row.kind === 'state' && row.subject === subject && row.expected === expected && row.afterStep === 'deliver-stale-unknown'), 'R03', `late observation preserves ${subject}`);
+  }
+
+  const completeAt = refund?.sequence.indexOf('same-identity-refund-completes');
+  const terminalAt = refund?.sequence.indexOf('record-first-failed-terminal');
+  const repeatAt = refund?.sequence.indexOf(REFUND_REPEAT);
+  check(completeAt >= 0 && terminalAt > completeAt && repeatAt > terminalAt, 'R04', 'same-identity/evidence duplicate follows first failed terminal');
+  check(refund?.expectedObservations.some(row => row.kind === 'counter' && row.subject === 'on-duplicate-refund-completed-delta' && row.expected === 0 && row.afterStep === REFUND_REPEAT), 'R04', 'zero delta is linked to delivered duplicate');
+
+  const accepted = scenario(body,'TA-accepted-only'), inputs = accepted?.inputs;
+  let receipt;
+  try { receipt = JSON.parse(inputs?.receiptBody); } catch { /* Report invalid representative bytes below. */ }
+  check(same(receipt, {taRequestId: inputs?.taRequestId, outcome:'accepted'}), 'R05', 'accepted illustrative body has no confirmed shares/NAV');
+  check(inputs?.receiptId === 'ta-accepted-receipt-p23' && inputs?.receiptId !== scenario(body,'TA-confirm')?.inputs.receiptId, 'R05', 'accepted delivery identity differs from confirmation');
+  check(inputs?.receiptBodyRole === 'illustrative-exact-bytes-without-asserting-final-TA-codec-schema' && same(inputs?.expectedTypedValues,{observationKind:'ACCEPTED'}), 'R05', 'illustrative receipt, not a new public codec');
+  check(same(accepted?.sequence,['RegisterFundTASubmission','RecordFundTAAccepted']), 'R05', 'submission followed by actual accepted stimulus');
+  check(accepted?.expectedObservations.some(row => row.kind === 'event' && row.subject === 'FundTAAccepted' && row.afterStep === 'RecordFundTAAccepted' && same(row.expected, {
+    count:1, fundOrderId:inputs?.originalOrder, paymentTxId:inputs?.paymentTxId, taRequestId:inputs?.taRequestId,
+    taReference:inputs?.taReference, receiptId:inputs?.receiptId, receiptBody:inputs?.receiptBody, observationKind:'ACCEPTED',
+  })), 'R05', 'positive accepted event with retained receipt correlation');
+  check(observed(body,'TA-accepted-only','state','taStatus','TA_ACCEPTED') && observed(body,'TA-accepted-only','state','confirmed-shares','not-created'), 'R05', 'accepted recorded without confirmed shares');
+  for (const key of NOT_RUN_FIELDS) check(body.readiness?.[key] === 'not-run', `R06 ${key}`, 'exact not-run readiness required');
+  return errors;
+}
 
 // Bank design-contract checks only. These compare source references and required
 // obligations; they never execute funds, a policy state machine or public lowering.
@@ -63,7 +122,7 @@ function contractErrors(candidate) {
   check(candidate.id === ID && candidate.status === 'demo-proposal', 'artifact', 'original proposal envelope');
   check(candidate.provenance?.workshopHeld === false && candidate.provenance?.source === 'user-approved-bounded-v1-and-bank-p23-plan', 'provenance', 'actual selected-policy source, no fictional workshop');
   check(candidate.source?.board === 'wealth-p23-v1-handoff' && candidate.source?.seq === 0, 'source', 'new independent capture address');
-  check(body.designVersion === 'bank-v1-p23-design-1', 'designVersion', 'business design version distinct from schemas');
+  check(body.designVersion === 'bank-v1-p23-design-2' && body.supersedesDesignVersion === 'bank-v1-p23-design-1', 'designVersion', 'explicit business design revision distinct from schemas');
   check(body.authorization?.scope === 'bank-source-design-contract-tests-and-projections-only', 'authorization', 'bank-only scope');
   for (const key of ['publicSourceWritesAuthorized','runtimeWritesAuthorized','serviceLifecycleAuthorized','productionPoliciesApproved','externalBankMockAuthorized']) {
     check(body.authorization?.[key] === false, 'authorization', `${key} stays false`);
@@ -139,7 +198,7 @@ function contractErrors(candidate) {
   check(identity?.backlogRevision === 'retain-owning-original-revision' && identity?.futureSlotOwnership === 'exactly-one-effective-revision' && identity?.oldPlans === 'no-automatic-migration', 'occurrence', 'revision ownership');
   const counters = resolution(body, 'I0-S07-sip-counters');
   check(counters?.mode === 'first-trusted-business-terminal-totals' && counters?.dedupeBy === 'occurrenceId' && counters?.successEvidence === 'correlated-TAConfirmed', 'counters', 'first trusted terminal');
-  check(same(counters?.failureEvidence, ['known-no-effects-rejection','completed-payment-compensation','TARejected-and-independent-refund-completed']), 'counters', 'safe failure evidence');
+  check(same(counters?.failureEvidence, FAILURE_EVIDENCE), 'counters', 'safe failure evidence');
   check(same(counters?.uncounted, ['pending','outcome-unknown','recovery-required','refund-in-progress','skipped']) && counters?.conflictingTerminal === 'reject', 'counters', 'unresolved not terminal');
   for (const key of ['successResetsFailure','consecutiveFailures','automaticThreeFailurePause']) check(counters?.[key] === false, 'counters', key);
   const refund = resolution(body, 'ROADMAP-D-refund-entry-authority');
@@ -198,7 +257,10 @@ function contractErrors(candidate) {
     check(FLOW_IDS.includes(value.flow) && PACKAGE_IDS.includes(value.acceptancePackage), value.id, 'known flow/package');
     check(populated(value.preconditions) && value.inputs && typeof value.inputs === 'object' && populated(value.sequence) && populated(value.expectedObservations) && populated(value.forbiddenEffects) && populated(value.sourceRefs), value.id, 'complete scenario and forbidden effects');
     check(value.execution === 'not-run' && value.evidenceLevel === 'design-oracle-not-runtime-test' && value.originalValuesMustBeRetained === true, value.id, 'unexecuted design oracle');
-    for (const row of value.expectedObservations || []) check(['event','state','resource-effect','customer-state','counter','diagnostic'].includes(row.kind) && text(row.subject) && Object.hasOwn(row,'expected'), value.id, 'typed observable');
+    for (const row of value.expectedObservations || []) {
+      check(['event','state','resource-effect','customer-state','counter','diagnostic'].includes(row.kind) && text(row.subject) && Object.hasOwn(row,'expected'), value.id, 'typed observable');
+      if (Object.hasOwn(row,'afterStep')) check(value.sequence?.includes(row.afterStep), value.id, 'observation stimulus exists in scenario sequence');
+    }
   }
   for (const id of FLOW_IDS) for (const label of ['success','duplicate','conflict','unknown-recovery','early-failure']) check(body.scenarios?.some(row => row.flow === id && row.labels?.includes(label)), id, `required scenario category ${label}`);
   const requiredObservations = [
@@ -228,6 +290,7 @@ function contractErrors(candidate) {
   for (const row of body.bindingInventory || []) check(document(row.file)?.schemaVersion === row.schemaVersion && row.modifiedByP23 === false && row.completeV1Coverage === false, row.file, 'actual schema and honest V1 coverage');
   check(body.readiness?.designContractValidated === false && body.readiness?.publicSemanticAdmission === 'not-run-for-new-v1-overlay' && body.readiness?.existingSourceGatesDoNotQualifyOverlay === true && body.readiness?.completeP23 === false, 'readiness', 'execution receipts stay outside truth');
   check(body.readiness?.runtimeArtifactClosure === 'blocked-separate-owner-evidence', 'readiness', 'separate artifact gate');
+  errors.push(...repairErrors(body));
   return errors;
 }
 
@@ -240,6 +303,15 @@ for (const id of FLOW_IDS) test(`P23 ${id}: success/duplicate/conflict/unknown/e
   const current = source.body.flows.find(row => row.id === id);
   assert.ok(current.scenarioIds.length >= 5);
   assert.deepEqual(contractErrors(source), []);
+});
+for (const id of ['R01','R02','R03','R04','R05','R06']) test(`P23 repair ${id}: required evidence, stimuli and oracles are coherent`, () => {
+  assert.deepEqual(repairErrors(source.body).filter(error => error.startsWith(id)), []);
+});
+for (const field of NOT_RUN_FIELDS) for (const value of ['passed', undefined]) test(`P23 not-run readiness rejects: ${field} ${value ?? 'missing'}`, () => {
+  const candidate = structuredClone(source);
+  if (value === undefined) delete candidate.body.readiness[field];
+  else candidate.body.readiness[field] = value;
+  assert.ok(contractErrors(candidate).some(error => error.includes(`R06 ${field}`)), field);
 });
 const mutateScenario = (body, id, fn) => fn(scenario(body,id));
 const mutations = [
@@ -292,6 +364,48 @@ const mutations = [
   ['runtime certification', b => b.readiness.runnable = true], ['P23 complete despite artifacts', b => b.readiness.completeP23 = true],
   ['tool hash in truth', b => b.toolDigest = 'forged'], ['claimed all V1 bindings', b => b.bindingInventory[0].completeV1Coverage = true],
 ];
+const repairMutations = [
+  ['R01','unscoped original payment', b => {
+    resolution(b,'I0-S07-sip-counters').failureEvidence[0] = 'known-no-effects-rejection';
+    flow(b,'sip').completion.failureEvidence[0] = 'known-no-effects-rejection';
+  }],
+  ['R01','refund noncompletion boundary removed', b => {
+    delete resolution(b,'I0-S07-sip-counters').refundNonCompletionEvidence;
+    delete flow(b,'sip').completion.refundNonCompletionEvidence;
+  }],
+  ['R01','terminal refund resumes as success', b => scenario(b,'SIP-refund-count-boundary').inputs.nonCompletionEvidenceRole = 'all-branches-resume-to-success'],
+  ['R01','unscoped lifecycle', b => flow(b,'sip').lifecycle[7] = 'known-no-effects-or-completed-payment-compensation=>failed'],
+  ['R01','unscoped positive stimulus', b => scenario(b,'SIP-no-effects-failure').sequence[0] = 'consume-correlated-no-effects-result'],
+  ['R01','refund rejection counts failure', b => scenario(b,'SIP-refund-count-boundary').expectedObservations.find(row => row.subject === 'per-refund-noncompletion-case-failure-delta').expected['refund-rejected-before-effects'] = 1],
+  ['R01','refund alternatives lack stimulus', b => scenario(b,'SIP-refund-count-boundary').sequence = scenario(b,'SIP-refund-count-boundary').sequence.filter(step => !step.startsWith('observe-each-'))],
+  ['R02','classification only guard', b => flow(b,'sip').guardObligations[3] = 'pause-classification-before-new-request'],
+  ['R02','paused trigger removed', b => scenario(b,'SIP-pause-backlog').sequence = scenario(b,'SIP-pause-backlog').sequence.filter(step => step !== PAUSED_TRIGGER)],
+  ['R02','backlog started while paused', b => scenario(b,'SIP-pause-backlog').expectedObservations.find(row => row.subject === 'slot10-new-cash-request-count-while-paused').expected = 1],
+  ['R02','oracle not linked to paused trigger', b => delete scenario(b,'SIP-pause-backlog').expectedObservations.find(row => row.subject === 'slot10-new-cash-request-count-while-paused').afterStep],
+  ['R03','count-only progress invariant', b => flow(b,'sip').eventObligations[3].invariant = 'unknown-pending-do-not-count-terminal'],
+  ['R03','terminal fold unprotected', b => flow(b,'sip').foldObligations.pop()],
+  ['R03','progress regresses despite terminal ledger', b => scenario(b,'SIP-late-terminal').expectedObservations.find(row => row.subject === 'occurrenceProgress').expected = 'outcome-unknown'],
+  ['R03','recovery reopened', b => scenario(b,'SIP-late-terminal').expectedObservations.find(row => row.subject === 'recovery-reopened').expected = true],
+  ['R04','duplicate completion not delivered', b => scenario(b,'SIP-refund-count-boundary').sequence.pop()],
+  ['R04','duplicate before first terminal', b => {
+    const sequence = scenario(b,'SIP-refund-count-boundary').sequence;
+    sequence.unshift(sequence.pop());
+  }],
+  ['R04','duplicate oracle has no stimulus link', b => delete scenario(b,'SIP-refund-count-boundary').expectedObservations.find(row => row.subject === 'on-duplicate-refund-completed-delta').afterStep],
+  ['R04','duplicate completion recounts', b => scenario(b,'SIP-refund-count-boundary').expectedObservations.find(row => row.subject === 'on-duplicate-refund-completed-delta').expected = 1],
+  ['R05','confirmed body in accepted scenario', b => scenario(b,'TA-accepted-only').inputs.receiptBody = scenario(b,'TA-confirm').inputs.receiptBody],
+  ['R05','confirmation delivery identity', b => scenario(b,'TA-accepted-only').inputs.receiptId = scenario(b,'TA-confirm').inputs.receiptId],
+  ['R05','accepted fixture claims final codec', b => scenario(b,'TA-accepted-only').inputs.receiptBodyRole = 'public-codec-verified'],
+  ['R05','pending alone without accepted event', b => scenario(b,'TA-accepted-only').expectedObservations = scenario(b,'TA-accepted-only').expectedObservations.filter(row => row.kind !== 'event')],
+  ['R05','accepted event has conflicting body', b => scenario(b,'TA-accepted-only').expectedObservations.find(row => row.subject === 'FundTAAccepted').expected.receiptBody = 'different'],
+  ['R05','accepted event not actually produced', b => scenario(b,'TA-accepted-only').expectedObservations.find(row => row.subject === 'FundTAAccepted').expected.count = 0],
+];
+for (const [id, label, mutate] of repairMutations) test(`P23 repair mutation ${id}: ${label}`, () => {
+  assert.deepEqual(contractErrors(source), [], 'valid base before mutation');
+  const candidate = structuredClone(source);
+  mutate(candidate.body);
+  assert.ok(contractErrors(candidate).some(error => error.startsWith(`${id}:`)), label);
+});
 for (const [label, mutate] of mutations) test(`P23 mutation rejects: ${label}`, () => {
   const candidate = structuredClone(source);
   mutate(candidate.body);
