@@ -1,0 +1,357 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: product-design
+id: bank-refund-review
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "bank-refund-review",
+    "version": "bank-v1-1",
+    "artifact": {
+      "context": "bankwealth",
+      "kind": "artifact",
+      "owner": [],
+      "id": "BankRefundReview"
+    },
+    "status": "proposal",
+    "provenance": [
+      {
+        "document": "bank-v1",
+        "pointer": "/aggregates/1"
+      }
+    ],
+    "approvalSource": null,
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "aggregate",
+        "owner": [],
+        "id": "FundOrder"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RequestFundPurchaseRefund"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "FundOrder",
+          "RequestFundPurchaseRefund"
+        ],
+        "id": "fundOrderId"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "FundOrder",
+          "RequestFundPurchaseRefund"
+        ],
+        "id": "paymentTxId"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "event",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "FundPurchaseRefundRequested"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "event-slot",
+        "owner": [
+          "FundOrder",
+          "FundPurchaseRefundRequested"
+        ],
+        "id": "fundOrderId"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "goal",
+        "plane": "strategy",
+        "kind": "goal",
+        "label": "可信TA拒绝后创建独立全本金退款；退款未完成时不显示本金已退",
+        "references": [],
+        "action": null,
+        "feedback": null
+      },
+      {
+        "id": "release",
+        "plane": "scope",
+        "kind": "release",
+        "label": "V1 本地演示，非真实基金公司接入和生产发行",
+        "references": [],
+        "action": null,
+        "feedback": null
+      },
+      {
+        "id": "target",
+        "plane": "structure",
+        "kind": "target",
+        "label": "FundOrder",
+        "references": [
+          {
+            "context": "bankwealth",
+            "kind": "aggregate",
+            "owner": [],
+            "id": "FundOrder"
+          }
+        ],
+        "action": null,
+        "feedback": null
+      },
+      {
+        "id": "screen",
+        "plane": "skeleton",
+        "kind": "screen",
+        "label": "refund状态视图设计提案，未生成UI",
+        "references": [],
+        "action": null,
+        "feedback": null
+      },
+      {
+        "id": "action",
+        "plane": "skeleton",
+        "kind": "action",
+        "label": "RequestFundPurchaseRefund",
+        "references": [
+          {
+            "context": "bankwealth",
+            "kind": "command",
+            "owner": [
+              "FundOrder"
+            ],
+            "id": "RequestFundPurchaseRefund"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "parameter",
+            "owner": [
+              "FundOrder",
+              "RequestFundPurchaseRefund"
+            ],
+            "id": "fundOrderId"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "parameter",
+            "owner": [
+              "FundOrder",
+              "RequestFundPurchaseRefund"
+            ],
+            "id": "paymentTxId"
+          }
+        ],
+        "action": {
+          "command": {
+            "context": "bankwealth",
+            "kind": "command",
+            "owner": [
+              "FundOrder"
+            ],
+            "id": "RequestFundPurchaseRefund"
+          },
+          "actor": "machine",
+          "intent": "machine",
+          "parameters": [
+            {
+              "parameter": {
+                "context": "bankwealth",
+                "kind": "parameter",
+                "owner": [
+                  "FundOrder",
+                  "RequestFundPurchaseRefund"
+                ],
+                "id": "fundOrderId"
+              },
+              "origin": "trusted-context",
+              "slot": "fundOrderId",
+              "from": null
+            },
+            {
+              "parameter": {
+                "context": "bankwealth",
+                "kind": "parameter",
+                "owner": [
+                  "FundOrder",
+                  "RequestFundPurchaseRefund"
+                ],
+                "id": "paymentTxId"
+              },
+              "origin": "trusted-context",
+              "slot": "paymentTxId",
+              "from": null
+            }
+          ]
+        },
+        "feedback": null
+      },
+      {
+        "id": "pending",
+        "plane": "skeleton",
+        "kind": "feedback",
+        "label": "已持久受理，不承诺业务成功或投影新鲜度",
+        "references": [
+          {
+            "context": "bankwealth",
+            "kind": "event",
+            "owner": [
+              "FundOrder"
+            ],
+            "id": "FundPurchaseRefundRequested"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "event-slot",
+            "owner": [
+              "FundOrder",
+              "FundPurchaseRefundRequested"
+            ],
+            "id": "fundOrderId"
+          }
+        ],
+        "action": null,
+        "feedback": {
+          "event": {
+            "context": "bankwealth",
+            "kind": "event",
+            "owner": [
+              "FundOrder"
+            ],
+            "id": "FundPurchaseRefundRequested"
+          },
+          "state": "pending",
+          "evidence": "provisional",
+          "resourceKeys": [
+            {
+              "context": "bankwealth",
+              "kind": "event-slot",
+              "owner": [
+                "FundOrder",
+                "FundPurchaseRefundRequested"
+              ],
+              "id": "fundOrderId"
+            }
+          ],
+          "watermark": null
+        }
+      },
+      {
+        "id": "content",
+        "plane": "surface",
+        "kind": "content",
+        "label": "可信TA拒绝后创建独立全本金退款；退款未完成时不显示本金已退。投影/客户页面/部署仍在后续边界；不以技术ack冒充业务终态。",
+        "references": [],
+        "action": null,
+        "feedback": null
+      }
+    ],
+    "relations": [
+      {
+        "id": "relation-0",
+        "kind": "screen-action",
+        "from": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankRefundReview"
+          },
+          "kind": "screen",
+          "id": "screen"
+        },
+        "to": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankRefundReview"
+          },
+          "kind": "action",
+          "id": "action"
+        }
+      },
+      {
+        "id": "relation-1",
+        "kind": "action-target",
+        "from": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankRefundReview"
+          },
+          "kind": "action",
+          "id": "action"
+        },
+        "to": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankRefundReview"
+          },
+          "kind": "target",
+          "id": "target"
+        }
+      },
+      {
+        "id": "relation-2",
+        "kind": "supports",
+        "from": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankRefundReview"
+          },
+          "kind": "feedback",
+          "id": "pending"
+        },
+        "to": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankRefundReview"
+          },
+          "kind": "action",
+          "id": "action"
+        }
+      },
+      {
+        "id": "relation-3",
+        "kind": "uses",
+        "from": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankRefundReview"
+          },
+          "kind": "screen",
+          "id": "screen"
+        },
+        "to": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankRefundReview"
+          },
+          "kind": "content",
+          "id": "content"
+        }
+      }
+    ]
+  }

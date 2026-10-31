@@ -1,0 +1,127 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: AppendSipDueSlot
+payload:
+  {
+    "name": "AppendSipDueSlot",
+    "parameters": [
+      {
+        "name": "position",
+        "dataType": "Long",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "dueSlot",
+        "dataType": "Long",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INITIALIZED",
+        "errCode": "SIP_INITIALIZED",
+        "cond": "state.initialized",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_SLOT_REPLAY_CONFLICT",
+        "errCode": "SIP_SLOT_REPLAY_CONFLICT",
+        "cond": "!state.slots.contains(param.position) || state.slots(param.position) == param.dueSlot",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_SLOT_ONCE",
+        "errCode": "SIP_SLOT_ONCE",
+        "cond": "!state.slots.contains(param.position)",
+        "onFail": "succeed-empty"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_SCHEDULE_OPEN",
+        "errCode": "SIP_SCHEDULE_OPEN",
+        "cond": "!state.scheduleSealed",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_SLOT_POSITION",
+        "errCode": "SIP_SLOT_POSITION",
+        "cond": "param.position == state.scheduleCount && param.position < 9223372036854775807",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_SLOT_ORDER",
+        "errCode": "SIP_SLOT_ORDER",
+        "cond": "param.dueSlot > state.lastDueSlot && param.dueSlot >= state.latestEffectiveSlot",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "SipDueSlotAppended"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ]
+    }
+  }
+events:
+  {
+    "SipDueSlotAppended": {
+      "name": "SipDueSlotAppended",
+      "payloads": [
+        {
+          "name": "position",
+          "dataType": "Long",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "dueSlot",
+          "dataType": "Long",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "position",
+          "expr": "param.position"
+        },
+        {
+          "slot": "dueSlot",
+          "expr": "param.dueSlot"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "slots",
+          "op": "put",
+          "key": "event.position",
+          "value": "event.dueSlot"
+        },
+        {
+          "slot": "scheduleCount",
+          "op": "integer-apply",
+          "delta": "literal:1",
+          "sign": 1
+        },
+        {
+          "slot": "lastDueSlot",
+          "expr": "event.dueSlot"
+        }
+      ]
+    }
+  }

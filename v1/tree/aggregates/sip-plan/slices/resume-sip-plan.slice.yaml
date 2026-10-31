@@ -1,0 +1,109 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: ResumeSipPlan
+payload:
+  {
+    "name": "ResumeSipPlan",
+    "parameters": [
+      {
+        "name": "tick",
+        "dataType": "Long",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INITIALIZED",
+        "errCode": "SIP_INITIALIZED",
+        "cond": "state.initialized",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_SCHEDULE_SEALED",
+        "errCode": "SIP_SCHEDULE_SEALED",
+        "cond": "state.scheduleSealed",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_RESUME_CLOCK",
+        "errCode": "SIP_RESUME_CLOCK",
+        "cond": "param.tick == state.currentTick",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_RESUME_ONCE",
+        "errCode": "SIP_RESUME_ONCE",
+        "cond": "state.paused",
+        "onFail": "succeed-empty"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_RESUME_CLASSIFIED",
+        "errCode": "SIP_RESUME_CLASSIFIED",
+        "cond": "state.observedCount == state.scheduleCount || (state.slots.contains(state.observedCount) && state.slots(state.observedCount) > state.currentTick)",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "SipPlanResumed"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ]
+    }
+  }
+events:
+  {
+    "SipPlanResumed": {
+      "name": "SipPlanResumed",
+      "payloads": [
+        {
+          "name": "tick",
+          "dataType": "Long",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "pauseTick",
+          "dataType": "Long",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "tick",
+          "expr": "param.tick"
+        },
+        {
+          "slot": "pauseTick",
+          "expr": "state.pauseTick"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "paused",
+          "expr": "literal:false"
+        },
+        {
+          "slot": "pauseIntervals",
+          "op": "put",
+          "key": "event.pauseTick",
+          "value": "event.tick"
+        }
+      ]
+    }
+  }

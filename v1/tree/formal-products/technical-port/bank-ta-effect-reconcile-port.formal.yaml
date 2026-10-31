@@ -1,0 +1,26 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: technical-port
+id: BankTaEffectReconcilePort
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "name": "BankTaEffectReconcilePort",
+    "version": "bank-v1-1",
+    "inputType": {
+      "form": "nominal",
+      "ref": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "BankTaEffectReconcile"
+      }
+    },
+    "outputType": {
+      "form": "primitive",
+      "name": "boolean"
+    }
+  }

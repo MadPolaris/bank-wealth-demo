@@ -1,0 +1,79 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: host-computation
+id: "[\"bankwealth\",\"StableTaRequestId\"]"
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": {
+      "context": "bankwealth",
+      "kind": "port",
+      "owner": [],
+      "id": "StableTaRequestId"
+    },
+    "version": "bank-v1-1",
+    "command": {
+      "context": "bankwealth",
+      "kind": "command",
+      "owner": [
+        "FundOrder"
+      ],
+      "id": "RegisterFundTASubmission"
+    },
+    "outputType": {
+      "form": "nominal",
+      "ref": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "TaRequestId"
+      }
+    },
+    "inputDependencies": [
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "FundOrder",
+          "RegisterFundTASubmission"
+        ],
+        "id": "fundOrderId"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "FundOrder",
+          "RegisterFundTASubmission"
+        ],
+        "id": "paymentTxId"
+      }
+    ],
+    "stableIdentityContract": {
+      "id": "StableTaRequestId-identity",
+      "version": "1",
+      "keys": [
+        {
+          "context": "bankwealth",
+          "kind": "parameter",
+          "owner": [
+            "FundOrder",
+            "RegisterFundTASubmission"
+          ],
+          "id": "fundOrderId"
+        },
+        {
+          "context": "bankwealth",
+          "kind": "parameter",
+          "owner": [
+            "FundOrder",
+            "RegisterFundTASubmission"
+          ],
+          "id": "paymentTxId"
+        }
+      ]
+    }
+  }

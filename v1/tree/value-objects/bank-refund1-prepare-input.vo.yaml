@@ -1,0 +1,25 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: BankRefund1PrepareInput
+seq: 60
+payload:
+  {
+    "name": "BankRefund1PrepareInput",
+    "context": "bankwealth",
+    "version": "bank-v1-1",
+    "fields": [
+      {
+        "name": "txid",
+        "dataType": "TxId"
+      },
+      {
+        "name": "resource",
+        "dataType": "AccountId"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money"
+      }
+    ]
+  }

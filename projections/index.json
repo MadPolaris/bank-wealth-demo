@@ -2,7 +2,7 @@
   "schemaVersion": "bank-wealth.design-projection/v1",
   "readiness": "design-proposal-only",
   "sourceDigest": "572723ba4bdc42f39b9a3bb92d09e9dc7fa8bdb59fb16b565fbc856971cc4578",
-  "toolDigest": "315bb736c8c29060f4bac2cc9234b756cd5802efa72ea0578923c69942725a73",
+  "toolDigest": "1f17140229dcdd3682c1f9924b37c7053d67c7a6e14363745ede310b664db879",
   "artifacts": [
     {
       "id": "actor-command.wealth",

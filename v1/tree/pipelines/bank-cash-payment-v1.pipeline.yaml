@@ -1,0 +1,231 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: pipeline
+id: bank-cash-payment-v1
+name: "Bank V1 sole durable cash payment entry"
+steps:
+  [
+    {
+      "id": "pay-cash-purchase",
+      "name": "Cash fund purchase: investor debit, collection credit, then order payment confirmation",
+      "description": "A single strict Saga invocation only; source event admission and matching durable identity must be established by one trusted host entry owner. No TA conditional branch or direct refund authorization.",
+      "execution": {
+        "invokeSaga": {
+          "ref": {
+            "sagaId": "bank-cash-payment-v1",
+            "version": "bank-v1-1"
+          },
+          "args": [
+            {
+              "slot": "investorAccountId",
+              "type": "AccountId",
+              "ref": "input:investorAccountId"
+            },
+            {
+              "slot": "fundOrderId",
+              "type": "FundOrderId",
+              "ref": "input:fundOrderId"
+            },
+            {
+              "slot": "fundCollectionAccountId",
+              "type": "AccountId",
+              "ref": "input:fundCollectionAccountId"
+            },
+            {
+              "slot": "amount",
+              "type": "Money",
+              "ref": "input:amount"
+            }
+          ],
+          "transactionIdentity": {
+            "type": "TxId",
+            "derivation": "durable-source-stage",
+            "source": {
+              "ref": "input:operation",
+              "type": "OperationId"
+            },
+            "stageId": "pay-cash-purchase",
+            "stageOccurrence": {
+              "ref": "input:occurrence",
+              "type": "OperationId"
+            },
+            "scope": "saga-version",
+            "conflict": "reject-different-args"
+          },
+          "start": "durable-intent-before-start",
+          "completionMode": "await-terminal",
+          "results": [
+            {
+              "resultKind": "succeeded",
+              "code": "Succeeded",
+              "outputs": [
+                {
+                  "slot": "txid",
+                  "ref": "result:txid",
+                  "type": "TxId"
+                }
+              ]
+            },
+            {
+              "resultKind": "rejected-before-effects",
+              "code": "Rejected",
+              "outputs": []
+            },
+            {
+              "resultKind": "compensated",
+              "code": "Compensated",
+              "outputs": []
+            },
+            {
+              "resultKind": "recovery-required",
+              "code": "RecoveryRequired",
+              "outputs": []
+            },
+            {
+              "resultKind": "outcome-unknown",
+              "code": "Unknown",
+              "outputs": []
+            }
+          ]
+        },
+        "reads": [
+          {
+            "slot": "operation",
+            "ref": "input:operation",
+            "type": "OperationId"
+          },
+          {
+            "slot": "occurrence",
+            "ref": "input:occurrence",
+            "type": "OperationId"
+          },
+          {
+            "slot": "investorAccountId",
+            "type": "AccountId",
+            "ref": "input:investorAccountId"
+          },
+          {
+            "slot": "fundOrderId",
+            "type": "FundOrderId",
+            "ref": "input:fundOrderId"
+          },
+          {
+            "slot": "fundCollectionAccountId",
+            "type": "AccountId",
+            "ref": "input:fundCollectionAccountId"
+          },
+          {
+            "slot": "amount",
+            "type": "Money",
+            "ref": "input:amount"
+          }
+        ],
+        "writes": [
+          {
+            "id": "paymentTxid",
+            "slot": "txid",
+            "type": "TxId",
+            "durability": "durable-reference"
+          }
+        ],
+        "outcomes": [
+          {
+            "code": "Succeeded",
+            "kind": "success",
+            "action": "continue"
+          },
+          {
+            "code": "Rejected",
+            "kind": "business-rejection",
+            "action": "stop"
+          },
+          {
+            "code": "Compensated",
+            "kind": "business-rejection",
+            "action": "stop"
+          },
+          {
+            "code": "RecoveryRequired",
+            "kind": "infrastructure-failure",
+            "action": "manual-recovery"
+          },
+          {
+            "code": "Unknown",
+            "kind": "unknown-effect",
+            "action": "manual-recovery"
+          }
+        ]
+      }
+    }
+  ]
+execution:
+  {
+    "schemaVersion": "truthsrc.execution/v1",
+    "inputs": [
+      {
+        "id": "operation",
+        "type": "OperationId",
+        "durability": "start-record"
+      },
+      {
+        "id": "occurrence",
+        "type": "OperationId",
+        "durability": "durable-reference"
+      },
+      {
+        "id": "investorAccountId",
+        "type": "AccountId",
+        "durability": "start-record"
+      },
+      {
+        "id": "fundOrderId",
+        "type": "FundOrderId",
+        "durability": "start-record"
+      },
+      {
+        "id": "fundCollectionAccountId",
+        "type": "AccountId",
+        "durability": "start-record"
+      },
+      {
+        "id": "amount",
+        "type": "Money",
+        "durability": "start-record"
+      },
+      {
+        "id": "fundCode",
+        "type": "Text",
+        "durability": "start-record"
+      }
+    ],
+    "outputs": [
+      {
+        "id": "paymentTxid",
+        "ref": "step:pay-cash-purchase:paymentTxid",
+        "type": "TxId"
+      }
+    ],
+    "recovery": {
+      "inputResponsibility": "host",
+      "inputs": [
+        "input:operation",
+        "input:occurrence",
+        "input:investorAccountId",
+        "input:fundOrderId",
+        "input:fundCollectionAccountId",
+        "input:amount",
+        "input:fundCode"
+      ],
+      "planVersion": "bank-v1-1",
+      "planCompatibility": "exact",
+      "checkpoint": "confirmed-prefix",
+      "unknownEffect": "reconcile-before-resume",
+      "ownership": "single-writer"
+    },
+    "admission": {
+      "maxConcurrentRuns": 1,
+      "maxInFlightSteps": 1,
+      "maxItemsPerChunk": 1,
+      "maxInFlightChunks": 1
+    }
+  }

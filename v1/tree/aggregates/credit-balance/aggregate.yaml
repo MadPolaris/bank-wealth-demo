@@ -1,0 +1,188 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: aggregate
+name: CreditBalance
+context: bankwealth
+order:
+  commands: ["InitializeAccount","ReserveFunds","DeductFunds","ReleaseReservedFunds","RecordIncomingCredits","CommitIncomingCredits","CancelIncomingCredit"]
+  events: ["AccountInitialized","ReserveFundsConfirmed","DeductFundsConfirmed","ReleaseReservedFundsConfirmed","RecordIncomingCreditsConfirmed","CommitIncomingCreditsConfirmed","CancelIncomingCreditConfirmed"]
+payload:
+  {
+    "name": "CreditBalance",
+    "entity": "CreditBalanceEntity",
+    "identifier": {
+      "name": "id",
+      "dataType": "AccountId",
+      "origin": "BUSINESS_INPUT"
+    },
+    "stateFields": [
+      {
+        "name": "id",
+        "dataType": "AccountId",
+        "default": ""
+      },
+      {
+        "name": "initialized",
+        "dataType": "Boolean",
+        "default": false
+      },
+      {
+        "name": "accountBalance",
+        "dataType": "Map[String, Money]",
+        "default": []
+      },
+      {
+        "name": "reservedAmount",
+        "dataType": "Map[TxId, Money]",
+        "default": []
+      },
+      {
+        "name": "incomingCredits",
+        "dataType": "Map[TxId, Money]",
+        "default": []
+      },
+      {
+        "name": "committedOutgoing",
+        "dataType": "Map[TxId, Money]",
+        "default": []
+      },
+      {
+        "name": "committedIncoming",
+        "dataType": "Map[TxId, Money]",
+        "default": []
+      },
+      {
+        "name": "compensatedOutgoing",
+        "dataType": "Map[TxId, Money]",
+        "default": []
+      },
+      {
+        "name": "compensatedIncoming",
+        "dataType": "Map[TxId, Money]",
+        "default": []
+      }
+    ],
+    "aggregateRuleRefs": [
+      {
+        "ruleId": "ACCOUNT_ID",
+        "errCode": "ACCOUNT_ID",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "ACCOUNT_CURRENCY",
+        "errCode": "ACCOUNT_CURRENCY",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "ACCOUNT_INIT_CONFLICT",
+        "errCode": "ACCOUNT_INIT_CONFLICT",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "ACCOUNT_INIT_ONCE",
+        "errCode": "ACCOUNT_INIT_ONCE",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "ACCOUNT_SEED_NONNEGATIVE",
+        "errCode": "ACCOUNT_SEED_NONNEGATIVE",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_RESOURCE",
+        "errCode": "LEDGER_RESOURCE",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_CNY",
+        "errCode": "LEDGER_CNY",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_POSITIVE",
+        "errCode": "LEDGER_POSITIVE",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_COMMITTEDOUTGOING_MATCH",
+        "errCode": "LEDGER_COMMITTEDOUTGOING_MATCH",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_COMPENSATEDOUTGOING_MATCH",
+        "errCode": "LEDGER_COMPENSATEDOUTGOING_MATCH",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_RESERVEDAMOUNT_MATCH",
+        "errCode": "LEDGER_RESERVEDAMOUNT_MATCH",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_ALREADY_COMMITTED",
+        "errCode": "LEDGER_ALREADY_COMMITTED",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_ALREADY_COMPENSATED",
+        "errCode": "LEDGER_ALREADY_COMPENSATED",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_ALREADY_PREPARED",
+        "errCode": "LEDGER_ALREADY_PREPARED",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_SUFFICIENT",
+        "errCode": "LEDGER_SUFFICIENT",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_COMMIT_ONCE",
+        "errCode": "LEDGER_COMMIT_ONCE",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_NOT_COMPENSATED",
+        "errCode": "LEDGER_NOT_COMPENSATED",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_PREPARED",
+        "errCode": "LEDGER_PREPARED",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_COMPENSATE_ONCE",
+        "errCode": "LEDGER_COMPENSATE_ONCE",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_NOT_COMMITTED",
+        "errCode": "LEDGER_NOT_COMMITTED",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_COMMITTEDINCOMING_MATCH",
+        "errCode": "LEDGER_COMMITTEDINCOMING_MATCH",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_COMPENSATEDINCOMING_MATCH",
+        "errCode": "LEDGER_COMPENSATEDINCOMING_MATCH",
+        "desc": "Explicit V1 source rule"
+      },
+      {
+        "ruleId": "LEDGER_INCOMINGCREDITS_MATCH",
+        "errCode": "LEDGER_INCOMINGCREDITS_MATCH",
+        "desc": "Explicit V1 source rule"
+      }
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "approvedBy": "user-approved-p24-p25-bank-joint",
+      "sourceVersion": "bank-v1-p23-design-2"
+    }
+  }

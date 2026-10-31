@@ -1,0 +1,31 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: technical-port
+id: BankRefund1CompensateExecute
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "name": "BankRefund1CompensateExecute",
+    "version": "bank-v1-1",
+    "inputType": {
+      "form": "nominal",
+      "ref": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "BankRefund1CompensateInput"
+      }
+    },
+    "outputType": {
+      "form": "nominal",
+      "ref": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "BankRefund1CompensateReceipt"
+      }
+    }
+  }

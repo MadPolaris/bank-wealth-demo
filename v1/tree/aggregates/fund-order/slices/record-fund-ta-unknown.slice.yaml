@@ -1,0 +1,238 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RecordFundTAUnknown
+payload:
+  {
+    "name": "RecordFundTAUnknown",
+    "parameters": [
+      {
+        "name": "fundOrderId",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "paymentTxId",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "taRequestId",
+        "dataType": "TaRequestId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "taReference",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "receiptId",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "receiptBody",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "fundCode",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "currency",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "TA_ORDER",
+        "errCode": "TA_ORDER",
+        "cond": "param.fundOrderId == state.id",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "TA_PAYMENT",
+        "errCode": "TA_PAYMENT",
+        "cond": "param.paymentTxId == state.selectedPaymentTxId && state.cashPaymentFinalResults.get(param.paymentTxId).contains(\"succeeded\")",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "TA_REQUEST",
+        "errCode": "TA_REQUEST",
+        "cond": "param.taRequestId == state.taRequestId && param.taRequestId.value.nonEmpty",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "TA_REFERENCE",
+        "errCode": "TA_REFERENCE",
+        "cond": "param.taReference.nonEmpty && (state.taReference.isEmpty || state.taReference == param.taReference)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "TA_FUND",
+        "errCode": "TA_FUND",
+        "cond": "param.fundCode == state.fundCode && param.currency == state.amount.currency",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "TA_RECEIPT_PRESENT",
+        "errCode": "TA_RECEIPT_PRESENT",
+        "cond": "param.receiptId.nonEmpty && param.receiptBody.nonEmpty",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "TA_RECEIPT_CONFLICT",
+        "errCode": "TA_RECEIPT_CONFLICT",
+        "cond": "!state.taReceipts.contains(param.receiptId) || (state.taReceipts(param.receiptId) == param.receiptBody && state.taReceiptOutcomes.get(param.receiptId).contains(\"unknown\"))",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "TA_RECEIPT_ONCE",
+        "errCode": "TA_RECEIPT_ONCE",
+        "cond": "!state.taReceipts.contains(param.receiptId)",
+        "onFail": "succeed-empty"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "TA_LATE_PROGRESS",
+        "errCode": "TA_LATE_PROGRESS",
+        "cond": "state.taStatus != \"confirmed\" && state.taStatus != \"rejected\"",
+        "onFail": "succeed-empty"
+      }
+    ],
+    "produces": [
+      "FundTAUnknown"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "payment/ta/refund"
+    }
+  }
+events:
+  {
+    "FundTAUnknown": {
+      "name": "FundTAUnknown",
+      "payloads": [
+        {
+          "name": "fundOrderId",
+          "dataType": "FundOrderId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "paymentTxId",
+          "dataType": "TxId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "taRequestId",
+          "dataType": "TaRequestId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "taReference",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "receiptId",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "receiptBody",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "fundCode",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "currency",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "outcome",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "fundOrderId",
+          "expr": "param.fundOrderId"
+        },
+        {
+          "slot": "paymentTxId",
+          "expr": "param.paymentTxId"
+        },
+        {
+          "slot": "taRequestId",
+          "expr": "param.taRequestId"
+        },
+        {
+          "slot": "taReference",
+          "expr": "param.taReference"
+        },
+        {
+          "slot": "receiptId",
+          "expr": "param.receiptId"
+        },
+        {
+          "slot": "receiptBody",
+          "expr": "param.receiptBody"
+        },
+        {
+          "slot": "fundCode",
+          "expr": "param.fundCode"
+        },
+        {
+          "slot": "currency",
+          "expr": "param.currency"
+        },
+        {
+          "slot": "outcome",
+          "expr": "literal:unknown"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "taReceipts",
+          "op": "put",
+          "key": "event.receiptId",
+          "value": "event.receiptBody"
+        },
+        {
+          "slot": "taReceiptOutcomes",
+          "op": "put",
+          "key": "event.receiptId",
+          "value": "event.outcome"
+        },
+        {
+          "slot": "taReference",
+          "expr": "event.taReference"
+        },
+        {
+          "slot": "taStatus",
+          "expr": "event.outcome"
+        }
+      ]
+    }
+  }

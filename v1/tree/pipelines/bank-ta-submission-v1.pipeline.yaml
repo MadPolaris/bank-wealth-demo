@@ -1,0 +1,110 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: pipeline
+id: bank-ta-submission-v1
+name: "Bank V1 durable TA submission boundary"
+steps:
+  [
+    {
+      "id": "submit-ta",
+      "name": "Submit or recover one paid TA request",
+      "description": "Technical confirmed means known submission observation only, never business share confirmation.",
+      "execution": {
+        "port": "SubmitPaidTaRequest",
+        "reads": [
+          {
+            "slot": "taRequestId",
+            "type": "TaRequestId",
+            "ref": "input:taRequestId"
+          },
+          {
+            "slot": "fundOrderId",
+            "type": "FundOrderId",
+            "ref": "input:fundOrderId"
+          },
+          {
+            "slot": "paymentTxId",
+            "type": "TxId",
+            "ref": "input:paymentTxId"
+          }
+        ],
+        "writes": [
+          {
+            "id": "taRequestId",
+            "slot": "taRequestId",
+            "type": "TaRequestId",
+            "durability": "checkpoint"
+          }
+        ],
+        "outcomes": [
+          {
+            "code": "Observed",
+            "kind": "success",
+            "action": "continue"
+          },
+          {
+            "code": "Refused",
+            "kind": "business-rejection",
+            "action": "stop"
+          },
+          {
+            "code": "Unavailable",
+            "kind": "infrastructure-failure",
+            "action": "manual-recovery"
+          },
+          {
+            "code": "Unknown",
+            "kind": "unknown-effect",
+            "action": "manual-recovery"
+          }
+        ]
+      }
+    }
+  ]
+execution:
+  {
+    "schemaVersion": "truthsrc.execution/v1",
+    "inputs": [
+      {
+        "id": "taRequestId",
+        "type": "TaRequestId",
+        "durability": "start-record"
+      },
+      {
+        "id": "fundOrderId",
+        "type": "FundOrderId",
+        "durability": "start-record"
+      },
+      {
+        "id": "paymentTxId",
+        "type": "TxId",
+        "durability": "start-record"
+      }
+    ],
+    "outputs": [
+      {
+        "id": "taRequestId",
+        "ref": "step:submit-ta:taRequestId",
+        "type": "TaRequestId"
+      }
+    ],
+    "recovery": {
+      "inputResponsibility": "host",
+      "inputs": [
+        "input:taRequestId",
+        "input:fundOrderId",
+        "input:paymentTxId"
+      ],
+      "planVersion": "bank-v1-1",
+      "planCompatibility": "exact",
+      "checkpoint": "confirmed-prefix",
+      "unknownEffect": "reconcile-before-resume",
+      "ownership": "single-writer"
+    },
+    "admission": {
+      "maxConcurrentRuns": 1,
+      "maxInFlightSteps": 1,
+      "maxItemsPerChunk": 1,
+      "maxInFlightChunks": 1
+    }
+  }

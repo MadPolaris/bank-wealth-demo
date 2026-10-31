@@ -1,0 +1,105 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: PauseSipPlan
+payload:
+  {
+    "name": "PauseSipPlan",
+    "parameters": [
+      {
+        "name": "tick",
+        "dataType": "Long",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INITIALIZED",
+        "errCode": "SIP_INITIALIZED",
+        "cond": "state.initialized",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_SCHEDULE_SEALED",
+        "errCode": "SIP_SCHEDULE_SEALED",
+        "cond": "state.scheduleSealed",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_PAUSE_REPLAY_CONFLICT",
+        "errCode": "SIP_PAUSE_REPLAY_CONFLICT",
+        "cond": "!state.paused || param.tick == state.pauseTick",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_PAUSE_ONCE",
+        "errCode": "SIP_PAUSE_ONCE",
+        "cond": "!state.paused",
+        "onFail": "succeed-empty"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_PAUSE_CLOCK",
+        "errCode": "SIP_PAUSE_CLOCK",
+        "cond": "param.tick == state.currentTick && param.tick >= 0",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_PAUSE_INTERVAL_ONCE",
+        "errCode": "SIP_PAUSE_INTERVAL_ONCE",
+        "cond": "!state.pauseIntervals.contains(param.tick)",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "SipPlanPaused"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ]
+    }
+  }
+events:
+  {
+    "SipPlanPaused": {
+      "name": "SipPlanPaused",
+      "payloads": [
+        {
+          "name": "tick",
+          "dataType": "Long",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "tick",
+          "expr": "param.tick"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "paused",
+          "expr": "literal:true"
+        },
+        {
+          "slot": "pauseTick",
+          "expr": "event.tick"
+        }
+      ]
+    }
+  }

@@ -1,0 +1,15 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: technical-port
+id: StableRefundOperationId
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "name": "StableRefundOperationId",
+    "version": "bank-v1-1",
+    "inputType": "String",
+    "outputType": "OperationId"
+  }

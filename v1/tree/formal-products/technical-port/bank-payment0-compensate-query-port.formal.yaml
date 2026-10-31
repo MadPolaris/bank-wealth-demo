@@ -1,0 +1,34 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: technical-port
+id: BankPayment0CompensateQueryPort
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "name": "BankPayment0CompensateQueryPort",
+    "version": "bank-v1-1",
+    "inputType": {
+      "form": "nominal",
+      "ref": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "BankPayment0CompensateQuery"
+      }
+    },
+    "outputType": {
+      "form": "optional",
+      "element": {
+        "form": "nominal",
+        "ref": {
+          "context": "bankwealth",
+          "kind": "type",
+          "owner": [],
+          "id": "BankPayment0CompensateReceipt"
+        }
+      }
+    }
+  }

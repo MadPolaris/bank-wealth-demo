@@ -1,0 +1,485 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: product-design
+id: bank-payment-review
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "bank-payment-review",
+    "version": "bank-v1-1",
+    "artifact": {
+      "context": "bankwealth",
+      "kind": "artifact",
+      "owner": [],
+      "id": "BankPaymentReview"
+    },
+    "status": "proposal",
+    "provenance": [
+      {
+        "document": "bank-v1",
+        "pointer": "/aggregates/1"
+      }
+    ],
+    "approvalSource": null,
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "aggregate",
+        "owner": [],
+        "id": "FundOrder"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RequestFundPurchaseSettlement"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "FundOrder",
+          "RequestFundPurchaseSettlement"
+        ],
+        "id": "operationId"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "FundOrder",
+          "RequestFundPurchaseSettlement"
+        ],
+        "id": "fundOrderId"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "FundOrder",
+          "RequestFundPurchaseSettlement"
+        ],
+        "id": "investorAccountId"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "FundOrder",
+          "RequestFundPurchaseSettlement"
+        ],
+        "id": "fundCollectionAccountId"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "FundOrder",
+          "RequestFundPurchaseSettlement"
+        ],
+        "id": "fundCode"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "FundOrder",
+          "RequestFundPurchaseSettlement"
+        ],
+        "id": "amount"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "event",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "FundPurchaseSettlementRequested"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "event-slot",
+        "owner": [
+          "FundOrder",
+          "FundPurchaseSettlementRequested"
+        ],
+        "id": "operationId"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "goal",
+        "plane": "strategy",
+        "kind": "goal",
+        "label": "客户提交申购后显示已受理；资金支付与TA份额确认分开呈现",
+        "references": [],
+        "action": null,
+        "feedback": null
+      },
+      {
+        "id": "release",
+        "plane": "scope",
+        "kind": "release",
+        "label": "V1 本地演示，非真实基金公司接入和生产发行",
+        "references": [],
+        "action": null,
+        "feedback": null
+      },
+      {
+        "id": "target",
+        "plane": "structure",
+        "kind": "target",
+        "label": "FundOrder",
+        "references": [
+          {
+            "context": "bankwealth",
+            "kind": "aggregate",
+            "owner": [],
+            "id": "FundOrder"
+          }
+        ],
+        "action": null,
+        "feedback": null
+      },
+      {
+        "id": "screen",
+        "plane": "skeleton",
+        "kind": "screen",
+        "label": "payment状态视图设计提案，未生成UI",
+        "references": [],
+        "action": null,
+        "feedback": null
+      },
+      {
+        "id": "action",
+        "plane": "skeleton",
+        "kind": "action",
+        "label": "RequestFundPurchaseSettlement",
+        "references": [
+          {
+            "context": "bankwealth",
+            "kind": "command",
+            "owner": [
+              "FundOrder"
+            ],
+            "id": "RequestFundPurchaseSettlement"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "parameter",
+            "owner": [
+              "FundOrder",
+              "RequestFundPurchaseSettlement"
+            ],
+            "id": "operationId"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "parameter",
+            "owner": [
+              "FundOrder",
+              "RequestFundPurchaseSettlement"
+            ],
+            "id": "fundOrderId"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "parameter",
+            "owner": [
+              "FundOrder",
+              "RequestFundPurchaseSettlement"
+            ],
+            "id": "investorAccountId"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "parameter",
+            "owner": [
+              "FundOrder",
+              "RequestFundPurchaseSettlement"
+            ],
+            "id": "fundCollectionAccountId"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "parameter",
+            "owner": [
+              "FundOrder",
+              "RequestFundPurchaseSettlement"
+            ],
+            "id": "fundCode"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "parameter",
+            "owner": [
+              "FundOrder",
+              "RequestFundPurchaseSettlement"
+            ],
+            "id": "amount"
+          }
+        ],
+        "action": {
+          "command": {
+            "context": "bankwealth",
+            "kind": "command",
+            "owner": [
+              "FundOrder"
+            ],
+            "id": "RequestFundPurchaseSettlement"
+          },
+          "actor": "human",
+          "intent": "public",
+          "parameters": [
+            {
+              "parameter": {
+                "context": "bankwealth",
+                "kind": "parameter",
+                "owner": [
+                  "FundOrder",
+                  "RequestFundPurchaseSettlement"
+                ],
+                "id": "operationId"
+              },
+              "origin": "user",
+              "slot": "operationId",
+              "from": null
+            },
+            {
+              "parameter": {
+                "context": "bankwealth",
+                "kind": "parameter",
+                "owner": [
+                  "FundOrder",
+                  "RequestFundPurchaseSettlement"
+                ],
+                "id": "fundOrderId"
+              },
+              "origin": "user",
+              "slot": "fundOrderId",
+              "from": null
+            },
+            {
+              "parameter": {
+                "context": "bankwealth",
+                "kind": "parameter",
+                "owner": [
+                  "FundOrder",
+                  "RequestFundPurchaseSettlement"
+                ],
+                "id": "investorAccountId"
+              },
+              "origin": "user",
+              "slot": "investorAccountId",
+              "from": null
+            },
+            {
+              "parameter": {
+                "context": "bankwealth",
+                "kind": "parameter",
+                "owner": [
+                  "FundOrder",
+                  "RequestFundPurchaseSettlement"
+                ],
+                "id": "fundCollectionAccountId"
+              },
+              "origin": "user",
+              "slot": "fundCollectionAccountId",
+              "from": null
+            },
+            {
+              "parameter": {
+                "context": "bankwealth",
+                "kind": "parameter",
+                "owner": [
+                  "FundOrder",
+                  "RequestFundPurchaseSettlement"
+                ],
+                "id": "fundCode"
+              },
+              "origin": "user",
+              "slot": "fundCode",
+              "from": null
+            },
+            {
+              "parameter": {
+                "context": "bankwealth",
+                "kind": "parameter",
+                "owner": [
+                  "FundOrder",
+                  "RequestFundPurchaseSettlement"
+                ],
+                "id": "amount"
+              },
+              "origin": "user",
+              "slot": "amount",
+              "from": null
+            }
+          ]
+        },
+        "feedback": null
+      },
+      {
+        "id": "pending",
+        "plane": "skeleton",
+        "kind": "feedback",
+        "label": "已持久受理，不承诺业务成功或投影新鲜度",
+        "references": [
+          {
+            "context": "bankwealth",
+            "kind": "event",
+            "owner": [
+              "FundOrder"
+            ],
+            "id": "FundPurchaseSettlementRequested"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "event-slot",
+            "owner": [
+              "FundOrder",
+              "FundPurchaseSettlementRequested"
+            ],
+            "id": "operationId"
+          }
+        ],
+        "action": null,
+        "feedback": {
+          "event": {
+            "context": "bankwealth",
+            "kind": "event",
+            "owner": [
+              "FundOrder"
+            ],
+            "id": "FundPurchaseSettlementRequested"
+          },
+          "state": "pending",
+          "evidence": "provisional",
+          "resourceKeys": [
+            {
+              "context": "bankwealth",
+              "kind": "event-slot",
+              "owner": [
+                "FundOrder",
+                "FundPurchaseSettlementRequested"
+              ],
+              "id": "operationId"
+            }
+          ],
+          "watermark": null
+        }
+      },
+      {
+        "id": "content",
+        "plane": "surface",
+        "kind": "content",
+        "label": "客户提交申购后显示已受理；资金支付与TA份额确认分开呈现。投影/客户页面/部署仍在后续边界；不以技术ack冒充业务终态。",
+        "references": [],
+        "action": null,
+        "feedback": null
+      }
+    ],
+    "relations": [
+      {
+        "id": "relation-0",
+        "kind": "screen-action",
+        "from": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankPaymentReview"
+          },
+          "kind": "screen",
+          "id": "screen"
+        },
+        "to": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankPaymentReview"
+          },
+          "kind": "action",
+          "id": "action"
+        }
+      },
+      {
+        "id": "relation-1",
+        "kind": "action-target",
+        "from": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankPaymentReview"
+          },
+          "kind": "action",
+          "id": "action"
+        },
+        "to": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankPaymentReview"
+          },
+          "kind": "target",
+          "id": "target"
+        }
+      },
+      {
+        "id": "relation-2",
+        "kind": "supports",
+        "from": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankPaymentReview"
+          },
+          "kind": "feedback",
+          "id": "pending"
+        },
+        "to": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankPaymentReview"
+          },
+          "kind": "action",
+          "id": "action"
+        }
+      },
+      {
+        "id": "relation-3",
+        "kind": "uses",
+        "from": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankPaymentReview"
+          },
+          "kind": "screen",
+          "id": "screen"
+        },
+        "to": {
+          "artifact": {
+            "context": "bankwealth",
+            "kind": "artifact",
+            "owner": [],
+            "id": "BankPaymentReview"
+          },
+          "kind": "content",
+          "id": "content"
+        }
+      }
+    ]
+  }

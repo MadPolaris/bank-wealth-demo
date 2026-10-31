@@ -1,0 +1,467 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: saga
+id: bank-independent-refund-v1
+name: "Bank V1 independent full-principal refund"
+seq: 3
+version: bank-v1-1
+payload:
+  {
+    "schemaVersion": "truthsrc.saga/v1",
+    "purpose": "Independent full-principal fund purchase refund: original collection to original investor",
+    "invariants": [
+      "Independent refund returns the retained full original principal from collection to original investor; no reuse of original payment reservation or compensation.",
+      "Only correlated cash-v2 TA rejection plus known successful original payment permits the authorized source event."
+    ],
+    "transactionIdType": "TxId",
+    "args": [
+      {
+        "slot": "fundCollectionAccountId",
+        "type": "AccountId"
+      },
+      {
+        "slot": "investorAccountId",
+        "type": "AccountId"
+      },
+      {
+        "slot": "amount",
+        "type": "Money"
+      }
+    ],
+    "participants": [
+      {
+        "id": "collectionCreditBalance",
+        "aggregate": "CreditBalance",
+        "resourceRef": {
+          "ref": "args:fundCollectionAccountId",
+          "type": "AccountId"
+        }
+      },
+      {
+        "id": "investorCreditBalance",
+        "aggregate": "CreditBalance",
+        "resourceRef": {
+          "ref": "args:investorAccountId",
+          "type": "AccountId"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "id": 1,
+        "dependsOn": []
+      },
+      {
+        "id": 2,
+        "dependsOn": [
+          1
+        ]
+      }
+    ],
+    "steps": [
+      {
+        "id": "debit-fund-collection",
+        "participant": "collectionCreditBalance",
+        "group": 1,
+        "phases": {
+          "prepare": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "CreditBalance",
+              "name": "ReserveFunds"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:fundCollectionAccountId",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "ref": "args:amount",
+                "type": "Money"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "type": "Money"
+              },
+              {
+                "slot": "currency",
+                "type": "Text"
+              },
+              {
+                "slot": "available",
+                "type": "Money"
+              }
+            ]
+          },
+          "commit": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "CreditBalance",
+              "name": "DeductFunds"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:fundCollectionAccountId",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "ref": "args:amount",
+                "type": "Money"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "type": "Money"
+              }
+            ]
+          },
+          "compensate": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "CreditBalance",
+              "name": "ReleaseReservedFunds"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:fundCollectionAccountId",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "ref": "args:amount",
+                "type": "Money"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "type": "Money"
+              },
+              {
+                "slot": "currency",
+                "type": "Text"
+              },
+              {
+                "slot": "available",
+                "type": "Money"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "credit-original-investor",
+        "participant": "investorCreditBalance",
+        "group": 2,
+        "phases": {
+          "prepare": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "CreditBalance",
+              "name": "RecordIncomingCredits"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:investorAccountId",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "ref": "args:amount",
+                "type": "Money"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "type": "Money"
+              }
+            ]
+          },
+          "commit": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "CreditBalance",
+              "name": "CommitIncomingCredits"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:investorAccountId",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "ref": "args:amount",
+                "type": "Money"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "type": "Money"
+              },
+              {
+                "slot": "currency",
+                "type": "Text"
+              },
+              {
+                "slot": "available",
+                "type": "Money"
+              }
+            ]
+          },
+          "compensate": {
+            "kind": "command",
+            "commandRef": {
+              "aggregate": "CreditBalance",
+              "name": "CancelIncomingCredit"
+            },
+            "bindings": [
+              {
+                "slot": "txid",
+                "ref": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "ref": "args:investorAccountId",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "ref": "args:amount",
+                "type": "Money"
+              }
+            ],
+            "outputs": [
+              {
+                "slot": "txid",
+                "type": "TxId"
+              },
+              {
+                "slot": "resource",
+                "type": "AccountId"
+              },
+              {
+                "slot": "amount",
+                "type": "Money"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "resilience": {
+      "maxAttempts": 1,
+      "phaseTimeoutMs": 1000,
+      "queryTimeoutMs": 1000,
+      "backoffMs": 0,
+      "totalTimeoutMs": 10000
+    },
+    "safety": {
+      "commitDecision": "durable-before-commit",
+      "abortDecision": "durable-before-compensate",
+      "afterCommit": "forward-recovery",
+      "unknown": "reconcile-before-resume",
+      "compensation": "confirmed-reservations",
+      "cancelBeforePrepare": "empty-release-and-fence",
+      "retryIdentity": "stable-operation",
+      "manualRecovery": "authorized-reconciliation-evidence"
+    },
+    "admission": {
+      "maxParticipants": 2,
+      "maxInFlight": 1,
+      "maxItemsPerChunk": 1,
+      "manifest": {
+        "mode": "static",
+        "durable": true
+      }
+    },
+    "triggers": [
+      {
+        "id": "bank-refund-request",
+        "kind": "event",
+        "sourceRef": {
+          "aggregate": "FundOrder",
+          "name": "FundPurchaseRefundRequested"
+        },
+        "argsMapping": [
+          {
+            "slot": "fundCollectionAccountId",
+            "type": "AccountId",
+            "ref": "source:fundCollectionAccountId"
+          },
+          {
+            "slot": "investorAccountId",
+            "type": "AccountId",
+            "ref": "source:investorAccountId"
+          },
+          {
+            "slot": "amount",
+            "type": "Money",
+            "ref": "source:amount"
+          }
+        ],
+        "idempotency": {
+          "ref": "source:refundOperationId",
+          "type": "OperationId",
+          "scope": "saga-version",
+          "conflict": "reject-different-args"
+        }
+      }
+    ],
+    "resultKinds": [
+      "succeeded",
+      "rejected-before-effects",
+      "compensated",
+      "recovery-required",
+      "outcome-unknown"
+    ],
+    "completions": [
+      {
+        "kind": "succeeded",
+        "eventRef": {
+          "aggregate": "FundOrder",
+          "name": "BankRefundResultSucceeded"
+        },
+        "bindings": [
+          {
+            "slot": "txid",
+            "ref": "txid",
+            "type": "TxId"
+          }
+        ]
+      },
+      {
+        "kind": "rejected-before-effects",
+        "eventRef": {
+          "aggregate": "FundOrder",
+          "name": "BankRefundResultRejectedBeforeEffects"
+        },
+        "bindings": [
+          {
+            "slot": "txid",
+            "ref": "txid",
+            "type": "TxId"
+          }
+        ]
+      },
+      {
+        "kind": "compensated",
+        "eventRef": {
+          "aggregate": "FundOrder",
+          "name": "BankRefundResultCompensated"
+        },
+        "bindings": [
+          {
+            "slot": "txid",
+            "ref": "txid",
+            "type": "TxId"
+          }
+        ]
+      },
+      {
+        "kind": "recovery-required",
+        "eventRef": {
+          "aggregate": "FundOrder",
+          "name": "BankRefundResultRecoveryRequired"
+        },
+        "bindings": [
+          {
+            "slot": "txid",
+            "ref": "txid",
+            "type": "TxId"
+          }
+        ]
+      },
+      {
+        "kind": "outcome-unknown",
+        "eventRef": {
+          "aggregate": "FundOrder",
+          "name": "BankRefundResultOutcomeUnknown"
+        },
+        "bindings": [
+          {
+            "slot": "txid",
+            "ref": "txid",
+            "type": "TxId"
+          }
+        ]
+      }
+    ]
+  }

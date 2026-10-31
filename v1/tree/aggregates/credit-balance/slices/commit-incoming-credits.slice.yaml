@@ -1,0 +1,179 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: CreditBalance
+command: CommitIncomingCredits
+payload:
+  {
+    "name": "CommitIncomingCredits",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_RESOURCE",
+        "errCode": "LEDGER_RESOURCE",
+        "cond": "state.initialized && param.resource == state.id",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_CNY",
+        "errCode": "LEDGER_CNY",
+        "cond": "param.amount.currency == \"CNY\"",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_POSITIVE",
+        "errCode": "LEDGER_POSITIVE",
+        "cond": "param.amount.amount > 0.00",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_COMMITTEDINCOMING_MATCH",
+        "errCode": "LEDGER_COMMITTEDINCOMING_MATCH",
+        "cond": "!state.committedIncoming.contains(param.txid) || state.committedIncoming(param.txid) == param.amount",
+        "onFail": "reject"
+      },
+      {
+        "ruleId": "LEDGER_COMMIT_ONCE",
+        "errCode": "LEDGER_COMMIT_ONCE",
+        "onFail": "succeed-empty",
+        "when": {
+          "form": "map-absent",
+          "map": "committedIncoming",
+          "key": "param.txid"
+        }
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_NOT_COMPENSATED",
+        "errCode": "LEDGER_NOT_COMPENSATED",
+        "cond": "!state.compensatedIncoming.contains(param.txid)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_PREPARED",
+        "errCode": "LEDGER_PREPARED",
+        "cond": "state.incomingCredits.contains(param.txid)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_INCOMINGCREDITS_MATCH",
+        "errCode": "LEDGER_INCOMINGCREDITS_MATCH",
+        "cond": "!state.incomingCredits.contains(param.txid) || state.incomingCredits(param.txid) == param.amount",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "CommitIncomingCreditsConfirmed"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "approvedBy": "user-approved-p24-p25-bank-joint",
+      "sourceVersion": "bank-v1-p23-design-2"
+    }
+  }
+events:
+  {
+    "CommitIncomingCreditsConfirmed": {
+      "name": "CommitIncomingCreditsConfirmed",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "resource",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "currency",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "available",
+          "dataType": "Money",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        },
+        {
+          "slot": "resource",
+          "expr": "param.resource"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        },
+        {
+          "slot": "currency",
+          "expr": "literal:CNY"
+        },
+        {
+          "slot": "available",
+          "expr": {
+            "form": "host",
+            "id": {
+              "context": "bankwealth",
+              "kind": "port",
+              "owner": [],
+              "id": "BalanceAfterCommitIncomingCredits"
+            },
+            "version": "bank-v1-1"
+          }
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "incomingCredits",
+          "op": "remove",
+          "key": "event.txid"
+        },
+        {
+          "slot": "committedIncoming",
+          "op": "put",
+          "key": "event.txid",
+          "value": "event.amount"
+        },
+        {
+          "slot": "accountBalance",
+          "op": "put",
+          "key": "event.currency",
+          "value": "event.available"
+        }
+      ]
+    }
+  }

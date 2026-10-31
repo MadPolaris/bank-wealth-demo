@@ -1,0 +1,53 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: BankPayment1PrepareReceipt
+seq: 31
+payload:
+  {
+    "name": "BankPayment1PrepareReceipt",
+    "context": "bankwealth",
+    "version": "bank-v1-1",
+    "fields": [
+      {
+        "name": "transaction",
+        "dataType": "TxId"
+      },
+      {
+        "name": "definitionVersion",
+        "dataType": "String"
+      },
+      {
+        "name": "argsDigest",
+        "dataType": "String"
+      },
+      {
+        "name": "participant",
+        "dataType": "String"
+      },
+      {
+        "name": "resource",
+        "dataType": "AccountId"
+      },
+      {
+        "name": "step",
+        "dataType": "String"
+      },
+      {
+        "name": "phase",
+        "dataType": "String"
+      },
+      {
+        "name": "payloadTxid",
+        "dataType": "TxId"
+      },
+      {
+        "name": "payloadResource",
+        "dataType": "AccountId"
+      },
+      {
+        "name": "payloadAmount",
+        "dataType": "Money"
+      }
+    ]
+  }
