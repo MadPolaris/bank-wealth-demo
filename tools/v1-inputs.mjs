@@ -164,8 +164,9 @@ export function writeBankDomainInputs(target) {
     requestBytes: Buffer.byteLength(JSON.stringify(request)), applicationRequests: 0, runtimeVerified: false };
 }
 
-export function bankApplicationRequest() {
-  const request = bankDomainRequest(), canonical = request.documents[0];
+export function bankApplicationRequest({ domainRequest } = {}) {
+  if (!domainRequest) return JSON.parse(readFileSync(join(ROOT, 'v1/formal-inputs/payment-376/request.json'), 'utf8'));
+  const request = structuredClone(domainRequest), canonical = request.documents[0];
   const sources = [['payment', 'payment-authored-165', ['sagas', 'runtime', 'execution']],
     ['refund', 'refund-authored-282', ['sagas', 'runtime', 'execution']],
     ['sip', 'sip-authored-307', ['execution']], ['ta', 'ta-authored-297', ['execution']]];

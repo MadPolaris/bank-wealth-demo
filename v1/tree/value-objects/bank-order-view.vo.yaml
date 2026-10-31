@@ -1,0 +1,80 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: BankOrderView
+seq: 103
+payload:
+  {
+    "name": "BankOrderView",
+    "context": "bankwealth",
+    "version": "bank-v1-service-1",
+    "fields": [
+      {
+        "name": "orderId",
+        "dataType": "FundOrderId"
+      },
+      {
+        "name": "operationId",
+        "dataType": "OperationId"
+      },
+      {
+        "name": "investorAccountId",
+        "dataType": "AccountId"
+      },
+      {
+        "name": "fundCollectionAccountId",
+        "dataType": "AccountId"
+      },
+      {
+        "name": "fundCode",
+        "dataType": "String"
+      },
+      {
+        "name": "amount",
+        "dataType": "MoneyWire"
+      },
+      {
+        "name": "paymentTxId",
+        "dataType": "Option[TxId]"
+      },
+      {
+        "name": "paymentStatus",
+        "dataType": "String"
+      },
+      {
+        "name": "taRequestId",
+        "dataType": "Option[TaRequestId]"
+      },
+      {
+        "name": "taStatus",
+        "dataType": "String"
+      },
+      {
+        "name": "taReference",
+        "dataType": "Option[String]"
+      },
+      {
+        "name": "taShares",
+        "dataType": "Option[BankTaSharesView]"
+      },
+      {
+        "name": "taRejectionReason",
+        "dataType": "Option[String]"
+      },
+      {
+        "name": "refundOperationId",
+        "dataType": "Option[OperationId]"
+      },
+      {
+        "name": "refundStatus",
+        "dataType": "String"
+      }
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1-service-integration",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-service-integration-619",
+      "sourceFlow": "P26-P32",
+      "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+    }
+  }

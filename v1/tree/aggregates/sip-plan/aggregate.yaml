@@ -4,8 +4,8 @@ kind: aggregate
 name: SipPlan
 context: bankwealth
 order:
-  commands: ["CreateSipPlan","AppendSipDueSlot","SealSipSchedule","ReviseSipPlan","AdvanceSipClock","PauseSipPlan","ResumeSipPlan","ObserveSipDueSlot","SkipPausedSipDueSlot","AdvanceSkippedSipSlot","TriggerSipInstallment","RecordSipInstallmentPending","RecordSipInstallmentOutcomeUnknown","RecordSipInstallmentRecoveryRequired","RecordSipInstallmentRefundInProgress","RecordSipInstallmentSucceeded","RecordSipInstallmentFailed"]
-  events: ["SipPlanCreated","SipDueSlotAppended","SipScheduleSealed","SipPlanRevised","SipClockAdvanced","SipPlanPaused","SipPlanResumed","SipDueSlotObserved","SipPausedDueSlotSkipped","SipSkippedSlotAdvanced","SipInstallmentTriggered","SipInstallmentPending","SipInstallmentOutcomeUnknown","SipInstallmentRecoveryRequired","SipInstallmentRefundInProgress","SipInstallmentSucceeded","SipInstallmentFailed"]
+  commands: ["CreateSipPlan","AppendSipDueSlot","SealSipSchedule","ReviseSipPlan","AdvanceSipClock","PauseSipPlan","ResumeSipPlan","ObserveSipDueSlot","SkipPausedSipDueSlot","AdvanceSkippedSipSlot","TriggerSipInstallment","RecordSipInstallmentPending","RecordSipInstallmentOutcomeUnknown","RecordSipInstallmentRecoveryRequired","RecordSipInstallmentRefundInProgress","RecordSipInstallmentSucceeded","RecordSipInstallmentFailed","RecordSipCreateIntent"]
+  events: ["SipPlanCreated","SipDueSlotAppended","SipScheduleSealed","SipPlanRevised","SipClockAdvanced","SipPlanPaused","SipPlanResumed","SipDueSlotObserved","SipPausedDueSlotSkipped","SipSkippedSlotAdvanced","SipInstallmentTriggered","SipInstallmentPending","SipInstallmentOutcomeUnknown","SipInstallmentRecoveryRequired","SipInstallmentRefundInProgress","SipInstallmentSucceeded","SipInstallmentFailed","SipCreateIntentRecorded"]
 payload:
   {
     "name": "SipPlan",
@@ -131,6 +131,29 @@ payload:
         "name": "failureTotal",
         "dataType": "Long",
         "default": "0"
+      },
+      {
+        "name": "createIntent",
+        "dataType": "Option[BankSipCreateIntent]",
+        "default": {
+          "present": false,
+          "value": null
+        }
+      },
+      {
+        "name": "sipCreateIntents",
+        "dataType": "Map[String, BankSipCreateIntent]",
+        "default": []
+      },
+      {
+        "name": "createIntentDueSlots",
+        "dataType": "Vector[Long]",
+        "default": []
+      },
+      {
+        "name": "intentAppendedDueSlots",
+        "dataType": "Map[Long, Long]",
+        "default": []
       }
     ],
     "aggregateRuleRefs": [
@@ -418,6 +441,56 @@ payload:
         "ruleId": "SIP_TOTAL_CAPACITY",
         "errCode": "SIP_TOTAL_CAPACITY",
         "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
+      },
+      {
+        "ruleId": "SIP_INTENT_OPTION",
+        "errCode": "SIP_INTENT_OPTION",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "SIP_INTENT_RESOURCE",
+        "errCode": "SIP_INTENT_RESOURCE",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "SIP_INTENT_BODY",
+        "errCode": "SIP_INTENT_BODY",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "SIP_INTENT_CONFLICT",
+        "errCode": "SIP_INTENT_CONFLICT",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "SIP_INTENT_EXISTING_CONFIG",
+        "errCode": "SIP_INTENT_EXISTING_CONFIG",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "SIP_INTENT_ONCE",
+        "errCode": "SIP_INTENT_ONCE",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "SIP_INTENT_BEFORE_CREATE",
+        "errCode": "SIP_INTENT_BEFORE_CREATE",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "SIP_ADMITTED_CREATE_MATCH",
+        "errCode": "SIP_ADMITTED_CREATE_MATCH",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "SIP_ADMITTED_SLOT_MEMBER",
+        "errCode": "SIP_ADMITTED_SLOT_MEMBER",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "SIP_ADMITTED_SCHEDULE_COVERED",
+        "errCode": "SIP_ADMITTED_SCHEDULE_COVERED",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
       }
     ],
     "provenance": {
@@ -431,7 +504,14 @@ payload:
         "/payload/info/artifact/body/resolutions/3",
         "/payload/info/artifact/body/resolutions/4",
         "/payload/info/artifact/body/flows/3"
-      ]
+      ],
+      "serviceIntegration": {
+        "author": "agent-assisted-bank-v1-service-integration",
+        "workshopHeld": false,
+        "sourceVersion": "bank-v1-service-integration-619",
+        "sourceFlow": "P26-P32",
+        "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+      }
     },
     "valueExpressionProfile": "truthsrc.domain-values/v2"
   }

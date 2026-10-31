@@ -7,8 +7,8 @@ import {readProductRequest} from '../../metarch-truthsrc/lib/products/cli.mjs';
 import {generate} from '../../metarch-truthsrc/generators/scala-cqrs-effect-application-v2/generate.mjs';
 import {bankApplicationRequest,V1_TREE} from '../tools/v1-inputs.mjs';
 const file=flow=>new URL('../v1/formal-inputs/'+flow+'-376/files.json',import.meta.url).pathname;
-test('four named bank flow requests keep the full current source and distinct entry obligations',()=>{
- const tree=JSON.parse(compileTree(V1_TREE)),expected={payment:'bank-cash-payment-v1',refund:'bank-independent-refund-v1',ta:'bank-ta-submission-v1',sip:'bank-sip-dispatch-v1'};
+test('four historical bank flow requests keep their complete frozen source and distinct entry obligations',()=>{
+ const tree=readProductRequest(file('payment')).documents.find(d=>d.id==='bank-v1').value,expected={payment:'bank-cash-payment-v1',refund:'bank-independent-refund-v1',ta:'bank-ta-submission-v1',sip:'bank-sip-dispatch-v1'};
  for(const [flow,pipeline] of Object.entries(expected)){
   const request=readProductRequest(file(flow));
   assert.deepEqual(request.documents.find(d=>d.id==='bank-v1').value,tree);

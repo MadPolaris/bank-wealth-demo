@@ -9,8 +9,36 @@ import example.bankwealth.domain.values._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
+object BankTaEffectBindings {
+  /** Constructor input for BankRuntime.taBindings. Both host paths resolve the
+    * scenario from the same trusted deployment function, never an HTTP field.
+    */
+  def forOrders(client: MockTAClient, scenarioForOrder: FundOrderId => String)
+      (implicit system: ActorSystem[_]): ActorRef[FundOrderAggregate.Request] => Host.Installed = {
+    require(client != null && !client.usesLegacyConfiguration && scenarioForOrder != null,
+      "explicit MockTA configuration and trusted per-order scenarios required")
+    order => {
+      val bridge = new BankTaBridge(order, client)
+      def bindings(operation: BankTaEffectOperation): Host.Installed = {
+        val scenario = scenarioForOrder(operation.request.fundOrderId)
+        require(scenario != null && scenario.nonEmpty, "trusted TA scenario required")
+        new BankTaEffectBindings(order, client, bridge, scenario).installed
+      }
+      Host.install(Host.Bindings(
+        Host.Implementation("bankwealth.BankTaEffectExecute", "bank-v1-1", (operation: BankTaEffectOperation) =>
+          bindings(operation).execute(operation)),
+        Host.Implementation("bankwealth.BankTaEffectQuery", "bank-v1-1", (operation: BankTaEffectOperation) =>
+          bindings(operation).query(operation)),
+        Host.Implementation("bankwealth.BankTaEffectReconcilePort", "bank-v1-1", (_: BankTaEffectReconcile) => Future.successful(false))
+      ))
+    }
+  }
+}
+
 final class BankTaEffectBindings(order: ActorRef[FundOrderAggregate.Request], client: MockTAClient, bridge: BankTaBridge,
     scenario: String)(implicit system: ActorSystem[_]) {
+  require(order != null && client != null && bridge != null && scenario != null && scenario.nonEmpty,
+    "complete trusted TA effect binding required")
   implicit private val ec: ExecutionContext = system.executionContext
   implicit private val timeout: Timeout = Timeout(3.seconds)
   private def verify(operation: BankTaEffectOperation): Future[FundOrderState] = {
@@ -33,7 +61,7 @@ final class BankTaEffectBindings(order: ActorRef[FundOrderAggregate.Request], cl
     Host.Implementation("bankwealth.BankTaEffectExecute", "bank-v1-1", (operation: BankTaEffectOperation) =>
       verify(operation).flatMap(_ => bridge.submit(scenario)).map(observation(operation, _))),
     Host.Implementation("bankwealth.BankTaEffectQuery", "bank-v1-1", (operation: BankTaEffectOperation) =>
-      verify(operation).flatMap(_ => client.query(operation.request.taRequestId.value)).map(response => Some(observation(operation, response)))),
+      verify(operation).flatMap(_ => bridge.reconcile(scenario)).map(response => Some(observation(operation, response)))),
     Host.Implementation("bankwealth.BankTaEffectReconcilePort", "bank-v1-1", (_: BankTaEffectReconcile) => Future.successful(false))
   ))
 }

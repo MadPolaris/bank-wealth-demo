@@ -1,0 +1,717 @@
+{
+  "schemaVersion": "truthsrc.execution-binding/v1",
+  "sagaBindings": {
+    "schemaVersion": "truthsrc.saga-binding/v1",
+    "sagas": [
+      {
+        "sagaId": "bank-independent-refund-v1",
+        "version": "bank-v1-1",
+        "module": "bankwealth.RefundModule",
+        "engine": {
+          "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+          "apiMode": "strict",
+          "entrypoint": "bankwealth.RefundEntry",
+          "capabilities": {
+            "required": [
+              "durable-commit-decision",
+              "durable-abort-decision",
+              "typed-nonterminal-unknown",
+              "safe-status-reattach",
+              "receipt-reconciliation",
+              "participant-idempotency-query",
+              "pinned-definition-codec",
+              "manual-evidence-authorization",
+              "cancel-before-prepare-fencing",
+              "durable-manifest"
+            ]
+          }
+        },
+        "codec": {
+          "id": "BankRefundArgs",
+          "version": "bank-v1-1",
+          "compatibleVersions": [
+            "bank-v1-1"
+          ],
+          "mapper": "bankwealth.RefundArgsCodec"
+        },
+        "types": [
+          {
+            "id": "TxId",
+            "canonicalType": "TxId",
+            "implementation": "example.bankwealth.domain.values.TxId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "OperationId",
+            "canonicalType": "OperationId",
+            "implementation": "example.bankwealth.domain.values.OperationId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "AccountId",
+            "canonicalType": "AccountId",
+            "implementation": "example.bankwealth.domain.values.AccountId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "FundOrderId",
+            "canonicalType": "FundOrderId",
+            "implementation": "example.bankwealth.domain.values.FundOrderId",
+            "kind": "id",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          {
+            "id": "Money",
+            "canonicalType": "Money",
+            "implementation": "example.bankwealth.domain.values.Money",
+            "kind": "money",
+            "currency": "ISO-4217",
+            "amountEncoding": "minor-unit-string",
+            "scale": 2,
+            "precision": 38,
+            "codec": "bankwealth.MoneyCodec"
+          },
+          {
+            "id": "Text",
+            "canonicalType": "String",
+            "implementation": "java.lang.String",
+            "kind": "string",
+            "minLength": 1,
+            "maxLength": 65536
+          }
+        ],
+        "participants": [
+          {
+            "participantId": "collectionCreditBalance",
+            "addressing": {
+              "resolver": "fixture.wealth.refund.collectionCreditBalanceResolver",
+              "aggregate": "CreditBalance",
+              "resourceType": "AccountId",
+              "mode": "exact-resource"
+            }
+          },
+          {
+            "participantId": "investorCreditBalance",
+            "addressing": {
+              "resolver": "fixture.wealth.refund.investorCreditBalanceResolver",
+              "aggregate": "CreditBalance",
+              "resourceType": "AccountId",
+              "mode": "exact-resource"
+            }
+          }
+        ],
+        "steps": [
+          {
+            "stepId": "debit-fund-collection",
+            "phases": {
+              "prepare": {
+                "kind": "command",
+                "port": "bankwealth.RefundReserveFundsPort",
+                "commandMapper": "bankwealth.RefundReserveFundsMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "ReserveFundsConfirmed"
+                  },
+                  "mapper": "bankwealth.RefundReserveFundsReceipt",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId",
+                      "ref": "receipt:txid"
+                    },
+                    {
+                      "slot": "resource",
+                      "type": "AccountId",
+                      "ref": "receipt:resource"
+                    },
+                    {
+                      "slot": "amount",
+                      "type": "Money",
+                      "ref": "receipt:amount"
+                    },
+                    {
+                      "slot": "currency",
+                      "type": "Text",
+                      "ref": "receipt:currency"
+                    },
+                    {
+                      "slot": "available",
+                      "type": "Money",
+                      "ref": "receipt:available"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.wealth.refund.debit_fund_collection_prepare_queryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.wealth.refund.debit_fund_collection_prepare_receiptMapper",
+                  "version": "bank-v1-1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.wealth.refund.debit_fund_collection_prepare_idempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "commit": {
+                "kind": "command",
+                "port": "bankwealth.RefundDeductFundsPort",
+                "commandMapper": "bankwealth.RefundDeductFundsMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "DeductFundsConfirmed"
+                  },
+                  "mapper": "bankwealth.RefundDeductFundsReceipt",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId",
+                      "ref": "receipt:txid"
+                    },
+                    {
+                      "slot": "resource",
+                      "type": "AccountId",
+                      "ref": "receipt:resource"
+                    },
+                    {
+                      "slot": "amount",
+                      "type": "Money",
+                      "ref": "receipt:amount"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.wealth.refund.debit_fund_collection_commit_queryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.wealth.refund.debit_fund_collection_commit_receiptMapper",
+                  "version": "bank-v1-1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.wealth.refund.debit_fund_collection_commit_idempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "compensate": {
+                "kind": "command",
+                "port": "bankwealth.RefundReleaseReservedFundsPort",
+                "commandMapper": "bankwealth.RefundReleaseReservedFundsMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "ReleaseReservedFundsConfirmed"
+                  },
+                  "mapper": "bankwealth.RefundReleaseReservedFundsReceipt",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId",
+                      "ref": "receipt:txid"
+                    },
+                    {
+                      "slot": "resource",
+                      "type": "AccountId",
+                      "ref": "receipt:resource"
+                    },
+                    {
+                      "slot": "amount",
+                      "type": "Money",
+                      "ref": "receipt:amount"
+                    },
+                    {
+                      "slot": "currency",
+                      "type": "Text",
+                      "ref": "receipt:currency"
+                    },
+                    {
+                      "slot": "available",
+                      "type": "Money",
+                      "ref": "receipt:available"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.wealth.refund.debit_fund_collection_compensate_queryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.wealth.refund.debit_fund_collection_compensate_receiptMapper",
+                  "version": "bank-v1-1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.wealth.refund.debit_fund_collection_compensate_idempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              }
+            }
+          },
+          {
+            "stepId": "credit-original-investor",
+            "phases": {
+              "prepare": {
+                "kind": "command",
+                "port": "bankwealth.RefundRecordIncomingCreditsPort",
+                "commandMapper": "bankwealth.RefundRecordIncomingCreditsMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "RecordIncomingCreditsConfirmed"
+                  },
+                  "mapper": "bankwealth.RefundRecordIncomingCreditsReceipt",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId",
+                      "ref": "receipt:txid"
+                    },
+                    {
+                      "slot": "resource",
+                      "type": "AccountId",
+                      "ref": "receipt:resource"
+                    },
+                    {
+                      "slot": "amount",
+                      "type": "Money",
+                      "ref": "receipt:amount"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.wealth.refund.credit_original_investor_prepare_queryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.wealth.refund.credit_original_investor_prepare_receiptMapper",
+                  "version": "bank-v1-1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.wealth.refund.credit_original_investor_prepare_idempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "commit": {
+                "kind": "command",
+                "port": "bankwealth.RefundCommitIncomingCreditsPort",
+                "commandMapper": "bankwealth.RefundCommitIncomingCreditsMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "CommitIncomingCreditsConfirmed"
+                  },
+                  "mapper": "bankwealth.RefundCommitIncomingCreditsReceipt",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId",
+                      "ref": "receipt:txid"
+                    },
+                    {
+                      "slot": "resource",
+                      "type": "AccountId",
+                      "ref": "receipt:resource"
+                    },
+                    {
+                      "slot": "amount",
+                      "type": "Money",
+                      "ref": "receipt:amount"
+                    },
+                    {
+                      "slot": "currency",
+                      "type": "Text",
+                      "ref": "receipt:currency"
+                    },
+                    {
+                      "slot": "available",
+                      "type": "Money",
+                      "ref": "receipt:available"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.wealth.refund.credit_original_investor_commit_queryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.wealth.refund.credit_original_investor_commit_receiptMapper",
+                  "version": "bank-v1-1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.wealth.refund.credit_original_investor_commit_idempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              },
+              "compensate": {
+                "kind": "command",
+                "port": "bankwealth.RefundCancelIncomingCreditPort",
+                "commandMapper": "bankwealth.RefundCancelIncomingCreditMapper",
+                "confirmation": {
+                  "kind": "durable-receipt",
+                  "eventRef": {
+                    "aggregate": "CreditBalance",
+                    "name": "CancelIncomingCreditConfirmed"
+                  },
+                  "mapper": "bankwealth.RefundCancelIncomingCreditReceipt",
+                  "outputs": [
+                    {
+                      "slot": "txid",
+                      "type": "TxId",
+                      "ref": "receipt:txid"
+                    },
+                    {
+                      "slot": "resource",
+                      "type": "AccountId",
+                      "ref": "receipt:resource"
+                    },
+                    {
+                      "slot": "amount",
+                      "type": "Money",
+                      "ref": "receipt:amount"
+                    }
+                  ]
+                },
+                "query": {
+                  "mapper": "fixture.wealth.refund.credit_original_investor_compensate_queryMapper",
+                  "mode": "read-only",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "resultKinds": [
+                    "confirmed",
+                    "not-executed",
+                    "unknown"
+                  ]
+                },
+                "receipt": {
+                  "mapper": "fixture.wealth.refund.credit_original_investor_compensate_receiptMapper",
+                  "version": "bank-v1-1",
+                  "durable": true,
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "args-digest",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadCompatibility": "exact",
+                  "evidence": "reservation-decision-effect-reconciliation"
+                },
+                "idempotency": {
+                  "mapper": "fixture.wealth.refund.credit_original_investor_compensate_idempotencyMapper",
+                  "identity": [
+                    "txid",
+                    "definition-version",
+                    "participant",
+                    "resource",
+                    "step",
+                    "phase"
+                  ],
+                  "payloadConflict": "reject",
+                  "attemptIdentity": "excluded"
+                }
+              }
+            }
+          }
+        ],
+        "triggerMappers": [
+          {
+            "triggerId": "bank-refund-request",
+            "argsMapper": "bankwealth.RefundEntryArgs",
+            "idempotencyMapper": "bankwealth.RefundEntryIdentity"
+          }
+        ],
+        "completionMappers": [
+          {
+            "kind": "succeeded",
+            "mapper": "bankwealth.RefundSucceededDelivery"
+          },
+          {
+            "kind": "rejected-before-effects",
+            "mapper": "bankwealth.RefundRejectedBeforeEffectsDelivery"
+          },
+          {
+            "kind": "compensated",
+            "mapper": "bankwealth.RefundCompensatedDelivery"
+          },
+          {
+            "kind": "recovery-required",
+            "mapper": "bankwealth.RefundRecoveryRequiredDelivery"
+          },
+          {
+            "kind": "outcome-unknown",
+            "mapper": "bankwealth.RefundOutcomeUnknownDelivery"
+          }
+        ]
+      }
+    ]
+  },
+  "pipelines": [
+    {
+      "pipelineId": "bank-independent-refund-v1",
+      "engine": "monarch-persistence/0.2.1",
+      "module": "bankwealth.RefundPipeline",
+      "codec": {
+        "id": "CashPurchasePipelineCodec",
+        "version": "bank-v1-1",
+        "compatibleVersions": [
+          "bank-v1-1"
+        ]
+      },
+      "types": [
+        {
+          "id": "TxId",
+          "implementation": "example.bankwealth.domain.values.TxId"
+        },
+        {
+          "id": "OperationId",
+          "implementation": "example.bankwealth.domain.values.OperationId"
+        },
+        {
+          "id": "AccountId",
+          "implementation": "example.bankwealth.domain.values.AccountId"
+        },
+        {
+          "id": "FundOrderId",
+          "implementation": "example.bankwealth.domain.values.FundOrderId"
+        },
+        {
+          "id": "Money",
+          "implementation": "example.bankwealth.domain.values.Money"
+        },
+        {
+          "id": "Text",
+          "implementation": "java.lang.String"
+        }
+      ],
+      "ports": [],
+      "invocations": [
+        {
+          "stepId": "return-principal",
+          "ref": {
+            "sagaId": "bank-independent-refund-v1",
+            "version": "bank-v1-1"
+          },
+          "adapter": "bankwealth.RefundInvocation",
+          "runtime": {
+            "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+            "apiMode": "strict",
+            "entrypoint": "bankwealth.RefundEntry"
+          },
+          "argsCodec": {
+            "id": "BankRefundArgs",
+            "version": "bank-v1-1",
+            "mapper": "bankwealth.RefundArgsCodec"
+          },
+          "resultCodec": {
+            "id": "SagaResultCodec",
+            "version": "bank-v1-1",
+            "mapper": "fixture.wealth.pay.SagaResultCodec"
+          },
+          "transactionIdentity": {
+            "mapper": "fixture.wealth.pay.DurableSourceStageIdentity",
+            "derivation": "durable-source-stage",
+            "payloadCompatibility": "exact"
+          }
+        }
+      ]
+    }
+  ]
+}

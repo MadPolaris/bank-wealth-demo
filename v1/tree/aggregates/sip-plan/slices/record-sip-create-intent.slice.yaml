@@ -1,0 +1,126 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: RecordSipCreateIntent
+payload:
+  {
+    "name": "RecordSipCreateIntent",
+    "parameters": [
+      {
+        "name": "intent",
+        "dataType": "BankSipCreateIntent",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "source",
+        "dataType": "Option[BankSipCreateIntent]",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INTENT_OPTION",
+        "errCode": "SIP_INTENT_OPTION",
+        "cond": "param.source.contains(param.intent)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INTENT_RESOURCE",
+        "errCode": "SIP_INTENT_RESOURCE",
+        "cond": "param.intent.planId == state.id",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INTENT_BODY",
+        "errCode": "SIP_INTENT_BODY",
+        "cond": "param.intent.principalId.nonEmpty && param.intent.clientRequestId.nonEmpty && param.intent.authorityVersion.nonEmpty && param.intent.clientRequestId == param.intent.request.clientRequestId && param.intent.request.fundCode == param.intent.config.fundCode && param.intent.request.effectiveSlot == param.intent.config.effectiveSlot && param.intent.request.amount.currency == param.intent.config.amount.currency && param.intent.request.dueSlots.nonEmpty",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INTENT_CONFLICT",
+        "errCode": "SIP_INTENT_CONFLICT",
+        "cond": "state.createIntent.isEmpty || state.createIntent.contains(param.intent)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INTENT_EXISTING_CONFIG",
+        "errCode": "SIP_INTENT_EXISTING_CONFIG",
+        "cond": "!state.initialized || (param.intent.planId == state.id && state.revisions.contains(param.intent.config.revision) && state.revisions(param.intent.config.revision) == param.intent.config)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INTENT_ONCE",
+        "errCode": "SIP_INTENT_ONCE",
+        "cond": "state.createIntent.isEmpty",
+        "onFail": "succeed-empty"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INTENT_BEFORE_CREATE",
+        "errCode": "SIP_INTENT_BEFORE_CREATE",
+        "cond": "!state.initialized && state.scheduleCount == 0 && !state.scheduleSealed",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "SipCreateIntentRecorded"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1-service-integration",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-service-integration-619",
+      "sourceFlow": "P26-P32",
+      "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+    }
+  }
+events:
+  {
+    "SipCreateIntentRecorded": {
+      "name": "SipCreateIntentRecorded",
+      "payloads": [
+        {
+          "name": "intent",
+          "dataType": "BankSipCreateIntent",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "source",
+          "dataType": "Option[BankSipCreateIntent]",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "intent",
+          "expr": "param.intent"
+        },
+        {
+          "slot": "source",
+          "expr": "param.source"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "createIntent",
+          "expr": "event.source"
+        },
+        {
+          "slot": "sipCreateIntents",
+          "op": "put",
+          "key": "literal:original",
+          "value": "event.intent"
+        },
+        {
+          "slot": "createIntentDueSlots",
+          "expr": "event.intent.request.dueSlots"
+        }
+      ]
+    }
+  }

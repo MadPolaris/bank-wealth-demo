@@ -21,6 +21,13 @@ payload:
     "guards": [
       {
         "kind": "invariantRef",
+        "ref": "SIP_ADMITTED_CREATE_MATCH",
+        "errCode": "SIP_ADMITTED_CREATE_MATCH",
+        "cond": "state.createIntent.isEmpty || (state.sipCreateIntents.contains(\"original\") && param.planId == state.sipCreateIntents(\"original\").planId && param.config == state.sipCreateIntents(\"original\").config)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
         "ref": "SIP_PLAN_ID",
         "errCode": "SIP_PLAN_ID",
         "cond": "param.planId.value.nonEmpty",
@@ -90,7 +97,14 @@ payload:
         "/payload/info/artifact/body/resolutions/3",
         "/payload/info/artifact/body/resolutions/4",
         "/payload/info/artifact/body/flows/3"
-      ]
+      ],
+      "serviceIntegration": {
+        "author": "agent-assisted-bank-v1-service-integration",
+        "workshopHeld": false,
+        "sourceVersion": "bank-v1-service-integration-619",
+        "sourceFlow": "P26-P32",
+        "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+      }
     }
   }
 events:

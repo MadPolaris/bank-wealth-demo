@@ -4,8 +4,8 @@ kind: aggregate
 name: FundOrder
 context: bankwealth
 order:
-  commands: ["RequestFundPurchaseSettlement","ReserveFundSubscription","ConfirmFundSubscriptionPayment","CancelCashFundSubscription","RecordFundCashPaymentSucceeded","RecordFundCashPaymentRejectedBeforeEffects","RecordFundCashPaymentCompensated","RecordFundCashPaymentRecoveryRequired","RecordFundCashPaymentOutcomeUnknown","RegisterFundTASubmission","RecordFundTAAccepted","RecordFundTAConfirmed","RecordFundTARejected","RecordFundTAUnknown","RequestFundPurchaseRefund","RecordFundRefundSucceeded","RecordFundRefundRejectedBeforeEffects","RecordFundRefundCompensated","RecordFundRefundRecoveryRequired","RecordFundRefundOutcomeUnknown"]
-  events: ["FundPurchaseSettlementRequested","ReserveFundSubscriptionConfirmed","FundSubscriptionPaymentConfirmed","CashFundSubscriptionCanceled","FundCashPaymentSucceeded","FundCashPaymentRejectedBeforeEffects","FundCashPaymentCompensated","FundCashPaymentRecoveryRequired","FundCashPaymentOutcomeUnknown","FundTASubmissionRegistered","FundTAAccepted","FundTASharesConfirmed","FundTARejected","FundTAUnknown","FundPurchaseRefundRequested","FundRefundSucceeded","FundRefundRejectedBeforeEffects","FundRefundCompensated","FundRefundRecoveryRequired","FundRefundOutcomeUnknown","FundTAReceiptObserved","BankPaymentResultSucceeded","BankPaymentResultRejectedBeforeEffects","BankPaymentResultCompensated","BankPaymentResultRecoveryRequired","BankPaymentResultOutcomeUnknown","BankRefundResultSucceeded","BankRefundResultRejectedBeforeEffects","BankRefundResultCompensated","BankRefundResultRecoveryRequired","BankRefundResultOutcomeUnknown"]
+  commands: ["RequestFundPurchaseSettlement","ReserveFundSubscription","ConfirmFundSubscriptionPayment","CancelCashFundSubscription","RecordFundCashPaymentSucceeded","RecordFundCashPaymentRejectedBeforeEffects","RecordFundCashPaymentCompensated","RecordFundCashPaymentRecoveryRequired","RecordFundCashPaymentOutcomeUnknown","RegisterFundTASubmission","RecordFundTAAccepted","RecordFundTAConfirmed","RecordFundTARejected","RecordFundTAUnknown","RequestFundPurchaseRefund","RecordFundRefundSucceeded","RecordFundRefundRejectedBeforeEffects","RecordFundRefundCompensated","RecordFundRefundRecoveryRequired","RecordFundRefundOutcomeUnknown","RecordCashRequestSource"]
+  events: ["FundPurchaseSettlementRequested","ReserveFundSubscriptionConfirmed","FundSubscriptionPaymentConfirmed","CashFundSubscriptionCanceled","FundCashPaymentSucceeded","FundCashPaymentRejectedBeforeEffects","FundCashPaymentCompensated","FundCashPaymentRecoveryRequired","FundCashPaymentOutcomeUnknown","FundTASubmissionRegistered","FundTAAccepted","FundTASharesConfirmed","FundTARejected","FundTAUnknown","FundPurchaseRefundRequested","FundRefundSucceeded","FundRefundRejectedBeforeEffects","FundRefundCompensated","FundRefundRecoveryRequired","FundRefundOutcomeUnknown","FundTAReceiptObserved","BankPaymentResultSucceeded","BankPaymentResultRejectedBeforeEffects","BankPaymentResultCompensated","BankPaymentResultRecoveryRequired","BankPaymentResultOutcomeUnknown","BankRefundResultSucceeded","BankRefundResultRejectedBeforeEffects","BankRefundResultCompensated","BankRefundResultRecoveryRequired","BankRefundResultOutcomeUnknown","CashRequestSourceRecorded"]
 payload:
   {
     "name": "FundOrder",
@@ -161,6 +161,19 @@ payload:
       {
         "name": "refundObservedResults",
         "dataType": "Map[TxId, String]",
+        "default": []
+      },
+      {
+        "name": "cashRequestSource",
+        "dataType": "Option[BankCashOriginal]",
+        "default": {
+          "present": false,
+          "value": null
+        }
+      },
+      {
+        "name": "cashRequestOriginals",
+        "dataType": "Map[String, BankCashOriginal]",
         "default": []
       }
     ],
@@ -419,13 +432,60 @@ payload:
         "ruleId": "REFUND_LATE_PROGRESS",
         "errCode": "REFUND_LATE_PROGRESS",
         "desc": "Explicit P23-derived V1 rule"
+      },
+      {
+        "ruleId": "CASH_SOURCE_OPTION",
+        "errCode": "CASH_SOURCE_OPTION",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "CASH_SOURCE_RESOURCE",
+        "errCode": "CASH_SOURCE_RESOURCE",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "CASH_SOURCE_BODY",
+        "errCode": "CASH_SOURCE_BODY",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "CASH_SOURCE_CONFLICT",
+        "errCode": "CASH_SOURCE_CONFLICT",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "CASH_SOURCE_PAYMENT",
+        "errCode": "CASH_SOURCE_PAYMENT",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "CASH_SOURCE_ONCE",
+        "errCode": "CASH_SOURCE_ONCE",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "CASH_SOURCE_BEFORE_SETTLEMENT",
+        "errCode": "CASH_SOURCE_BEFORE_SETTLEMENT",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
+      },
+      {
+        "ruleId": "CASH_ADMITTED_PAYMENT_MATCH",
+        "errCode": "CASH_ADMITTED_PAYMENT_MATCH",
+        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
       }
     ],
     "provenance": {
       "author": "agent-assisted-bank-v1",
       "workshopHeld": false,
       "sourceVersion": "bank-v1-p23-design-2",
-      "sourceFlow": "payment/ta/refund"
+      "sourceFlow": "payment/ta/refund",
+      "serviceIntegration": {
+        "author": "agent-assisted-bank-v1-service-integration",
+        "workshopHeld": false,
+        "sourceVersion": "bank-v1-service-integration-619",
+        "sourceFlow": "P26-P32",
+        "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+      }
     }
   }
 extraEvents:

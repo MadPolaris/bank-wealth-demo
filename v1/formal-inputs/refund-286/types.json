@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "truthsrc.exact-type-binding/v1",
+  "types": [
+    {
+      "domain": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "Money"
+      },
+      "version": "bank-v1-1",
+      "source": {
+        "document": "bank-v1",
+        "pointer": "/valueObjects/11"
+      },
+      "form": "unit-decimal",
+      "precision": 38,
+      "scale": 2,
+      "amountMember": {
+        "context": "bankwealth",
+        "kind": "member",
+        "owner": [
+          "Money"
+        ],
+        "id": "amount"
+      },
+      "unitMember": {
+        "context": "bankwealth",
+        "kind": "member",
+        "owner": [
+          "Money"
+        ],
+        "id": "currency"
+      },
+      "units": [
+        "CNY"
+      ]
+    },
+    {
+      "domain": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "AmountDecimal"
+      },
+      "version": "bank-v1-1",
+      "source": {
+        "document": "bank-v1",
+        "pointer": "/valueObjects/8"
+      },
+      "form": "decimal",
+      "precision": 38,
+      "scale": 2,
+      "amountMember": null,
+      "unitMember": null,
+      "units": []
+    }
+  ]
+}

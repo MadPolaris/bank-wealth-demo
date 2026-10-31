@@ -1,0 +1,24 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: BankAccountKey
+seq: 90
+payload:
+  {
+    "name": "BankAccountKey",
+    "context": "bankwealth",
+    "version": "bank-v1-service-1",
+    "fields": [
+      {
+        "name": "schemaVersion",
+        "dataType": "String"
+      }
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1-service-integration",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-service-integration-619",
+      "sourceFlow": "P26-P32",
+      "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+    }
+  }

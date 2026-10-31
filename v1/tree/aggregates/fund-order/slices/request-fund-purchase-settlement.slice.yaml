@@ -41,6 +41,13 @@ payload:
     "guards": [
       {
         "kind": "invariantRef",
+        "ref": "CASH_ADMITTED_PAYMENT_MATCH",
+        "errCode": "CASH_ADMITTED_PAYMENT_MATCH",
+        "cond": "state.cashRequestSource.isEmpty || (state.cashRequestOriginals.contains(\"original\") && param.operationId == state.cashRequestOriginals(\"original\").payment.operationId && param.fundOrderId == state.cashRequestOriginals(\"original\").payment.fundOrderId && param.investorAccountId == state.cashRequestOriginals(\"original\").payment.investorAccountId && param.fundCollectionAccountId == state.cashRequestOriginals(\"original\").payment.fundCollectionAccountId && param.fundCode == state.cashRequestOriginals(\"original\").payment.fundCode && param.amount == state.cashRequestOriginals(\"original\").payment.amount)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
         "ref": "ORDER_RESOURCE",
         "errCode": "ORDER_RESOURCE",
         "cond": "param.fundOrderId == state.id",
@@ -89,7 +96,14 @@ payload:
       "author": "agent-assisted-bank-v1",
       "workshopHeld": false,
       "sourceVersion": "bank-v1-p23-design-2",
-      "sourceFlow": "payment/ta/refund"
+      "sourceFlow": "payment/ta/refund",
+      "serviceIntegration": {
+        "author": "agent-assisted-bank-v1-service-integration",
+        "workshopHeld": false,
+        "sourceVersion": "bank-v1-service-integration-619",
+        "sourceFlow": "P26-P32",
+        "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+      }
     }
   }
 events:

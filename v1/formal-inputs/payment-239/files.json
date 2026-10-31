@@ -1,0 +1,370 @@
+{
+  "schemaVersion": "truthsrc.product-input-files/v1",
+  "documents": [
+    {
+      "id": "bank-v1",
+      "schemaVersion": "truthsrc/v1",
+      "file": "bank-v1.json"
+    },
+    {
+      "id": "references",
+      "schemaVersion": "truthsrc.reference-binding/v1",
+      "file": "references.json"
+    },
+    {
+      "id": "types",
+      "schemaVersion": "truthsrc.exact-type-binding/v1",
+      "file": "types.json"
+    },
+    {
+      "id": "codecs",
+      "schemaVersion": "truthsrc.exact-codec-binding/v1",
+      "file": "codecs.json"
+    },
+    {
+      "id": "decisions",
+      "schemaVersion": "truthsrc.domain-semantic-binding/v4",
+      "file": "decisions.json"
+    },
+    {
+      "id": "dependencies",
+      "schemaVersion": "truthsrc.domain-dependency-binding/v6",
+      "file": "dependencies.json"
+    },
+    {
+      "id": "folds",
+      "schemaVersion": "truthsrc.domain-fold-binding/v6",
+      "file": "folds.json"
+    },
+    {
+      "id": "external",
+      "schemaVersion": "truthsrc.domain-external-event-binding/v2",
+      "file": "external.json"
+    },
+    {
+      "id": "sagas",
+      "schemaVersion": "truthsrc.saga-binding/v1",
+      "file": "sagas.json"
+    },
+    {
+      "id": "runtime",
+      "schemaVersion": "truthsrc.saga-runtime-binding/v2",
+      "file": "runtime.json"
+    },
+    {
+      "id": "execution",
+      "schemaVersion": "truthsrc.execution-binding/v1",
+      "file": "execution.json"
+    },
+    {
+      "id": "hosts",
+      "schemaVersion": "truthsrc.saga-host-binding/v1",
+      "file": "hosts.json"
+    },
+    {
+      "id": "artifacts",
+      "schemaVersion": "truthsrc.artifact-binding/v2",
+      "file": "artifacts.json"
+    }
+  ],
+  "assemblies": [],
+  "requirements": [
+    {
+      "id": "reference-layout",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.reference-layout/v1",
+      "capabilities": [
+        {
+          "id": "qualified-reference-layout",
+          "version": "1"
+        }
+      ],
+      "requires": [],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "referenceBinding": "references"
+      }
+    },
+    {
+      "id": "exact-value-types",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.exact-value-types/v1",
+      "capabilities": [
+        {
+          "id": "exact-value-types",
+          "version": "1"
+        }
+      ],
+      "requires": [
+        {
+          "id": "reference-layout",
+          "version": "1"
+        }
+      ],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "exactTypeBinding": "types"
+      }
+    },
+    {
+      "id": "exact-value-codecs",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.exact-value-codecs/v1",
+      "capabilities": [
+        {
+          "id": "exact-value-codecs",
+          "version": "1"
+        }
+      ],
+      "requires": [
+        {
+          "id": "reference-layout",
+          "version": "1"
+        },
+        {
+          "id": "exact-value-types",
+          "version": "1"
+        }
+      ],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "exactCodecBinding": "codecs"
+      }
+    },
+    {
+      "id": "domain-decision",
+      "version": "4",
+      "payloadSchemaVersion": "truthsrc.domain-decision/v4",
+      "capabilities": [
+        {
+          "id": "ordered-domain-decision",
+          "version": "4"
+        }
+      ],
+      "requires": [
+        {
+          "id": "reference-layout",
+          "version": "1"
+        },
+        {
+          "id": "exact-value-types",
+          "version": "1"
+        }
+      ],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "semanticBinding": "decisions"
+      }
+    },
+    {
+      "id": "domain-dependencies",
+      "version": "6",
+      "payloadSchemaVersion": "truthsrc.domain-dependencies/v6",
+      "capabilities": [
+        {
+          "id": "domain-dependencies",
+          "version": "6"
+        }
+      ],
+      "requires": [
+        {
+          "id": "reference-layout",
+          "version": "1"
+        },
+        {
+          "id": "domain-decision",
+          "version": "4"
+        },
+        {
+          "id": "exact-value-types",
+          "version": "1"
+        },
+        {
+          "id": "domain-external-events",
+          "version": "2"
+        }
+      ],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "dependencyBinding": "dependencies"
+      }
+    },
+    {
+      "id": "domain-folds",
+      "version": "6",
+      "payloadSchemaVersion": "truthsrc.domain-folds/v6",
+      "capabilities": [
+        {
+          "id": "domain-folds",
+          "version": "6"
+        }
+      ],
+      "requires": [
+        {
+          "id": "reference-layout",
+          "version": "1"
+        },
+        {
+          "id": "domain-dependencies",
+          "version": "6"
+        },
+        {
+          "id": "exact-value-types",
+          "version": "1"
+        }
+      ],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "foldBinding": "folds"
+      }
+    },
+    {
+      "id": "domain-external-events",
+      "version": "2",
+      "payloadSchemaVersion": "truthsrc.domain-external-events/v2",
+      "capabilities": [
+        {
+          "id": "external-event-producers",
+          "version": "2"
+        }
+      ],
+      "requires": [
+        {
+          "id": "reference-layout",
+          "version": "1"
+        }
+      ],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "externalEventBinding": "external"
+      }
+    },
+    {
+      "id": "saga-contract",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.saga-ir/v1",
+      "capabilities": [
+        {
+          "id": "saga-static-contract",
+          "version": "1"
+        }
+      ],
+      "requires": [],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "sagaBinding": "sagas"
+      }
+    },
+    {
+      "id": "saga-runtime-contract",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.saga-runtime-contract/v3",
+      "capabilities": [
+        {
+          "id": "saga-runtime-lowering",
+          "version": "3"
+        }
+      ],
+      "requires": [
+        {
+          "id": "saga-contract",
+          "version": "1"
+        }
+      ],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "sagaBinding": "sagas",
+        "runtimeBinding": "runtime"
+      }
+    },
+    {
+      "id": "execution-contract",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.execution/v1",
+      "capabilities": [
+        {
+          "id": "execution-static-contract",
+          "version": "1"
+        }
+      ],
+      "requires": [
+        {
+          "id": "saga-contract",
+          "version": "1"
+        }
+      ],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "sagaBinding": "sagas",
+        "executionBinding": "execution"
+      }
+    },
+    {
+      "id": "artifact-contract",
+      "version": "2",
+      "payloadSchemaVersion": "truthsrc.artifact-contract/v2",
+      "capabilities": [
+        {
+          "id": "artifact-static-contract",
+          "version": "2"
+        }
+      ],
+      "requires": [
+        {
+          "id": "reference-layout",
+          "version": "1"
+        }
+      ],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "artifactBinding": "artifacts"
+      }
+    },
+    {
+      "id": "saga-host-contract",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.saga-host-contract/v1",
+      "capabilities": [
+        {
+          "id": "finite-saga-host-contract",
+          "version": "1"
+        }
+      ],
+      "requires": [
+        {
+          "id": "reference-layout",
+          "version": "1"
+        },
+        {
+          "id": "exact-value-types",
+          "version": "1"
+        },
+        {
+          "id": "saga-contract",
+          "version": "1"
+        },
+        {
+          "id": "saga-runtime-contract",
+          "version": "1"
+        },
+        {
+          "id": "execution-contract",
+          "version": "1"
+        },
+        {
+          "id": "domain-external-events",
+          "version": "2"
+        },
+        {
+          "id": "artifact-contract",
+          "version": "2"
+        }
+      ],
+      "inputRoles": {
+        "canonical": "bank-v1",
+        "hostBinding": "hosts"
+      }
+    }
+  ],
+  "options": {}
+}

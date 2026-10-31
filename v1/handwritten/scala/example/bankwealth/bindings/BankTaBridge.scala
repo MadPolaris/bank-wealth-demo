@@ -44,38 +44,77 @@ final class BankTaBridge(order: ActorRef[FundOrderAggregate.Request], ta: MockTA
     result.set[JsonNode]("amount", mapper.createObjectNode().put("minorUnits", wire.minorUnits).put("currency", wire.currency))
     result
   }
-  def submit(scenario: String): Future[JsonNode] = for {
+  def register(): Future[BankTaEffectRequest] = for {
     before <- state()
     _ = paid(before)
-    _ <- execute(FundOrderProtocol.RegisterFundTASubmission(before.id, before.selectedPaymentTxId))
+    _ <- if (before.taRequestId.value.isEmpty)
+      execute(FundOrderProtocol.RegisterFundTASubmission(before.id, before.selectedPaymentTxId))
+      else {
+        require(before.taRequestId == StableOrderIdentity.StableTaRequestId(before,
+          FundOrderProtocol.RegisterFundTASubmission(before.id, before.selectedPaymentTxId)), "retained TA identity is not the original")
+        Future.successful(())
+      }
+    retained <- state()
+    _ = require(retained.id == before.id && retained.selectedPaymentTxId == before.selectedPaymentTxId &&
+      retained.taRequestId == StableOrderIdentity.StableTaRequestId(retained,
+        FundOrderProtocol.RegisterFundTASubmission(retained.id, retained.selectedPaymentTxId)), "registered TA original changed")
+  } yield BankTaEffectRequest(retained.taRequestId, retained.id, retained.selectedPaymentTxId)
+
+  def submit(scenario: String): Future[JsonNode] = for {
+    original <- register()
     registered <- state()
+    _ = require(registered.taRequestId == original.taRequestId, "registered TA identity changed")
     response <- ta.submit(request(registered, scenario))
     _ <- applyResponse(response)
   } yield response
-  def reconcile(): Future[JsonNode] = for {
+  def reconcile(): Future[JsonNode] = reconcileWithScenario(None)
+  def reconcile(scenario: String): Future[JsonNode] = {
+    require(scenario != null && scenario.nonEmpty, "trusted TA scenario required")
+    reconcileWithScenario(Some(scenario))
+  }
+  private def reconcileWithScenario(scenario: Option[String]): Future[JsonNode] = for {
     s <- state()
     _ = paid(s)
     _ = require(s.taRequestId.value.nonEmpty, "no durable TA request to recover")
     response <- ta.query(s.taRequestId.value)
+    _ = require(!response.path("request").isObject || scenario.forall(_ == response.path("request").path("scenario").asText()),
+      "TA scenario differs from trusted deployment selection")
     _ <- applyResponse(response)
   } yield response
-  def requestRefund(): Future[BankRefundOriginal] = for {
-    before <- state()
-    _ = paid(before)
-    _ = require(before.taStatus == "rejected" && before.taRequestId.value.nonEmpty, "related TA rejection required")
-    response <- ta.query(before.taRequestId.value)
-    _ = require(response.path("canonicalReceipts").isArray, "authoritative TA rejection receipts required")
-    rejected = response.get("canonicalReceipts").elements().asScala.toVector.filter(r => r.path("outcome").asText() == "rejected")
-    _ = require(rejected.size == 1, "unique authoritative TA rejection required")
-    _ <- ingest(rejected.head)
-    _ <- execute(FundOrderProtocol.RequestFundPurchaseRefund(before.id, before.selectedPaymentTxId))
-    retained <- state()
-    _ = require(retained.refundOperationId.value.nonEmpty, "durable independent refund intent missing")
-  } yield BankRefundOriginal(retained.id, retained.selectedPaymentTxId, retained.investorAccountId,
-    retained.fundCollectionAccountId, retained.amount, retained.refundOperationId)
+  def requestRefund(): Future[BankRefundOriginal] = state().flatMap { before =>
+    paid(before)
+    require(before.taStatus == "rejected" && before.taRequestId.value.nonEmpty, "related TA rejection required")
+    // The original persisted intent is sufficient to reattach the independent parent,
+    // even when the external TA is now unavailable. Never mint an attempt identity.
+    if (before.refundOperationId.value.nonEmpty) Future.successful(refundOriginal(before))
+    else for {
+      response <- ta.query(before.taRequestId.value)
+      _ = responseAssociation(response, before)
+      rejected = response.get("canonicalReceipts").elements().asScala.toVector.filter(r => r.path("outcome").asText() == "rejected")
+      _ = require(rejected.size == 1, "unique authoritative TA rejection required")
+      _ <- ingest(rejected.head)
+      _ <- execute(FundOrderProtocol.RequestFundPurchaseRefund(before.id, before.selectedPaymentTxId))
+      retained <- state()
+      _ = require(retained.id == before.id && retained.selectedPaymentTxId == before.selectedPaymentTxId && retained.refundOperationId.value.nonEmpty,
+        "durable independent refund intent missing or changed")
+    } yield refundOriginal(retained)
+  }
+  private def refundOriginal(s: FundOrderState): BankRefundOriginal =
+    BankRefundOriginal(s.id, s.selectedPaymentTxId, s.investorAccountId, s.fundCollectionAccountId, s.amount, s.refundOperationId)
 
-  private def applyResponse(response: JsonNode): Future[Unit] = {
-    require(response.path("canonicalReceipts").isArray, "complete authoritative TA receipts required")
+  private def responseAssociation(response: JsonNode, s: FundOrderState): Unit = {
+    require(response != null && response.isObject && text(response, "requestId") == s.taRequestId.value &&
+      response.path("canonicalReceipts").isArray, "complete same-request authoritative TA response required")
+    val original = response.get("request")
+    if (original != null) {
+      fields(original, Set("requestId", "orderId", "paymentTxId", "investorAccountId", "fundCollectionAccountId", "fundCode", "amount", "scenario"))
+      val expected = request(s, text(original, "scenario"))
+      require(original == expected, "TA retained financial original differs from paid order")
+    } else require(response.get("canonicalReceipts").size() == 0 && response.path("status").asText() == "unknown",
+      "unknown query without original must not contain receipts or a terminal result")
+  }
+  private def applyResponse(response: JsonNode): Future[Unit] = state().flatMap { s =>
+    responseAssociation(response, s)
     response.get("canonicalReceipts").elements().asScala.toVector.foldLeft(Future.successful(()))((done, receipt) => done.flatMap(_ => ingest(receipt)))
   }
   def ingest(receipt: JsonNode): Future[Unit] = {
@@ -85,7 +124,8 @@ final class BankTaBridge(order: ActorRef[FundOrderAggregate.Request], ta: MockTA
       _ = paid(s)
       decoded = decode(receipt, s)
       authoritative <- ta.query(requestId)
-      _ = require(authoritative.path("canonicalReceipts").isArray && authoritative.get("canonicalReceipts").elements().asScala.exists(_ == receipt), "receipt body is not authoritative for this TA request")
+      _ = responseAssociation(authoritative, s)
+      _ = require(authoritative.get("canonicalReceipts").elements().asScala.exists(_ == receipt), "receipt body is not authoritative for this TA request")
       _ <- execute(command(decoded))
     } yield ()
   }

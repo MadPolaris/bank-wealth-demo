@@ -9,6 +9,16 @@ payload:
     "parameters": [],
     "guards": [
       {
+        "ruleId": "SIP_ADMITTED_SCHEDULE_COVERED",
+        "errCode": "SIP_ADMITTED_SCHEDULE_COVERED",
+        "onFail": "reject",
+        "when": {
+          "form": "collection-covered",
+          "map": "intentAppendedDueSlots",
+          "collection": "state.createIntentDueSlots"
+        }
+      },
+      {
         "kind": "invariantRef",
         "ref": "SIP_INITIALIZED",
         "errCode": "SIP_INITIALIZED",
@@ -44,7 +54,14 @@ payload:
         "/payload/info/artifact/body/resolutions/3",
         "/payload/info/artifact/body/resolutions/4",
         "/payload/info/artifact/body/flows/3"
-      ]
+      ],
+      "serviceIntegration": {
+        "author": "agent-assisted-bank-v1-service-integration",
+        "workshopHeld": false,
+        "sourceVersion": "bank-v1-service-integration-619",
+        "sourceFlow": "P26-P32",
+        "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+      }
     }
   }
 events:
