@@ -1220,7 +1220,74 @@ payload:
             "csrf": true
           }
         ],
-        "projections": []
+        "projections": [],
+        "pages": {
+          "schemaVersion": "truthsrc.service-pages/v1",
+          "shellPath": "/bank/v1",
+          "scriptPath": "/bank/v1/client-script",
+          "renderer": {
+            "id": "example.bankwealth.web.BankBrowserPages",
+            "version": "1"
+          },
+          "aliases": [
+            {
+              "endpointId": "account-me",
+              "path": "/bank/v1/accounts/me"
+            },
+            {
+              "endpointId": "cash-submit",
+              "path": "/bank/v1/cash-requests"
+            },
+            {
+              "endpointId": "cash-original",
+              "path": "/bank/v1/cash-requests/:clientRequestId"
+            },
+            {
+              "endpointId": "order-detail",
+              "path": "/bank/v1/orders/:orderId"
+            },
+            {
+              "endpointId": "sip-create",
+              "path": "/bank/v1/sip-plans"
+            },
+            {
+              "endpointId": "sip-list",
+              "path": "/bank/v1/sip-plans"
+            },
+            {
+              "endpointId": "sip-detail",
+              "path": "/bank/v1/sip-plans/:planId"
+            },
+            {
+              "endpointId": "sip-revise",
+              "path": "/bank/v1/sip-plans/:planId/revisions"
+            },
+            {
+              "endpointId": "sip-pause",
+              "path": "/bank/v1/sip-plans/:planId/pause"
+            },
+            {
+              "endpointId": "sip-resume",
+              "path": "/bank/v1/sip-plans/:planId/resume"
+            },
+            {
+              "endpointId": "sip-occurrences",
+              "path": "/bank/v1/sip-plans/:planId/occurrences"
+            },
+            {
+              "endpointId": "operations-pending",
+              "path": "/bank/v1/operations/pending"
+            },
+            {
+              "endpointId": "operation-reconcile",
+              "path": "/bank/v1/operations/:operationId/reconcile"
+            },
+            {
+              "endpointId": "business-tick",
+              "path": "/bank/v1/business-clock/tick"
+            }
+          ]
+        }
       }
     },
     "implementations": [

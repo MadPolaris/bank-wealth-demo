@@ -33,6 +33,17 @@ final class BankRecovery(directory: BankRuntimeDirectory, journal: BankJournal, 
       case _ => Future.successful(Left(Unavailable))
     }
   }
+  private[integration] def resumePayment(original: BankPaymentOriginal): Future[Outcome[Unit]] =
+    directory.ensureCash(original).flatMap { runtime =>
+      runtime.coordinator.ref.ask[StrictSagaCoordinator.Reply](StrictSagaCoordinator.GetStatus).flatMap {
+        case StrictSagaCoordinator.Status(state) if state.identity.exists(_.transactionId == runtime.transactionId) =>
+          if (!state.terminal)
+            reconcile(runtime.coordinator, runtime.transactionId, original.operationId).map(_.map(_ => ()))
+          else Future.successful(Right(()))
+        case _ => Future.successful(Left(Unavailable))
+      }
+    }.recover { case NonFatal(_) => Left(Unavailable) }
+
   def reconcileExisting(principal: Principal, key: BankOperationKey): Future[Outcome[BankRecoveryAcknowledgement]] = {
     if (!config.operator(principal)) Future.successful(Left(NotAuthorized))
     else journal.persistenceIds().filter(pid => pid.startsWith(ids.prefix + "order/") || pid.startsWith(ids.prefix + "plan/")).runWith(Sink.seq).flatMap { pids =>

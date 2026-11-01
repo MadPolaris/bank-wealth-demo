@@ -8,6 +8,7 @@ import akka.stream.{KillSwitches, Materializer, SharedKillSwitch, SystemMaterial
 import akka.stream.scaladsl.{Sink, Source}
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
 
 final class BankPersistenceJournal(
     val namespace: String,
@@ -38,7 +39,20 @@ final class BankPersistenceJournal(
   }
   def events(pid: String, after: Long): Source[BankJournalEnvelope, NotUsed] = {
     check(pid, after)
-    query.eventsByPersistenceId(pid, after + 1L, Long.MaxValue).via(stop.flow).map(envelope).mapMaterializedValue(_ => NotUsed)
+    Source.lazySource { () =>
+      var cursor = after
+      // The pinned Mongo driver shares a bounded pool; a tail cursor per PID starves finite recovery reads.
+      Source.tick(Duration.Zero, 500.millis, ()).mapAsync(1) { _ =>
+        currentEvents(pid, cursor).map { rows =>
+          val fresh = rows.filter(_.sequenceNr > cursor)
+          fresh.zipWithIndex.foreach { case (row, index) =>
+            require(row.sequenceNr == cursor + index + 1L, "journal sequence gap")
+          }
+          fresh.lastOption.foreach(row => cursor = row.sequenceNr)
+          fresh
+        }
+      }.mapConcat(identity).via(stop.flow)
+    }.mapMaterializedValue(_ => NotUsed)
   }
   def close(): Unit = if (closed.compareAndSet(false, true)) stop.shutdown()
 }

@@ -10,8 +10,16 @@ import {bankApplicationRequest,V1_TREE} from '../tools/v1-inputs.mjs';
 test('service source and historical application inputs are explicit separate complete versions',()=>{
  const current=JSON.parse(compileTree(V1_TREE)),request=bankServiceRequest();
  assert.deepEqual(request.documents.find(d=>d.id==='bank-v1').value,current);
- const captured=readProductRequest(new URL('../v1/formal-inputs/release-service-631/files.json',import.meta.url).pathname);
+ const captured=readProductRequest(new URL('../v1/formal-inputs/release-pages-721/files.json',import.meta.url).pathname);
  assert.deepEqual(captured,request);
+ const previous=readProductRequest(new URL('../v1/formal-inputs/release-service-631/files.json',import.meta.url).pathname);
+ const priorService=previous.documents.find(d=>d.id==='bank-v1').value.artifactContracts.find(a=>a.id==='bank-service').deployment.service;
+ assert.ok(!Object.hasOwn(priorService,'pages'));
+ const pages=current.artifactContracts.find(a=>a.id==='bank-service').deployment.service.pages;
+ assert.equal(pages.aliases.length,14);
+ assert.equal(pages.shellPath,'/bank/v1');
+ assert.equal(pages.renderer.id,'example.bankwealth.web.BankBrowserPages');
+ assert.deepEqual(compileProductSet(previous).diagnostics,[]);
  const result=compileProductSet(request);assert.deepEqual(result.diagnostics,[]);assert.equal(result.result.products.length,14);
  for(const [id,version] of [['artifact-contract','3'],['saga-host-contract','2'],['effect-host-contract','2']]) assert.equal(result.result.products.find(p=>p.id===id).version,version);
  const old=bankApplicationRequest();assert.ok(!old.documents.find(d=>d.id==='bank-v1').value.artifactContracts.some(a=>a.deployment.service));

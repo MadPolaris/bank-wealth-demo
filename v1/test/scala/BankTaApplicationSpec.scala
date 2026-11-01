@@ -338,8 +338,10 @@ final class BankTaApplicationSpec extends AnyFunSuite {
       assert(h.eventCount[PersistentMonarch.StageDone](graph.parent.persistenceId) == 0)
       assert(h.eventCount[PersistentMonarch.RunFailedEvt](graph.parent.persistenceId) == 0 && h.submissions == 1)
       h.await(h.client.advance(1L))
-      assert(h.await(app.resumeExisting(h.payment.fundOrderId)) == Right(()))
-      assert(h.state.taStatus == "confirmed" && h.eventCount[PersistentMonarch.StageDone](graph.parent.persistenceId) == 0)
+      h.eventually {
+        assert(h.await(app.resumeExisting(h.payment.fundOrderId)) == Right(()))
+        assert(h.state.taStatus == "confirmed" && h.eventCount[PersistentMonarch.StageDone](graph.parent.persistenceId) == 0)
+      }
       val retainedRequest = h.state.taRequestId
       h.restartRuntime()
       h.loseEffectReply.set(false)

@@ -93,15 +93,16 @@ final class BankServiceFactory extends BankServiceService.Factory {
       val ta = new BankTaRefundApplication(runtime, journal, client, _ => scenario, terminal, authorityConfig, admission)
       resources += ta
       val jdbcExecutor = Executors.newFixedThreadPool(2)
-      resources += new AutoCloseable { def close(): Unit = { jdbcExecutor.shutdown(); jdbcExecutor.awaitTermination(10, java.util.concurrent.TimeUnit.SECONDS); () } }
+      resources.prepend(new AutoCloseable { def close(): Unit = { jdbcExecutor.shutdown(); jdbcExecutor.awaitTermination(10, java.util.concurrent.TimeUnit.SECONDS); () } })
       val dataSource = new BankJdbcDataSource(configuration.get[String]("db.default.url"), configuration.get[String]("db.default.username"), configuration.get[String]("db.default.password"))
       val readside = new BankReadside(journal, authorityConfig, dataSource)(system, ExecutionContext.fromExecutor(jdbcExecutor))
       resources += readside
       val recovery = new BankRecovery(runtime, journal, authorityConfig, cash, machineAuthorization)
-      val loop = new BankRecoveryLoop(journal, cash, ta, sip)
+      val loop = new BankRecoveryLoop(journal, cash, ta, sip, recovery)
       resources += loop
       new BankServiceService.Composition {
         val authority = new BankDemoAuthority(authorityConfig)
+        override val pages = Some(example.bankwealth.web.BankBrowserPages)
         val bindings = BankServiceEndpoints.build(cash, readside, new BankBusinessClock(sip, client), recovery)
         val ready: Future[Unit] = readside.start().flatMap(_ => loop.start())
         private val stopped = new java.util.concurrent.atomic.AtomicBoolean(false)
