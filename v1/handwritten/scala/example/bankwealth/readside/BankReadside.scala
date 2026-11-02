@@ -19,7 +19,7 @@ import java.sql.{Connection, PreparedStatement, ResultSet}
 import javax.sql.DataSource
 import scalapb.GeneratedMessage
 import scala.collection.mutable
-import scala.concurrent.{blocking, ExecutionContext, Future}
+import scala.concurrent.{blocking, Await, ExecutionContext, Future, Promise}
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
 
@@ -43,6 +43,24 @@ final class BankReadside(journal: BankJournal, config: BankDemoConfiguration, da
   private var poll: Option[akka.actor.Cancellable] = None
   private var closed = false
   private var initialized: Option[Future[Unit]] = None
+  private var pendingWork = 0
+  private val drained = Promise[Unit]()
+  private var shutdownResult = Option.empty[Future[Unit]]
+
+  private def tracked[A]()(work: => Future[A]): Future[A] = synchronized {
+    if (closed) Future.failed(new IllegalStateException("readside is closed"))
+    else {
+      pendingWork += 1
+      val result = try work catch { case NonFatal(error) => Future.failed(error) }
+      result.transform { outcome =>
+        synchronized {
+          pendingWork -= 1
+          if (closed && pendingWork == 0) drained.trySuccess(())
+        }
+        outcome
+      }(ExecutionContext.parasitic)
+    }
+  }
 
   private final case class Row(pid: String, kind: String, resource: String, account: Option[String],
       principal: Option[String], last: Long, observed: Option[Long], payload: Option[Array[Byte]])
@@ -270,7 +288,7 @@ final class BankReadside(journal: BankJournal, config: BankDemoConfiguration, da
     */
   def project(envelope: BankJournalEnvelope): Future[Unit] = {
     identity(envelope.persistenceId) // reject before any JDBC access
-    initialize().flatMap { _ => Future(transaction(write = true) { c =>
+    tracked() { initialize().flatMap { _ => Future(transaction(write = true) { c =>
       val r = ensureRow(c, envelope.persistenceId)
       val p = payload(envelope.event)
       val old = select(c, "SELECT payload_type,payload_manifest,payload FROM bank_read_event WHERE namespace=? AND pid_key=? AND sequence_nr=?",
@@ -287,7 +305,7 @@ final class BankReadside(journal: BankJournal, config: BankDemoConfiguration, da
           indexes(c, r.copy(account = account, principal = principal, last = envelope.sequenceNr, observed = None, payload = state))
       }
       ()
-    }) }
+    }) } }
   }
 
   private def checkpoint(pid: String): Future[Long] = Future(transaction(write = false)(c => row(c, pid).map(_.last).getOrElse(0L)))
@@ -295,7 +313,7 @@ final class BankReadside(journal: BankJournal, config: BankDemoConfiguration, da
     * Any later live delivery invalidates that frontier. A concurrent projection ahead of
     * this sample stays unknown, rather than claiming the stale sample is current.
     */
-  def catchUp(pid: String): Future[Unit] = {
+  def catchUp(pid: String): Future[Unit] = tracked() {
     identity(pid)
     initialize().flatMap(_ => checkpoint(pid)).flatMap { after =>
       journal.currentEvents(pid, after).flatMap { events =>
@@ -316,42 +334,66 @@ final class BankReadside(journal: BankJournal, config: BankDemoConfiguration, da
   private def watch(pid: String): Unit = synchronized {
     if (!closed && !watches.contains(pid)) {
       identity(pid)
-      val running = journal.events(pid, 0L).via(stop.flow).mapAsync(1)(project).runWith(Sink.ignore)
+      val running = tracked() {
+        journal.events(pid, 0L).via(stop.flow).mapAsync(1)(project).runWith(Sink.ignore)
+          .transformWith(_ => invalidate(pid).map(_ => Done))
+      }
       watches.put(pid, running)
-      running.onComplete { _ => synchronized { watches.remove(pid) }; invalidate(pid) }
+      running.onComplete { _ => synchronized { watches.remove(pid) } }(ExecutionContext.parasitic)
     }
   }
   private def invalidate(pid: String): Future[Unit] = Future(transaction(write = true) { c =>
     update(c, "UPDATE bank_read_stream SET observed_sequence=NULL WHERE namespace=? AND pid_key=?", namespace, hash(pid)); ()
   })
-  def start(): Future[Unit] = initialize().map { _ => synchronized {
+  private def discover(): Future[Done] = tracked() {
+    journal.persistenceIds().via(stop.flow).runForeach(watch)
+  }
+  def start(): Future[Unit] = tracked() { initialize().map { _ => synchronized {
     require(!closed, "readside is closed")
     if (discovery.isEmpty) {
-      discovery = Some(journal.persistenceIds().via(stop.flow).runForeach(watch))
+      discovery = Some(discover())
       // Discovery may be an infinite source. Never await its completion as startup readiness.
-      // Replaying currentEvents periodically both repairs gaps and samples real frontiers.
-      poll = Some(system.scheduler.scheduleAtFixedRate(Duration.Zero, 2.seconds)(new Runnable {
-        def run(): Unit = {
-          journal.persistenceIds().via(stop.flow).runForeach(watch)
-          val pids = synchronized { watches.keys.toVector }
-          pids.foreach(pid => catchUp(pid).failed.foreach(_ => invalidate(pid)))
+      poll = Some(system.scheduler.scheduleWithFixedDelay(Duration.Zero, 2.seconds)(new Runnable {
+        def run(): Unit = BankReadside.this.synchronized {
+          if (!closed) {
+            discover()
+            watches.keys.toVector.foreach { pid =>
+              tracked() { catchUp(pid).recoverWith { case NonFatal(_) => invalidate(pid) } }
+            }
+          }
         }
       })(ec))
     }
     ()
-  } }
-  def close(): Unit = synchronized {
-    if (!closed) { closed = true; poll.foreach(_.cancel()); stop.shutdown() }
+  } } }
+  def shutdown(): Future[Unit] = synchronized {
+    shutdownResult.getOrElse {
+      closed = true
+      poll.foreach(_.cancel())
+      stop.shutdown()
+      if (pendingWork == 0) drained.trySuccess(())
+      val result = drained.future.flatMap { _ =>
+        initialized match {
+          case None => Future.successful(())
+          case Some(ready) => ready.flatMap { _ => Future(transaction(write = true) { c =>
+            update(c, "UPDATE bank_read_stream SET observed_sequence=NULL WHERE namespace=?", namespace); ()
+          }) }
+        }
+      }
+      shutdownResult = Some(result)
+      result
+    }
   }
+  def close(): Unit = { Await.result(shutdown(), 20.seconds); () }
 
   private def customer(p: Principal): Either[Failure, BankDemoPrincipal] =
     if (p == null) Left(NotAuthenticated) else config.customer(p).toRight(NotAuthorized)
   private def query[A](p: Principal)(f: (Connection, BankDemoPrincipal) => A): Future[Outcome[A]] = customer(p) match {
     case Left(error) => Future.successful(Left(error))
-    case Right(who) => Future {
+    case Right(who) => tracked() { Future {
       try Right(transaction(write = false)(c => f(c, who)))
       catch { case Denied(error) => Left(error); case NonFatal(_) => Left(Unavailable) }
-    }
+    } }
   }
   private def validPage(limit: Long, after: Long): Unit =
     if (limit < 1L || limit > 100L || after < 0L || after > Int.MaxValue.toLong - limit) throw Denied(InvalidRequest)
@@ -469,7 +511,7 @@ final class BankReadside(journal: BankJournal, config: BankDemoConfiguration, da
   def pending(p: Principal, key: BankPendingPageKey): Future[Outcome[BankPendingResponse]] = {
     if (p == null) Future.successful(Left(NotAuthenticated))
     else if (!config.operator(p)) Future.successful(Left(NotAuthorized))
-    else Future {
+    else tracked() { Future {
       try Right(transaction(write = false) { c =>
         validPage(key.limit, key.after)
         val records = select(c, "SELECT * FROM bank_read_pending WHERE namespace=? ORDER BY operation_id,flow LIMIT ? OFFSET ?", Seq(namespace, key.limit + 1L, key.after)) { r =>
@@ -480,6 +522,6 @@ final class BankReadside(journal: BankJournal, config: BankDemoConfiguration, da
         BankPendingResponse(metadata(page.flatMap(x => row(c, x._2)), completeSet = false), page.map(_._1), if (records.size > key.limit) Some(key.after + key.limit) else None)
       })
       catch { case Denied(error) => Left(error); case NonFatal(_) => Left(Unavailable) }
-    }
+    } }
   }
 }

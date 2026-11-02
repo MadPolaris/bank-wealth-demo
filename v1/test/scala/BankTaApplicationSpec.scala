@@ -37,7 +37,8 @@ import scala.jdk.CollectionConverters._
   * The configured existing worker must accept journal + ownedRoot arguments.
   */
 object BankTaApplicationFixture {
-  def withHarness(scenario: String, loseTaReply: Boolean = false, hideRefundReceipt: Boolean = false)
+  def withHarness(scenario: String, loseTaReply: Boolean = false, hideRefundReceipt: Boolean = false,
+      holdBeforeSubmit: Boolean = false)
       (body: Harness => Unit): Unit = {
     def configuredPath(key: String): Path = Paths.get(sys.props.getOrElse(key,
       throw new IllegalArgumentException("explicit test configuration required: " + key)))
@@ -60,7 +61,7 @@ object BankTaApplicationFixture {
       val readiness = Await.result(client.query(readinessId), 10.seconds)
       require(readiness.path("requestId").asText() == readinessId && readiness.path("status").asText() == "unknown",
         "owned worker readiness query required")
-      harness = new Harness(kit, client, scenario, loseTaReply, hideRefundReceipt)
+      harness = new Harness(kit, client, scenario, loseTaReply, hideRefundReceipt, holdBeforeSubmit)
       body(harness)
     } finally {
       try {
@@ -70,7 +71,7 @@ object BankTaApplicationFixture {
   }
 
   final class Harness(val kit: ActorTestKit, var client: MockTAClient, scenario: String,
-      loseTaReply: Boolean, hideRefundReceipt: Boolean) extends AutoCloseable {
+      loseTaReply: Boolean, hideRefundReceipt: Boolean, holdBeforeSubmit: Boolean) extends AutoCloseable {
     implicit val system: ActorSystem[_] = kit.system
     implicit val ec: ExecutionContext = system.executionContext
     implicit val materializer: Materializer = SystemMaterializer(system).materializer
@@ -94,7 +95,10 @@ object BankTaApplicationFixture {
     val payment = original.payment
     val selectedScenario = new AtomicReference[String](scenario)
     val loseEffectReply = new AtomicBoolean(loseTaReply)
+    val holdTaSubmission = new AtomicBoolean(holdBeforeSubmit)
+    val submissionBlocked = Promise[Unit]()
     val hideRefundEvidence = new AtomicBoolean(hideRefundReceipt)
+    val refundFaultPhase = new AtomicReference[String]("prepare")
     val hiddenRefundReads = new AtomicInteger(0)
     val discoverOrders = new AtomicBoolean(false)
     val subscriptions = new AtomicInteger(0)
@@ -114,10 +118,22 @@ object BankTaApplicationFixture {
         require(ids.owns(pid) && after >= 0L)
         query.currentEventsByPersistenceId(pid, after + 1L, Long.MaxValue).runWith(Sink.seq).map { rows =>
           val events = rows.map(e => BankJournalEnvelope(e.persistenceId, e.sequenceNr, e.event)).toVector
-          if (pid == ids.account(collection) && hideRefundEvidence.get() &&
-              events.exists(_.event.isInstanceOf[CreditBalanceReserveFundsConfirmedPB])) {
+          val refundTx = refundGraph.map(_.transactionId)
+          val fault = refundFaultPhase.get() match {
+            case "prepare" => pid == ids.account(collection) && events.exists(_.event.isInstanceOf[CreditBalanceReserveFundsConfirmedPB])
+            case "collection-commit" => pid == ids.account(collection) && events.exists {
+              case BankJournalEnvelope(_, _, event: CreditBalanceDeductFundsConfirmedPB) => refundTx.contains(example.bankwealth.infrastructure.serialization.DomainConverters.decodeCreditBalanceDeductFundsConfirmedPB(event).txid.value)
+              case _ => false
+            }
+            case "investor-commit" => pid == ids.account(investor) && events.exists {
+              case BankJournalEnvelope(_, _, event: CreditBalanceCommitIncomingCreditsConfirmedPB) => refundTx.contains(example.bankwealth.infrastructure.serialization.DomainConverters.decodeCreditBalanceCommitIncomingCreditsConfirmedPB(event).txid.value)
+              case _ => false
+            }
+            case _ => false
+          }
+          if (hideRefundEvidence.get() && fault) {
             hiddenRefundReads.incrementAndGet()
-            throw new java.io.IOException("owned fault after durable refund prepare, before receipt delivery")
+            throw new java.io.IOException("owned fault after durable refund phase, before receipt delivery")
           }
           events
         }
@@ -148,7 +164,10 @@ object BankTaApplicationFixture {
         val actual = base(order)
         TaHost.install(TaHost.Bindings(
           TaHost.Implementation("bankwealth.BankTaEffectExecute", "bank-v1-1", (op: BankTaEffectOperation) =>
-            actual.execute(op).flatMap { result =>
+            if (holdTaSubmission.get()) {
+              submissionBlocked.trySuccess(())
+              Promise[BankTaEffectObservation]().future
+            } else actual.execute(op).flatMap { result =>
               if (loseEffectReply.get()) Future.failed(new java.io.IOException("reply lost after durable TA submission"))
               else Future.successful(result)
             }),
@@ -315,6 +334,60 @@ final class BankTaApplicationSpec extends AnyFunSuite {
     }
   }
 
+  test("TA-application-intent-before-submit: automatic recovery completes the original unsubmitted durable effect") {
+    withHarness("accepted", holdBeforeSubmit = true) { h =>
+      h.pay()
+      h.application().resumeExisting(h.payment.fundOrderId)
+      h.await(h.submissionBlocked.future)
+      val graph = h.taRuntime
+      h.eventually {
+        assert(h.eventCount[TaHost.Intent](graph.host.persistenceId) == 1)
+        assert(h.eventCount[PersistentMonarch.RunStarted](graph.parent.persistenceId) == 1)
+      }
+      assert(h.submissions == 0 && h.eventCount[PersistentMonarch.StageDone](graph.parent.persistenceId) == 0)
+      val request = graph.request
+      h.restartRuntime()
+      h.holdTaSubmission.set(false)
+      h.discoverOrders.set(true)
+      h.application()
+      h.eventually {
+        assert(h.state.taStatus == "accepted")
+        assert(h.eventCount[PersistentMonarch.StageDone](graph.parent.persistenceId) == 1)
+      }
+      assert(h.state.taRequestId == request.taRequestId && h.submissions == 1)
+      assert(h.eventCount[TaHost.Intent](graph.host.persistenceId) == 1)
+      assert(h.eventCount[PersistentMonarch.RunStarted](graph.parent.persistenceId) == 1)
+      assert(h.balance(h.investor) == BigDecimal("900.00") && h.balance(h.collection) == BigDecimal("100.00"))
+      assert(h.state.taConfirmedShares.shares.value.isEmpty && h.terminalCalls.isEmpty)
+    }
+  }
+
+  test("TA-application-retry-authority: only a current exact durable absence can authorize the original submission") {
+    withHarness("accepted") { h =>
+      h.pay()
+      val request = h.await(h.bridge.register())
+      val parent = example.bankwealth.application.bank_ta_submission_v1Execution.State(
+        example.bankwealth.application.bank_ta_submission_v1Execution.Inputs(request.taRequestId, request.fundOrderId, request.paymentTxId))
+      val operation = BankTaEffectOperation(TaHost.operationIdentity(parent), request)
+      val installed = BankTaEffectBindings.forOrders(h.client, h.scenarioForOrder)(h.system)(h.order.ref)
+      val proof = h.await(installed.query(operation)).get
+      assert(proof.status == "absent" && proof.result.isEmpty && h.submissions == 0)
+      val retry = BankTaEffectReconcile(operation.operation, request, "retry", Some(proof), "bank-demo-ta-original-retry-v1")
+      assert(h.await(installed.reconcile(retry)))
+      for (invalid <- Vector(retry.copy(authorization = "customer-token"), retry.copy(decision = "query"),
+        retry.copy(evidence = None), retry.copy(evidence = Some(proof.copy(status = "unknown"))),
+        retry.copy(evidence = Some(proof.copy(evidence = "{}"))), retry.copy(operation = "substitute"),
+        retry.copy(request = request.copy(taRequestId = TaRequestId("foreign"))))) {
+        assert(!h.await(installed.reconcile(invalid)))
+      }
+      assert(h.submissions == 0)
+      h.await(h.bridge.submit("accepted"))
+      assert(!h.await(installed.reconcile(retry)))
+      assert(h.await(installed.query(operation)).exists(_.status == "confirmed"))
+      assert(h.submissions == 1 && h.state.taStatus == "accepted" && h.state.taConfirmedShares.shares.value.isEmpty)
+    }
+  }
+
   test("TA-application-accepted-only: completed technical effect never becomes an investment success or refund") {
     withHarness("accepted") { h =>
       h.pay()
@@ -384,10 +457,11 @@ final class BankTaApplicationSpec extends AnyFunSuite {
       h.accepted(app)
       h.eventually(assert(h.subscriptions.get() > 0))
       val gate = Promise[Unit]()
-      h.terminalDelivery = _ => gate.future
+      val entered = Promise[Unit]()
+      h.terminalDelivery = _ => { entered.trySuccess(()); gate.future }
       h.await(h.client.advance(1L))
+      h.await(entered.future)
       val pending = app.resumeExisting(h.payment.fundOrderId)
-      h.eventually(assert(!h.terminalCalls.isEmpty))
       assert(!pending.isCompleted)
       app.close(); app.close()
       assert(h.await(pending) == Left(Unavailable))

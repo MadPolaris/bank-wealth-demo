@@ -6,8 +6,8 @@ import akka.stream.{KillSwitches, Materializer, SystemMaterializer}
 import akka.stream.scaladsl.{RestartSource, Sink, Source}
 import akka.util.Timeout
 import example.bankwealth.application.{bank_independent_refund_v1Execution => Refund, bank_ta_submission_v1Execution => Ta,
-  bank_refund_hostHost => RefundHost}
-import example.bankwealth.bindings.{BankTaBridge, MockTAClient, StableOrderIdentity}
+  bank_refund_hostHost => RefundHost, bank_ta_effectEffectHost => TaHost}
+import example.bankwealth.bindings.{BankTaBridge, BankTaEffectBindings, MockTAClient, StableOrderIdentity}
 import example.bankwealth.domain._
 import example.bankwealth.domain.values._
 import example.bankwealth.infrastructure.proto._
@@ -192,6 +192,7 @@ final class BankTaRefundApplication(directory: BankRuntimeDirectory, journal: Ba
         _ = require(runtime.request == request && runtime.host.persistenceId == ids.taHost(request.taRequestId) &&
           runtime.parent.persistenceId == ids.taRun(request.taRequestId), "TA runtime changed original identity")
         _ <- startOriginal(runtime.parent, request.taRequestId.value, Ta.State(Ta.Inputs(request.taRequestId, id, request.paymentTxId)), Ta.codec, Vector("submit-ta#0"))
+        _ <- recoverUnsubmitted(runtime)
         _ <- if (terminal(retained, retainedEvents).nonEmpty) Future.successful(())
           else { active(); bridge.reconcile(scenario).map(_ => ()) }
         after <- state(handle)
@@ -200,6 +201,27 @@ final class BankTaRefundApplication(directory: BankRuntimeDirectory, journal: Ba
       } yield value
     }
   } yield result
+
+  private def recoverUnsubmitted(runtime: BankTaRuntime): Future[Unit] = history(runtime.host.persistenceId).flatMap { events =>
+    val input = Ta.State(Ta.Inputs(runtime.request.taRequestId, runtime.request.fundOrderId, runtime.request.paymentTxId))
+    val intents = events.collect { case e: TaHost.Intent => e }
+    require(intents.size <= 1, "duplicate TA effect intent")
+    intents.foreach(e => require(e.operation == TaHost.operationIdentity(input) && Ta.codec.decode(e.original.toByteArray) == input,
+      "TA effect intent differs from original registered request"))
+    val latest = events.collect { case e: TaHost.ObservationStored => e.value }.lastOption.filterNot(_.isEmpty)
+      .map(bytes => DomainConverters.decodeBankTaEffectObservationPB(BankTaEffectObservationPB.parseFrom(bytes.toByteArray)))
+    latest match {
+      case Some(proof) if intents.nonEmpty && proof.status == "absent" =>
+        require(proof.operation == TaHost.operationIdentity(input) && proof.request == runtime.request && proof.result.isEmpty && proof.evidence.nonEmpty,
+          "TA retry requires matching durable absence")
+        active()
+        runtime.host.ref.ask[TaHost.Reply](reply => TaHost.Reconcile(input, "retry", BankTaEffectBindings.RecoveryAuthorization, reply)).map {
+          case _: TaHost.Completed | _: TaHost.Pending => ()
+          case _: TaHost.Conflict => throw new IllegalStateException("TA retry rejected original identity")
+        }
+      case _ => Future.successful(())
+    }
+  }
 
   private def finish(handle: BankActorHandle[FundOrderAggregate.Request], s: FundOrderState, events: Vector[Any],
       bridge: BankTaBridge): Future[Outcome[Unit]] = {

@@ -119,6 +119,59 @@ final class BankRefundApplicationSpec extends AnyFunSuite {
     }
   }
 
+  for (phase <- Vector("prepare", "collection-commit", "investor-commit")) {
+    test("REFUND-automatic-recovery: durable " + phase + " resumes from discovery without operator reconciliation") {
+      withHarness("rejected", hideRefundReceipt = true) { h =>
+        implicit val system: akka.actor.typed.ActorSystem[_] = h.system
+        h.refundFaultPhase.set(phase)
+        h.pay()
+        h.await(h.bridge.submit("rejected"))
+        h.await(h.client.advance(1L))
+        h.await(h.bridge.reconcile("rejected"))
+        h.await(h.bridge.requestRefund())
+        val graph = h.refundRuntime
+        val app = h.application()
+        h.await(app.resumeExisting(h.payment.fundOrderId))
+        h.taRuntime
+        h.eventually {
+          assert(h.refundStatus.status == StrictStatus.RecoveryRequired)
+          assert(h.hiddenRefundReads.get() > 0)
+          assert(h.eventCount[PersistentMonarch.StageDone](graph.parent.persistenceId) == 0)
+        }
+        val identity = h.refundStatus.identity
+        val original = h.refundOriginal
+        assert(h.eventCount[CreditBalanceReserveFundsConfirmedPB](h.ids.account(h.collection)) == 1)
+        assert(h.eventCount[CreditBalanceDeductFundsConfirmedPB](h.ids.account(h.collection)) == (if (phase == "prepare") 0 else 1))
+        assert(h.eventCount[CreditBalanceCommitIncomingCreditsConfirmedPB](h.ids.account(h.investor)) == (if (phase == "investor-commit") 1 else 0))
+        h.restartRuntime()
+        h.hideRefundEvidence.set(false)
+        h.discoverOrders.set(true)
+        h.refundRuntime
+        val recovered = h.application()
+        val cash = new example.bankwealth.integration.BankCashRequests(h.runtime, h.config, h.admission, h.journal)
+        val recovery = new example.bankwealth.integration.BankRecovery(h.runtime, h.journal, h.config, cash, "owned-b-refund-recovery")
+        val sip = new example.bankwealth.sip.BankSipApplication(h.runtime, h.journal, h.config, h.admission)
+        val loop = new example.bankwealth.integration.BankRecoveryLoop(h.journal, cash, recovered, sip, recovery)
+        try {
+          h.await(loop.start())
+          h.eventually {
+            assert(h.refundStatus.status == StrictStatus.Succeeded)
+            assert(h.state.refundOutcome == "succeeded")
+            assert(h.eventCount[PersistentMonarch.StageDone](h.refundRuntime.parent.persistenceId) == 1)
+          }
+          assert(h.refundStatus.identity == identity && h.refundOriginal == original)
+          assert(h.eventCount[PersistentMonarch.RunStarted](graph.parent.persistenceId) == 1)
+          assert(h.eventCount[FundOrderFundPurchaseRefundRequestedPB](h.order.persistenceId) == 1)
+          assert(h.eventCount[FundOrderFundRefundSucceededPB](h.order.persistenceId) == 1)
+          assert(h.eventCount[CreditBalanceReserveFundsConfirmedPB](h.ids.account(h.collection)) == 1)
+          assert(h.eventCount[CreditBalanceDeductFundsConfirmedPB](h.ids.account(h.collection)) == 1)
+          assert(h.eventCount[CreditBalanceCommitIncomingCreditsConfirmedPB](h.ids.account(h.investor)) == 1)
+          assert(h.balance(h.investor) == BigDecimal("1000.00") && h.balance(h.collection) == BigDecimal("0.00"))
+        } finally { loop.close(); sip.close() }
+      }
+    }
+  }
+
   private def canceledRefund(index: Int, expected: String): Unit = {
     withHarness("rejected") { h =>
       h.pay()

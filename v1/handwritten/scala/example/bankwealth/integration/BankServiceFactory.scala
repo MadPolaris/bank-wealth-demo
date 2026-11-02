@@ -106,7 +106,7 @@ final class BankServiceFactory extends BankServiceService.Factory {
         val bindings = BankServiceEndpoints.build(cash, readside, new BankBusinessClock(sip, client), recovery)
         val ready: Future[Unit] = readside.start().flatMap(_ => loop.start())
         private val stopped = new java.util.concurrent.atomic.AtomicBoolean(false)
-        def close(): Unit = if (stopped.compareAndSet(false, true)) resources.reverseIterator.foreach(_.close())
+        def close(): Unit = if (stopped.compareAndSet(false, true)) BankResourceCleanup.closeAll(resources.reverse.toVector)
       }
     } catch {
       case NonFatal(error) =>

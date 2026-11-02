@@ -54,6 +54,7 @@ final class BankRecoveryLoop(journal: BankJournal, cash: BankCashRequests, ta: B
           val originals = rows.collect { case p: FundOrderCashRequestSourceRecordedPB => DomainConverters.decodeFundOrderCashRequestSourceRecordedPB(p).original }.distinct
           val plans = rows.collect { case p: SipPlanSipCreateIntentRecordedPB => DomainConverters.decodeSipPlanSipCreateIntentRecordedPB(p).intent.planId }.distinct
           val settlements = rows.collect { case p: FundOrderFundPurchaseSettlementRequestedPB => DomainConverters.decodeFundOrderFundPurchaseSettlementRequestedPB(p) }.distinct
+          val refunds = rows.collect { case p: FundOrderFundPurchaseRefundRequestedPB => DomainConverters.decodeFundOrderFundPurchaseRefundRequestedPB(p) }.distinct
           val orders = settlements.map(_.fundOrderId)
           for {
             cashResults <- Future.traverse(originals)(o => attempt(cash.resumePersisted(o)))
@@ -61,7 +62,9 @@ final class BankRecoveryLoop(journal: BankJournal, cash: BankCashRequests, ta: B
             paymentResults <- Future.traverse(settlements)(s => attempt(recovery.resumePayment(example.bankwealth.domain.values.BankPaymentOriginal(
               s.operationId, s.fundOrderId, s.investorAccountId, s.fundCollectionAccountId, s.fundCode, s.amount))))
             taResults <- Future.traverse(orders)(o => attempt(ta.resumeExisting(o)))
-          } yield if ((cashResults ++ sipResults ++ paymentResults ++ taResults).forall(identity)) pending else pending :+ pid
+            refundResults <- Future.traverse(refunds)(r => attempt(recovery.resumeRefund(example.bankwealth.domain.values.BankRefundOriginal(
+              r.fundOrderId, r.paymentTxId, r.investorAccountId, r.fundCollectionAccountId, r.amount, r.refundOperationId))))
+          } yield if ((cashResults ++ sipResults ++ paymentResults ++ taResults ++ refundResults).forall(identity)) pending else pending :+ pid
         }.recover { case NonFatal(_) => pending :+ pid }
       }
     }}

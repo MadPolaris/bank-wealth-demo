@@ -19,12 +19,14 @@ final class BankAutomaticRecoverySpec extends AnyFunSuite {
   private val identity = TransactionIdentity("original-transaction", "definition", 1, "args-digest",
     "definition-digest", CodecPin("args", 1), "plan-digest")
 
-  for ((name, state, expectedCalls, expectedRight) <- Vector(
+  private val refund = BankRefundOriginal(original.fundOrderId, TxId("original-payment-transaction"),
+    original.investorAccountId, original.fundCollectionAccountId, original.amount, OperationId("original-refund"))
+  for (flow <- Vector("payment", "refund"); (name, state, expectedCalls, expectedRight) <- Vector(
     ("uncertain", StrictState(identity = Some(identity), status = StrictStatus.RecoveryRequired), 1, true),
     ("completed", StrictState(identity = Some(identity), status = StrictStatus.Succeeded), 0, true),
     ("interrupted-commit", StrictState(identity = Some(identity), status = StrictStatus.Committing), 1, true),
     ("foreign", StrictState(identity = Some(identity.copy(transactionId = "other")), status = StrictStatus.RecoveryRequired), 0, false))) {
-    test("automatic recovery uses retained identity only: " + name) {
+    test("automatic " + flow + " recovery uses retained identity only: " + name) {
       val kit = ActorTestKit(ConfigFactory.load())
       implicit val system: ActorSystem[_] = kit.system
       val calls = kit.createTestProbe[StrictSagaCoordinator.Reconcile]()
@@ -47,7 +49,11 @@ final class BankAutomaticRecoverySpec extends AnyFunSuite {
           Future.successful(BankCashRuntime(original, identity.transactionId,
             BankActorHandle("owned/payment-saga", coordinator), null, null))
         }
-        def ensureRefund(value: BankRefundOriginal): Future[BankRefundRuntime] = throw new AssertionError("unexpected refund")
+        def ensureRefund(value: BankRefundOriginal): Future[BankRefundRuntime] = {
+          assert(value == refund && flow == "refund")
+          Future.successful(BankRefundRuntime(refund, identity.transactionId,
+            BankActorHandle("owned/refund-saga", coordinator), null, null))
+        }
         def ensureTa(value: BankTaEffectRequest): Future[BankTaRuntime] = throw new AssertionError("unexpected TA")
         def ensureSipDispatch(value: SipOccurrence): Future[BankSipDispatchRuntime] = throw new AssertionError("unexpected occurrence")
         def close(): Unit = ()
@@ -61,7 +67,7 @@ final class BankAutomaticRecoverySpec extends AnyFunSuite {
           def close(): Unit = ()
         }
         val recovery = new BankRecovery(directory, journal, null, null, "trusted-machine-token")
-        assert(Await.result(recovery.resumePayment(original), 5.seconds).isRight == expectedRight)
+        assert(Await.result(if (flow == "payment") recovery.resumePayment(original) else recovery.resumeRefund(refund), 5.seconds).isRight == expectedRight)
         if (expectedCalls == 1) {
           val request = calls.receiveMessage()
           assert(request.identity == identity && request.authorization == "trusted-machine-token" && request.maxInteractions == 32)

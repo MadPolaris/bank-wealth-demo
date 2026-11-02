@@ -33,15 +33,23 @@ final class BankRecovery(directory: BankRuntimeDirectory, journal: BankJournal, 
       case _ => Future.successful(Left(Unavailable))
     }
   }
+  private def resume(coordinator: BankActorHandle[StrictSagaCoordinator.Command], transactionId: String,
+      operationId: OperationId): Future[Outcome[Unit]] =
+    coordinator.ref.ask[StrictSagaCoordinator.Reply](StrictSagaCoordinator.GetStatus).flatMap {
+      case StrictSagaCoordinator.Status(state) if state.identity.exists(_.transactionId == transactionId) =>
+        if (!state.terminal) reconcile(coordinator, transactionId, operationId).map(_.map(_ => ()))
+        else Future.successful(Right(()))
+      case _ => Future.successful(Left(Unavailable))
+    }
+
   private[integration] def resumePayment(original: BankPaymentOriginal): Future[Outcome[Unit]] =
     directory.ensureCash(original).flatMap { runtime =>
-      runtime.coordinator.ref.ask[StrictSagaCoordinator.Reply](StrictSagaCoordinator.GetStatus).flatMap {
-        case StrictSagaCoordinator.Status(state) if state.identity.exists(_.transactionId == runtime.transactionId) =>
-          if (!state.terminal)
-            reconcile(runtime.coordinator, runtime.transactionId, original.operationId).map(_.map(_ => ()))
-          else Future.successful(Right(()))
-        case _ => Future.successful(Left(Unavailable))
-      }
+      resume(runtime.coordinator, runtime.transactionId, original.operationId)
+    }.recover { case NonFatal(_) => Left(Unavailable) }
+
+  private[integration] def resumeRefund(original: BankRefundOriginal): Future[Outcome[Unit]] =
+    directory.ensureRefund(original).flatMap { runtime =>
+      resume(runtime.coordinator, runtime.transactionId, original.refundOperationId)
     }.recover { case NonFatal(_) => Left(Unavailable) }
 
   def reconcileExisting(principal: Principal, key: BankOperationKey): Future[Outcome[BankRecoveryAcknowledgement]] = {

@@ -349,6 +349,8 @@ final class BankReadsideProjectionSpec extends AnyFunSuite {
       assert(!f.journal.closed, "closing a projection must not close the shared journal")
       events.foreach(event => await(f.readside.project(event)))
       assert(f.count("bank_read_event") == events.size)
+      assert(disposition(success(await(f.readside.accountMe(f.alice, BankAccountKey(BankReadsideSchema.version)))).metadata) == "unknown")
+      f.catchUp(events)
       assert(success(await(f.readside.accountMe(f.alice, BankAccountKey(BankReadsideSchema.version)))) == original)
       f.reopen(clearDerived = true)
       assert(f.count("bank_read_event") == 0)
