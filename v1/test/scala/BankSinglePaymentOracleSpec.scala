@@ -6,6 +6,7 @@ import akka.persistence.query.PersistenceQuery
 import akka.persistence.testkit.PersistenceTestKitPlugin
 import akka.persistence.testkit.query.scaladsl.PersistenceTestKitReadJournal
 import akka.persistence.testkit.scaladsl.PersistenceTestKit
+import akka.serialization.{SerializationExtension, Serializers}
 import akka.stream.SystemMaterializer
 import akka.stream.scaladsl.Sink
 import com.typesafe.config.ConfigFactory
@@ -19,7 +20,7 @@ import net.imadz.infra.saga.strict._
 import net.imadz.monarch.persistence.{DurableRunObserver, PersistentMonarch}
 import org.scalatest.funsuite.AnyFunSuite
 import scalapb.GeneratedMessage
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, Future, Promise}
 import scala.concurrent.duration._
 
 /** P27-1 explicit single-purchase oracle: one 100.00 purchase from 1000.00/0.00 must end at
@@ -67,7 +68,51 @@ final class BankSinglePaymentOracleSpec extends AnyFunSuite {
 
       @volatile var coordinator: ActorRef[StrictSagaCoordinator.Command] = null
       val bindings = new BankPaymentBindings(original, investor, "oracle-investor", collection, "oracle-collection", order, "oracle-order", read, () => coordinator)
-      coordinator = kit.spawn(Definition.coordinator("oracle-saga", Definition.fromTechnical(bindings.installed), new ReconcileAuthorizer {
+      val expectedInput = Execution.State(Execution.Inputs(operationId, operationId, investorId, orderId, collectionId, amount, original.fundCode))
+      val expectedTxid = TxId(Host.operationIdentity(expectedInput))
+      val underlying = Definition.fromTechnical(bindings.installed)
+      val collectionCommitted = kit.createTestProbe[Unit]()
+      val allowCollectionAck = Promise[Unit]()
+      val orderCommitChecks = kit.createTestProbe[Boolean]()
+      val ports = new Definition.Ports {
+        val technical = underlying.technical
+        val installed = underlying.installed
+        val reserve_investor_funds_prepare = underlying.reserve_investor_funds_prepare
+        val reserve_investor_funds_commit = underlying.reserve_investor_funds_commit
+        val reserve_investor_funds_compensate = underlying.reserve_investor_funds_compensate
+        val credit_fund_collection_prepare = underlying.credit_fund_collection_prepare
+        val credit_fund_collection_commit = new PhasePort[Definition.Args, BankPayment1CommitReceipt] {
+          val receiptCodec = underlying.credit_fund_collection_commit.receiptCodec
+          val querySafety = underlying.credit_fund_collection_commit.querySafety
+          def execute(request: OperationRequest[Definition.Args]): Future[PhaseOutcome[BankPayment1CommitReceipt]] =
+            underlying.credit_fund_collection_commit.execute(request).flatMap { actual =>
+              collectionCommitted.ref ! (())
+              allowCollectionAck.future.map(_ => actual)
+            }
+          def query(request: OperationRequest[Definition.Args]): Future[PhaseOutcome[BankPayment1CommitReceipt]] =
+            allowCollectionAck.future.flatMap(_ => underlying.credit_fund_collection_commit.query(request))
+        }
+        val credit_fund_collection_compensate = underlying.credit_fund_collection_compensate
+        val reserve_cash_fund_order_prepare = underlying.reserve_cash_fund_order_prepare
+        val reserve_cash_fund_order_commit = new PhasePort[Definition.Args, BankPayment2CommitReceipt] {
+          val receiptCodec = underlying.reserve_cash_fund_order_commit.receiptCodec
+          val querySafety = underlying.reserve_cash_fund_order_commit.querySafety
+          def execute(request: OperationRequest[Definition.Args]): Future[PhaseOutcome[BankPayment2CommitReceipt]] = {
+            val investorPaid = journal.persistedInStorage("oracle-investor").collect {
+              case p: CreditBalanceDeductFundsConfirmedPB => DomainConverters.decodeCreditBalanceDeductFundsConfirmedPB(p)
+            }.exists(e => e.txid == expectedTxid && e.resource == investorId && e.amount == amount)
+            val collectionPaid = journal.persistedInStorage("oracle-collection").collect {
+              case p: CreditBalanceCommitIncomingCreditsConfirmedPB => DomainConverters.decodeCreditBalanceCommitIncomingCreditsConfirmedPB(p)
+            }.exists(e => e.txid == expectedTxid && e.resource == collectionId && e.amount == amount)
+            orderCommitChecks.ref ! (investorPaid && collectionPaid && allowCollectionAck.isCompleted)
+            underlying.reserve_cash_fund_order_commit.execute(request)
+          }
+          def query(request: OperationRequest[Definition.Args]): Future[PhaseOutcome[BankPayment2CommitReceipt]] =
+            underlying.reserve_cash_fund_order_commit.query(request)
+        }
+        val reserve_cash_fund_order_compensate = underlying.reserve_cash_fund_order_compensate
+      }
+      coordinator = kit.spawn(Definition.coordinator("oracle-saga", ports, new ReconcileAuthorizer {
         def authorize(id: TransactionIdentity, token: String): Either[String, String] = Left("not authorized")
       }))
       val host = kit.spawn(Host("oracle-host", coordinator, bindings.installed))
@@ -83,54 +128,77 @@ final class BankSinglePaymentOracleSpec extends AnyFunSuite {
       execution ! PersistentMonarch.StartRun("cash-run", bindings.parentInput, starts.ref)
       assert(starts.receiveMessage().isInstanceOf[PersistentMonarch.Accepted])
 
-      // Oracle written from the package requirement, not from observed output.
       val statuses = kit.createTestProbe[StrictSagaCoordinator.Reply]()
       def status(): StrictState = { coordinator ! StrictSagaCoordinator.GetStatus(statuses.ref); statuses.receiveMessage().asInstanceOf[StrictSagaCoordinator.Status].state }
+      collectionCommitted.receiveMessage(10.seconds)
+      assert(!journal.persistedInStorage("oracle-order").exists(_.isInstanceOf[FundOrderFundSubscriptionPaymentConfirmedPB]))
+      assert(!journal.persistedInStorage("oracle-monarch").exists(_.isInstanceOf[PersistentMonarch.StageDone]))
+      assert(!status().terminal)
+      allowCollectionAck.success(())
+      assert(orderCommitChecks.receiveMessage(10.seconds))
       statuses.awaitAssert(assert(status().terminal && status().status == StrictStatus.Succeeded), 20.seconds, 100.millis)
-      assert(status().identity.exists(_.transactionId == bindings.operationId), "Saga identity must be the operation identity")
+      assert(status().identity.exists(_.transactionId == expectedTxid.value))
+      assert(status().commitDecision)
+      assert(bindings.parentInput == expectedInput)
 
       val balances = kit.createTestProbe[CreditBalanceState]()
       def balance(actor: ActorRef[CreditBalanceAggregate.Request]): CreditBalanceState = { actor ! CreditBalanceAggregate.GetState(balances.ref); balances.receiveMessage() }
       assert(balance(investor).accountBalance("CNY").amount == BigDecimal("900.00"))
       assert(balance(collection).accountBalance("CNY").amount == BigDecimal("100.00"))
 
-      // Exact per-participant PB receipt sequences; each receipt's txid must be the same single payment transaction.
-      def receipts(pid: String): Vector[(String, String, String, BigDecimal)] =
+      def receipts(pid: String): Vector[(String, TxId, String, Money)] =
         journal.persistedInStorage(pid).collect {
-          case p: CreditBalanceReserveFundsConfirmedPB => val e = DomainConverters.decodeCreditBalanceReserveFundsConfirmedPB(p); ("reserve", e.txid.value, e.resource.value, e.amount.amount)
-          case p: CreditBalanceDeductFundsConfirmedPB => val e = DomainConverters.decodeCreditBalanceDeductFundsConfirmedPB(p); ("deduct", e.txid.value, e.resource.value, e.amount.amount)
-          case p: CreditBalanceCommitIncomingCreditsConfirmedPB => val e = DomainConverters.decodeCreditBalanceCommitIncomingCreditsConfirmedPB(p); ("credit", e.txid.value, e.resource.value, e.amount.amount)
-          case p: CreditBalanceReleaseReservedFundsConfirmedPB => val e = DomainConverters.decodeCreditBalanceReleaseReservedFundsConfirmedPB(p); ("release", e.txid.value, e.resource.value, e.amount.amount)
+          case p: CreditBalanceReserveFundsConfirmedPB => val e = DomainConverters.decodeCreditBalanceReserveFundsConfirmedPB(p); ("reserve", e.txid, e.resource.value, e.amount)
+          case p: CreditBalanceDeductFundsConfirmedPB => val e = DomainConverters.decodeCreditBalanceDeductFundsConfirmedPB(p); ("deduct", e.txid, e.resource.value, e.amount)
+          case p: CreditBalanceRecordIncomingCreditsConfirmedPB => val e = DomainConverters.decodeCreditBalanceRecordIncomingCreditsConfirmedPB(p); ("incoming", e.txid, e.resource.value, e.amount)
+          case p: CreditBalanceCommitIncomingCreditsConfirmedPB => val e = DomainConverters.decodeCreditBalanceCommitIncomingCreditsConfirmedPB(p); ("credit", e.txid, e.resource.value, e.amount)
+          case p: CreditBalanceReleaseReservedFundsConfirmedPB => val e = DomainConverters.decodeCreditBalanceReleaseReservedFundsConfirmedPB(p); ("release", e.txid, e.resource.value, e.amount)
+          case p: CreditBalanceCancelIncomingCreditConfirmedPB => val e = DomainConverters.decodeCreditBalanceCancelIncomingCreditConfirmedPB(p); ("cancel-incoming", e.txid, e.resource.value, e.amount)
+          case p: FundOrderReserveFundSubscriptionConfirmedPB => val e = DomainConverters.decodeFundOrderReserveFundSubscriptionConfirmedPB(p); ("subscribe", e.txid, e.resource.value, e.amount)
+          case p: FundOrderFundSubscriptionPaymentConfirmedPB => val e = DomainConverters.decodeFundOrderFundSubscriptionPaymentConfirmedPB(p); ("pay-order", e.txid, e.resource.value, e.amount)
+          case p: FundOrderCashFundSubscriptionCanceledPB => val e = DomainConverters.decodeFundOrderCashFundSubscriptionCanceledPB(p); ("cancel-order", e.txid, e.resource.value, e.amount)
         }.toVector
-      val investorReceipts = receipts("oracle-investor")
-      val collectionReceipts = receipts("oracle-collection")
-      assert(investorReceipts.map(_._1) == Vector("reserve", "deduct"))
-      assert(collectionReceipts.map(_._1) == Vector("credit"))
-      val txids = (investorReceipts ++ collectionReceipts).map(_._2).distinct
-      assert(txids.size == 1, "all three participant phases must share one payment transaction id")
-      assert(investorReceipts(0)._3 == "investor" && investorReceipts(0)._4 == BigDecimal("100.00"))
-      assert(investorReceipts(1)._3 == "investor" && investorReceipts(1)._4 == BigDecimal("100.00"))
-      assert(collectionReceipts(0)._3 == "collection" && collectionReceipts(0)._4 == BigDecimal("100.00"))
-      // Reserved funds are fully consumed: no release receipt in a successful purchase.
-      assert(!journal.persistedInStorage("oracle-investor").exists(_.isInstanceOf[CreditBalanceReleaseReservedFundsConfirmedPB]))
-
-      // Durable Monarch checkpoint names the same transaction; the run completes exactly once.
-      assert(checkpoints.receiveMessage(5.seconds).pay_cash_purchase_paymentTxid.contains(TxId(txids.head)))
+      for ((pid, resource, phases) <- Vector(
+        ("oracle-investor", investorId.value, Vector("reserve", "deduct")),
+        ("oracle-collection", collectionId.value, Vector("incoming", "credit")),
+        ("oracle-order", orderId.value, Vector("subscribe", "pay-order")))) {
+        assert(receipts(pid) == phases.map(phase => (phase, expectedTxid, resource, amount)))
+      }
+      assert(balance(investor).reservedAmount.isEmpty)
+      assert(balance(investor).committedOutgoing == Map(expectedTxid -> amount))
+      assert(balance(collection).committedIncoming == Map(expectedTxid -> amount))
+      val expectedState = expectedInput.copy(pay_cash_purchase_paymentTxid = Some(expectedTxid))
+      assert(checkpoints.receiveMessage(5.seconds) == expectedState)
       assert(completed.receiveMessage(5.seconds) == "succeeded")
-      assert(!journal.persistedInStorage("oracle-monarch").exists(_.isInstanceOf[PersistentMonarch.RunFailedEvt]))
+      val runEvents = journal.persistedInStorage("oracle-monarch").toVector
+      assert(runEvents.size == 3)
+      val start = runEvents.collect { case e: PersistentMonarch.RunStarted => e }.ensuring(_.size == 1).head
+      assert(start.runId == "cash-run" && start.stageCursors == Vector("pay-cash-purchase#0"))
+      assert(Execution.codec.decode(start.initialSnapshot) == expectedInput)
+      assert(start.initialSnapshot.toVector == Execution.codec.encode(expectedInput).toVector)
+      val done = runEvents.collect { case e: PersistentMonarch.StageDone => e }.ensuring(_.size == 1).head
+      assert(done.cursor == "pay-cash-purchase#0" && done.metadata.isEmpty && done.timestamp > 0)
+      assert(Execution.codec.decode(done.snapshot) == expectedState)
+      assert(done.snapshot.toVector == Execution.codec.encode(expectedState).toVector)
+      assert(runEvents.collect { case e: PersistentMonarch.RunCompleted => e.runId } == Vector("cash-run"))
 
-      // Order-last-commit: the settlement result is present, and a later settlement attempt changes nothing.
       val orders = kit.createTestProbe[FundOrderState]()
       def orderState(): FundOrderState = { order ! FundOrderAggregate.GetState(orders.ref); orders.receiveMessage() }
-      orders.awaitAssert(assert(orderState().cashPaymentFinalResults.get(TxId(txids.head)).contains("succeeded")), 15.seconds, 100.millis)
-      val before = Vector("oracle-investor", "oracle-collection", "oracle-order", "oracle-saga", "oracle-host", "oracle-monarch").map(p => p -> journal.persistedInStorage(p).size).toMap
+      orders.awaitAssert(assert(orderState().cashPaymentFinalResults.get(expectedTxid).contains("succeeded")), 15.seconds, 100.millis)
+      val serialization = SerializationExtension(system.classicSystem)
+      def inventory(pid: String): Vector[(Int, String, Vector[Byte])] = journal.persistedInStorage(pid).toVector.map { event =>
+        val value = event.asInstanceOf[AnyRef]
+        val serializer = serialization.findSerializerFor(value)
+        (serializer.identifier, Serializers.manifestFor(serializer, value), serializer.toBinary(value).toVector)
+      }
+      val before = Vector("oracle-investor", "oracle-collection", "oracle-order", "oracle-saga", "oracle-host", "oracle-monarch").map(p => p -> inventory(p)).toMap
       val retained = orderState()
       order ! FundOrderAggregate.Execute(FundOrderProtocol.RequestFundPurchaseSettlement(operationId, orderId, investorId, collectionId, original.fundCode, Money(BigDecimal("101.00"), "CNY")), orderReplies.ref)
       assert(orderReplies.receiveMessage() == FundOrderAggregate.Refused("ORDER_REPLAY_CONFLICT"))
       order ! FundOrderAggregate.Execute(FundOrderProtocol.RequestFundPurchaseSettlement(operationId, orderId, investorId, collectionId, original.fundCode, amount), orderReplies.ref)
       assert(orderReplies.receiveMessage() == FundOrderAggregate.Accepted(Vector.empty))
       assert(orderState() == retained)
-      before.foreach { case (pid, count) => assert(journal.persistedInStorage(pid).size == count) }
+      before.foreach { case (pid, events) => assert(inventory(pid) == events) }
       assert(balance(investor).accountBalance("CNY").amount == BigDecimal("900.00"))
       assert(balance(collection).accountBalance("CNY").amount == BigDecimal("100.00"))
     } finally kit.shutdownTestKit()

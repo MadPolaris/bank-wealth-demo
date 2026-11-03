@@ -278,28 +278,38 @@ async function verifyEvidence(evidence, snapshot, source, io) {
     let actual;
     if (evidence.kind === 'supply-manifest@1') {
       const manifestFile = JSON.parse(io.read(evidence.parameters.manifest).toString('utf8'));
-      const files = manifestFile.files ?? [];
-      const unresolved = manifestFile.unresolved ?? [];
+      list(manifestFile.files, 'supply files');
+      list(manifestFile.unresolved, 'supply unresolved');
+      const files = manifestFile.files;
+      const unresolved = manifestFile.unresolved;
       actual = { schemaVersion: manifestFile.schemaVersion, status: manifestFile.status, fileCount: Array.isArray(files) ? files.length : Object.keys(files).length,
         unresolvedCount: unresolved.length, unresolvedCodes: sorted(unresolved.map(u => u.code)) };
       assert.ok(manifestFile.schemaVersion === 'bank-existing-supply-manifest/v1', 'supply manifest schema differs');
     } else if (evidence.kind === 'cold-build@1') {
       const result = JSON.parse(io.read(evidence.parameters.result).toString('utf8'));
+      assert.equal(result.schemaVersion, 'bank-cold-build/v1', 'cold result schema differs');
+      assert.ok(['passed', 'blocked', 'failed'].includes(result.status), 'cold result status required');
+      for (const field of ['noNetwork', 'sourceUnchanged', 'suppliesUnchanged', 'testPhase']) assert.equal(typeof result[field], 'boolean', 'explicit cold result boolean required: ' + field);
       actual = { schemaVersion: result.schemaVersion, status: result.status, noNetwork: result.noNetwork === true,
         sourceUnchanged: result.sourceUnchanged === true, suppliesUnchanged: result.suppliesUnchanged === true,
         testPhase: result.testPhase === true, prefilledBridges: Array.isArray(result.prefilledDerivedBridges) ? result.prefilledDerivedBridges.length : result.prefilledBridges ?? 0 };
     } else if (evidence.kind === 'portable-generation@1') {
       const receipt = JSON.parse(io.read(evidence.parameters.receipt).toString('utf8'));
+      text(receipt.target, 'recorded generation target');
+      assert.ok(receipt.milestoneAccepted == null || typeof receipt.milestoneAccepted === 'boolean', 'recorded milestoneAccepted must be boolean or null');
       actual = { target: receipt.target, milestoneAccepted: receipt.milestoneAccepted ?? null };
     } else {
       const run = JSON.parse(io.read(evidence.parameters.runReceipt).toString('utf8'));
-      actual = { exitCode: run.exitCode, waited: run.waited === true, timedOut: run.timedOut === true };
+      assert.ok(Number.isInteger(run.exitCode), 'explicit execution exitCode required');
+      assert.equal(typeof run.waited, 'boolean', 'explicit execution waited required');
+      assert.equal(typeof run.timedOut, 'boolean', 'explicit execution timedOut required');
+      actual = { exitCode: run.exitCode, waited: run.waited, timedOut: run.timedOut };
     }
     assert.deepEqual(pointerValue(recorded0, evidence.resultPointer), actual, 'recorded execution outcome differs from recomputed artifact');
-    return { kind: evidence.kind, state: 'subset-verified', receipts, sourceSnapshotSha256: source.sha256,
-      sourceFiles: evidence.sourceFiles, references: evidence.references, actual,
-      originalItemCertified: false,
-      limitation: 'Execution receipt verification is not full original-item acceptance; unresolved supply items and licensing gaps remain recorded as blocked.' };
+    return { kind: evidence.kind, state: 'recorded-summary-only', receipts, sourceSnapshotSha256: source.sha256,
+      sourceFiles: evidence.sourceFiles, references: evidence.references, recordedSummary: actual,
+      originalItemCertified: false, executionVerified: false,
+      limitation: 'Only hashes and JSON summary agreement were checked. Execution logs, commands, classpath, output inventory, license applicability and historical source binding have not been verified.' };
   }
   else {
     mustBeInventoried(snapshot, parameters.root, false);
@@ -379,8 +389,10 @@ export async function evaluate(manifest) {
         if (entry.status === 'attested') {
           const manual = slot.evidence.filter(e => e.kind === 'manual-owner-declared');
           const adverse = manual.find(e => e.declaredOutcome !== 'passed');
+          const unverified = slot.evidence.some(e => e.state === 'recorded-summary-only');
           slot.localStatus = slot.status = adverse ? adverse.declaredOutcome
-            : manual.length ? 'manual-owner-declared' : 'partial';
+            : manual.length ? 'manual-owner-declared' : unverified ? 'blocked' : 'partial';
+          if (unverified && !adverse) slot.reason = 'Recorded JSON summaries are not independently verified execution evidence.';
           if (adverse) slot.reason = 'Owner explicitly declared ' + adverse.declaredOutcome + '; no successful override is allowed.';
         }
       } catch (error) {
@@ -442,10 +454,8 @@ export async function orchestrate(options = {}) {
       : 'No controlled complete-release executor and resource permit is integrated; no action started.' });
   }
   report.steps.push(
-    { step: 'portable-supply-and-licenses', status: 'blocked', reason: mode === 'run'
-      ? 'Supply closure is captured and cold-buildable, but 4 plugins lack local license evidence and 87 metadata-only POMs were never fetched; licensing remains a precise, disclosed gap.'
-      : 'Collector licensing closure is not certified from a read-only check; no missing artifact is invented.' },
-    { step: 'clean-cache-delivery', status: 'unexecuted', reason: 'The gate itself does not execute cold builds; actual cold-build receipts (JS 1010/1012, BC 1015, prefilled derived bridges, cold-rebuild still blocked) are verified per-slot as cold-build@1 evidence, and no download or host-cache fallback is performed here.' },
+    { step: 'portable-supply-and-licenses', status: 'blocked', reason: 'No complete supply and license verifier is integrated; JSON summaries do not establish closure or artifact availability.' },
+    { step: 'clean-cache-delivery', status: 'unexecuted', reason: 'No cold build is executed here. Recorded summaries do not verify historical execution, empty caches, full test coverage or deployment.' },
     { step: 'original-required-result-gate', status: report.allOriginalRequiredProven ? 'verified' : 'blocked', required: 25,
       reason: 'Only full original-item certification may satisfy the definitive gate; subset evidence and owner declarations are not automatic certification.' },
     { step: 'dist-promotion', status: 'blocked', reason: 'All original required results plus supply licensing closure must be proven. No dist writer is implemented or called.' }

@@ -349,7 +349,7 @@ test('report writes are exclusive, do not create parents, reject links and canno
   assert.throws(() => writeReport(forged, { ...report, accepted: true })); assert.equal(existsSync(forged), false);
 }));
 
-test('execution-receipt verifiers recompute supply/cold/portable/mysql artifacts within their mapped slots only', async () => fresh(async root => {
+test('matching execution summaries stay blocked without independent execution verification', async () => fresh(async root => {
   const f = fixture(root);
   const supplyManifest = join(root, 'SUPPLY-MANIFEST.json');
   save(supplyManifest, { schemaVersion: 'bank-existing-supply-manifest/v1', status: 'captured-blocked', files: [{ file: 'maven/a.jar' }], unresolved: [{ code: 'missing-license-evidence' }, { code: 'missing-license-evidence' }] });
@@ -376,11 +376,28 @@ test('execution-receipt verifiers recompute supply/cold/portable/mysql artifacts
   }
   f.manifest.slots = [...byIndex.entries()].map(([index, evidence]) => ({ index, status: 'attested', evidence }));
   const report = await evaluate(f.manifest); notReleased(report);
-  for (const [index] of byIndex) { if (slot(report, index).localStatus !== 'partial') console.error('SLOT', index, slot(report, index).localStatus, slot(report, index).reason, slot(report, index).reason + ' | ' + JSON.stringify(slot(report, index).evidence.map(e => [e.kind, e.state]))); assert.equal(slot(report, index).localStatus, 'partial'); assert.equal(slot(report, index).status, 'blocked'); }
+  for (const [index] of byIndex) {
+    const result = slot(report, index);
+    assert.equal(result.localStatus, 'blocked');
+    assert.equal(result.status, 'blocked');
+    for (const item of result.evidence) {
+      assert.equal(item.state, 'recorded-summary-only');
+      assert.equal(item.executionVerified, false);
+      assert.equal(item.originalItemCertified, false);
+    }
+  }
   // tampered receipt no longer matches the recomputed artifact (direct overwrite; save() is exclusive-create)
   writeFileSync(coldResult, JSON.stringify({ ...coldActual, status: 'blocked' }, null, 2) + '\n');
   const tampered = await evaluate(f.manifest); notReleased(tampered);
   assert.equal(tampered.exitCode, 1);
+  const missingWait = structuredClone(f.manifest);
+  writeFileSync(mysqlRun, JSON.stringify({ exitCode: 0, timedOut: false }));
+  const mysqlEvidence = missingWait.slots.find(s => s.index === 'P31:2').evidence[0];
+  mysqlEvidence.parameters.runReceipt = fileRef(mysqlRun);
+  mysqlEvidence.receipts = [fileRef(mysqlRun)];
+  const incomplete = await evaluate(missingWait);
+  assert.equal(slot(incomplete, 'P31:2').localStatus, 'failed');
+  assert.match(slot(incomplete, 'P31:2').reason, /explicit execution waited/);
   // P32 verifier kinds cannot be filed under a business slot
   const wrongSlot = structuredClone(f.manifest);
   wrongSlot.slots[0].index = 'P27:2';

@@ -15,7 +15,11 @@ import example.bankwealth.service.BankServiceService.Principal
 import java.io.PrintWriter
 import java.lang.reflect.{InvocationHandler, InvocationTargetException, Method, Proxy}
 import java.sql.{Connection, DriverManager, SQLException}
-import java.util.UUID
+import java.util.{Base64, UUID}
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Path, Paths, StandardOpenOption}
+import java.sql.Types
+import play.api.libs.json._
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.Logger
 import javax.sql.DataSource
@@ -25,20 +29,13 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import org.scalatest.Assertions
 
-/** P31-2 real-MySQL negative-path acceptance (2026-11-01 authorization, exclusive container).
-  * Runs the five fault paths against the real projection code over MySQL 8.4.11:
-  * duplicate delivery, conflicting/identity-mismatched payloads, sequence gaps,
-  * early SIP occurrence join, and injected index-write failure rolling the whole
-  * event/state/checkpoint transaction back. Event production uses the same real
-  * aggregates as BankReadsideProjectionSpec (testkit capture), not hand-built rows.
-  * Storage is the exclusive container named by MYSQL_NEGATIVE_URL only; no unit-suite
-  * storage is touched and nothing here certifies other MySQL versions.
+/** The caller owns the loopback MySQL endpoint and credential file. Every scenario
+  * retains its independent schema, including on failure; no existing data is cleared.
   */
 object BankMysqlNegativeMain extends Assertions {
   private def intercept[A <: Throwable : Manifest](body: => Unit): A = {
     try { body; fail("expected exception") } catch { case e: Throwable if manifest[A].runtimeClass.isInstance(e) => e.asInstanceOf[A] }
   }
-  private def env(name: String): String = sys.env.getOrElse(name, sys.error("missing " + name))
 
   final class SimpleMysqlDataSource(url: String, user: String, password: String) extends DataSource {
     def getConnection: Connection = DriverManager.getConnection(url, user, password)
@@ -96,10 +93,46 @@ object BankMysqlNegativeMain extends Assertions {
     def close(): Unit = ()
   }
 
+  private def save(root: Path, name: String, value: JsValue): Unit = {
+    Files.write(root.resolve(name + ".json"), (Json.prettyPrint(value) + "\n").getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW)
+    ()
+  }
   def main(args: Array[String]): Unit = {
-    val url = env("MYSQL_NEGATIVE_URL"); val user = env("MYSQL_NEGATIVE_USER"); val password = env("MYSQL_NEGATIVE_PASSWORD")
+    require(args.length == 3, "expected owned output directory, loopback JDBC endpoint and credential file")
+    val output = Paths.get(args(0)).toRealPath()
+    require(output.toString == args(0) && Files.isDirectory(output))
+    val url = args(1)
+    require(url.matches("jdbc:mysql://127\\.0\\.0\\.1:[0-9]{1,5}"), "exclusive loopback endpoint required")
+    val port = url.substring(url.lastIndexOf(':') + 1).toInt
+    require(port > 0 && port <= 65535)
+    val credential = Paths.get(args(2)).toRealPath()
+    require(credential.startsWith(output.getParent), "credential must belong to the owned run")
+    val password = new String(Files.readAllBytes(credential), StandardCharsets.UTF_8).trim
+    require(password.nonEmpty)
+    val scenarios = Vector("mysql-duplicate-zero-effect", "mysql-conflict-and-identity-rejected", "mysql-gap-holds-watermark",
+      "mysql-early-occurrence-retryable-join", "mysql-index-failure-rolls-back")
+    val outcomes = scenarios.map { scenario =>
+      val directory = Files.createDirectory(output.resolve(scenario))
+      val schema = "bank_neg_" + UUID.randomUUID().toString.replace("-", "")
+      save(directory, "input", Json.obj("scenario" -> scenario, "schema" -> schema, "endpoint" -> url))
+      try {
+        runScenario(url, password, schema, scenario, directory)
+        Json.obj("scenario" -> scenario, "status" -> "passed", "schema" -> schema)
+      } catch {
+        case scala.util.control.NonFatal(error) =>
+          val value = Json.obj("scenario" -> scenario, "status" -> "failed", "schema" -> schema,
+            "errorClass" -> error.getClass.getName, "frames" -> error.getStackTrace.take(8).map(_.toString).toVector)
+          save(directory, "failure", value)
+          value
+      }
+    }
+    save(output, "result", Json.obj("scenarios" -> outcomes, "schemasRetained" -> true, "releaseAccepted" -> false))
+    require(outcomes.forall(v => (v \ "status").as[String] == "passed"), "MySQL acceptance failed; see owned evidence")
+  }
+
+  private def runScenario(url: String, password: String, schema: String, scenario: String, output: Path): Unit = {
+    val user = "root"
     Class.forName("com.mysql.cj.jdbc.Driver")
-    val schema = "bank_neg_" + UUID.randomUUID().toString.replace("-", "")
     val setup = DriverManager.getConnection(url, user, password)
     try { val s = setup.createStatement(); try s.execute("CREATE DATABASE " + schema) finally s.close() }
     finally setup.close()
@@ -143,10 +176,13 @@ object BankMysqlNegativeMain extends Assertions {
       def checkpoint(pid: String): Option[Long] =
         sql("SELECT last_sequence FROM bank_read_stream WHERE namespace=? AND persistence_id=?", pid)(_.getLong(1)).headOption
 
+      val journalEvidence = mutable.LinkedHashMap.empty[String, Vector[BankJournalEnvelope]]
       def capture(pid: String): Vector[BankJournalEnvelope] = {
         val values = storage.persistedInStorage(pid).toVector
         require(values.nonEmpty && values.forall(_.isInstanceOf[GeneratedMessage]), "generated PB events required")
-        values.zipWithIndex.map { case (e, i) => BankJournalEnvelope(pid, i.toLong + 1L, e) }
+        val events = values.zipWithIndex.map { case (e, i) => BankJournalEnvelope(pid, i.toLong + 1L, e) }
+        journalEvidence.put(pid, events)
+        events
       }
       def accountEvents(account: AccountId, balance: String = "1000.00", reserve: Boolean = false): Vector[BankJournalEnvelope] = {
         val pid = ids.account(account)
@@ -206,107 +242,142 @@ object BankMysqlNegativeMain extends Assertions {
         capture(pid) -> states.receiveMessage().occurrences(10L)
       }
 
-      var readside = new BankReadside(journal, config, dataSource)
-      await(readside.initialize())
-      var failures = Vector.empty[String]
-      def check(name: String)(body: => Unit): Unit =
-        try { body; println("PASS " + name) } catch { case e: Throwable => failures :+= name; println("FAIL " + name + ": " + e) }
-      // Each scenario starts from an empty journal namespace and empty MySQL namespace rows:
-      // fresh namespace string, cleared testkit storage, and cleared projection tables.
-      def resetScenario(): Unit = {
-        storage.clearAll()
+      val readside = new BankReadside(journal, config, dataSource)
+      val tables = Vector(
+        ("bank_read_namespace", Vector("namespace", "schema_version"), "namespace"),
+        ("bank_read_stream", Vector("namespace", "pid_key", "persistence_id", "kind", "resource_id", "owner_account", "owner_principal", "last_sequence", "observed_sequence", "state_payload"), "namespace,pid_key"),
+        ("bank_read_event", Vector("namespace", "pid_key", "sequence_nr", "payload_type", "payload_manifest", "payload"), "namespace,pid_key,sequence_nr"),
+        ("bank_read_occurrence", Vector("namespace", "plan_key", "due_slot", "occurrence_key", "order_key", "owner_account", "occurrence_payload"), "namespace,plan_key,due_slot"),
+        ("bank_read_pending", Vector("namespace", "operation_key", "flow", "operation_id", "order_id", "plan_id", "occurrence_id", "source_pid", "phase", "status", "recoverable"), "namespace,operation_key,flow"))
+      def snapshot(name: String): JsObject = {
         val c = dataSource.getConnection
-        // bank_read_namespace stays: the projection requires its installed namespace row
-        try Vector("bank_read_pending", "bank_read_occurrence", "bank_read_event", "bank_read_stream").foreach { table =>
-          val s = c.prepareStatement("DELETE FROM " + table + " WHERE namespace=?")
-          try { s.setString(1, journal.namespace); s.executeUpdate() } finally s.close()
-        } finally c.close()
+        c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ)
+        c.setAutoCommit(false)
+        val result = try JsObject(tables.map { case (table, columns, keys) =>
+          val s = c.prepareStatement("SELECT " + columns.mkString(",") + " FROM " + table + " WHERE namespace=? ORDER BY " + keys)
+          try {
+            s.setString(1, journal.namespace)
+            val r = s.executeQuery()
+            try {
+              val meta = r.getMetaData
+              val rows = Vector.newBuilder[JsObject]
+              while (r.next()) rows += JsObject((1 to meta.getColumnCount).map { i =>
+                val value: JsValue = if (r.getObject(i) == null) JsNull else meta.getColumnType(i) match {
+                  case Types.BINARY | Types.VARBINARY | Types.LONGVARBINARY | Types.BLOB => Json.obj("base64" -> Base64.getEncoder.encodeToString(r.getBytes(i)))
+                  case _ => JsString(r.getString(i))
+                }
+                meta.getColumnLabel(i) -> value
+              })
+              table -> JsArray(rows.result())
+            } finally r.close()
+          } finally s.close()
+        }) finally { try c.rollback() finally c.close() }
+        save(output, name, result)
+        result
       }
-
-      // ① duplicate delivery: same PID+seq twice is exactly-once
-      check("mysql-duplicate-zero-effect") {
-        val events = accountEvents(investor, reserve = true)
-        val pid = events.head.persistenceId
-        intercept[IllegalArgumentException](await(readside.project(events(1))))
-        assert(count("bank_read_event") == 0)
-        await(readside.project(events.head))
-        await(readside.project(events.head))
-        assert(count("bank_read_event") == 1 && checkpoint(pid).contains(1L))
+      def replay(events: Vector[BankJournalEnvelope]): Unit = {
+        journal.put(events)
+        await(readside.catchUp(events.head.persistenceId))
       }
-      // ② conflicting payload at same PID+seq is rejected; identity mismatch rejected
-      check("mysql-conflict-and-identity-rejected") {
-        resetScenario()
-        val events = accountEvents(investor, reserve = true)
-        val other = accountEvents(otherInvestor).head
-        val pid = events.head.persistenceId
-        await(readside.project(events.head))
-        intercept[IllegalArgumentException](await(readside.project(events.head.copy(event = other.event))))
-        intercept[IllegalArgumentException](await(readside.project(BankJournalEnvelope(pid, 2L, other.event))))
-        assert(count("bank_read_event") == 1 && checkpoint(pid).contains(1L))
+      def exactEvents(events: Vector[BankJournalEnvelope]): Unit = {
+        val bytes = sql("SELECT payload FROM bank_read_event WHERE namespace=? ORDER BY sequence_nr")(_.getBytes(1).toVector)
+        assert(bytes == events.map(_.event.asInstanceOf[GeneratedMessage].toByteArray.toVector))
       }
-      // ③ sequence gap does not advance the contiguous checkpoint
-      check("mysql-gap-holds-watermark") {
-        resetScenario()
-        val events = accountEvents(investor, reserve = true)
-        val pid = events.head.persistenceId
-        intercept[IllegalArgumentException](await(readside.project(events(1))))
-        assert(checkpoint(pid).isEmpty && count("bank_read_event") == 0)
-        await(readside.project(events.head))
-        await(readside.project(events(1)))
-        assert(checkpoint(pid).contains(2L) && count("bank_read_event") == 2)
+      try {
+        await(readside.initialize())
+        snapshot("initial")
+        scenario match {
+          case "mysql-duplicate-zero-effect" =>
+            val events = accountEvents(investor, reserve = true)
+            replay(events)
+            val before = snapshot("before")
+            events.foreach(e => await(readside.project(e)))
+            assert(snapshot("after") == before)
+            exactEvents(events)
+            assert(checkpoint(events.head.persistenceId).contains(2L))
+            val BankAccountResponse(_, value) = await(readside.accountMe(alice, BankAccountKey(BankReadsideSchema.version))).fold(e => sys.error(e.code), identity)
+            assert(value.contains(BankAccountView(investor, true, MoneyWire("90000", "CNY"), MoneyWire("10000", "CNY"))))
+          case "mysql-conflict-and-identity-rejected" =>
+            val events = accountEvents(investor, reserve = true)
+            val other = accountEvents(otherInvestor).head
+            await(readside.project(events.head))
+            val before = snapshot("before")
+            val conflict = intercept[IllegalArgumentException](await(readside.project(events.head.copy(event = other.event))))
+            assert(conflict.getMessage.contains("conflicting journal sequence/payload"))
+            assert(snapshot("after-conflict") == before)
+            val mismatch = intercept[IllegalArgumentException](await(readside.project(BankJournalEnvelope(events.head.persistenceId, 2L, other.event))))
+            assert(mismatch.getMessage.contains("account event identity mismatch"))
+            assert(snapshot("after-identity") == before)
+            await(readside.project(events(1)))
+            assert(checkpoint(events.head.persistenceId).contains(2L))
+            exactEvents(events)
+          case "mysql-gap-holds-watermark" =>
+            val events = accountEvents(investor, reserve = true)
+            val before = snapshot("before")
+            val gap = intercept[IllegalArgumentException](await(readside.project(events(1))))
+            assert(gap.getMessage.contains("noncontiguous journal sequence"))
+            assert(snapshot("after-gap") == before)
+            assert(checkpoint(events.head.persistenceId).isEmpty)
+            replay(events)
+            exactEvents(events)
+            assert(checkpoint(events.head.persistenceId).contains(2L))
+          case "mysql-early-occurrence-retryable-join" =>
+            val (events, occurrence) = planEvents("late-order")
+            replay(events)
+            val key = BankOccurrencePageKey(occurrence.planId, 50L, 0L)
+            val BankSipOccurrencePage(beforeMeta, beforeRows, _) = await(readside.occurrences(alice, key)).fold(e => sys.error(e.code), identity)
+            val BankReadMetadata(_, beforeStatus, _) = beforeMeta
+            assert(beforeStatus == "unknown" && beforeRows.size == 1)
+            val BankSipOccurrenceView(beforeOccurrence, slot, progress, paymentBefore, taBefore, refundBefore, terminalBefore) = beforeRows.head
+            assert(beforeOccurrence == occurrence && paymentBefore == "unknown" && taBefore == "unknown" && refundBefore == "unknown" && terminalBefore.isEmpty)
+            snapshot("before-order")
+            val payment = BankPaymentOriginal(occurrence.operationId, occurrence.fundOrderId, occurrence.config.investorAccountId,
+              occurrence.config.fundCollectionAccountId, occurrence.config.fundCode, occurrence.config.amount)
+            replay(orderEvents(payment, None))
+            val BankSipOccurrencePage(afterMeta, afterRows, _) = await(readside.occurrences(alice, key)).fold(e => sys.error(e.code), identity)
+            val BankReadMetadata(_, afterStatus, marks) = afterMeta
+            assert(afterStatus == "caught-up")
+            assert(marks == journalEvidence.toVector.map { case (pid, persisted) =>
+              BankProjectionWatermark(pid, persisted.last.sequenceNr, Some(persisted.last.sequenceNr), "caught-up")
+            }.sortBy(_.persistenceId))
+            assert(afterRows.size == 1)
+            val BankSipOccurrenceView(afterOccurrence, afterSlot, afterProgress, paymentAfter, taAfter, refundAfter, terminalAfter) = afterRows.head
+            assert(afterOccurrence == occurrence && afterSlot == slot && afterProgress == progress)
+            assert(paymentAfter == "payment-requested" && taAfter == "not-submitted" && refundAfter == "not-required" && terminalAfter.isEmpty)
+            assert(count("bank_read_occurrence") == 1)
+            val after = snapshot("after-order")
+            journalEvidence.values.foreach(_.foreach(e => await(readside.project(e))))
+            assert(snapshot("after-duplicates") == after)
+          case "mysql-index-failure-rolls-back" =>
+            val source = cashOriginal("atomic")
+            val event = orderEvents(source.payment, Some(source)).head
+            val before = snapshot("before")
+            dataSource.failOnSql = Some("INSERT INTO bank_read_pending")
+            val failure = intercept[SQLException](await(readside.project(event)))
+            assert(failure.getMessage == "injected projection-index write failure")
+            assert(dataSource.failOnSql.isEmpty && dataSource.hits.get == 1)
+            assert(snapshot("after-failure") == before)
+            assert(checkpoint(event.persistenceId).isEmpty)
+            await(readside.project(event))
+            assert(checkpoint(event.persistenceId).contains(1L) && count("bank_read_pending") == 1)
+            exactEvents(Vector(event))
+            val BankCashRequestResponse(_, value) = await(readside.cashOriginal(alice, BankCashRequestKey(source.clientRequestId))).fold(e => sys.error(e.code), identity)
+            assert(value.exists { case BankCashRequestView(original, _, _, _) => original == source })
+          case _ => throw new IllegalArgumentException("unknown scenario")
+        }
+        snapshot("final")
+      } finally {
+        try save(output, "journal", JsObject(journalEvidence.toVector.map { case (pid, events) => pid -> JsArray(events.map { e =>
+          val pb = e.event.asInstanceOf[GeneratedMessage]
+          Json.obj("sequence" -> e.sequenceNr, "type" -> pb.getClass.getName, "base64" -> Base64.getEncoder.encodeToString(pb.toByteArray))
+        }) })) finally {
+          readside.close()
+          journal.close()
+        }
       }
-      // ④ early SIP occurrence joins when the order stream arrives later
-      check("mysql-early-occurrence-retryable-join") {
-        resetScenario()
-        val (planEventsVec, occurrence) = planEvents("late-order")
-        journal.put(planEventsVec)
-        await(readside.catchUp(planEventsVec.head.persistenceId))
-        val payment = BankPaymentOriginal(occurrence.operationId, occurrence.fundOrderId, occurrence.config.investorAccountId,
-          occurrence.config.fundCollectionAccountId, occurrence.config.fundCode, occurrence.config.amount)
-        // Mirrors the unit spec's early-join scenario: order stream without a cash source record,
-        // so the SIP payment identity itself authorizes the settlement request.
-        val orderVec = orderEvents(payment, None)
-        journal.put(orderVec)
-        await(readside.catchUp(orderVec.head.persistenceId))
-        val key = BankOccurrencePageKey(occurrence.planId, 50L, 0L)
-        val BankSipOccurrencePage(metadata, rows, _) = await(readside.occurrences(alice, key)).fold(e => sys.error(e.code), identity)
-        val view = rows.collectFirst { case v: BankSipOccurrenceView => v }
-        assert(view.exists { v => v.occurrence == occurrence && v.paymentStatus != "unknown" },
-          "occurrence must join after the order stream arrives")
-        assert(count("bank_read_occurrence") == 1)
-      }
-      // ⑤ injected index-write failure rolls the whole transaction back
-      check("mysql-index-failure-rolls-back") {
-        resetScenario()
-        val source = cashOriginal("atomic")
-        val event = orderEvents(source.payment, Some(source)).head
-        dataSource.failOnSql = Some("INSERT INTO bank_read_pending")
-        intercept[SQLException](await(readside.project(event)))
-        assert(dataSource.failOnSql.isEmpty && dataSource.hits.get > 0, "the fault must actually hit an index write")
-        assert(count("bank_read_event") == 0 && count("bank_read_stream") == 0 && count("bank_read_pending") == 0)
-        assert(checkpoint(event.persistenceId).isEmpty)
-        await(readside.project(event))
-        assert(checkpoint(event.persistenceId).contains(1L) && count("bank_read_event") == 1 && count("bank_read_pending") == 1)
-      }
-      // exact five-table final state visible on real MySQL
-      check("mysql-five-tables-final") {
-        resetScenario()
-        val c = dataSource.getConnection
-        val tables = try {
-          val s = c.prepareStatement("SELECT table_name FROM information_schema.tables WHERE table_schema=?")
-          try { s.setString(1, schema); val r = s.executeQuery(); try { val b = Vector.newBuilder[String]; while (r.next()) b += r.getString(1); b.result() } finally r.close() } finally s.close()
-        } finally c.close()
-        assert(tables.toSet == Set("bank_read_event", "bank_read_stream", "bank_read_pending", "bank_read_occurrence", "bank_read_namespace"),
-          "schema tables: " + tables)
-      }
-      readside.close()
-      if (failures.nonEmpty) { println("FAILURES: " + failures.mkString(",")); sys.exit(2) }
-      println("ALL MYSQL NEGATIVE PATHS PASSED")
     } finally {
       kit.shutdownTestKit()
-      val drop = DriverManager.getConnection(url, user, password)
-      try { val s = drop.createStatement(); try s.execute("DROP DATABASE " + schema) finally s.close() }
-      finally drop.close()
+      save(output, "closed", Json.obj("actorSystemTerminated" -> true, "schemaRetained" -> schema))
     }
   }
 }

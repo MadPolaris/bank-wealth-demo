@@ -37,7 +37,7 @@ public final class BankColdNetworkGuard extends SecurityManager {
   public void checkAccept(String host, int port) { throw new SecurityException("cold build cannot accept"); }
 }
 `;
-async function command(executable, args, cwd, env, base, seconds) {
+export async function coldCommand(executable, args, cwd, env, base, seconds) {
   const out = openSync(base + '.stdout.log', 'wx'), err = openSync(base + '.stderr.log', 'wx');
   let timer, killer, timedOut = false, child, cancelled = null;
   const stop = signal => {
@@ -51,11 +51,14 @@ async function command(executable, args, cwd, env, base, seconds) {
   process.on('SIGTERM', onTerm); process.on('SIGINT', onInt);
   try {
     child = spawn(executable, args, { cwd, env, stdio: ['ignore', out, err] });
-    const end = new Promise((resolve, reject) => { child.once('error', reject); child.once('close', (code, signal) => resolve({ code, signal })); });
+    const end = new Promise(resolve => {
+      child.once('error', error => resolve({ code: null, signal: null, launchError: error.code ?? error.name }));
+      child.once('close', (code, signal) => resolve({ code, signal, launchError: null }));
+    });
     timer = setTimeout(() => { timedOut = true; child.kill('SIGTERM'); killer = setTimeout(() => child.kill('SIGKILL'), 15000); }, seconds * 1000);
     const result = await end;
     clearTimeout(timer); clearTimeout(killer);
-    const receipt = { command: [executable, ...args], cwd, pid: child.pid, ...result, waited: true, timedOut, cancelled,
+    const receipt = { command: [executable, ...args], cwd, pid: child.pid, ...result, waited: !result.launchError, timedOut, cancelled,
       stdoutSha: sha(base + '.stdout.log'), stderrSha: sha(base + '.stderr.log') };
     save(base + '.json', receipt);
     return receipt;
@@ -65,8 +68,60 @@ async function command(executable, args, cwd, env, base, seconds) {
     closeSync(out); closeSync(err);
   }
 }
+export function validateBridgeComponents(entries, repositories) {
+  assert.ok(Array.isArray(entries), 'bridgeComponents must be an array');
+  const names = new Set();
+  return entries.map(entry => {
+    assert.deepEqual(Object.keys(entry).sort(), ['file', 'name', 'sha256']);
+    assert.match(entry.name, /^org\.scala-sbt-compiler-bridge_2\.(12|13)-1\.4\.4-bin_2\.(12|13)\.\d+__55\.0(?:-1\.4\.4_\d{8}T\d{6})?\.jar$/u);
+    assert.ok(!names.has(entry.name), 'duplicate bridge destination');
+    names.add(entry.name);
+    plainPath(entry.file);
+    assert.match(entry.sha256, /^[0-9a-f]{64}$/u);
+    assert.equal(sha(entry.file), entry.sha256, 'bridge component hash differs from declaration');
+    const roots = [...new Set(repositories.map(r => dirname(r.root)))];
+    const root = roots.find(r => {
+      const path = relative(r, entry.file);
+      return !path.startsWith('../') && path.startsWith('boot/');
+    });
+    assert.ok(root, 'bridge must belong to an explicit captured supply');
+    const manifestPath = join(root, 'SUPPLY-MANIFEST.json');
+    plainPath(manifestPath);
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    assert.equal(manifest.schemaVersion, 'bank-existing-supply-manifest/v1');
+    assert.ok(Array.isArray(manifest.files) && Array.isArray(manifest.unresolved));
+    const row = manifest.files.find(f => f.file === relative(root, entry.file) && f.sha256 === entry.sha256);
+    assert.ok(row && row.roles?.includes('bootstrap-file'), 'bridge missing from captured inventory');
+    assert.ok(manifest.unresolved.some(item => item.code === 'derived-compiler-bridge-rebuild-unverified' &&
+      item.sha256 === entry.sha256 && row.origins?.some(origin => origin.file === item.file)), 'derived bridge provenance missing');
+    return { ...entry, manifest: { file: manifestPath, sha256: sha(manifestPath) } };
+  });
+}
+export function validateColdSourceMounts(settings, repositories) {
+  const mounts = [...new Set([...settings.matchAll(/file\("([^"\n]+)"\)/g)].map(m => m[1]))];
+  return mounts.filter(mount => mount.startsWith('/')).map(mount => {
+    plainPath(mount);
+    const supply = repositories.map(r => dirname(r.root)).find(root => mount.startsWith(root + '/ext/'));
+    assert.ok(supply, 'cold build ext must be captured supply, not workspace sources');
+    const manifestFile = join(supply, 'SUPPLY-MANIFEST.json');
+    const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'));
+    assert.equal(manifest.schemaVersion, 'bank-existing-supply-manifest/v1');
+    const prefix = relative(supply, mount) + '/';
+    const rows = manifest.files.filter(row => row.file.startsWith(prefix));
+    assert.ok(rows.length > 0 && rows.every(row => row.roles?.includes('external-source')), 'captured ext source declaration missing');
+    const declared = Object.fromEntries(rows.map(row => [row.file.slice(prefix.length), 'sha256:' + row.sha256]));
+    assert.equal(Object.keys(declared).length, rows.length, 'duplicate ext manifest path');
+    const inventory = sourceInventory(mount);
+    assert.deepEqual(inventory, declared, 'ext source bytes differ from captured manifest');
+    return { root: mount, inventory, manifest: { file: manifestFile, sha256: sha(manifestFile) } };
+  });
+}
+
 export async function runColdBuild(config) {
-  assert.deepEqual(Object.keys(config).sort(), ['bridgeComponents', 'java', 'javac', 'launcher', 'ownedRoot', 'repositories', 'target', 'testPhase']);
+  const required = ['java', 'javac', 'launcher', 'ownedRoot', 'repositories', 'target'];
+  assert.ok(required.every(key => Object.hasOwn(config, key)));
+  assert.ok(Object.keys(config).every(key => [...required, 'bridgeComponents', 'testPhase'].includes(key)));
+  if (Object.hasOwn(config, 'testPhase')) assert.equal(typeof config.testPhase, 'boolean');
   for (const k of ['java', 'javac', 'launcher', 'target']) plainPath(config[k]);
   plainPath(config.ownedRoot, true);
   const parts = relative(join(ROOT, '.scratch'), config.ownedRoot).split('/');
@@ -77,23 +132,10 @@ export async function runColdBuild(config) {
   const sources = sourceInventory(config.target);
   assert.ok(!Object.keys(sources).some(p => p.startsWith('target/') || p.startsWith('project/target/') || p.startsWith('project/project/target/')), 'cold build requires a never-built generated target');
   const settings = readFileSync(join(config.target, 'build.sbt'), 'utf8');
-  for (const mount of [...settings.matchAll(/file\("([^"\n]+)"\)/g)].map(m => m[1])) {
-    if (mount.startsWith('/')) assert.ok(config.repositories.some(r => mount.startsWith(dirname(r.root) + '/ext/')), 'cold build ext must be captured supply, not workspace sources');
-  }
+  const externalSources = validateColdSourceMounts(settings, config.repositories);
   assert.doesNotMatch(settings, /\.rounds\//, 'cold generated build must not reference author runtime delivery directories');
   const supplies = config.repositories.map(r => ({ ...r, inventory: sourceInventory(r.root) }));
-  // Optional zinc component prefill: locally-compiled compiler bridges declared in a captured supply
-  // (hash + published sources recorded in its manifest). This is a declared derived artifact, not a
-  // host-cache fallback; rebuild-unverified stays recorded in the supply manifest itself.
-  const bridges = [];
-  for (const entry of config.bridgeComponents ?? []) {
-    assert.deepEqual(Object.keys(entry).sort(), ['file', 'name', 'sha256']);
-    plainPath(entry.file);
-    assert.match(entry.name, /^org\.scala-sbt-compiler-bridge_2\.(12|13)-1\.4\.4-bin_/u);
-    assert.ok(entry.name.endsWith('.jar'), 'component destination name must be a jar file name');
-    assert.equal(sha(entry.file), entry.sha256, 'bridge component hash differs from declaration');
-    bridges.push({ file: entry.file, name: entry.name, sha256: entry.sha256 });
-  }
+  const bridges = validateBridgeComponents(config.bridgeComponents ?? [], config.repositories);
   mkdirSync(config.ownedRoot);
   for (const name of ['home', 'boot', 'global', 'ivy', 'coursier', 'tmp', 'guard']) mkdirSync(join(config.ownedRoot, name));
   writeFileSync(join(config.ownedRoot, 'repositories'), repositories, { flag: 'wx' });
@@ -102,7 +144,7 @@ export async function runColdBuild(config) {
   const env = { HOME: join(config.ownedRoot, 'home'), JAVA_HOME: dirname(dirname(config.java)),
     PATH: dirname(config.java) + ':/usr/bin:/bin', LANG: 'en_US.UTF-8', TMPDIR: join(config.ownedRoot, 'tmp'),
     COURSIER_CACHE: join(config.ownedRoot, 'coursier'), COURSIER_REPOSITORIES: config.repositories.map(r => pathToFileURL(r.root).href).join('|') };
-  const before = { source: sources, supplies, toolchain: Object.fromEntries(['java', 'javac', 'launcher'].map(k => [k, { path: config[k], sha: sha(config[k]) }])),
+  const before = { source: sources, externalSources, supplies, toolchain: Object.fromEntries(['java', 'javac', 'launcher'].map(k => [k, { path: config[k], sha: sha(config[k]) }])),
     bridgeComponents: bridges, cachesInitiallyEmpty: bridges.length === 0, prefilledDerivedBridges: bridges.length > 0, noNetwork: true, config };
   save(join(config.ownedRoot, 'input.json'), before);
   for (const bridge of bridges) {
@@ -111,9 +153,9 @@ export async function runColdBuild(config) {
     // component id zinc computes (includes the bridge version/timestamp suffix).
     const base = join(config.ownedRoot, 'global/zinc/org.scala-sbt', bridge.name);
     mkdirSync(dirname(base), { recursive: true });
-    writeFileSync(base, bytes);
+    writeFileSync(base, bytes, { flag: 'wx' });
   }
-  const guard = await command(config.javac, ['-d', join(config.ownedRoot, 'guard'), join(config.ownedRoot, 'guard/BankColdNetworkGuard.java')], config.ownedRoot, env, join(config.ownedRoot, 'javac'), 45);
+  const guard = await coldCommand(config.javac, ['-d', join(config.ownedRoot, 'guard'), join(config.ownedRoot, 'guard/BankColdNetworkGuard.java')], config.ownedRoot, env, join(config.ownedRoot, 'javac'), 45);
   assert.equal(guard.code, 0);
   const property = (name, path) => '-D' + name + '=' + join(config.ownedRoot, path);
   const sbtTasks = config.testPhase === true ? ['show externalResolvers', 'show csrCacheDirectory', 'update', 'compile', 'show Compile / fullClasspath', 'Test / update', 'Test / compile', 'test']
@@ -123,12 +165,20 @@ export async function runColdBuild(config) {
     property('coursier.cache', 'coursier'), property('java.io.tmpdir', 'tmp'), property('sbt.repository.config', 'repositories'),
     '-Dsbt.override.build.repos=true', property('sbt.boot.properties', 'sbt.boot.properties'), '-cp', join(config.ownedRoot, 'guard') + ':' + config.launcher,
     'xsbt.boot.Boot', ...sbtTasks];
-  const build = await command(config.java, args, config.target, env, join(config.ownedRoot, 'build'), config.testPhase === true ? 1500 : 480);
+  const build = await coldCommand(config.java, args, config.target, env, join(config.ownedRoot, 'build'), 480);
   assert.deepEqual(sourceInventory(config.target, { afterBuild: true }), sources);
   for (const r of supplies) assert.deepEqual(sourceInventory(r.root), r.inventory);
+  for (const source of externalSources) {
+    assert.deepEqual(sourceInventory(source.root), source.inventory, 'external sources changed during build');
+    assert.equal(sha(source.manifest.file), source.manifest.sha256, 'external source manifest changed during build');
+  }
+  for (const bridge of bridges) {
+    assert.equal(sha(bridge.file), bridge.sha256, 'bridge changed during build');
+    assert.equal(sha(bridge.manifest.file), bridge.manifest.sha256, 'supply manifest changed during build');
+  }
   const result = { schemaVersion: 'bank-cold-build/v1', status: build.code === 0 && !build.timedOut && !build.cancelled ? 'passed' : 'blocked', build, testPhase: config.testPhase === true,
-    noNetwork: true, cachesInitiallyEmpty: bridges.length === 0, prefilledDerivedBridges: bridges.map(b => ({ sha256: b.sha256 })), sourceUnchanged: true, suppliesUnchanged: true,
-    scope: 'empty-network build with explicit file-only supplies; compiler bridges may be prefilled from captured derived declarations; not license approval, runtime deployment or release acceptance' };
+    noNetwork: true, cachesInitiallyEmpty: bridges.length === 0, prefilledDerivedBridges: bridges.map(b => ({ sha256: b.sha256 })), sourceUnchanged: true, externalSourcesUnchanged: true, suppliesUnchanged: true,
+    scope: 'file-only build with declared optional bridge prefill; testPhase runs only suites mounted by the generated target, not full bank acceptance; not license approval, runtime deployment or release acceptance' };
   save(join(config.ownedRoot, 'result.json'), result);
   return result;
 }
