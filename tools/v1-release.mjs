@@ -1,26 +1,6 @@
-// P32's read-only release gate. No subprocess, generation, copy or dist writer
-// lives here. Full original-item certifiers and the controlled supply/build/
-// delivery executor are deliberately NOT inferred from subset receipts.
-//
-// CLI: --check|--run [--manifest /absolute/manifest.json]
-//                    [--output /absolute/bank/.scratch/fresh-report.json]
-// --check never generates source. --run currently performs the same sequential
-// validations, then records blocked execution. Exit 1 = invalid/failed evidence;
-// exit 2 = blocked/unexecuted acceptance; exit 0 is reserved for actual release.
-//
-// Manifest: { schemaVersion: MANIFEST_SCHEMA, slots: [{index,status,reason?,
-//   evidence?:[]}], sourceSnapshot?: {request:{file,sha256}, inventories:[
-//   {root,afterBuild,files:{'relative/file':'sha256:<64 lowercase hex>'}}]},
-//   generation?: {inputs,jsTarget,bcTarget} }. All paths are canonical absolute.
-// Slots are filing indices, NOT invented formal package names. An attested slot
-// contains evidence, not a supplied pass. Missing slots remain required.
-// Manual evidence: { kind: 'manual-owner-declared', owner, declaredOutcome,
-//   scope, limitations: [], receipts: [{file,sha256}], sourceFiles: [...],
-//   references: [the complete sourceReference() result] }.
-// Concrete evidence uses kind from EVIDENCE_VERIFIERS, the same byte/source
-// bindings, one receipt, resultPointer (RFC6901, '' means entire JSON), and
-// parameters for the named existing provenance function. Its selected receipt
-// must equal the freshly recomputed result. It proves only that function's scope.
+// The v1 manifest path remains read-only and cannot promote subset receipts.
+// --execution selects the separate v2 controlled execution configuration.
+// Neither path accepts a caller-supplied successful release certification.
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { closeSync, constants, fstatSync, lstatSync, openSync, readFileSync, readdirSync, realpathSync, writeFileSync } from 'node:fs';
@@ -477,7 +457,7 @@ export function parseArgs(args) {
   const result = {}, seen = new Set();
   for (let i = 0; i < args.length; i++) {
     const flag = args[i];
-    assert.ok(['--check', '--run', '--manifest', '--output'].includes(flag), 'unknown argument: ' + flag);
+    assert.ok(['--check', '--run', '--manifest', '--output', '--execution'].includes(flag), 'unknown argument: ' + flag);
     assert.ok(!seen.has(flag), 'duplicate argument: ' + flag); seen.add(flag);
     if (flag === '--check' || flag === '--run') {
       assert.ok(!result.mode, 'choose exactly one of --check and --run'); result.mode = flag.slice(2);
@@ -510,6 +490,12 @@ export function writeReport(file, report) {
 }
 export async function main(args = process.argv.slice(2)) {
   const options = parseArgs(args);
+  if (options.execution) {
+    assert.ok(!options.manifest && !options.output, 'execution configuration cannot be combined with v1 evidence manifests or output');
+    const config = JSON.parse(readBytes(options.execution).toString('utf8'));
+    const { checkExecution, runExecution } = await import('./v1-release-orchestrate.mjs');
+    return options.mode === 'check' ? { ...checkExecution(config), exitCode: 2 } : runExecution(config, options.execution);
+  }
   const bytes = options.manifest ? readBytes(options.manifest) : undefined;
   const report = await orchestrate({ mode: options.mode, manifest: bytes ? JSON.parse(bytes.toString('utf8')) : undefined });
   if (options.manifest) {

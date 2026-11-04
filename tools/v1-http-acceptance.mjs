@@ -6,6 +6,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { plainPath } from './v1-release-generation.mjs';
 import { sourceInventory } from './v1-release-provenance.mjs';
+import { verifyReleaseBuild } from './v1-release-build-evidence.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const sha = path => createHash('sha256').update(readFileSync(path)).digest('hex');
@@ -65,6 +66,11 @@ export function validateHttpAcceptance(config) {
   assert.ok(parts.length === 2 && /^p26-p32-bank-v1-[A-Za-z0-9_-]+$/.test(parts[0]) && /^http-[A-Za-z0-9_-]+$/.test(parts[1]), 'fresh owned HTTP evidence root required');
   const targetParts = relative(join(ROOT, 'target/bank-wealth-release-v1'), config.target).split('/');
   assert.ok(targetParts.length === 3 && targetParts.every(p => /^[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(p)) && ['js-app', 'bc-app'].includes(targetParts[2]));
+  if (json(config.buildReceipt).schemaVersion === 'bank-release-build/v2') {
+    const build = verifyReleaseBuild(config.buildReceipt, config.target);
+    assert.ok(Object.hasOwn(build.source.tests, 'scala/BankHttpAcceptanceMain.scala'));
+    return { classpath: build.classpath, bytecode: { classpath: build.classpathInventory }, sources: externalSources(), buildSha: sha(config.buildReceipt) };
+  }
   assert.ok(config.buildReceipt.startsWith(dirname(config.ownedRoot) + '/') && config.buildReceipt.endsWith('-app.json'));
   const build = json(config.buildReceipt);
   assert.equal(build.cwd, config.target);

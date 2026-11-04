@@ -5,6 +5,7 @@ import { closeSync, existsSync, lstatSync, mkdirSync, openSync, readdirSync, rea
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { verifyReleaseBuild } from './v1-release-build-evidence.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const sipCrashCases = Object.freeze(['sip-intent-before-create', 'sip-create-before-append', 'sip-append-before-next',
@@ -53,6 +54,12 @@ export function validateCrashConfiguration(config) {
   }
   assert.ok(config.classpath.includes(join(config.target, 'target/scala-2.13/test-classes')), 'compiled bank test entry required');
   const build = json(config.buildReceipt);
+  if (build.schemaVersion === 'bank-release-build/v2') {
+    const verified = verifyReleaseBuild(config.buildReceipt, config.target);
+    assert.deepEqual(config.classpath, verified.classpath);
+    assert.ok(Object.hasOwn(verified.source.tests, 'scala/' + childMain(config.caseName) + '.scala'));
+    return config;
+  }
   assert.equal(build.cwd, config.target);
   assert.equal(build.exitCode, 0);
   assert.equal(build.waited, true);
@@ -373,12 +380,18 @@ async function invocation(config, mode) {
 export async function runBankCrashRecovery(config) {
   validateCrashConfiguration(config);
   const before = inputs(config);
-  assert.deepEqual(before.generated, json(config.buildReceipt).sourceAfter, 'generated files differ from successful build');
-  const compiled = json(config.buildReceipt.replace(/-app\.json$/, '-build-output.json'));
-  assert.equal(compiled.schemaVersion, 'bank-crash-build-output/v1');
-  assert.equal(compiled.buildReceiptSHA, sha(config.buildReceipt));
-  assert.equal(compiled.sourceReceiptSHA, sha(config.buildReceipt.replace(/-app\.json$/, '.json')));
-  assert.deepEqual(before.classpath, compiled.classpath, 'bytecode or dependency bytes differ from successful build');
+  const build = json(config.buildReceipt);
+  if (build.schemaVersion === 'bank-release-build/v2') {
+    assert.deepEqual(before.generated, build.source.generated);
+    assert.deepEqual(before.classpath, build.classpathInventory);
+  } else {
+    assert.deepEqual(before.generated, build.sourceAfter, 'generated files differ from successful build');
+    const compiled = json(config.buildReceipt.replace(/-app\.json$/, '-build-output.json'));
+    assert.equal(compiled.schemaVersion, 'bank-crash-build-output/v1');
+    assert.equal(compiled.buildReceiptSHA, sha(config.buildReceipt));
+    assert.equal(compiled.sourceReceiptSHA, sha(config.buildReceipt.replace(/-app\.json$/, '.json')));
+    assert.deepEqual(before.classpath, compiled.classpath, 'bytecode or dependency bytes differ from successful build');
+  }
   mkdirSync(config.ownedRoot, { mode: 0o700 });
   mkdirSync(join(config.ownedRoot, 'runs'), { mode: 0o700 });
   save(join(config.ownedRoot, 'inputs.json'), before);

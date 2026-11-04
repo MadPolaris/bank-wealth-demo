@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "bank-upstream-license-evidence/v1",
+  "component": "com.typesafe.sbt:sbt-twirl:1.5.1",
+  "license": "Apache-2.0",
+  "upstream": "https://github.com/playframework/twirl",
+  "tag": "1.5.1",
+  "commit": "d176bc29ac5af7ba2b57d45b0424a218136b6fff",
+  "files": {
+    "LICENSE": {
+      "file": "LICENSE",
+      "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+      "gitBlobSha1": "8dada3edaf50dbc082c9a125058f25def75e625a"
+    },
+    "README.md": {
+      "file": "README.md",
+      "sha256": "a53242ac290d6cf944ea55df3aae2c76942f0ec233312e42221e438e2cff501e",
+      "gitBlobSha1": "b620516a397987203208ee8a6b88c408dd2c9e45"
+    },
+    "build.sbt": {
+      "file": "build.sbt",
+      "sha256": "d72ac74862313c347509c9d55b393bc4ba4f55f6193d3cce31f054d64c1671b2",
+      "gitBlobSha1": "1f2e72d403a52aefc00fcc89fa9613995143bf58"
+    },
+    "sbt-twirl/src/main/scala/play/twirl/sbt/SbtTwirl.scala": {
+      "file": "sbt-twirl__src__main__scala__play__twirl__sbt__SbtTwirl.scala",
+      "sha256": "7f5f68b51e72f67afc29c8a60856427b681c681447d6a193116d9e0bb9451a01",
+      "gitBlobSha1": "1269cac38e2a1233dea3f29a19c0d72c6aeb83e7"
+    }
+  },
+  "requests": [
+    {
+      "url": "https://api.github.com/repos/playframework/twirl/git/ref/tags/1.5.1",
+      "file": "tag.json",
+      "sha256": "41599c84be6bc6165181130a20857bdbf05e26e696f72b827ddc10c7c7288109",
+      "bytes": 380,
+      "argv": [
+        "/usr/bin/curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--proto",
+        "=https",
+        "--max-time",
+        "40",
+        "https://api.github.com/repos/playframework/twirl/git/ref/tags/1.5.1"
+      ],
+      "pid": 88057,
+      "waited": true,
+      "exitCode": 0
+    },
+    {
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/d176bc29ac5af7ba2b57d45b0424a218136b6fff?recursive=1",
+      "file": "tree.json",
+      "sha256": "28739a1e75f4dd7b75401d52b9a2732620454e91ffd228f3948ef23fb70e0aac",
+      "bytes": 78847,
+      "argv": [
+        "/usr/bin/curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--proto",
+        "=https",
+        "--max-time",
+        "40",
+        "https://api.github.com/repos/playframework/twirl/git/trees/d176bc29ac5af7ba2b57d45b0424a218136b6fff?recursive=1"
+      ],
+      "pid": 88058,
+      "waited": true,
+      "exitCode": 0
+    },
+    {
+      "url": "https://raw.githubusercontent.com/playframework/twirl/d176bc29ac5af7ba2b57d45b0424a218136b6fff/LICENSE",
+      "file": "LICENSE",
+      "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+      "bytes": 11357,
+      "argv": [
+        "/usr/bin/curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--proto",
+        "=https",
+        "--max-time",
+        "40",
+        "https://raw.githubusercontent.com/playframework/twirl/d176bc29ac5af7ba2b57d45b0424a218136b6fff/LICENSE"
+      ],
+      "pid": 88088,
+      "waited": true,
+      "exitCode": 0
+    },
+    {
+      "url": "https://raw.githubusercontent.com/playframework/twirl/d176bc29ac5af7ba2b57d45b0424a218136b6fff/README.md",
+      "file": "README.md",
+      "sha256": "a53242ac290d6cf944ea55df3aae2c76942f0ec233312e42221e438e2cff501e",
+      "bytes": 3184,
+      "argv": [
+        "/usr/bin/curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--proto",
+        "=https",
+        "--max-time",
+        "40",
+        "https://raw.githubusercontent.com/playframework/twirl/d176bc29ac5af7ba2b57d45b0424a218136b6fff/README.md"
+      ],
+      "pid": 88089,
+      "waited": true,
+      "exitCode": 0
+    },
+    {
+      "url": "https://raw.githubusercontent.com/playframework/twirl/d176bc29ac5af7ba2b57d45b0424a218136b6fff/build.sbt",
+      "file": "build.sbt",
+      "sha256": "d72ac74862313c347509c9d55b393bc4ba4f55f6193d3cce31f054d64c1671b2",
+      "bytes": 7193,
+      "argv": [
+        "/usr/bin/curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--proto",
+        "=https",
+        "--max-time",
+        "40",
+        "https://raw.githubusercontent.com/playframework/twirl/d176bc29ac5af7ba2b57d45b0424a218136b6fff/build.sbt"
+      ],
+      "pid": 88092,
+      "waited": true,
+      "exitCode": 0
+    },
+    {
+      "url": "https://raw.githubusercontent.com/playframework/twirl/d176bc29ac5af7ba2b57d45b0424a218136b6fff/sbt-twirl/src/main/scala/play/twirl/sbt/SbtTwirl.scala",
+      "file": "sbt-twirl__src__main__scala__play__twirl__sbt__SbtTwirl.scala",
+      "sha256": "7f5f68b51e72f67afc29c8a60856427b681c681447d6a193116d9e0bb9451a01",
+      "bytes": 4514,
+      "argv": [
+        "/usr/bin/curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--proto",
+        "=https",
+        "--max-time",
+        "40",
+        "https://raw.githubusercontent.com/playframework/twirl/d176bc29ac5af7ba2b57d45b0424a218136b6fff/sbt-twirl/src/main/scala/play/twirl/sbt/SbtTwirl.scala"
+      ],
+      "pid": 88093,
+      "waited": true,
+      "exitCode": 0
+    }
+  ],
+  "licenseAndNoticePaths": [
+    "LICENSE"
+  ],
+  "localArtifacts": [
+    {
+      "path": "/Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/.scratch/p26-p32-bank-v1-59o__arv/supply-1068/ivy/com.typesafe.sbt/sbt-twirl/scala_2.12/sbt_1.0/1.5.1/ivys/ivy.xml",
+      "sha256": "0a07722322af5dd2ec4ab05fa609b7d38760e35068d09041ce4eee33ff5676ad"
+    },
+    {
+      "path": "/Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/.scratch/p26-p32-bank-v1-59o__arv/supply-1068/ivy/com.typesafe.sbt/sbt-twirl/scala_2.12/sbt_1.0/1.5.1/jars/sbt-twirl.jar",
+      "sha256": "4a89b353cba314d695750e33a8c9f862762cfde26ee7a9cedd073ec8a98de52e"
+    }
+  ],
+  "previousEvidence": {
+    "path": "/Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/.scratch/p26-p32-bank-v1-59o__arv/p32-supply-1065/TWIRL-LICENSE-CHECK-F.json",
+    "sha256": "0d6390331511ecdece32029f59ef7e1ddc9223aa974a56ab6690c665990e7d40"
+  },
+  "pluginSpecificEvidenceSatisfied": true,
+  "attribution": "Copyright (C) Lightbend Inc. <https://www.lightbend.com>",
+  "redistributionRequirements": [
+    "Include the Apache-2.0 license.",
+    "Retain applicable copyright and attribution notices.",
+    "Mark modifications if modifying upstream files.",
+    "Retain applicable NOTICE text if present in distributed material."
+  ],
+  "limits": [
+    "Source tag, module declaration and captured binary identity are linked; this is not reproducible binary provenance.",
+    "No separate NOTICE or plugin-specific license file appears in the complete pinned source tree.",
+    "This verifies license evidence, not legal approval or full release acceptance."
+  ],
+  "downloadedBuildDependencies": false,
+  "sourceEvidenceRetrieved": true,
+  "localDataUploaded": false,
+  "legalApproval": false,
+  "releaseAccepted": false
+}

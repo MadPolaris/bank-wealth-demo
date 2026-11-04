@@ -1,0 +1,1939 @@
+{
+  "sha": "d176bc29ac5af7ba2b57d45b0424a218136b6fff",
+  "url": "https://api.github.com/repos/playframework/twirl/git/trees/d176bc29ac5af7ba2b57d45b0424a218136b6fff",
+  "tree": [
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "86f0cae38569bff6fc392bf55a0247b3be080f52",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/86f0cae38569bff6fc392bf55a0247b3be080f52"
+    },
+    {
+      "path": ".github/settings.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b80ba89c7272afbc0e819067e4c89c703335570",
+      "size": 2970,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/1b80ba89c7272afbc0e819067e4c89c703335570"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3505924cc0f05b52c8b834053b9854e96b503cc6",
+      "size": 158,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/3505924cc0f05b52c8b834053b9854e96b503cc6"
+    },
+    {
+      "path": ".mergify.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1fe1e20355a9593dca1742da6aa01adebde20d25",
+      "size": 1410,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/1fe1e20355a9593dca1742da6aa01adebde20d25"
+    },
+    {
+      "path": ".scalafmt.conf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "28e415d58087dfe177fd00427f92160ba7a1b110",
+      "size": 536,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/28e415d58087dfe177fd00427f92160ba7a1b110"
+    },
+    {
+      "path": ".travis.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05edaea5995b49ec3233f7d31355d3619d47d829",
+      "size": 2301,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/05edaea5995b49ec3233f7d31355d3619d47d829"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "86ca2e4c4d30480d01bebf48228257902e607ab1",
+      "size": 10371,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/86ca2e4c4d30480d01bebf48228257902e607ab1"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8dada3edaf50dbc082c9a125058f25def75e625a",
+      "size": 11357,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/8dada3edaf50dbc082c9a125058f25def75e625a"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b620516a397987203208ee8a6b88c408dd2c9e45",
+      "size": 3184,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/b620516a397987203208ee8a6b88c408dd2c9e45"
+    },
+    {
+      "path": "api",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a542f242f46ca6d583520c5941cf94e03753581a",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/a542f242f46ca6d583520c5941cf94e03753581a"
+    },
+    {
+      "path": "api/shared",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b52f4ccce9cfad0f21d4a01b901a9ab0140957a6",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/b52f4ccce9cfad0f21d4a01b901a9ab0140957a6"
+    },
+    {
+      "path": "api/shared/src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4f55844ebe9bfd1d2ffba1e31f520c4dd494e633",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/4f55844ebe9bfd1d2ffba1e31f520c4dd494e633"
+    },
+    {
+      "path": "api/shared/src/main",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "aa296a47fd04a640a310c265a4ea2aaf6b636128",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/aa296a47fd04a640a310c265a4ea2aaf6b636128"
+    },
+    {
+      "path": "api/shared/src/main/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3bc8d47c1e9ef42e43bf64a0d05aa46dbebb9369",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/3bc8d47c1e9ef42e43bf64a0d05aa46dbebb9369"
+    },
+    {
+      "path": "api/shared/src/main/scala/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "32e6ceeaf4f049e1bac78521bbc5c042755e1e40",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/32e6ceeaf4f049e1bac78521bbc5c042755e1e40"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0ba0032e4641ad83b652f13e686e5f9277d0e229",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/0ba0032e4641ad83b652f13e686e5f9277d0e229"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2084ca32328fdc6073bfb56ffbd023e6af78d041",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/2084ca32328fdc6073bfb56ffbd023e6af78d041"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/BaseScalaTemplate.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4c946613818b1ddd9f7b662dc098e7ca2f32c5b0",
+      "size": 2139,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/4c946613818b1ddd9f7b662dc098e7ca2f32c5b0"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/Content.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fd527473c08739fc5bbd3e93e4cf8e8119a0fae2",
+      "size": 1778,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/fd527473c08739fc5bbd3e93e4cf8e8119a0fae2"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/Format.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7069ad0dc284f67f4d8ce9f5665299083a2046bb",
+      "size": 1036,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/7069ad0dc284f67f4d8ce9f5665299083a2046bb"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/Formats.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "06a57dac3dd278d887940fbf770835b4200fe6c5",
+      "size": 6812,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/06a57dac3dd278d887940fbf770835b4200fe6c5"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/Template.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6b08ca4963bda1bedfa2c1aea0942f63bc858cec",
+      "size": 4054,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/6b08ca4963bda1bedfa2c1aea0942f63bc858cec"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/TemplateMagic.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "45a3497bdf7e350d622f533d6c5219ce81db5bf5",
+      "size": 1510,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/45a3497bdf7e350d622f533d6c5219ce81db5bf5"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/TwirlFeatureImports.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34f7eb81c96709066401af3269e6a5a3c27de578",
+      "size": 1609,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/34f7eb81c96709066401af3269e6a5a3c27de578"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/TwirlHelperImports.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3b2554ed73c9d4f1e3d0b9640fb01472e9d48043",
+      "size": 931,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/3b2554ed73c9d4f1e3d0b9640fb01472e9d48043"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/package.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26e5c3b921253c815027b8d47aeab48aebf74256",
+      "size": 1377,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/26e5c3b921253c815027b8d47aeab48aebf74256"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/utils",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c0ce76c771476d04aab92f58dd1b7562a5d575c9",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/c0ce76c771476d04aab92f58dd1b7562a5d575c9"
+    },
+    {
+      "path": "api/shared/src/main/scala/play/twirl/api/utils/StringEscapeUtils.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b94d2c487fc108ab61a48540a5f4b4c2e01b99b0",
+      "size": 1630,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/b94d2c487fc108ab61a48540a5f4b4c2e01b99b0"
+    },
+    {
+      "path": "api/shared/src/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a8558595b2bd0e8005a07326a368fb7e2cda3687",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/a8558595b2bd0e8005a07326a368fb7e2cda3687"
+    },
+    {
+      "path": "api/shared/src/test/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7b474f72c52f6758d286758e5d6d4e54d304d455",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/7b474f72c52f6758d286758e5d6d4e54d304d455"
+    },
+    {
+      "path": "api/shared/src/test/scala/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "65d35ae818279fb16c43ef4f23626481709e74a7",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/65d35ae818279fb16c43ef4f23626481709e74a7"
+    },
+    {
+      "path": "api/shared/src/test/scala/play/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5aeeb7a57513735f0237e0b951450d8a3b50ba28",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/5aeeb7a57513735f0237e0b951450d8a3b50ba28"
+    },
+    {
+      "path": "api/shared/src/test/scala/play/twirl/api",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fcde5473a29dffe9904270524df0e895105dd52a",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/fcde5473a29dffe9904270524df0e895105dd52a"
+    },
+    {
+      "path": "api/shared/src/test/scala/play/twirl/api/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c6a0ac2f1f488d02aa7348beecc0df0702512082",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/c6a0ac2f1f488d02aa7348beecc0df0702512082"
+    },
+    {
+      "path": "api/shared/src/test/scala/play/twirl/api/test/BufferedContentSpec.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "43cba40fd99f66316ca7e840f0de55865312cf78",
+      "size": 2402,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/43cba40fd99f66316ca7e840f0de55865312cf78"
+    },
+    {
+      "path": "api/shared/src/test/scala/play/twirl/api/test/FormatSpec.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cff6ee5f74538d67b605d3c6bca1f41b84a79815",
+      "size": 1338,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/cff6ee5f74538d67b605d3c6bca1f41b84a79815"
+    },
+    {
+      "path": "api/shared/src/test/scala/play/twirl/api/test/StringInterpolationSpec.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f723c6b967a5a07d062760ad5f657e712620e4d",
+      "size": 1121,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/1f723c6b967a5a07d062760ad5f657e712620e4d"
+    },
+    {
+      "path": "build.sbt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f2e72d403a52aefc00fcc89fa9613995143bf58",
+      "size": 7193,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/1f2e72d403a52aefc00fcc89fa9613995143bf58"
+    },
+    {
+      "path": "compiler",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "101689f7a91897a10e65807898154800b8e74f6d",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/101689f7a91897a10e65807898154800b8e74f6d"
+    },
+    {
+      "path": "compiler/src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3160da95a9285f9358716a1eac186110d187a1a0",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/3160da95a9285f9358716a1eac186110d187a1a0"
+    },
+    {
+      "path": "compiler/src/main",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2d8c5037cdcabcde59d5c61b20b44ccc04a7553d",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/2d8c5037cdcabcde59d5c61b20b44ccc04a7553d"
+    },
+    {
+      "path": "compiler/src/main/java",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5ebe3cbff5a45d18790edc964e17676a2f565cbc",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/5ebe3cbff5a45d18790edc964e17676a2f565cbc"
+    },
+    {
+      "path": "compiler/src/main/java/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "276b55db43ffc96e5969b8b2a9d8b7b0c99aae52",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/276b55db43ffc96e5969b8b2a9d8b7b0c99aae52"
+    },
+    {
+      "path": "compiler/src/main/java/play/japi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4a5c712879ffa23174dee42c6ac8a322cd3813fd",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/4a5c712879ffa23174dee42c6ac8a322cd3813fd"
+    },
+    {
+      "path": "compiler/src/main/java/play/japi/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "919aba3c74daaf02d39c54700473824b02eafff0",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/919aba3c74daaf02d39c54700473824b02eafff0"
+    },
+    {
+      "path": "compiler/src/main/java/play/japi/twirl/compiler",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9f16dfcc8ee9f82825b252f5ef4473525bd2e923",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/9f16dfcc8ee9f82825b252f5ef4473525bd2e923"
+    },
+    {
+      "path": "compiler/src/main/java/play/japi/twirl/compiler/TwirlCompiler.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23fb470ad0a9c99bc3056aa903e18e1773cb865b",
+      "size": 2092,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/23fb470ad0a9c99bc3056aa903e18e1773cb865b"
+    },
+    {
+      "path": "compiler/src/main/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "123facd694a6955242f4fab0386dcc859b3a438a",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/123facd694a6955242f4fab0386dcc859b3a438a"
+    },
+    {
+      "path": "compiler/src/main/scala/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "978c6c4fa1eeb295213fd841ab11c0869d3031a0",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/978c6c4fa1eeb295213fd841ab11c0869d3031a0"
+    },
+    {
+      "path": "compiler/src/main/scala/play/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "504c0d10fa3bd948e219068d0542416e43034489",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/504c0d10fa3bd948e219068d0542416e43034489"
+    },
+    {
+      "path": "compiler/src/main/scala/play/twirl/compiler",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "aaae42d0ba0794842cb02621e8a9b66349cf388d",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/aaae42d0ba0794842cb02621e8a9b66349cf388d"
+    },
+    {
+      "path": "compiler/src/main/scala/play/twirl/compiler/TwirlCompiler.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f1b803fa22eb1b81c484f143608f6e84a58a6cf",
+      "size": 26384,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/9f1b803fa22eb1b81c484f143608f6e84a58a6cf"
+    },
+    {
+      "path": "compiler/src/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "327ba8910249ff4c4362e160accca906c0e17a01",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/327ba8910249ff4c4362e160accca906c0e17a01"
+    },
+    {
+      "path": "compiler/src/test/java",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7e35f8da66f0089a147c7cdca3583e66c66f6cde",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/7e35f8da66f0089a147c7cdca3583e66c66f6cde"
+    },
+    {
+      "path": "compiler/src/test/java/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b97fe0fc072c8455dea10f819f906588c38de78f",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/b97fe0fc072c8455dea10f819f906588c38de78f"
+    },
+    {
+      "path": "compiler/src/test/java/play/japi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ae0251973cf96650d9ecfb44ee40e6f2c85f25bc",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/ae0251973cf96650d9ecfb44ee40e6f2c85f25bc"
+    },
+    {
+      "path": "compiler/src/test/java/play/japi/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9a04ebf4a8e6f0d978e03d48e541d8bb69101776",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/9a04ebf4a8e6f0d978e03d48e541d8bb69101776"
+    },
+    {
+      "path": "compiler/src/test/java/play/japi/twirl/compiler",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8669fd7fd89287397c5ad48e26a12bd6307ed23a",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/8669fd7fd89287397c5ad48e26a12bd6307ed23a"
+    },
+    {
+      "path": "compiler/src/test/java/play/japi/twirl/compiler/TwirlCompilerTest.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e89e9692b5b170268c91f7730525a99c39e76fb8",
+      "size": 2044,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e89e9692b5b170268c91f7730525a99c39e76fb8"
+    },
+    {
+      "path": "compiler/src/test/resources",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f64c0cc1bb7086b104e123e1cecc555ef4405f96",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/f64c0cc1bb7086b104e123e1cecc555ef4405f96"
+    },
+    {
+      "path": "compiler/src/test/resources/argImports.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "161c4e77fd0563e81b709ce786634376c300edfc",
+      "size": 179,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/161c4e77fd0563e81b709ce786634376c300edfc"
+    },
+    {
+      "path": "compiler/src/test/resources/blockWithNestedTuple.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d1adf917cab52bd4e0d3c91de20d7805aa4ae053",
+      "size": 95,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/d1adf917cab52bd4e0d3c91de20d7805aa4ae053"
+    },
+    {
+      "path": "compiler/src/test/resources/blockWithTuple.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da81c4a9ea4b1a96abbbe04729824d4ff36e762d",
+      "size": 73,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/da81c4a9ea4b1a96abbbe04729824d4ff36e762d"
+    },
+    {
+      "path": "compiler/src/test/resources/elseIf.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0a21ff5be430f0bd3419da8895282d839a403e2e",
+      "size": 97,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/0a21ff5be430f0bd3419da8895282d839a403e2e"
+    },
+    {
+      "path": "compiler/src/test/resources/error.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "229faaa70abb7772fdcefa80b61a474b3098a721",
+      "size": 23,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/229faaa70abb7772fdcefa80b61a474b3098a721"
+    },
+    {
+      "path": "compiler/src/test/resources/escapebrace.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "836c7020dabc32495dc52c3556b50628acdeb9a6",
+      "size": 52,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/836c7020dabc32495dc52c3556b50628acdeb9a6"
+    },
+    {
+      "path": "compiler/src/test/resources/existential.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b8e798009597e680605ecf84e488287acc92bd61",
+      "size": 23,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/b8e798009597e680605ecf84e488287acc92bd61"
+    },
+    {
+      "path": "compiler/src/test/resources/hello.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f605f3fa383f8832ababa4c5bf751f52418bc8f",
+      "size": 54,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/0f605f3fa383f8832ababa4c5bf751f52418bc8f"
+    },
+    {
+      "path": "compiler/src/test/resources/helloNull.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1073fd209fabe2990299e5fa1e2c6f5748e22d1b",
+      "size": 39,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/1073fd209fabe2990299e5fa1e2c6f5748e22d1b"
+    },
+    {
+      "path": "compiler/src/test/resources/htmlInner.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a2202e0c4c39bb550cd5c5549d5f98ed7f4ff545",
+      "size": 285,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/a2202e0c4c39bb550cd5c5549d5f98ed7f4ff545"
+    },
+    {
+      "path": "compiler/src/test/resources/htmlParam.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da74d9d086d4a4f39851cad048e2d972c0722670",
+      "size": 36,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/da74d9d086d4a4f39851cad048e2d972c0722670"
+    },
+    {
+      "path": "compiler/src/test/resources/ifWithoutBrackets.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "239d9613acfb407fb02a80bc81ad0e40f44f9c2d",
+      "size": 104,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/239d9613acfb407fb02a80bc81ad0e40f44f9c2d"
+    },
+    {
+      "path": "compiler/src/test/resources/ifWithoutBracketsComplex.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85df1e789a0b5b5f76918dca579de7f3548bec8e",
+      "size": 339,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/85df1e789a0b5b5f76918dca579de7f3548bec8e"
+    },
+    {
+      "path": "compiler/src/test/resources/importsDefault.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e3656b76024a2bd6e595567477704754f50ffb94",
+      "size": 18,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e3656b76024a2bd6e595567477704754f50ffb94"
+    },
+    {
+      "path": "compiler/src/test/resources/inject.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cada77cc50d4f52271089568ccba5d4da6092fd7",
+      "size": 48,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/cada77cc50d4f52271089568ccba5d4da6092fd7"
+    },
+    {
+      "path": "compiler/src/test/resources/injectComments.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ffc9841888df934c4194c261722f0b2b4b714a70",
+      "size": 188,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/ffc9841888df934c4194c261722f0b2b4b714a70"
+    },
+    {
+      "path": "compiler/src/test/resources/injectNoArgs.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2130263e8ac5c25ed3ed25e875a90d150103fcb7",
+      "size": 25,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/2130263e8ac5c25ed3ed25e875a90d150103fcb7"
+    },
+    {
+      "path": "compiler/src/test/resources/injectParamGroups.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a9419cdd18e75e2a9af9428165bba607adbfcd7a",
+      "size": 71,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/a9419cdd18e75e2a9af9428165bba607adbfcd7a"
+    },
+    {
+      "path": "compiler/src/test/resources/long.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "92432370bc62e3ae7a55d1876e92b38f75c07d9c",
+      "size": 87051,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/92432370bc62e3ae7a55d1876e92b38f75c07d9c"
+    },
+    {
+      "path": "compiler/src/test/resources/patternMatching.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6db730aca83c6d7a30bcb9a68d404649b434da1d",
+      "size": 431,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/6db730aca83c6d7a30bcb9a68d404649b434da1d"
+    },
+    {
+      "path": "compiler/src/test/resources/real.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a2202e0c4c39bb550cd5c5549d5f98ed7f4ff545",
+      "size": 285,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/a2202e0c4c39bb550cd5c5549d5f98ed7f4ff545"
+    },
+    {
+      "path": "compiler/src/test/resources/set.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "458071bc27fa38935f661ca77b11431f5c4d3d6d",
+      "size": 61,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/458071bc27fa38935f661ca77b11431f5c4d3d6d"
+    },
+    {
+      "path": "compiler/src/test/resources/static.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dedbd68c128cdd50d51a46d6628a03fb968f2e44",
+      "size": 17,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/dedbd68c128cdd50d51a46d6628a03fb968f2e44"
+    },
+    {
+      "path": "compiler/src/test/resources/triplequotes.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f99faa3251fa2d832f4b7733127a5e299fb5ea5",
+      "size": 18,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/6f99faa3251fa2d832f4b7733127a5e299fb5ea5"
+    },
+    {
+      "path": "compiler/src/test/resources/utf8.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "59133aa455620c2b855415ad76e5d92f5ec8261f",
+      "size": 15,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/59133aa455620c2b855415ad76e5d92f5ec8261f"
+    },
+    {
+      "path": "compiler/src/test/resources/varArgsExistential.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f0ed4496b2af6ad69caccba71539d4a710892cbe",
+      "size": 40,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/f0ed4496b2af6ad69caccba71539d4a710892cbe"
+    },
+    {
+      "path": "compiler/src/test/resources/zipWithIndex.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f23564ea59df49e12e68d712cc2c918c5ebdc970",
+      "size": 95,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/f23564ea59df49e12e68d712cc2c918c5ebdc970"
+    },
+    {
+      "path": "compiler/src/test/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "82d373ac5db2fb4345a92eeeeeb2965e0defe513",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/82d373ac5db2fb4345a92eeeeeb2965e0defe513"
+    },
+    {
+      "path": "compiler/src/test/scala/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b6ba2769962e9a304deac580bdb609c99c7bcfb0",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/b6ba2769962e9a304deac580bdb609c99c7bcfb0"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "79e436d34e9df20ce478d71654930a6039ffa463",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/79e436d34e9df20ce478d71654930a6039ffa463"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl/compiler",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7b0c59f4f7f66f3ac094df3dbe01632d910b73df",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/7b0c59f4f7f66f3ac094df3dbe01632d910b73df"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl/compiler/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e86fd6d828d867c54bedb5b001f6bef37adb821c",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/e86fd6d828d867c54bedb5b001f6bef37adb821c"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl/compiler/test/Benchmark.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "328970443053396aa68a541e06a5684478cee332",
+      "size": 1527,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/328970443053396aa68a541e06a5684478cee332"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl/compiler/test/CompilerSpec.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8d81f9dc0dd94b1d85839ae0d5873d9670e1825",
+      "size": 14102,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/a8d81f9dc0dd94b1d85839ae0d5873d9670e1825"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl/compiler/test/TemplateUtilsSpec.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6b07f491128a8967a7605a5d0f489ab1f2c88b9b",
+      "size": 1816,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/6b07f491128a8967a7605a5d0f489ab1f2c88b9b"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl/compiler/test/imports",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fc4884812383a83284e2aef8a3e0dc99b2bf4ad6",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/fc4884812383a83284e2aef8a3e0dc99b2bf4ad6"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl/compiler/test/imports/bar",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "26ac60c97e593a1146dfb1f14699d9cb58982548",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/26ac60c97e593a1146dfb1f14699d9cb58982548"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl/compiler/test/imports/bar/Default.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5f9948a41f60dd1cd5cb094d7ffdd3acd8a70a7b",
+      "size": 162,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/5f9948a41f60dd1cd5cb094d7ffdd3acd8a70a7b"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl/compiler/test/imports/foo",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "de2c1ff8e94d09547d396a478190f7c7ada55c68",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/de2c1ff8e94d09547d396a478190f7c7ada55c68"
+    },
+    {
+      "path": "compiler/src/test/scala/play/twirl/compiler/test/imports/foo/Default.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b75d67d2bf19c1336a2520bd8bb28e3f373e55e",
+      "size": 162,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/7b75d67d2bf19c1336a2520bd8bb28e3f373e55e"
+    },
+    {
+      "path": "docs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4376db4e5962539c2aee7779cd8c7bda76568ceb",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/4376db4e5962539c2aee7779cd8c7bda76568ceb"
+    },
+    {
+      "path": "docs/build.sbt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da3f493a3c8e3dcad76940e7feb79b70ee61c1a8",
+      "size": 1948,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/da3f493a3c8e3dcad76940e7feb79b70ee61c1a8"
+    },
+    {
+      "path": "docs/manual",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cdc0c0132a324070ead4f9fd86790c12e09400f3",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/cdc0c0132a324070ead4f9fd86790c12e09400f3"
+    },
+    {
+      "path": "docs/manual/working",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5f4b57538bc5fad8781b4d3b241b611cf772f604",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/5f4b57538bc5fad8781b4d3b241b611cf772f604"
+    },
+    {
+      "path": "docs/manual/working/javaGuide",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9d03508929743aeefec9ea5ae25d6c117798dd64",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/9d03508929743aeefec9ea5ae25d6c117798dd64"
+    },
+    {
+      "path": "docs/manual/working/javaGuide/main",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "73667f98ecd1b2342dd4ee07f958c889d693a94c",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/73667f98ecd1b2342dd4ee07f958c889d693a94c"
+    },
+    {
+      "path": "docs/manual/working/javaGuide/main/templates",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "bd67df010798423a68744d8e0bf4fc2fe58bb8c9",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/bd67df010798423a68744d8e0bf4fc2fe58bb8c9"
+    },
+    {
+      "path": "docs/manual/working/javaGuide/main/templates/JavaCustomTemplateFormat.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f8e8860f1421508369ec1d2951dec589d884a382",
+      "size": 3566,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/f8e8860f1421508369ec1d2951dec589d884a382"
+    },
+    {
+      "path": "docs/manual/working/javaGuide/main/templates/JavaTemplateUseCases.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "70b38a3ef47652d0f8e8654848668870fea2db5d",
+      "size": 3800,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/70b38a3ef47652d0f8e8654848668870fea2db5d"
+    },
+    {
+      "path": "docs/manual/working/javaGuide/main/templates/JavaTemplates.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e0f9a72f7e37ab7219f4807fd2f964fdb7c1b66",
+      "size": 8646,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/6e0f9a72f7e37ab7219f4807fd2f964fdb7c1b66"
+    },
+    {
+      "path": "docs/manual/working/javaGuide/main/templates/JavaTemplatesDependencyInjection.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4b5c7d2b93c84aa24595b5ef0d4e2cf557ee25ef",
+      "size": 1797,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/4b5c7d2b93c84aa24595b5ef0d4e2cf557ee25ef"
+    },
+    {
+      "path": "docs/manual/working/javaGuide/main/templates/images",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c2caa5057ca4f9b274fcb9d76d1ceb18f335ea12",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/c2caa5057ca4f9b274fcb9d76d1ceb18f335ea12"
+    },
+    {
+      "path": "docs/manual/working/javaGuide/main/templates/images/templatesError.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7e7f500039d2f79fc827a18df5d943bde113b4a9",
+      "size": 65910,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/7e7f500039d2f79fc827a18df5d943bde113b4a9"
+    },
+    {
+      "path": "docs/manual/working/javaGuide/main/templates/index.toc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a582d68c6cd77218309196830ed8fa8932cc13fc",
+      "size": 177,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/a582d68c6cd77218309196830ed8fa8932cc13fc"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6c175ae8a622c1dba5c3041564f865257fbce8b3",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/6c175ae8a622c1dba5c3041564f865257fbce8b3"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a30024ce70995882a96d279e894c3d9013ed2e87",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/a30024ce70995882a96d279e894c3d9013ed2e87"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "38c8498ca2af51ae2459fd6f4cde330b5cbad0b2",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/38c8498ca2af51ae2459fd6f4cde330b5cbad0b2"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/ScalaCustomTemplateFormat.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "19fe1814f035687133b0567e1c7c320dd8a060db",
+      "size": 4615,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/19fe1814f035687133b0567e1c7c320dd8a060db"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/ScalaTemplateUseCases.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b09649b5b91722d0a73aa712cb91c132016eed53",
+      "size": 3811,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/b09649b5b91722d0a73aa712cb91c132016eed53"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/ScalaTemplates.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8ad703c255238711d5284d93f6e9c434e38ac4d",
+      "size": 8100,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/a8ad703c255238711d5284d93f6e9c434e38ac4d"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/ScalaTemplatesDependencyInjection.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dcca46b1dbf4418a2d80bb4f8f7ae8d3e431f112",
+      "size": 1738,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/dcca46b1dbf4418a2d80bb4f8f7ae8d3e431f112"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7be56d267e8f9534291af1d5f77c57f85a776e56",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/7be56d267e8f9534291af1d5f77c57f85a776e56"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/AbsoluteImportTester.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1fdad76a260f0467937dc1f2fc92380d6f7eac7c",
+      "size": 171,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/1fdad76a260f0467937dc1f2fc92380d6f7eac7c"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/ScalaTemplates.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a8a5a66182ab8aeb007826a2b28059fc8a168aa",
+      "size": 4449,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/5a8a5a66182ab8aeb007826a2b28059fc8a168aa"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5063aac3c0ccde3dfb907e04dde3379b8c19fb8a",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/5063aac3c0ccde3dfb907e04dde3379b8c19fb8a"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "16528dba84d265689beb00d31de5ec90bb3ec57c",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/16528dba84d265689beb00d31de5ec90bb3ec57c"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/constructor.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "174d48972e0b74c121eb41c7ec3b3493674c9fd7",
+      "size": 177,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/174d48972e0b74c121eb41c7ec3b3493674c9fd7"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/curriedParameters.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0ee0d33865ca9dc02d1b78d50ebc6ba8478d07d4",
+      "size": 94,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/0ee0d33865ca9dc02d1b78d50ebc6ba8478d07d4"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/defaultParameters.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b44853e703dfe14e266bcbe3b4419641664866a1",
+      "size": 85,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/b44853e703dfe14e266bcbe3b4419641664866a1"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/displayScalaTypes.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a37f5614a771f6e5eaffbc9b420fdafa6c04b4c",
+      "size": 308,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/6a37f5614a771f6e5eaffbc9b420fdafa6c04b4c"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/firstLineComment.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b0e8a4b123ff0d584f49f4c25631556d50ebc764",
+      "size": 253,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/b0e8a4b123ff0d584f49f4c25631556d50ebc764"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/importStatement.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "abf750b49b2b668b2a04e8668a624dc5bca23197",
+      "size": 243,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/abf750b49b2b668b2a04e8668a624dc5bca23197"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/simpleParameters.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "144f89c048d2e7dd74db5e15dde02bec0361d4be",
+      "size": 143,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/144f89c048d2e7dd74db5e15dde02bec0361d4be"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/snippets.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ce9ab0ea3c5a06273af0a3e634c882c4ab5da1c4",
+      "size": 1217,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/ce9ab0ea3c5a06273af0a3e634c882c4ab5da1c4"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/views",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e3d962b9f38265398d1416b36aaca6f36844ede5",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/e3d962b9f38265398d1416b36aaca6f36844ede5"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/views/Application",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5ece52369ae17e3fc87ab801b1b5bf8acc2e3d74",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/5ece52369ae17e3fc87ab801b1b5bf8acc2e3d74"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/code/scalaguide/templates/views/Application/index.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a19c48593997a161eb4973716fbd8b5ae020988",
+      "size": 217,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/5a19c48593997a161eb4973716fbd8b5ae020988"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/images",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "28b9f041bd9a4876dea3ef866a197781153ad1cf",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/28b9f041bd9a4876dea3ef866a197781153ad1cf"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/images/displayScalaTypes.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d519a593c946556634524194ec086033ce429537",
+      "size": 71909,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/d519a593c946556634524194ec086033ce429537"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/images/templatesError.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7e7f500039d2f79fc827a18df5d943bde113b4a9",
+      "size": 65910,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/7e7f500039d2f79fc827a18df5d943bde113b4a9"
+    },
+    {
+      "path": "docs/manual/working/scalaGuide/main/templates/index.toc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0fd987fa79c9c70c3266fae9580d18d00c7202ce",
+      "size": 180,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/0fd987fa79c9c70c3266fae9580d18d00c7202ce"
+    },
+    {
+      "path": "docs/project",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fadb71d9f9816b5bf9ef14ba4990e30e499d9008",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/fadb71d9f9816b5bf9ef14ba4990e30e499d9008"
+    },
+    {
+      "path": "docs/project/build.properties",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0837f7a132de5da231fd78602c0d9bf929345545",
+      "size": 19,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/0837f7a132de5da231fd78602c0d9bf929345545"
+    },
+    {
+      "path": "docs/project/plugins.sbt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "581c290efb0d7d8a470473a5f707609fc3fb23bb",
+      "size": 451,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/581c290efb0d7d8a470473a5f707609fc3fb23bb"
+    },
+    {
+      "path": "parser",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "683847f2fbf26c80671bfc01058d86119d7d9a46",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/683847f2fbf26c80671bfc01058d86119d7d9a46"
+    },
+    {
+      "path": "parser/src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "246b2b71982a354805e5d425eed37b813a5c5966",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/246b2b71982a354805e5d425eed37b813a5c5966"
+    },
+    {
+      "path": "parser/src/main",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a0d1136889b716c485d59c4d36bff15374ec338a",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/a0d1136889b716c485d59c4d36bff15374ec338a"
+    },
+    {
+      "path": "parser/src/main/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3578dd0a28066be342361453924cc051fca2d7ef",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/3578dd0a28066be342361453924cc051fca2d7ef"
+    },
+    {
+      "path": "parser/src/main/scala/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ec7e6e18cbc6574a2d69542c24db8bbcd73d4973",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/ec7e6e18cbc6574a2d69542c24db8bbcd73d4973"
+    },
+    {
+      "path": "parser/src/main/scala/play/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "516991f68a8a52fe9eea500b1850ba8570495815",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/516991f68a8a52fe9eea500b1850ba8570495815"
+    },
+    {
+      "path": "parser/src/main/scala/play/twirl/parser",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e145bde142a15ea73c7228a2299c7e134379dd7e",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/e145bde142a15ea73c7228a2299c7e134379dd7e"
+    },
+    {
+      "path": "parser/src/main/scala/play/twirl/parser/TreeNodes.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd76310928947a63c04be2ccd632d11832c5f322",
+      "size": 1633,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/bd76310928947a63c04be2ccd632d11832c5f322"
+    },
+    {
+      "path": "parser/src/main/scala/play/twirl/parser/TwirlIO.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ea717dcd946ddd8e2a4bb2c0e5836019c5cf7ccd",
+      "size": 2575,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/ea717dcd946ddd8e2a4bb2c0e5836019c5cf7ccd"
+    },
+    {
+      "path": "parser/src/main/scala/play/twirl/parser/TwirlParser.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bef7e2c34910364471d48bf1614bfb506d84cf96",
+      "size": 30882,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/bef7e2c34910364471d48bf1614bfb506d84cf96"
+    },
+    {
+      "path": "parser/src/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "071e8b3ad899262fd20bc229941dda34dbe8e63c",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/071e8b3ad899262fd20bc229941dda34dbe8e63c"
+    },
+    {
+      "path": "parser/src/test/resources",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7514dbb39ee0e328db1c2f13dac739edf6c5ec2e",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/7514dbb39ee0e328db1c2f13dac739edf6c5ec2e"
+    },
+    {
+      "path": "parser/src/test/resources/case.scala.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5f6e2b6d3766a3fd8e0ef2c4074f9098b9d0588",
+      "size": 154,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/d5f6e2b6d3766a3fd8e0ef2c4074f9098b9d0588"
+    },
+    {
+      "path": "parser/src/test/resources/complicated.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc4ed456b6f5e669ee664f11eb8682a171fa4347",
+      "size": 398,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/dc4ed456b6f5e669ee664f11eb8682a171fa4347"
+    },
+    {
+      "path": "parser/src/test/resources/elseIf.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b2d5a7f3042e5f63ca951e0633784a463c6ea09",
+      "size": 136,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/5b2d5a7f3042e5f63ca951e0633784a463c6ea09"
+    },
+    {
+      "path": "parser/src/test/resources/imports.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7deb2f6dffcb4ddef0a50fa9519e56edd605df7e",
+      "size": 181,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/7deb2f6dffcb4ddef0a50fa9519e56edd605df7e"
+    },
+    {
+      "path": "parser/src/test/resources/invalidAt.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4e413ae44e4d56ab09a89e85b7f23f4f7fbd081f",
+      "size": 140,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/4e413ae44e4d56ab09a89e85b7f23f4f7fbd081f"
+    },
+    {
+      "path": "parser/src/test/resources/simple.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c4769a9f57c6022ba94e1c8dd2131f87d7b72340",
+      "size": 128,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/c4769a9f57c6022ba94e1c8dd2131f87d7b72340"
+    },
+    {
+      "path": "parser/src/test/resources/static.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dedbd68c128cdd50d51a46d6628a03fb968f2e44",
+      "size": 17,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/dedbd68c128cdd50d51a46d6628a03fb968f2e44"
+    },
+    {
+      "path": "parser/src/test/resources/unclosedBracket.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "753010c33ad2c5293f441a935199cf17f6a86884",
+      "size": 126,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/753010c33ad2c5293f441a935199cf17f6a86884"
+    },
+    {
+      "path": "parser/src/test/resources/unclosedBracket2.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23f075e908ab0772efad8ffbfb39b8212370a8eb",
+      "size": 370,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/23f075e908ab0772efad8ffbfb39b8212370a8eb"
+    },
+    {
+      "path": "parser/src/test/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "522e563142857615b92b891d07b984f81b46d43f",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/522e563142857615b92b891d07b984f81b46d43f"
+    },
+    {
+      "path": "parser/src/test/scala/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b807470192c1968a93be29fa173c5f8d38b7a8f9",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/b807470192c1968a93be29fa173c5f8d38b7a8f9"
+    },
+    {
+      "path": "parser/src/test/scala/play/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a080bca5950f1c7b41910a9972fadbf386de9c63",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/a080bca5950f1c7b41910a9972fadbf386de9c63"
+    },
+    {
+      "path": "parser/src/test/scala/play/twirl/parser",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5fceae0110903c814598f2259fb55c26751ed904",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/5fceae0110903c814598f2259fb55c26751ed904"
+    },
+    {
+      "path": "parser/src/test/scala/play/twirl/parser/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6f3ae76308b8e1d04e3810eec3b3a11437e57ee9",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/6f3ae76308b8e1d04e3810eec3b3a11437e57ee9"
+    },
+    {
+      "path": "parser/src/test/scala/play/twirl/parser/test/ParserSpec.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b746c39161694d9d05eed8be5a8ed22ecac42207",
+      "size": 7826,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/b746c39161694d9d05eed8be5a8ed22ecac42207"
+    },
+    {
+      "path": "project",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ca46c58deaa5f593cf470f145541dbc57d392b96",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/ca46c58deaa5f593cf470f145541dbc57d392b96"
+    },
+    {
+      "path": "project/build.properties",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0837f7a132de5da231fd78602c0d9bf929345545",
+      "size": 19,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/0837f7a132de5da231fd78602c0d9bf929345545"
+    },
+    {
+      "path": "project/plugins.sbt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9af8e99e5e6c667d3a054eb8cf31152f46de096d",
+      "size": 507,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/9af8e99e5e6c667d3a054eb8cf31152f46de096d"
+    },
+    {
+      "path": "sbt-twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "95cb4ba2f87a167ce97511075af200187776ade4",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/95cb4ba2f87a167ce97511075af200187776ade4"
+    },
+    {
+      "path": "sbt-twirl/src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "04c3d702d3601fe3af1c841dc20a753335533516",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/04c3d702d3601fe3af1c841dc20a753335533516"
+    },
+    {
+      "path": "sbt-twirl/src/main",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "db84b39834e9c6136d1fcf6a5fd9e361310f8ccf",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/db84b39834e9c6136d1fcf6a5fd9e361310f8ccf"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-0.13",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fa4e09e8e8c85a1e16bb3bfa953595eec5e01f04",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/fa4e09e8e8c85a1e16bb3bfa953595eec5e01f04"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-0.13/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "779073dfc8afc8ef7ae75a7bb9cea833e1175c35",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/779073dfc8afc8ef7ae75a7bb9cea833e1175c35"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-0.13/play/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "64852839c3c5cbe3bc01df0aeeb042dec21283e9",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/64852839c3c5cbe3bc01df0aeeb042dec21283e9"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-0.13/play/twirl/sbt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1237fad831dd1d735950c7a2c29f7e8880e641e1",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/1237fad831dd1d735950c7a2c29f7e8880e641e1"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-0.13/play/twirl/sbt/SbtTwirlCompat.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3e9b851ae67b8a7ebdf6d5a4aef1c58252d0fa94",
+      "size": 328,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/3e9b851ae67b8a7ebdf6d5a4aef1c58252d0fa94"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-0.13/play/twirl/sbt/TemplateCompilerErrorHandler.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1970cde62ddfa72e00fa791b22a8776a98b9563c",
+      "size": 676,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/1970cde62ddfa72e00fa791b22a8776a98b9563c"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-0.13/play/twirl/sbt/TemplateProblem.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2dc5f46b70ae02dbe2cfaf8ca9af3fb877232850",
+      "size": 4724,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/2dc5f46b70ae02dbe2cfaf8ca9af3fb877232850"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-1.0",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "386f081bbf5352bced0b7ef6ea3c7c4e9385c910",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/386f081bbf5352bced0b7ef6ea3c7c4e9385c910"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-1.0/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7025336a0914419cded942033f44dd3aeb5c78c8",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/7025336a0914419cded942033f44dd3aeb5c78c8"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-1.0/play/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "97e9bd8f9e3bdc22e707929252a6b2bcc0136cf3",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/97e9bd8f9e3bdc22e707929252a6b2bcc0136cf3"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-1.0/play/twirl/sbt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7049970ad8f158fd4bfc7b776c1ccaaef7e0066",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/d7049970ad8f158fd4bfc7b776c1ccaaef7e0066"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-1.0/play/twirl/sbt/SbtTwirlCompat.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2503017b501a4f0ab019f9d6fddfab50b0c8f625",
+      "size": 471,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/2503017b501a4f0ab019f9d6fddfab50b0c8f625"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-1.0/play/twirl/sbt/TemplateCompilerErrorHandler.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26ca106294aa8c43a92baeda376a3f6e55bdbbb7",
+      "size": 673,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/26ca106294aa8c43a92baeda376a3f6e55bdbbb7"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala-sbt-1.0/play/twirl/sbt/TemplateProblem.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf81f6da835722689d15d73a9d16b0dff575c3b4",
+      "size": 5128,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/bf81f6da835722689d15d73a9d16b0dff575c3b4"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "35f8c449bdc1eab58c8da2e6ab630993da72f288",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/35f8c449bdc1eab58c8da2e6ab630993da72f288"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3387d586e2fb03339ff225377ae8149220bee640",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/3387d586e2fb03339ff225377ae8149220bee640"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala/play/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f8c567d8b2b5f6968bb000c8478ebd4a282abf9a",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/f8c567d8b2b5f6968bb000c8478ebd4a282abf9a"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala/play/twirl/sbt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "06beb7fb36c054634a62029194012fb3baa1bc7f",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/06beb7fb36c054634a62029194012fb3baa1bc7f"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala/play/twirl/sbt/SbtTwirl.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1269cac38e2a1233dea3f29a19c0d72c6aeb83e7",
+      "size": 4514,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/1269cac38e2a1233dea3f29a19c0d72c6aeb83e7"
+    },
+    {
+      "path": "sbt-twirl/src/main/scala/play/twirl/sbt/TemplateCompiler.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe569844c45f6ec4870955d384e3047bd07dfe33",
+      "size": 2712,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/fe569844c45f6ec4870955d384e3047bd07dfe33"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5aa7f34542b5bd35e256df31742fd0c57cde4287",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/5aa7f34542b5bd35e256df31742fd0c57cde4287"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c4f6102a3b8504bebed8e1d23533c961bf30ea64",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/c4f6102a3b8504bebed8e1d23533c961bf30ea64"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ee9c6fb59a89e4d994369e334a3ca4af237312f5",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/ee9c6fb59a89e4d994369e334a3ca4af237312f5"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/build.sbt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3d50b8810b2ecde7fc2fd287f41231eb296644e5",
+      "size": 416,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/3d50b8810b2ecde7fc2fd287f41231eb296644e5"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/project",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1b6cd4062e9b2adb1fbcebc64ed3ad32158f474c",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/1b6cd4062e9b2adb1fbcebc64ed3ad32158f474c"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/project/plugins.sbt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "631d5883a1f0c630e14c9a03e03c93d8843b264f",
+      "size": 78,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/631d5883a1f0c630e14c9a03e03c93d8843b264f"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ead9cda3735eb863000435ccbb25a29815f2542b",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/ead9cda3735eb863000435ccbb25a29815f2542b"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/main",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "58d27af53808fc527995cbd51354abc813f857e8",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/58d27af53808fc527995cbd51354abc813f857e8"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/main/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "20188478edee6298020adc99ce025b36bf282b6e",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/20188478edee6298020adc99ce025b36bf282b6e"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/main/scala/bar",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fd6923cf2537e1b05735f727a0f8290e36ee1898",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/fd6923cf2537e1b05735f727a0f8290e36ee1898"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/main/scala/bar/Default.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/main/scala/foo",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fd6923cf2537e1b05735f727a0f8290e36ee1898",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/fd6923cf2537e1b05735f727a0f8290e36ee1898"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/main/scala/foo/Default.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/main/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3400e8fca8a62ac8426144ac0cdb29b1c26d59aa",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/3400e8fca8a62ac8426144ac0cdb29b1c26d59aa"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/main/twirl/a",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "20d25b7521ca8f1241f70541a92706b399d54ee0",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/20d25b7521ca8f1241f70541a92706b399d54ee0"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/main/twirl/a/b",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7436759454ebe7766b21b8b09e22e2befc7e8d18",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/7436759454ebe7766b21b8b09e22e2befc7e8d18"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/main/twirl/a/b/c.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4015c616cdf7582d5c482e2437c7ae8f3b9704a3",
+      "size": 30,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/4015c616cdf7582d5c482e2437c7ae8f3b9704a3"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e8b0327623c546d9dff22fedc7bef8c8cef30025",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/e8b0327623c546d9dff22fedc7bef8c8cef30025"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/test/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "219d0f3dd5247e1f2296f9d71aa73602756d53c1",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/219d0f3dd5247e1f2296f9d71aa73602756d53c1"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/test/scala/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "39dc610a09585b02b9f1cf65e6c21a75e58b1cd6",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/39dc610a09585b02b9f1cf65e6c21a75e58b1cd6"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/test/scala/test/Test.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24c31da3fd2d4c540b907e7915b66db4167a5095",
+      "size": 329,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/24c31da3fd2d4c540b907e7915b66db4167a5095"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/test/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9dbe8b7ffb86f0c748f8351674fb95bdef1a4550",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/9dbe8b7ffb86f0c748f8351674fb95bdef1a4550"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/test/twirl/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e3af817479e4ec57b4403bc45d1c7528b86b284d",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/e3af817479e4ec57b4403bc45d1c7528b86b284d"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/test/twirl/test/importshadow.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/test/twirl/test/shadow.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/src/test/twirl/test/template.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ebed4021a0a0ea47be2fb6edede68d89c7beb25a",
+      "size": 24,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/ebed4021a0a0ea47be2fb6edede68d89c7beb25a"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/compile/test",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cce08f68a86017e896e0e60921341e4b47e36aec",
+      "size": 11,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/cce08f68a86017e896e0e60921341e4b47e36aec"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "455fe9bbe3f554a5df1ee80f0b6ed5818c39541e",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/455fe9bbe3f554a5df1ee80f0b6ed5818c39541e"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/build.sbt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "27c818c4e249495f7aa2a4b352c74399aac9107e",
+      "size": 199,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/27c818c4e249495f7aa2a4b352c74399aac9107e"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/project",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "eb2a2f5f1ffd9750a502dc3a36811f8e7cbf0aa3",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/eb2a2f5f1ffd9750a502dc3a36811f8e7cbf0aa3"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/project/plugins.sbt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2349e7a998a68adff1725f54746cb540f7548861",
+      "size": 135,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/2349e7a998a68adff1725f54746cb540f7548861"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "bd1e0093834078013330c5c9bc76c74e3cc675ae",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/bd1e0093834078013330c5c9bc76c74e3cc675ae"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7d7280ccabbc2bb81a56505ca933d525e473124e",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/7d7280ccabbc2bb81a56505ca933d525e473124e"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "31afc5d8047c28e6efdf2efa013c38bb0fc65a28",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/31afc5d8047c28e6efdf2efa013c38bb0fc65a28"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/scala/Test.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "50cf404cdef77479d70b88a12bd4beb482624d71",
+      "size": 385,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/50cf404cdef77479d70b88a12bd4beb482624d71"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/scala/bar",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fd6923cf2537e1b05735f727a0f8290e36ee1898",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/fd6923cf2537e1b05735f727a0f8290e36ee1898"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/scala/bar/Default.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/scala/foo",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fd6923cf2537e1b05735f727a0f8290e36ee1898",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/fd6923cf2537e1b05735f727a0f8290e36ee1898"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/scala/foo/Default.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4d42c5bde6482afd4928ec7e9bda915d28264724",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/4d42c5bde6482afd4928ec7e9bda915d28264724"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/twirl/a",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "20d25b7521ca8f1241f70541a92706b399d54ee0",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/20d25b7521ca8f1241f70541a92706b399d54ee0"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/twirl/a/b",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7436759454ebe7766b21b8b09e22e2befc7e8d18",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/7436759454ebe7766b21b8b09e22e2befc7e8d18"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/twirl/a/b/c.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4015c616cdf7582d5c482e2437c7ae8f3b9704a3",
+      "size": 30,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/4015c616cdf7582d5c482e2437c7ae8f3b9704a3"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/twirl/importshadow.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/twirl/shadow.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/twirl/template.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ebed4021a0a0ea47be2fb6edede68d89c7beb25a",
+      "size": 24,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/ebed4021a0a0ea47be2fb6edede68d89c7beb25a"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/src/main/twirl/xml_test.scala.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b34cfcb3023fd9bee180220e3fcaee26eca56205",
+      "size": 38,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/b34cfcb3023fd9bee180220e3fcaee26eca56205"
+    },
+    {
+      "path": "sbt-twirl/src/sbt-test/twirl/scalajs-compile/test",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "62ea636c177f49af4c0909e08d8a15b00ab10034",
+      "size": 6,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/62ea636c177f49af4c0909e08d8a15b00ab10034"
+    },
+    {
+      "path": "sbt-twirl/src/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "49530a2877bc27208d331c0f0e9324c1d13700bf",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/49530a2877bc27208d331c0f0e9324c1d13700bf"
+    },
+    {
+      "path": "sbt-twirl/src/test/scala",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e956c92517a669863bcd0bc25e9acc05c67e61e3",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/e956c92517a669863bcd0bc25e9acc05c67e61e3"
+    },
+    {
+      "path": "sbt-twirl/src/test/scala/play",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e4d5418b63e53fad15043a6dfd2acd04c430c01f",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/e4d5418b63e53fad15043a6dfd2acd04c430c01f"
+    },
+    {
+      "path": "sbt-twirl/src/test/scala/play/twirl",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a5d891872eb50479ac0d36860440a47db9021df5",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/a5d891872eb50479ac0d36860440a47db9021df5"
+    },
+    {
+      "path": "sbt-twirl/src/test/scala/play/twirl/sbt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c740d5b1d9572f962d42eb95cbc9e807703753ed",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/c740d5b1d9572f962d42eb95cbc9e807703753ed"
+    },
+    {
+      "path": "sbt-twirl/src/test/scala/play/twirl/sbt/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c0a995f9d36bf64c55039c89c37bc74a90a9347e",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/c0a995f9d36bf64c55039c89c37bc74a90a9347e"
+    },
+    {
+      "path": "sbt-twirl/src/test/scala/play/twirl/sbt/test/TemplateMappingSpec.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b616ce59f5676d5856707454fd05454d723ba3e7",
+      "size": 2097,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/b616ce59f5676d5856707454fd05454d723ba3e7"
+    },
+    {
+      "path": "sbt-twirl/src/test/scala/play/twirl/sbt/test/TemplatePositionSpec.scala",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1e036a97176b37e1b4f895dbc78e3773e0e7cf3",
+      "size": 2753,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/b1e036a97176b37e1b4f895dbc78e3773e0e7cf3"
+    },
+    {
+      "path": "scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "84f3b25ca96c3974961967411ad5f6e899a01cca",
+      "url": "https://api.github.com/repos/playframework/twirl/git/trees/84f3b25ca96c3974961967411ad5f6e899a01cca"
+    },
+    {
+      "path": "scripts/test-code.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "97337724ab92ed84dd9f10826a29fb7dc00a4556",
+      "size": 202,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/97337724ab92ed84dd9f10826a29fb7dc00a4556"
+    },
+    {
+      "path": "scripts/validate-code.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "e57b6abc56d2da8c726409b4b1b9c57d83416692",
+      "size": 146,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/e57b6abc56d2da8c726409b4b1b9c57d83416692"
+    },
+    {
+      "path": "scripts/validate-docs.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "6daa27b7630726328f4079247dfb90406ba31f4a",
+      "size": 199,
+      "url": "https://api.github.com/repos/playframework/twirl/git/blobs/6daa27b7630726328f4079247dfb90406ba31f4a"
+    }
+  ],
+  "truncated": false
+}
