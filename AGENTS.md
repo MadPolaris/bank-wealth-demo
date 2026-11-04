@@ -40,7 +40,21 @@ BANK_TRUTHSRC_INTEGRATION=1 node --test --test-concurrency=1 test/unified-truth.
 
 The integration uses its own disposable author/output copy. It does not launch
 services or the old domain qualifier. It does not certify full runtime recovery.
-See `docs/TRUTH-BUILD.md` for a separately isolated offline compile check.
+See `docs/TRUTH-BUILD.md` for separately isolated offline compile and explicit
+`--run-generated-tests` verification. That mode executes only admitted generated
+unit suites under the same OS network/write restrictions; it does not mount
+`v1/test`, start services, or certify four-flow business and cross-JVM recovery.
+`npm run test:build-verifier` tests the verifier contract without starting a JVM.
+
+The separate `--run-actor-tests` mode adds exactly eight read-only frozen business
+suite files to the six current generated test files: 41 business assertions plus
+23 generated units. It retains the generated forked runner, fixed manifest and
+OS network denial; only its new `.local/mock-ta/truthsrc-actors-*` round is writable
+for TA journals. Its worker consumes an explicit provenance-labelled historical
+fixture, never an implicit old author snapshot. Do not append whole test directories,
+change frozen tests, or call this HTTP/database/cross-JVM acceptance.
+See `docs/TRUTH-RUNTIME-ACCEPTANCE.md`; `npm run test:actor-verifier` exercises the
+Node worker and verifier contracts with owned temporary journals, without a JVM.
 
 ## Semantics and protected history
 

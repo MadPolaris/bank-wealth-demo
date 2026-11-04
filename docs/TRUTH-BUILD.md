@@ -1,10 +1,42 @@
-# 当前真源服务的离线编译验证
+# 当前真源服务的离线编译与生成单元测试
 
 `tools/verify-truthsrc-build.mjs` 验证一个**当前 JS 真源项目生成的、尚未构建过的银行服务目录**，连同原始 `v1/handwritten/scala/` 编译。它不是旧发行复演脚本，也不导入 `v1-release-cold.mjs`。
 
-默认只运行服务 `compile`。可显式增加 **生成测试源码的 `Test / compile`**；本工具不执行 `test`、`testOnly`、`run`、`runMain`、HTTP 验收或历史 Scala acceptance suites。编译成功不表示应用已启动、业务验收通过或完整1134重新签收。runtime retry/backoff/deadline 设计仍为 **OPEN**。
+默认只运行服务 `compile`。`--compile-generated-tests` 只增加生成测试源码的 `Test / compile`；`--run-generated-tests` 隐含该编译步骤，并通过生成 build 的固定 `Test / test` 执行已准入的生成单元测试。另有独立`--run-actor-tests`模式，按固定清单增加八个冻结业务Suite，不是整目录历史测试；它仍用原fork/runner和OS禁网，详见[四流actor窗口](TRUTH-RUNTIME-ACCEPTANCE.md#四流actor窗口独立于服务数据库)。两个执行模式互斥，均无任意task、`testOnly`、`run`、`runMain`或HTTP入口。通过不表示完整1134重新签收，runtime retry/backoff/deadline设计仍为 **OPEN**。
 
-## 最终实际构建：passed
+## 最终四流actor执行：passed
+
+`target/truthsrc-actor-candidate-20261105-01`在新空缓存和相同禁网边界下通过
+9protobuf／499应用Scala／14测试源码编译，**64测试／13Suite全部成功、exit0**。
+其中付款6项、TA8项、独立退款7项、有限SIP20项，另有23生成测试；build89.037秒。
+15个新TA journal、16次正常worker启动/关闭/wait，全部15项保护检查true。
+回执位于`target/truthsrc-actor-20261105-01/`的`result.json`、`actor-tests.json`、
+`actor-workers.json`及`actual-build-sources.json`。没有运行HTTP/真实数据库/浏览器/
+跨JVM恢复，不改变1134签收。详见[验证记录](TRUTH-VALIDATION.md)。
+
+actor模式额外允许写本轮`.local/mock-ta/truthsrc-actors-<evidence-name>`，只用显式
+冻结fixture；旧作者、旧scratch和loader读取被OS禁止，新config写入被禁止。
+默认模式和生成-only模式不创建TA目录或挂载业务测试。原生成-only两次通过记录
+仍保留，不能把actor结果填回旧回执。
+
+## 最终生成单元执行：passed
+
+用户要求继续剩余任务后，`target/truthsrc-unit-candidate-20261105-02`在全新
+`target/truthsrc-unit-20261105-02/`完成冷编译及生成单元测试，**passed／exit0**。
+9protobuf、499应用Scala、6生成测试源码编译成功，真实fork运行23测试全部成功，
+5Suite完成、零失败/取消/忽略/pending/abort；build71.053秒，ScalaTest1.735秒。
+`GeneratedFiniteHostSpec`为零测试Suite，不将它作为finite host业务覆盖。
+
+`result.json`、`generated-tests.json`与`actual-build-sources.json`记录全部11项
+checks=true；实际sbt staging的199输入与准入candidate完整对账，sourceBound=true，
+35手写/7本地runtime/1065供给/当前输入/沙箱控制与canary均未变。进程全部回收，
+无timeout、取消、残留group或终止错误。第一轮unit01同样23测试成功；发现staging
+后补上机器对账才新建unit02复验，unit01原回执及历史compile/失败证据没有改写。
+
+没有运行四流业务/HTTP/数据库/浏览器/多JVM恢复，未启服务或容器，未重签1134。
+详细命令与失败修正记录见 [验证记录](TRUTH-VALIDATION.md)。
+
+## 已保留的仅编译结果：passed
 
 2026-11-05 第三次，当前`generated/current/`在全新
 `target/truthsrc-build-20261105-03/`验证 **passed、exit0**。
@@ -52,7 +84,7 @@ OS内核边界、199输入文件、手写/runtime/供给、当前真源/工具�
 
 首次OS probe `target/truthsrc-os-sandbox-probe-20261105-jrrZhB/` 也保留：网络/文件拒绝已生效，但Python `subprocess.DEVNULL` 以 `O_RDWR` 打开 `/dev/null` 被拒绝，尚未启动孙进程。只增加**精确literal `/dev/null`**后才获得上述成功；没有放开 `/dev`、系统临时目录或网络。
 
-这证明新OS边界可用，**不证明完整build已通过**。主会话完成最新源码的core检查并冻结输入后，才通过公共入口生成全新candidate，安排下述编译验证。
+独立probe本身只证明OS边界可用，不证明完整build；随后尝试3的实际完整编译结果已在文首记录。
 
 ## 尝试2的静默 exit2：已定位并修复启动配置
 
@@ -82,12 +114,12 @@ OS内核边界、199输入文件、手写/runtime/供给、当前真源/工具�
 
 **唯一正式行为修改：**验证器设置 `-Dsbt.server.forcestart=true`，保留 `-Dsbt.server.autostart=false`、关闭supershell、强制OS sandbox、原write根及新candidate独占要求。该fallback也会跳过真实“已有boot server”的失败，所以不能用于共享/既有candidate，更不能取消freshness/协作占用检查。没有network例外、额外write根、manager保护降级或终端权限例外。
 
-这只证明本次静默启动阻断已修复及空dummy的sbt启动成功，**尚未证明银行服务compile、生成测试compile或任何业务验收通过**。下一次完整编译仍须主会话冻结输入、经公共生成入口生成全新candidate并使用全新evidence；尝试1/2及本诊断全部保留，不能复用。
+上述启动probe只证明静默阻断已修复及空dummy启动成功，不单独证明应用编译或业务验收。后续尝试3已完成文首的应用/测试源码编译；每次新执行仍需冻结输入、新candidate和新evidence，尝试1/2及诊断全部保留。
 
 ## 前置与独占约定
 
 - 固定银行作者入口是根 `truthsrc.project.json`，当前树是 `truth/bank-wealth/`，生成器是 sibling `metarch-truthsrc` 的 `scala-cqrs-play-service@1`。不使用 BC、共享 `metarch-app`/`ingested-app` 或旧 `.scratch`。
-- 先由当前公共 JS pipeline 生成自己的 candidate。验证器只在内存重新取得当前 plan，**不执行 apply、不重写 build.sbt/config/source、不拷贝或追加历史测试**。手写源码必须已由生成的 build 挂载；验证器不补挂载来掩盖生成器缺陷。
+- 先由当前公共 JS pipeline 生成自己的 candidate。验证器只在内存重新取得当前 plan，**不执行 apply、不重写 build.sbt/config/source、不拷贝历史测试**。默认/生成-only模式不追加业务测试；actor模式只按固定清单用绝对路径挂载八个冻结测试文件，额外摘要对账。手写源码必须已由生成的 build 挂载；验证器不补挂载来掩盖生成器缺陷。
 - 生成前所需 `.local/truthsrc-runtime/` 继续由已有 `tools/prepare-truthsrc-runtime.mjs` 准备。验证器只读取并盘点这个目录，不修改该 helper，不重建、安装或发布 runtime。
 - 使用本地 Node、`/usr/bin/sandbox-exec`、`/usr/bin/python3` 标准库和 JDK11；sandbox不可用、profile加载失败或实际拒绝probe失败均为blocked，不降级隔离。默认 JDK 是 `/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home`；可用 `--java-home` 指定其他已安装的 **Darwin x64 JDK11**。归档的 protoc 是 osx-x86_64；Apple Silicon 需要能实际运行该工具链的 Rosetta 环境。不会自动下载工具链。
 - 所有 CLI 路径必须是规范绝对路径，父目录已存在；不接受空格、符号链接、大小写/Unicode 别名、`.`/`..` 或 `.scratch` 路径分量。不根据调用者的 `JAVA_HOME`/`PATH` 自动选择 JDK。
@@ -97,20 +129,20 @@ OS内核边界、199输入文件、手写/runtime/供给、当前真源/工具�
 
 ## 推荐调用
 
-以下是**等待主会话完成core检查并冻结最新源码后**的推荐下一轮；本次未执行。必须先确认两个新路径均未被占用。旧 `20261105-01` / `20261105-02` candidate/evidence及所有probe目录不能复用；示例 `20261105-03` 若已存在，选另一个全新名称。不要在源码仍变化时生成/编译。
+以下是仅编译模式的路径示例。必须先确认候选和证据路径均不存在；旧 `20261105-01`／`02`／`03` 和所有probe目录不能复用。将`<new-id>`替换为本轮新名称，不要在源码仍变化时生成/编译。
 
 ```bash
 node /Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/tools/truthsrc-project.mjs generate \
-  --out /Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/target/truthsrc-service-build-candidate-20261105-03
+  --out "/Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/target/truthsrc-service-build-candidate-<new-id>"
 ```
 
 然后默认只编译服务及原手写源码。
 
 ```bash
 node /Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/tools/verify-truthsrc-build.mjs \
-  --project-output /Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/target/truthsrc-service-build-candidate-20261105-03 \
+  --project-output "/Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/target/truthsrc-service-build-candidate-<new-id>" \
   --archive /Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/dist/bank-wealth-v1-darwin-x64-1134.tar.gz \
-  --evidence /Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/target/truthsrc-build-20261105-03
+  --evidence "/Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/target/truthsrc-build-<new-id>"
 ```
 
 若同一轮还要编译生成测试源码，在**首次调用**末尾加 `--compile-generated-tests`。它不是测试运行授权，也不会在上一次已经构建的 candidate 上补跑。需要指定 JDK 时增加以下参数。
@@ -137,6 +169,10 @@ node /Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/tools/verify-truthsr
 6. 构建前与构建后记录 candidate 全部非构建产物文件、完整手写树及本地冻结 runtime 的字节/文件集。失败、超时和取消也进行后盘点；公共工具的输入指纹另行复核。
 
 这是针对受信任的当前本地 JS 工具和作者输入的文件级 admission，不是给任意外部仓库执行 build 的通用沙箱，也不是来源签名或业务语义认证。并行修改应停止并重新生成，而不是放宽 admission。
+
+sbt 1.4.9在本机实际从本次`global/staging/<hash>/<candidate-basename>`副本装载项目（此前compile03也如此）。验证器不能只盘点原candidate：它从已核摘要的构建日志定位唯一装载根，只接受原candidate或本次自有staging的限定形状，并排除规定构建目录后将全部输入文件集合/字节与准入快照逐项对账。`actual-build-sources.json`记录实际根、199输入的完整摘要及结果；未知根、缺文件、多文件或任何字节变化阻止最终通过。缓存初始为空，副本来自本轮sbt，没有借用旧源码或warm build。
+
+staging位于允许写入的evidence内；这里增加的是受信构建的实际来源对账，不宣称它是恶意进程不可修改的源码挂载或抗敌对并发事务。原candidate、作者及外置手写源仍受OS写入禁令保护。
 
 ## 独立离线 supply 与继承的 OS 边界
 
@@ -169,22 +205,56 @@ Python 先检查全部 member 的有效名称、PAX 名称、文件/目录类型
 | `subpath` | candidate的 `target/`、`project/target/`、`project/project/target/` |
 | `literal` | candidate的 `project/project` 目录自身，不能写它的任意其他子文件 |
 | `literal` | `/dev/null`，仅为已观察到的subprocess重定向需求 |
+| actor模式独有`subpath` | 本轮新`.local/mock-ta/truthsrc-actors-<evidence-name>`；根内`actor-ta.json`另以literal拒绝写入。默认/生成-only没有此规则。 |
+
+actor模式另外以`deny file-read*`禁止旧两树、`.scratch`、`dist/v1`和旧truth loader；独立额外probe验证旧loader读取拒绝、config写拒绝以及本轮TA根允许写。此规则不是放开网络，原23次网络/越界写拒绝探针继续执行。
 
 - 根路径通过既有alias/symlink preflight及 `realpath` 校验，profile使用规范路径。系统临时目录、用户HOME/cache、作者输入、生成源码/build/config和外部手写树均不在write allowlist中。新建的symlink也不能把允许的写入根变成外部写入口；实际symlink逃逸probe必须被内核拒绝。
 - 在解包/sbt前，用同一个wrapper运行 `javac -proc:none` 和独立 `TruthsrcSandboxProbe`。只有JDK11移除自身manager后真实网络/文件syscall仍拒绝、native子孙进程继承拒绝、evidence写入成功，才能继续。网络只探测loopback数字地址；不建立listener或外部连接，不使用DNS。不能把ECONNREFUSED、timeout、地址族不支持或Java `SecurityException` 当作OS拒绝证明；Python须为EPERM/EACCES，Java须为对应的OS socket/filesystem异常。
 - canary由验证器在sandbox启动前，以 `mkdtemp` 创建在evidence的**新临时兄弟目录**中，不在任何允许写入根内。只对自有canary做实际写入/删除probe；不以任何用户源码作破坏性目标。evidence的 `boundary/escape` 是唯一明确记录的诊断symlink。probe、build前和finally都核对canary文件集/字节、该链接及profile/probe源摘要；保留目录，不自动清理。
 - **所有顶层子进程**（javac、Java probe、Python供给提取、sbt）均由强制的 `/usr/bin/sandbox-exec -f <profile> <command>` 启动，native protoc、fork JVM与其他exec后代自动继承同一内核边界。receipt记录真实wrapper命令和profile SHA256；每次启动前检查profile未变。删除或替换SecurityManager、清空JAVA_TOOL_OPTIONS，均不能撤销继承的OS策略。
 - 移除原Java-only `TruthsrcBuildGuard` 的启动安装。显式 `JAVA_TOOL_OPTIONS` 只传播本次缓存/配置位置，不承担隔离；`-XX:-UsePerfData` 避免外部perfdata写入，JVM错误文件指向evidence。sbt server autostart/supershell继续关闭。没有无效的 `sbt.trap.exit` 开关。
-- sbt `set` 显式限定 Test unmanaged sources 为当前生成计划中的 `src/test/scala/*.scala` 文件，资源仅取生成的 `src/test/resources`。只在指定flag时运行 `Test / compile`，绝不挂载旧银行测试树。删除了编译不需要的 `set Test / fork`、`set Test / javaOptions` guard覆盖；不执行或改写 `UnitTestMain`。
+- sbt `set` 显式限定 Test unmanaged sources，默认/生成-only为当前生成计划六文件，actor模式再加入固定八业务文件，并核对实际`Test / sources`十四文件集合；资源只取当前生成`src/test/resources`。不挂整个旧银行测试树。执行模式只增加fork前完整suite集合断言、actor所需具名属性与固定 `Test / test`；不覆盖生成的fork、network manager或测试task，不改写 `UnitTestMain`。
 - 提取supply的完整文件集/字节在build前后必须相同。自有缓存记录 `cache-before.json`（全空）和 `cache-after.json`（完整摘要）；缓存允许正常增长，**不是要求编译后的缓存仍为空**，也不访问或补用用户缓存。
 
 **边界限制：**这是macOS当前可用Seatbelt的进程级网络/写盘隔离，不是通用容器或来源签名。读取和其它未禁止的OS操作仍是allow default；Node父验证器及admission的当前本地JS工具仍须受信任。JDK/Python/供给/native工具现在也在同一network/file-write策略内，但不声称防御任意恶意代码、OS漏洞或通过未覆盖的IPC攻击其他服务。evidence内的供应和缓存属于可写范围，故仍需摘要核对；文件盘点、协作独占与preflight也不是抗敌对并发替换的事务。
 
-## 为什么仍不提供 generated test 执行
+## 生成单元测试的独立执行门
 
-本次范围是服务编译和可选的生成测试源码编译，CLI保持 `--project-output` / `--archive` / `--evidence`、可选 `--java-home` / `--compile-generated-tests`。没有 `--run-generated-tests`、`--test`、`testOnly` 或通用sbt task参数。
+2026-11-05用户要求继续未完成任务，本轮只推进无网络、无服务/容器的生成单元测试；并未因此批准新HTTP/数据库/浏览器/恢复发行窗口。`--run-generated-tests` 默认关闭，保留所有新candidate/evidence、来源准入、固定离线供给、真实OS拒绝probe与后代继承检查。它隐含 `Test / compile`，随后只调用生成 build 原有的 `Test / test`；不替换 `UnitTestMain`、`UnitNoNetwork`，不禁用fork，不挂载历史测试。
 
-原Java-only guard与生成 `UnitTestMain` / final `UnitNoNetwork` 的身份冲突不再是OS隔离机制的限制：Java manager更换不能放开内核网络/写盘边界。不过本次**没有运行生成测试或证明其完整运行兼容性**，不能把sandbox probe/编译回执升级为测试成功证据。将来若单独授权执行，仍须核查生成测试入口与存储配置、保持OS拒绝probe及后代继承，只运行已admission的生成测试，不追加历史测试或发布runtime。
+当前六个生成Scala文件为五个Suite及一个配置/启动支撑文件，共23项显式测试：
+
+| Suite | 项数 | 实际覆盖 |
+|---|---:|---|
+| `GeneratedActorStateSpec` | 3 | 三个真实生成actor的空状态查询，计算端口为query-only。 |
+| `GeneratedDomainRoundtripSpec` | 5 | 三个空状态protobuf字节往返，Money/AmountDecimal wire、PO及protobuf转换。 |
+| `GeneratedFiniteHostSpec` | 0 | 仅构造时验证unit配置，没有finite host或四流业务测试。 |
+| `GeneratedServiceConfigurationSpec` | 11 | 合成生产配置的正反向准入；不初始化driver或连接数据库。 |
+| `GeneratedUnitStorageSpec` | 4 | 错误/JSON、缺配置、禁用生产存储/socket、自造String actor的testkit快照恢复。 |
+
+存储固定local actor＋内存PersistenceTestKit journal/snapshot，真实执行事件溯源actor和序列化，不是LevelDB、Mongo、MySQL或跨JVM恢复。socket负例要求Java manager拒绝，强制OS sandbox另外防止manager替换或native后代绕过。
+
+验证器仅在执行模式从已准入生成源码提取当前固定Suite/测试名字和摘要，显式记录零测试Suite；两种仅编译模式不受固定23项清单限制。fork前核对 `Test / definedTests` 完整集合；执行后同时核对日志摘要、独立unit JVM、配置marker、每个Suite与测试名字、23成功/零失败取消忽略pending及五Suite完成/零abort。编译exit0、单独的“all passed”、漏跑Suite或不完整日志不能签出测试成功。回执区分requested、JVM started、run started、completed、passed；日志不可读取/不再匹配摘要时启动/完成记`null`未知，不记成未执行。所有来源、供给、沙箱和进程退出检查完成后才封存source-bound测试子回执；原始`outputPassed`不等于最终`passed`。退出失败、超时、取消及残留process group仍阻止passed。此解析针对固定生成风格与ScalaTest版本，不是通用Scala语法解析或第三方日志认证。
+
+执行器的轻量合同测试为：
+
+```bash
+npm run test:build-verifier
+```
+
+实际JVM运行必须使用下面示例中的**全新路径**，既有路径不可复用；不能清理`generated/current`再补跑：
+
+```bash
+node tools/truthsrc-project.mjs generate --out "$PWD/target/truthsrc-unit-candidate-<new-id>"
+node tools/verify-truthsrc-build.mjs \
+  --project-output "$PWD/target/truthsrc-unit-candidate-<new-id>" \
+  --archive "$PWD/dist/bank-wealth-v1-darwin-x64-1134.tar.gz" \
+  --evidence "$PWD/target/truthsrc-unit-<new-id>" \
+  --run-generated-tests
+```
+
+生成单元测试不包括付款本金oracle、TA、独立退款、有限SIP业务、HTTP/读侧/页面、数据库或多JVM恢复。M10完整运行门、BC七项作者阶段裁定及现役切换保持独立；原1134不重签。
 
 ## 回执、超时与失败处理
 
@@ -192,19 +262,24 @@ Python 先检查全部 member 的有效名称、PAX 名称、文件/目录类型
 
 - 阶段严格顺序执行：sandbox内javac上限45秒、真实OS边界probe30秒、extraction480秒、sbt480秒；任一失败即停止后续执行。
 - 超时或 SIGINT/SIGTERM 向整个当前 group 发 SIGTERM，15 秒宽限后 SIGKILL；等待直接子进程 `close`/回收，不用 Promise.race 把仍运行的 JVM 遗留在后台。
-- 直接子进程退出后仍有 group 成员也会清理并阻止 passed；另有最多5秒 group 消失轮询。只有直接子进程能由 Node 回收，不能声称回收任意脱离 process group 的后代。内核不能及时终止的进程也使这不是严格的总墙钟时限。
+- 直接子进程退出后仍有 group 成员也会清理并阻止 passed；另有最多5秒 group 消失轮询。`kill(-pgid,0)`的EPERM按仍可能存活处理，不当作已退出；终止错误进入回执并阻止passed，不因异常丢掉已经预留的阶段回执。只有直接子进程能由 Node 回收，不能声称回收任意脱离 process group 的后代。内核不能及时终止的进程也使这不是严格的总墙钟时限。
+- 最后同步来源/缓存盘点后先让事件循环处理待决SIGINT/SIGTERM，再封存最终回执；收到取消不得只因build已经exit0而通过。小回执落盘和外部并发仍不是跨文件原子事务。
 
 主要证据文件如下。
 
-- `input.json`：本轮参数、当前真源/工具指纹、工具链（含sandbox-exec）摘要、初始空缓存记录。
+- `input.json`：本轮参数、当前真源/工具和验证器本身指纹、工具链（含sandbox-exec）摘要、初始空缓存记录；执行模式另含完整生成测试manifest。
 - `sources-before.json` / `sources-after.json`：生成文件、手写树、本地 runtime 的 byte inventory；后者也包含提取 supply 的后盘点。
+- `actual-build-sources.json`：sbt日志中实际装载的项目根及完整输入对账；区分本轮staging副本与原candidate，不以原目录未改代替编译输入验证。
 - `extract.stdout.log` / `supply-before.json`：整包校验及1065个实际提取文件的摘要。
 - `cache-before.json` / `cache-after.json`：仅本次自有可变缓存的前后完整摘要。
 - `sandbox.sb` / `boundary/` / `sandbox-before.json` / `sandbox-after.json`：真实OS profile、探测源码/类、允许路径、外部canary和控制文件摘要核对。
 - `sandbox-probe.json`：实际syscall拒绝、移除Java manager后仍生效及native子孙继承的通过证明；不是build成功证明。
 - `repositories` / `sbt.boot.properties` / `build-plan.json`：本轮离线配置、wrapper/profile摘要和真实sbt tasks。
 - `{javac,sandbox-check,extract,build}.{stdout.log,stderr.log,json}`：实际sandbox wrapper命令、退出码/信号、timeout/cancellation/group状态和日志SHA256。
-- `result.json`：本轮 `passed` 或 `blocked`、实际阶段、OS probe通过、源码/供给/canary/控制文件未变检查及有限scope。只有退出码0且最终回执为passed才是本轮build成功；空/缺失回执是未完成，不是成功。
+- `generated-tests.json`：仅生成-only执行时产生；完整来源/边界复核后的source-bound结论、独立JVM、预期与观察Suite/测试名及数量、原始输出/进程结果、执行事实未知状态。必须同时检查整体`result.json`；不能截取`outputPassed`当完整验收。
+- `actor-tests.json`：仅actor执行时产生，记录完整64项、生成/业务分组及相同source-bound检查；该模式不生成另一份重复的generated-tests回执。
+- `actor-inputs-before/after.json`、`actor-workers.json`、`actor-journals-after.json`：八冻结测试及worker/fixture/config/Node输入，15journal/16次worker完整正常退出与配置摘要，以及保留的本轮TA文件库存。
+- `result.json`：本轮 `passed` 或 `blocked`、实际阶段、OS probe通过、源码/供给/canary/控制文件未变检查及有限scope。只有退出码0且最终回执为passed才是本轮请求范围成功；生成-only还必须有`generatedTests.passed=true`，actor模式必须有`actorTests.passed=true`及worker/外置输入检查。空/缺失回执是未完成，不是成功。
 
 路径/JDK/既有输出等最早前置失败可能发生在 evidence 创建之前，此时只返回 stderr 与非零退出码。创建 evidence 后的失败尽量留下 blocked 回执和盘点；没有 rollback、自动重试、全事务或自动删除。
 

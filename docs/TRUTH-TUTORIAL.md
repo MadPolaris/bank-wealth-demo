@@ -25,8 +25,11 @@ Saga副本，由公共assembly组装。配置中的runtime仓库和外部源路�
 项目解析。`prepare` 只提取六个已核SHA的JAR/POM，未编译/发布runtime。
 Scala构建/服务运行另需JDK、sbt及依赖/存储，不能把生成当作运行认证。
 本轮已在独立空缓存、仅本地供给和OS禁止网络的环境中通过499应用Scala源
-及6生成测试源码编译；未启动服务或重新执行1134运行窗口。复现方式及
-每轮独占输出要求见 [离线构建验证](TRUTH-BUILD.md)。
+及生成测试源码编译；生成-only窗口23项通过。后续固定actor窗口又实际通过
+41项业务＋23项生成测试，覆盖四流原业务断言，详见[运行验收边界](TRUTH-RUNTIME-ACCEPTANCE.md)。
+actor持久化使用内存testkit，TA使用显式有来源fixture及本轮新journal；
+这些结果不是HTTP/真实数据库/跨JVM恢复或1134重签。复现与独占输出要求见
+[离线构建与受限测试](TRUTH-BUILD.md)。
 
 ## 第一条垂直切片：预留现金
 

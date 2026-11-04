@@ -12,6 +12,8 @@
     "test:next-design": "node --test test/cash-next-design.test.mjs",
     "test:roadmap": "node --test test/roadmap-design.test.mjs",
     "test:current": "node --test test/unified-truth.test.mjs",
+    "test:build-verifier": "node --test --test-concurrency=1 test/truthsrc-build.test.mjs",
+    "test:actor-verifier": "node --test --test-concurrency=1 test/truthsrc-build.test.mjs test/truthsrc-actor-tests.test.mjs test/truthsrc-actor-ta.test.mjs",
     "test:historical-preview": "node --test test/truth.test.mjs test/projections.test.mjs test/cash-contract.test.mjs test/mock-ta.test.mjs test/i0-design.test.mjs test/cash-next-design.test.mjs test/roadmap-design.test.mjs",
     "test:p23": "node --test test/p23-finish-contract.test.mjs",
     "test:formal-contracts": "node --test test/formal-contract-inputs.test.mjs",

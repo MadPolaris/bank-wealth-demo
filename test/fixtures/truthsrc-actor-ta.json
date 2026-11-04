@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "bank.truthsrc-actor-ta-fixture/v1",
+  "interpretation": "historical-frozen-test-fixture",
+  "source": {
+    "file": "tree/inbox/refining/question-rf-cash-purchase-v2-contract-0.yaml",
+    "pointer": "/payload/info/artifact/body/mockConfiguration",
+    "sha256": "d2fe1a3f07225963f19a811b3aacbcddad841c7382263c600ab1c93d40ed6992"
+  },
+  "configuration": {
+    "schemaVersion": "bank-wealth.mock-ta/v1",
+    "currency": "CNY",
+    "feesMinorUnits": "0",
+    "refundMode": "full-principal",
+    "initialBusinessTick": 0,
+    "scenarios": [
+      {
+        "id": "confirmed",
+        "outcome": "confirmed",
+        "delayTicks": 1,
+        "fixture": {
+          "shares": "80.0000",
+          "nav": "1.2345"
+        }
+      },
+      {
+        "id": "rejected",
+        "outcome": "rejected",
+        "delayTicks": 1,
+        "reason": "TA_DEMO_REJECTED"
+      },
+      {
+        "id": "delayed",
+        "outcome": "confirmed",
+        "delayTicks": 3,
+        "fixture": {
+          "shares": "80.0000",
+          "nav": "1.2345"
+        }
+      },
+      {
+        "id": "unknown",
+        "outcome": "unknown",
+        "delayTicks": 0
+      },
+      {
+        "id": "accepted",
+        "outcome": "accepted",
+        "delayTicks": 0
+      },
+      {
+        "id": "duplicate-identical",
+        "outcome": "confirmed",
+        "delayTicks": 1,
+        "fixture": {
+          "shares": "80.0000",
+          "nav": "1.2345"
+        },
+        "delivery": "identical-duplicate"
+      },
+      {
+        "id": "duplicate-conflicting",
+        "outcome": "confirmed",
+        "delayTicks": 1,
+        "fixture": {
+          "shares": "80.0000",
+          "nav": "1.2345"
+        },
+        "delivery": "conflicting-duplicate",
+        "conflictFixture": {
+          "shares": "81.0000",
+          "nav": "1.2468"
+        }
+      }
+    ]
+  }
+}

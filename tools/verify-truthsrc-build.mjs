@@ -5,9 +5,13 @@ import {
   closeSync, createReadStream, lstatSync, mkdirSync, mkdtempSync, openSync, readFileSync,
   readdirSync, readlinkSync, readSync, realpathSync, symlinkSync, writeFileSync,
 } from 'node:fs';
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
+import {
+  ACTOR_FIXTURE, ACTOR_READ_DENIALS, ACTOR_SUPPORT, ACTOR_WORKER, actorOwnedRoot, actorReadProbeSource,
+  actorSuiteNames, actorTestManifest, combineActorManifest, verifyActorWorkers,
+} from './truthsrc-actor-tests.mjs';
 
 // Deliberately independent of the historical release/cold-build drivers.
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -24,15 +28,29 @@ const ARTIFACT_DIRS = ['target', 'project/target', 'project/project/target'];
 const CACHE_DIRS = ['home', 'cache', 'ivy', 'coursier', 'boot', 'global', 'tmp'];
 const GRACE_MS = 15_000;
 const REAP_POLL_MS = 5_000;
+const GENERATED_SUITES = [
+  ['GeneratedActorStateSpec', 3],
+  ['GeneratedDomainRoundtripSpec', 5],
+  ['GeneratedFiniteHostSpec', 0],
+  ['example.bankwealth.service.GeneratedServiceConfigurationSpec', 11],
+  ['example.bankwealth.service.GeneratedUnitStorageSpec', 4],
+];
+const UNIT_CONFIGURATION = 'UNIT-CONFIGURATION-OK journal=testkit snapshot=testkit network=denied';
+const SUITES_MARKER = 'TRUTHSRC-GENERATED-SUITES=';
 const usage = `Usage: node tools/verify-truthsrc-build.mjs \\
   --project-output <absolute-fresh-generated-root> \\
   --archive <absolute-clean-1134.tar.gz> --evidence <absolute-new-evidence-root> \\
   [--java-home <absolute-JDK11-home>] [--compile-generated-tests]
+  [--run-generated-tests | --run-actor-tests]
 
 Output must be under this bank's generated/ or target/; evidence under target/.
 Parents must exist. No symlinks, path aliases, spaces, or .scratch paths.
-Default: compile the service and original handwritten Scala. The optional flag
-also compiles ONLY generated test sources; neither mode executes tests/services.
+Default: compile the service and original handwritten Scala. --compile-generated-tests
+only compiles generated test sources. --run-generated-tests compiles and executes ONLY
+the admitted generated unit suites. --run-actor-tests additionally runs eight fixed
+business actor suites with testkit and a new, explicitly configured local TA journal.
+Both execution modes use the generated Test / test and forked unit JVM. No HTTP,
+database services, arbitrary sbt tasks, or whole-directory historical tests are accepted.
 Each attempt needs a fresh candidate and a new evidence directory. No cleanup,
 network resolution, runtime rebuild/publish, or historical acceptance runner.`;
 
@@ -50,20 +68,173 @@ const onInt = () => cancel('SIGINT');
 const onTerm = () => cancel('SIGTERM');
 const notCancelled = () => assert.ok(!cancelled, 'verification cancelled: ' + cancelled);
 
-function parseArgs(args) {
+export function parseArgs(args) {
   if (args.length === 1 && args[0] === '--help') return null;
   const flags = new Map();
-  let compileTests = false;
   for (let i = 0; i < args.length; i++) {
     const flag = args[i];
-    if (flag === '--compile-generated-tests' && !compileTests) { compileTests = true; continue; }
+    assert.ok(!flags.has(flag), usage);
+    if (['--compile-generated-tests', '--run-generated-tests', '--run-actor-tests'].includes(flag)) { flags.set(flag, true); continue; }
     assert.ok(['--project-output', '--archive', '--evidence', '--java-home'].includes(flag) &&
-      !flags.has(flag) && args[i + 1] && !args[i + 1].startsWith('--'), usage);
+      args[i + 1] && !args[i + 1].startsWith('--'), usage);
     flags.set(flag, args[++i]);
   }
   for (const flag of ['--project-output', '--archive', '--evidence']) assert.ok(flags.has(flag), usage);
+  const runActors = flags.has('--run-actor-tests');
+  assert.ok(!(runActors && flags.has('--run-generated-tests')), 'choose one explicit execution mode');
+  const runTests = runActors || flags.has('--run-generated-tests');
   return { output: flags.get('--project-output'), archive: flags.get('--archive'),
-    evidence: flags.get('--evidence'), javaHome: flags.get('--java-home') ?? DEFAULT_JAVA_HOME, compileTests };
+    evidence: flags.get('--evidence'), javaHome: flags.get('--java-home') ?? DEFAULT_JAVA_HOME,
+    compileTests: runTests || flags.has('--compile-generated-tests'), runTests, runActors };
+}
+
+export function generatedTestManifest(entries, { runTests = true } = {}) {
+  if (!runTests) return null;
+  const files = entries.filter(e => e.path.startsWith('src/test/scala/') && e.path.endsWith('.scala'));
+  const expectedFiles = ['src/test/scala/UnitConfigurationCheck.scala', ...GENERATED_SUITES.map(([name]) =>
+    'src/test/scala/' + name.split('.').at(-1) + '.scala')];
+  assert.deepEqual(files.map(e => e.path).sort(), expectedFiles.sort(), 'unexpected generated unit source set');
+  const suites = GENERATED_SUITES.map(([name, count]) => {
+    const shortName = name.split('.').at(-1), file = 'src/test/scala/' + shortName + '.scala';
+    const content = files.find(e => e.path === file).content;
+    const declaration = [...content.matchAll(/^final class ([A-Za-z][A-Za-z0-9]*) extends AnyFunSuite \{/gm)];
+    assert.deepEqual(declaration.map(m => m[1]), [shortName], 'unexpected generated suite class: ' + file);
+    const packages = [...content.matchAll(/^package ([A-Za-z][A-Za-z0-9.]*)$/gm)].map(m => m[1]);
+    assert.deepEqual(packages, name.includes('.') ? [name.slice(0, name.lastIndexOf('.'))] : [], 'unexpected suite package: ' + file);
+    // This is the admitted generator's literal test declaration, not a Scala parser.
+    const tests = [...content.matchAll(/^  test\(("(?:[^"\\\r\n]|\\.)*")\) \{/gm)].map(m => JSON.parse(m[1]));
+    assert.equal(tests.length, count, 'generated unit test count changed: ' + name);
+    assert.equal(new Set(tests).size, count, 'duplicate generated test name: ' + name);
+    return { name, file, sha256: hash(content), tests };
+  });
+  return { suites, suiteCount: suites.length, testCount: suites.reduce((sum, suite) => sum + suite.tests.length, 0),
+    zeroTestSuites: suites.filter(suite => suite.tests.length === 0).map(suite => suite.name) };
+}
+
+export function buildTasks(testFiles, { compileTests = false, runTests = false, runActors = false } = {}, manifest = null, actor = null) {
+  const actorFiles = runActors ? manifest.suites.filter(suite => suite.sourceKind === 'frozen-business-test').map(suite => suite.file).sort() : [];
+  if (runActors) {
+    assert.ok(runTests && actor, 'actor execution requires explicit manifest and configuration');
+    assert.deepEqual(actorFiles.map(file => basename(file)).sort(), actorSuiteNames().map(name => name.split('.').at(-1) + '.scala').sort());
+  }
+  const sources = [...testFiles.map(file => 'baseDirectory.value / ' + JSON.stringify(file)), ...actorFiles.map(file => 'file(' + JSON.stringify(file) + ')')];
+  const tasks = [
+    'set Test / unmanagedSourceDirectories := Seq(baseDirectory.value / "src" / "test" / "scala")',
+    'set Test / unmanagedSources := Seq(' + sources.join(', ') + ')',
+    'set Test / unmanagedResourceDirectories := Seq(baseDirectory.value / "src" / "test" / "resources")',
+    ...(runActors ? ['set Test / javaOptions ++= Seq(' + [
+      '-Dbank.mock-ta.node=' + actor.node, '-Dbank.mock-ta.worker=' + actor.worker, '-Dbank.mock-ta.owned-root=' + actor.ownedRoot,
+    ].map(value => JSON.stringify(value)).join(', ') + ')'] : []),
+    'show externalResolvers', 'show csrCacheDirectory', 'compile', 'show Compile / fullClasspath',
+    ...(compileTests || runTests ? ['Test / compile'] : []),
+  ];
+  if (runTests) {
+    assert.ok(manifest?.suites?.length, 'admitted generated test manifest required');
+    const names = manifest.suites.map(suite => suite.name).sort();
+    assert.deepEqual(names, [...GENERATED_SUITES.map(([name]) => name), ...(runActors ? actorSuiteNames() : [])].sort(), 'unexpected test suites');
+    // Add pre-fork assertions; do not replace the generated task or its manager.
+    const actualSources = runActors ? ' val sourcePaths = (Test / sources).value.map(_.getCanonicalPath).sorted; ' +
+      'require(sourcePaths == Seq(' + sources.map(source => '(' + source + ').getCanonicalPath').join(', ') + ').sorted, "unexpected test source closure"); ' +
+      'println("TRUTHSRC-ACTOR-SOURCES=" + sourcePaths.mkString(",")); ' : ' ';
+    tasks.push('set Test / javaOptions += { val suites = (Test / definedTests).value.map(_.name).sorted; ' +
+      'require(suites == Seq(' + names.map(name => JSON.stringify(name)).join(', ') + '), "unexpected test suites"); ' +
+      'println(' + JSON.stringify(SUITES_MARKER) + ' + suites.mkString(","));' + actualSources + '"-Dtruthsrc.unit-admitted=true" }',
+    'Test / test');
+  }
+  return tasks;
+}
+
+export function inspectGeneratedTests(stdout, manifest, sbtPid) {
+  const lines = stdout.replace(/\x1b\[[0-9;]*m/g, '').split(/\r?\n/).map(line => line.replace(/^\[info\] ?/, ''));
+  const errors = [], require = (ok, message) => { if (!ok) errors.push(message); };
+  const matches = pattern => lines.map(line => line.match(pattern)).filter(Boolean);
+  const one = (pattern, label) => {
+    const found = matches(pattern);
+    require(found.length === 1, 'expected exactly one ' + label);
+    return found.length === 1 ? found[0] : null;
+  };
+  const marker = one(/^TRUTHSRC-GENERATED-SUITES=(.*)$/, 'admitted suite marker');
+  const names = marker ? marker[1].split(',') : [];
+  require(isDeepStrictEqual(names, manifest.suites.map(suite => suite.name).sort()), 'discovered suites differ from admitted manifest');
+  require(lines.includes(UNIT_CONFIGURATION), 'unit configuration/no-network validation missing');
+  const pid = one(/^UNIT-JVM-PID=([1-9][0-9]*)$/, 'forked unit JVM marker');
+  const unitJvmPid = pid ? Number(pid[1]) : null;
+  require(Number.isSafeInteger(unitJvmPid) && unitJvmPid !== sbtPid, 'unit runner did not identify a distinct forked JVM');
+  const starting = one(/^Run starting\. Expected test count is: ([0-9]+)$/, 'ScalaTest run start');
+  require(Number(starting?.[1]) === manifest.testCount, 'expected test count differs');
+  const observed = [];
+  let active = null;
+  for (const line of lines) {
+    const heading = line.match(/^([A-Za-z][A-Za-z0-9_.]*):$/);
+    if (heading) { active = { name: heading[1], tests: [] }; observed.push(active); }
+    else if (line.startsWith('- ') && active) active.tests.push(line.slice(2));
+  }
+  const expected = manifest.suites.map(suite => ({ name: suite.name.split('.').at(-1), tests: [...suite.tests].sort() }));
+  const byName = (a, b) => a.name.localeCompare(b.name);
+  require(isDeepStrictEqual(observed.map(suite => ({ ...suite, tests: [...suite.tests].sort() })).sort(byName), expected.sort(byName)),
+    'reported suite/test names differ or include failed, skipped, duplicate or unexpected tests');
+  const total = one(/^Total number of tests run: ([0-9]+)$/, 'executed test total');
+  const suites = one(/^Suites: completed ([0-9]+), aborted ([0-9]+)$/, 'suite completion summary');
+  const tests = one(/^Tests: succeeded ([0-9]+), failed ([0-9]+), canceled ([0-9]+), ignored ([0-9]+), pending ([0-9]+)$/, 'test result summary');
+  require(Number(total?.[1]) === manifest.testCount, 'executed test count differs');
+  require(Number(suites?.[1]) === manifest.suiteCount && Number(suites?.[2]) === 0, 'suite completion/abort counts differ');
+  require(Number(tests?.[1]) === manifest.testCount && tests?.slice(2).every(n => n === '0'), 'nonpassing or missing tests');
+  require(matches(/^All tests passed\.$/).length === 1, 'successful ScalaTest completion missing or repeated');
+  return { requested: true, evidenceState: 'observed', jvmStarted: pid !== null, started: starting !== null, completed: !!(total && suites && tests),
+    passed: errors.length === 0, unitJvmPid, sbtPid, discoveredSuites: names,
+    testsObserved: observed.reduce((sum, suite) => sum + suite.tests.length, 0),
+    totals: total && suites && tests ? { run: Number(total[1]), suitesCompleted: Number(suites[1]), suitesAborted: Number(suites[2]),
+      succeeded: Number(tests[1]), failed: Number(tests[2]), canceled: Number(tests[3]), ignored: Number(tests[4]), pending: Number(tests[5]) } : null,
+    expected: manifest, observed, errors };
+}
+
+export function actualBuildSourceRoot(stdout, output, evidence) {
+  const roots = [...stdout.matchAll(/^\[info\] loading project definition from (.+)\/project\r?$/gm)].map(match => match[1]);
+  assert.equal(roots.length, 1, 'one actual sbt project definition required');
+  const root = roots[0];
+  if (root === output) return root;
+  const staged = relative(join(evidence, 'global/staging'), root).split('/');
+  assert.ok(within(join(evidence, 'global/staging'), root) && staged.length === 2 &&
+    /^[0-9a-f]+$/.test(staged[0]) && staged[1] === basename(output), 'sbt loaded an unexpected source root');
+  return root;
+}
+
+export function compareBuildSources(before, after) {
+  assert.deepEqual(after, before, 'actual sbt-loaded input bytes/file set differ from admitted candidate');
+  return { passed: true, files: Object.keys(before).length };
+}
+
+const EXECUTION_CHECKS = ['osSandboxEnforced', 'outputUnchanged', 'handwrittenUnchanged', 'localRuntimeUnchanged',
+  'supplyUnchanged', 'currentInputsUnchanged', 'sandboxControlsAndCanariesUnchanged', 'ownedCachesInventoried', 'verifierUnchanged',
+  'actualBuildSourcesVerified'];
+
+export function completeGeneratedTests(observation, receipt, checks, cancellation = null, verificationErrors = []) {
+  const errors = [...(observation.errors ?? [])];
+  let processPassed = false;
+  try { succeeded(receipt); processPassed = true; }
+  catch (error) { errors.push(error.message); }
+  const requiredChecks = [...EXECUTION_CHECKS, ...(observation.expected?.businessTests ?
+    ['actorInputsUnchanged', 'actorWorkersVerified', 'actorBoundaryEnforced', 'actualTestSourcesVerified'] : [])];
+  const unverified = requiredChecks.filter(name => checks[name] !== true);
+  if (unverified.length) errors.push('unverified source/boundary checks: ' + unverified.join(', '));
+  if (cancellation) errors.push('cancelled: ' + cancellation);
+  errors.push(...verificationErrors);
+  const outputPassed = observation.passed === true;
+  return { ...observation, outputPassed, processPassed, sourceBound: unverified.length === 0,
+    passed: outputPassed && processPassed && errors.length === 0, errors: [...new Set(errors)] };
+}
+
+// A macrotask turn is required after synchronous hashing; Promise.resolve alone
+// can leave pending SIGINT/SIGTERM callbacks behind the final receipt.
+export async function drainPendingSignals() {
+  await new Promise(done => setImmediate(done));
+  await delay(0);
+}
+
+export function isMainModule(argv, moduleUrl) {
+  if (!argv) return false;
+  try { return pathToFileURL(realpathSync(argv)).href === pathToFileURL(realpathSync(fileURLToPath(moduleUrl))).href; }
+  catch { return pathToFileURL(resolve(argv)).href === moduleUrl; }
 }
 
 function safePath(file, kind = 'directory') {
@@ -129,6 +300,50 @@ function inventory(root, { afterBuild = false } = {}) {
   return files;
 }
 
+function snapshotFiles(files) {
+  return Object.fromEntries(files.map(file => {
+    safePath(file, 'file');
+    const stat = lstatSync(file);
+    assert.equal(stat.nlink, 1, 'hardlinked actor input forbidden');
+    return [file, { bytes: stat.size, sha256: fileDigest(file) }];
+  }));
+}
+
+async function prepareActors(evidence, generatedManifest) {
+  const { parseStrictJson } = await import(pathToFileURL(join(TOOL, 'lib/strict-json.mjs')));
+  const { canonicalJson, validateMockConfiguration } = await import('./../simulator/contract.mjs');
+  const manifest = actorTestManifest();
+  const before = snapshotFiles([...manifest.suites.map(suite => suite.file), ...ACTOR_SUPPORT]);
+  for (const suite of manifest.suites) assert.equal(suite.sha256, before[suite.file].sha256, 'actor source changed while capturing manifest');
+  const fixtureBytes = readFileSync(ACTOR_FIXTURE), fixture = parseStrictJson(fixtureBytes);
+  assert.equal(hash(fixtureBytes), before[ACTOR_FIXTURE].sha256);
+  assert.equal(fixture.interpretation, 'historical-frozen-test-fixture');
+  validateMockConfiguration(fixture.configuration);
+  const node = safePath(realpathSync(process.execPath), 'file');
+  before[node] = snapshotFiles([node])[node];
+  const ownedRoot = actorOwnedRoot(evidence), parent = dirname(ownedRoot);
+  safePath(dirname(parent));
+  try { safePath(parent); }
+  catch (error) {
+    if (readdirSync(dirname(parent)).some(name => fold(name) === fold(basename(parent)))) throw error;
+    mkdirSync(parent, { mode: 0o700 });
+    safePath(parent);
+  }
+  safePath(ownedRoot, 'new');
+  mkdirSync(ownedRoot, { mode: 0o700 });
+  save(join(ownedRoot, 'actor-owner.json'), { evidence, pid: process.pid, source: PROJECT });
+  const config = join(ownedRoot, 'actor-ta.json');
+  save(config, { schemaVersion: 'bank.truthsrc-actor-ta/v1', ownedRoot,
+    fixture: { file: ACTOR_FIXTURE, sha256: hash(fixtureBytes) } });
+  before[config] = snapshotFiles([config])[config];
+  const actor = { node, worker: ACTOR_WORKER, ownedRoot, config, configSha256: before[config].sha256,
+    fixture: ACTOR_FIXTURE, fixtureSha256: hash(fixtureBytes),
+    configurationDigest: hash(canonicalJson(fixture.configuration)), before,
+    manifest: combineActorManifest(generatedManifest, manifest) };
+  save(join(evidence, 'actor-inputs-before.json'), actor);
+  return actor;
+}
+
 function assertFreshOutput(output) {
   for (const directory of ARTIFACT_DIRS) {
     try { lstatSync(join(output, directory)); }
@@ -139,7 +354,7 @@ function assertFreshOutput(output) {
 
 // Only this fixed, local JS implementation is loaded. Never import from the
 // candidate, its ledger, an archive member, or a caller-selected generator.
-async function admitCandidate(output) {
+async function admitCandidate(output, options) {
   safePath(TOOL);
   safePath(PROJECT, 'file');
   safePath(HANDWRITTEN);
@@ -219,10 +434,11 @@ async function admitCandidate(output) {
   for (const file of ['src/test/scala/UnitConfigurationCheck.scala', 'src/test/scala/GeneratedUnitStorageSpec.scala'])
     assert.ok(testFiles.includes(file), 'current service unit support missing');
   assert.ok(build.includes('.service.UnitTestMain'), 'unexpected generated test runner');
+  const testManifest = generatedTestManifest(plan.entries, options);
   const handwritten = inventory(HANDWRITTEN), runtime = inventory(RUNTIME);
   assert.ok(Object.keys(handwritten).some(file => file.endsWith('.scala')), 'empty handwritten Scala tree');
   assertUnchanged(captured);
-  return { before, handwritten, runtime, captured, assertUnchanged, testFiles, generator: plan.generator };
+  return { before, handwritten, runtime, captured, assertUnchanged, testFiles, testManifest, generator: plan.generator };
 }
 
 // tarfile is used ONLY as a reader, never extract()/extractall(). Validate the
@@ -394,12 +610,12 @@ public final class TruthsrcSandboxProbe {
 }
 `;
 
-function prepareSandbox(evidence, output) {
+function prepareSandbox(evidence, output, actor = null) {
   // Existing ancestors are checked for symlinks/aliases by safePath; subpaths use
   // canonical kernel paths, never a lexical allowlist in a replaceable JVM guard.
   for (const root of [evidence, output]) assert.equal(realpathSync(safePath(root)), root);
   safePath(SANDBOX, 'file');
-  const subpaths = [evidence, ...ARTIFACT_DIRS.map(dir => join(output, dir))];
+  const subpaths = [evidence, ...ARTIFACT_DIRS.map(dir => join(output, dir)), ...(actor ? [actor.ownedRoot] : [])];
   assert.equal(realpathSync('/dev/null'), '/dev/null');
   assert.ok(lstatSync('/dev/null').isCharacterDevice(), 'expected /dev/null device');
   // Python subprocess DEVNULL opens O_RDWR (observed EPERM without this literal).
@@ -408,7 +624,9 @@ function prepareSandbox(evidence, output) {
   const profile = join(evidence, 'sandbox.sb');
   const text = '(version 1)\n(allow default)\n(deny network*)\n(deny file-write*)\n(allow file-write*\n' +
     subpaths.map(path => '  (subpath ' + JSON.stringify(path) + ')').join('\n') + '\n' +
-    literals.map(path => '  (literal ' + JSON.stringify(path) + ')').join('\n') + ')\n';
+    literals.map(path => '  (literal ' + JSON.stringify(path) + ')').join('\n') + ')\n' +
+    (actor ? '(deny file-read*\n' + ACTOR_READ_DENIALS.map(path => '  (subpath ' + JSON.stringify(path) + ')').join('\n') + ')\n' +
+      '(deny file-write* (literal ' + JSON.stringify(actor.config) + '))\n' : '');
   write(profile, text);
   const boundary = join(evidence, 'boundary');
   mkdirSync(boundary, { mode: 0o700 });
@@ -421,11 +639,12 @@ function prepareSandbox(evidence, output) {
   symlinkSync(canaries, escape); // only this recorded diagnostic link; no input links admitted
   write(join(boundary, 'probe.py'), sandboxPythonSource);
   write(join(boundary, 'TruthsrcSandboxProbe.java'), sandboxJavaSource);
-  const controlFiles = [profile, join(boundary, 'probe.py'), join(boundary, 'TruthsrcSandboxProbe.java')];
+  const controlFiles = [profile, join(boundary, 'probe.py'), join(boundary, 'TruthsrcSandboxProbe.java'),
+    ...(actor ? [actor.config] : [])];
   const controlsBefore = Object.fromEntries(controlFiles.map(file => [file, fileDigest(file)]));
   const sandbox = { executable: SANDBOX, profile, profileSha256: hash(text), subpaths, literals,
     network: 'deny network* (unconditional)', defaultFileWrites: 'deny file-write*', deviceWriteExceptions: ['/dev/null'],
-    canaries, canariesBefore, escape, controlsBefore };
+    canaries, canariesBefore, escape, controlsBefore, historicalReadDenials: actor ? ACTOR_READ_DENIALS : [] };
   save(join(evidence, 'sandbox-before.json'), sandbox);
   return sandbox;
 }
@@ -477,7 +696,11 @@ const delay = ms => new Promise(done => setTimeout(done, ms));
 function groupAlive(pid) {
   if (!pid) return false;
   try { process.kill(-pid, 0); return true; }
-  catch (error) { if (error.code === 'ESRCH') return false; throw error; }
+  catch (error) {
+    if (error.code === 'ESRCH') return false;
+    if (error.code === 'EPERM') return true; // A denied probe is not proof that the group has exited.
+    throw error;
+  }
 }
 function signalGroup(pid, signal) {
   if (!pid) return;
@@ -485,7 +708,7 @@ function signalGroup(pid, signal) {
   catch (error) { if (error.code !== 'ESRCH') throw error; }
 }
 
-async function command(executable, args, cwd, env, base, timeoutMs, sandbox) {
+export async function command(executable, args, cwd, env, base, timeoutMs, sandbox) {
   notCancelled();
   // Mandatory wrapper: extraction, javac, probes, sbt and every exec descendant
   // have the same OS boundary. No unsandboxed or Java-only fallback exists.
@@ -493,7 +716,11 @@ async function command(executable, args, cwd, env, base, timeoutMs, sandbox) {
   safePath(sandbox.profile, 'file');
   assert.equal(fileDigest(sandbox.profile), sandbox.profileSha256, 'sandbox profile changed before launch');
   const invocation = [SANDBOX, '-f', sandbox.profile, executable, ...args];
-  const descriptors = [];
+  const descriptors = [], terminationErrors = [];
+  const terminate = (pid, signal) => {
+    try { signalGroup(pid, signal); }
+    catch (error) { terminationErrors.push({ pid, signal, error: error.code ?? error.message }); }
+  };
   let timer, killer, child, launchError = null, timedOut = false, termAt = null;
   const started = Date.now();
   try {
@@ -501,8 +728,8 @@ async function command(executable, args, cwd, env, base, timeoutMs, sandbox) {
     const stop = () => {
       if (termAt !== null) return;
       termAt = Date.now();
-      signalGroup(child?.pid, 'SIGTERM');
-      killer = setTimeout(() => signalGroup(child?.pid, 'SIGKILL'), GRACE_MS);
+      terminate(child?.pid, 'SIGTERM');
+      killer = setTimeout(() => terminate(child?.pid, 'SIGKILL'), GRACE_MS);
     };
     stopChild = stop;
     let code = null, signal = null, closed = false;
@@ -522,14 +749,14 @@ async function command(executable, args, cwd, env, base, timeoutMs, sandbox) {
     if (leftoverGroup) {
       stop();
       while (groupAlive(child.pid) && Date.now() < termAt + GRACE_MS) await delay(100);
-      signalGroup(child.pid, 'SIGKILL');
+      terminate(child.pid, 'SIGKILL');
       const until = Date.now() + REAP_POLL_MS;
       while (groupAlive(child.pid) && Date.now() < until) await delay(100);
     }
     clearTimeout(killer);
     const receipt = { command: invocation, sandboxProfileSha256: sandbox.profileSha256, cwd, pid: child?.pid ?? null,
       startedAt: new Date(started).toISOString(), elapsedMs: Date.now() - started, timeoutMs, graceMs: GRACE_MS,
-      code, signal, launchError, timedOut, cancelled, directChildClosed: closed,
+      code, signal, launchError, timedOut, cancelled, terminationErrors, directChildClosed: closed,
       directChildReaped: closed && !launchError, leftoverGroup, groupAliveAfter: groupAlive(child?.pid),
       stdoutSha256: fileDigest(base + '.stdout.log'), stderrSha256: fileDigest(base + '.stderr.log') };
     writeFileSync(descriptors[2], json(receipt));
@@ -542,11 +769,12 @@ async function command(executable, args, cwd, env, base, timeoutMs, sandbox) {
 }
 function succeeded(receipt) {
   assert.ok(receipt.code === 0 && !receipt.signal && !receipt.launchError && !receipt.timedOut && !receipt.cancelled &&
-    receipt.directChildReaped && !receipt.leftoverGroup && !receipt.groupAliveAfter, 'command failed; inspect its exclusive receipt and logs');
+    receipt.directChildReaped && !receipt.leftoverGroup && !receipt.groupAliveAfter && !receipt.terminationErrors?.length,
+    'command failed; inspect its exclusive receipt and logs');
 }
 
 async function verify(options) {
-  const { output, archive, evidence, javaHome, compileTests } = options;
+  const { output, archive, evidence, javaHome, compileTests, runTests, runActors } = options;
   assert.equal(process.platform, 'darwin', 'this captured toolchain is for Darwin, not a portable supply');
   safePath(output); safePath(archive, 'file'); safePath(evidence, 'new'); safePath(javaHome);
   assert.ok([join(ROOT, 'generated'), join(ROOT, 'target')].some(root => within(root, output) && output !== join(ROOT, 'target')),
@@ -562,17 +790,25 @@ async function verify(options) {
   mkdirSync(evidence, { mode: 0o700 }); // exclusive: no recursive parent creation or reuse
   const result = { schemaVersion: 'bank.truthsrc-build/v1', status: 'blocked', output, evidence,
     archive: { file: archive, expectedSha256: ARCHIVE_SHA }, javaHome, compileGeneratedTests: compileTests,
-    testsExecuted: false, servicesStarted: false, runtimeRebuilt: false, runtimePublished: false,
+    runGeneratedTests: runTests && !runActors, runActorTests: runActors, testsExecuted: false,
+    actorTests: { requested: runActors, passed: false },
+    generatedTests: { requested: runTests && !runActors, evidenceState: 'not-dispatched', jvmStarted: false, started: false, completed: false, passed: false },
+    servicesStarted: false, runtimeRebuilt: false, runtimePublished: false,
     release1134Resigned: false, runtimeRetryBackoffDeadline: 'OPEN', phases: {}, checks: {}, errors: [],
-    scope: 'current JS-generated bank service plus original handwritten Scala compilation; optional generated-test compilation only; not runtime or 1134 acceptance' };
-  let admitted, supplyBefore, sandbox, cachesBefore;
+    scope: runActors ? 'current JS bank service: fixed four-flow actor regression plus generated units; testkit and explicitly frozen TA fixture only; not HTTP, databases, multi-JVM recovery or 1134 acceptance' :
+      'current JS-generated bank service plus original handwritten Scala; optional generated-only unit compilation/execution; not four-flow, HTTP, database, multi-JVM recovery or 1134 acceptance' };
+  let admitted, supplyBefore, sandbox, cachesBefore, verifierBefore, actor, executionManifest;
+  let testObservation = { requested: runTests, evidenceState: 'not-dispatched', jvmStarted: false, started: false, completed: false, passed: false, errors: [] };
   const phases = result.phases;
   try {
+    verifierBefore = { file: fileURLToPath(import.meta.url), sha256: fileDigest(fileURLToPath(import.meta.url)) };
     for (const name of CACHE_DIRS) mkdirSync(join(evidence, name), { mode: 0o700 });
     cachesBefore = Object.fromEntries(CACHE_DIRS.map(name => [name, inventory(join(evidence, name))]));
     const initiallyEmpty = Object.fromEntries(CACHE_DIRS.map(name => [name, Object.keys(cachesBefore[name]).length === 0]));
     save(join(evidence, 'cache-before.json'), cachesBefore);
-    admitted = await admitCandidate(output);
+    admitted = await admitCandidate(output, options);
+    if (runActors) actor = await prepareActors(evidence, admitted.testManifest);
+    executionManifest = actor?.manifest ?? admitted.testManifest;
     notCancelled();
     save(join(evidence, 'sources-before.json'), { output: admitted.before, handwritten: admitted.handwritten, localRuntime: admitted.runtime });
     result.archive.sha256 = await archiveDigest(archive);
@@ -581,15 +817,30 @@ async function verify(options) {
       PATH: join(javaHome, 'bin') + ':/usr/bin:/bin', LANG: 'en_US.UTF-8', TMPDIR: join(evidence, 'tmp'),
       XDG_CACHE_HOME: join(evidence, 'cache'), XDG_CONFIG_HOME: join(evidence, 'home/.config'), XDG_DATA_HOME: join(evidence, 'home/.local/share'),
       COURSIER_CACHE: join(evidence, 'coursier'), COURSIER_JVM_CACHE: join(evidence, 'cache/jvm'), COURSIER_ARCHIVE_CACHE: join(evidence, 'cache/archives') };
+    if (actor) {
+      env.BANK_ACTOR_TA_CONFIG = actor.config;
+      env.BANK_ACTOR_TA_CONFIG_SHA256 = actor.configSha256;
+    }
     const supply = join(evidence, 'supply'), repositories = repositoryText(supply);
     env.COURSIER_REPOSITORIES = repositories.maven + '|ivy:' + repositories.ivy + repositories.pattern;
     save(join(evidence, 'input.json'), { ...options, project: PROJECT, handwrittenRoot: HANDWRITTEN, toolRoot: TOOL,
       generator: admitted.generator, sources: admitted.captured.sources, archiveSha256: ARCHIVE_SHA,
       toolchain: Object.fromEntries([java, javac, join(javaHome, 'release'), PYTHON, SANDBOX].map(file => [file, fileDigest(file)])),
-      initiallyEmpty, compilerBridgePrefill: false, inheritedEnvironment: false, env, testFiles: compileTests ? admitted.testFiles : [] });
-    sandbox = prepareSandbox(evidence, output);
+      initiallyEmpty, compilerBridgePrefill: false, inheritedEnvironment: false, env, verifier: verifierBefore,
+      testFiles: compileTests ? admitted.testFiles : [], testManifest: runTests ? executionManifest : null,
+      actor: actor ? { ownedRoot: actor.ownedRoot, fixtureSha256: actor.fixtureSha256, configSha256: actor.configSha256 } : null });
+    sandbox = prepareSandbox(evidence, output, actor);
     await probeSandbox(sandbox, java, javac, output, evidence, env, phases);
     result.checks.osSandboxEnforced = true;
+    if (actor) {
+      const probe = join(evidence, 'actor-sandbox-probe.py');
+      write(probe, actorReadProbeSource(actor.config, actor.ownedRoot));
+      sandbox.controlsBefore[probe] = fileDigest(probe);
+      phases.actorSandboxProbe = await command(PYTHON, ['-I', '-S', probe], evidence, env, join(evidence, 'actor-sandbox-check'), 30_000, sandbox);
+      succeeded(phases.actorSandboxProbe);
+      assert.ok(readFileSync(join(evidence, 'actor-sandbox-check.stdout.log'), 'utf8').includes('TRUTHSRC-ACTOR-SANDBOX-OK'));
+      result.checks.actorBoundaryEnforced = true;
+    }
     write(join(evidence, 'extract-supply.py'), extractSource);
     phases.extract = await command(PYTHON, ['-I', '-S', join(evidence, 'extract-supply.py'), archive, supply, ARCHIVE_SHA],
       evidence, env, join(evidence, 'extract'), 480_000, sandbox);
@@ -619,34 +870,63 @@ async function verify(options) {
     // Cache/config hints only; confinement is inherited OS state, not removable
     // JAVA_TOOL_OPTIONS or Test / javaOptions. No Test runner/guard override.
     const buildEnv = { ...env, JAVA_TOOL_OPTIONS: javaOptions.join(' ') };
-    const quoted = value => JSON.stringify(value);
-    const tasks = [
-      'set Test / unmanagedSourceDirectories := Seq(baseDirectory.value / "src" / "test" / "scala")',
-      'set Test / unmanagedSources := Seq(' + admitted.testFiles.map(file => 'baseDirectory.value / ' + quoted(file)).join(', ') + ')',
-      'set Test / unmanagedResourceDirectories := Seq(baseDirectory.value / "src" / "test" / "resources")',
-      'show externalResolvers', 'show csrCacheDirectory', 'compile', 'show Compile / fullClasspath',
-      ...(compileTests ? ['Test / compile'] : []),
-    ];
+    const tasks = buildTasks(admitted.testFiles, options, executionManifest, actor);
     save(join(evidence, 'build-plan.json'), { javaOptions, tasks, env: buildEnv,
       sandbox: { profile: sandbox.profile, sha256: sandbox.profileSha256, subpaths: sandbox.subpaths, literals: sandbox.literals },
-      allowedAppArtifactDirectories: ARTIFACT_DIRS, historicalTestSourcesAppended: false, testExecutionSupported: false });
+      allowedAppArtifactDirectories: ARTIFACT_DIRS, historicalTestSourcesAppended: !!actor,
+      explicitFrozenActorSources: actor ? actor.manifest.suites.filter(s => s.sourceKind === 'frozen-business-test').map(s => s.file) : [],
+      testExecutionSupported: true, testExecutionRequested: runTests, testManifest: runTests ? executionManifest : null });
     checkSandbox(sandbox);
     assert.deepEqual(inventory(supply), supplyBefore, 'supply changed before build');
     admitted.assertUnchanged(admitted.captured);
     assert.deepEqual(inventory(output), admitted.before, 'candidate changed before build');
     assert.deepEqual(inventory(HANDWRITTEN), admitted.handwritten, 'handwritten input changed before build');
     assert.deepEqual(inventory(RUNTIME), admitted.runtime, 'local runtime changed before build');
+    if (actor) assert.deepEqual(snapshotFiles(Object.keys(actor.before)), actor.before, 'actor inputs changed before build');
     notCancelled();
     // Cooperative output claim within the only allowed app-write territory.
     // Never remove another invocation's claim or clean/reuse old build outputs.
     assertFreshOutput(output);
     mkdirSync(join(output, 'target'));
     save(join(output, 'target/truthsrc-build-owner.json'), { evidence, pid: process.pid, project: PROJECT });
+    if (runTests) {
+      result.testsExecuted = null;
+      testObservation = { requested: true, evidenceState: 'unavailable', jvmStarted: null, started: null, completed: null,
+        passed: false, expected: executionManifest, errors: [] };
+    }
     phases.build = await command(java, ['-Xmx2G', '-XX:ActiveProcessorCount=2', ...javaOptions,
       '-cp', join(supply, 'launcher/sbt-launch.jar'), 'xsbt.boot.Boot', ...tasks],
       output, buildEnv, join(evidence, 'build'), 480_000, sandbox);
+    const stdout = readFileSync(join(evidence, 'build.stdout.log'));
+    assert.equal(hash(stdout), phases.build.stdoutSha256, 'build log changed before result verification');
+    if (runTests) {
+      try {
+        testObservation = inspectGeneratedTests(stdout.toString('utf8'), executionManifest, phases.build.pid);
+        result.testsExecuted = testObservation.started;
+      } catch (error) {
+        testObservation.errors.push('test execution evidence unavailable: ' + error.message);
+        throw error;
+      }
+    }
+    const actualRoot = actualBuildSourceRoot(stdout.toString('utf8'), output, evidence);
+    const actualSources = inventory(actualRoot, { afterBuild: true });
+    const actualCheck = compareBuildSources(admitted.before, actualSources);
+    result.checks.actualBuildSourcesVerified = true;
+    save(join(evidence, 'actual-build-sources.json'), { ...actualCheck, root: actualRoot, staged: actualRoot !== output,
+      admittedOutput: output, stdoutSha256: phases.build.stdoutSha256, sources: actualSources });
+    if (actor) {
+      const sourceMarkers = [...stdout.toString('utf8').matchAll(/^TRUTHSRC-ACTOR-SOURCES=(.+)$/gm)];
+      assert.equal(sourceMarkers.length, 1, 'one actual Test sources marker required');
+      const expected = [...admitted.testFiles.map(file => join(actualRoot, file)), ...actor.manifest.suites.filter(s => s.sourceKind === 'frozen-business-test').map(s => s.file)].sort();
+      assert.deepEqual(sourceMarkers[0][1].split(',').sort(), expected, 'actual compiled Test sources differ');
+      result.checks.actualTestSourcesVerified = true;
+    }
     succeeded(phases.build);
-  } catch (error) { result.errors.push(error.message); }
+  } catch (error) {
+    result.errors.push(error.message);
+    if (runTests && testObservation.evidenceState === 'unavailable')
+      testObservation.errors.push('test execution evidence unavailable: ' + error.message);
+  }
   finally {
     // Reconcile even on compiler failure, timeout or cancellation. Detection is
     // not rollback and does not make concurrent directory replacement atomic.
@@ -668,6 +948,21 @@ async function verify(options) {
       try { save(join(evidence, 'sources-after.json'), after); }
       catch (error) { result.errors.push(error.message); }
     }
+    if (actor) {
+      try {
+        const after = snapshotFiles(Object.keys(actor.before));
+        save(join(evidence, 'actor-inputs-after.json'), after);
+        assert.deepEqual(after, actor.before, 'actor tests/worker/configuration inputs changed');
+        result.checks.actorInputsUnchanged = true;
+      } catch (error) { result.checks.actorInputsUnchanged = false; result.errors.push(error.message); }
+      try {
+        const workers = verifyActorWorkers(actor);
+        save(join(evidence, 'actor-workers.json'), workers);
+        result.checks.actorWorkersVerified = true;
+      } catch (error) { result.checks.actorWorkersVerified = false; result.errors.push(error.message); }
+      try { save(join(evidence, 'actor-journals-after.json'), inventory(actor.ownedRoot)); }
+      catch (error) { result.errors.push(error.message); }
+    }
     if (sandbox) {
       try {
         save(join(evidence, 'sandbox-after.json'), checkSandbox(sandbox));
@@ -682,24 +977,42 @@ async function verify(options) {
         result.checks.ownedCachesInventoried = true;
       } catch (error) { result.checks.ownedCachesInventoried = false; result.errors.push(error.message); }
     }
+    try {
+      assert.ok(verifierBefore, 'verifier baseline unavailable');
+      result.checks.verifierUnchanged = fileDigest(verifierBefore.file) === verifierBefore.sha256;
+      assert.ok(result.checks.verifierUnchanged, 'verifier changed during execution');
+    } catch (error) { result.checks.verifierUnchanged = false; result.errors.push(error.message); }
+    await drainPendingSignals();
     result.cancelled = cancelled;
     if (cancelled) result.errors.push('cancelled: ' + cancelled);
-    result.status = result.errors.length === 0 && result.checks.osSandboxEnforced && phases.build?.code === 0 ? 'passed' : 'blocked';
+    if (runTests) {
+      const key = runActors ? 'actorTests' : 'generatedTests', check = key + 'Passed';
+      result[key] = completeGeneratedTests(testObservation, phases.build, result.checks, cancelled, result.errors);
+      result.checks[check] = result[key].passed;
+      if (!result[key].passed) result.errors.push('tests not verified: ' + result[key].errors.join('; '));
+      try { save(join(evidence, runActors ? 'actor-tests.json' : 'generated-tests.json'), { ...result[key], stdoutSha256: phases.build?.stdoutSha256 ?? null }); }
+      catch (error) { result[key].passed = false; result.checks[check] = false; result.errors.push(error.message); }
+    }
+    result.status = result.errors.length === 0 && result.checks.osSandboxEnforced && phases.build?.code === 0 &&
+      (!runTests || result[runActors ? 'actorTests' : 'generatedTests'].passed) ? 'passed' : 'blocked';
     save(join(evidence, 'result.json'), result);
   }
-  console.log(json({ status: result.status, evidence, receipt: join(evidence, 'result.json'), testsExecuted: false }));
+  console.log(json({ status: result.status, evidence, receipt: join(evidence, 'result.json'), testsExecuted: result.testsExecuted,
+    generatedTestsPassed: result.generatedTests.passed, actorTestsPassed: result.actorTests.passed }));
   if (result.status !== 'passed') process.exitCode = cancelled === 'SIGINT' ? 130 : cancelled === 'SIGTERM' ? 143 : 2;
 }
 
-try {
-  const options = parseArgs(process.argv.slice(2));
-  if (!options) console.log(usage);
-  else {
-    process.on('SIGINT', onInt); process.on('SIGTERM', onTerm);
-    try { await verify(options); }
-    finally { process.off('SIGINT', onInt); process.off('SIGTERM', onTerm); }
+if (isMainModule(process.argv[1], import.meta.url)) {
+  try {
+    const options = parseArgs(process.argv.slice(2));
+    if (!options) console.log(usage);
+    else {
+      process.on('SIGINT', onInt); process.on('SIGTERM', onTerm);
+      try { await verify(options); }
+      finally { process.off('SIGINT', onInt); process.off('SIGTERM', onTerm); }
+    }
+  } catch (error) {
+    console.error(error.message);
+    process.exitCode = cancelled === 'SIGINT' ? 130 : cancelled === 'SIGTERM' ? 143 : 2;
   }
-} catch (error) {
-  console.error(error.message);
-  process.exitCode = cancelled === 'SIGINT' ? 130 : cancelled === 'SIGTERM' ? 143 : 2;
 }
