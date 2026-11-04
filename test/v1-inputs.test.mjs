@@ -16,7 +16,7 @@ test('four historical bank flow requests keep their complete frozen source and d
   assert.equal(scope.flow,flow);assert.equal(scope.pipeline,pipeline);assert.ok(scope.requiredOracles.length);
   assert.equal(scope.runtimeVerified,false);
  }
- assert.deepEqual(readProductRequest(file('sip')),bankApplicationRequest());
+ assert.deepEqual(readProductRequest(file('sip')),bankApplicationRequest({historical:true}));
 });
 test('complete bank contracts reject amount, owner, source guard and authority signature mutations before plans',()=>{
  const input=readProductRequest(file('sip'));

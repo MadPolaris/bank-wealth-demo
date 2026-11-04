@@ -1,0 +1,18 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: system
+schemaVersion: "truthsrc.author/v1"
+id: bank-wealth
+name: "银行财富有界示例"
+workshop: bank-wealth-v1
+sessionOrder:
+  [
+    "refining",
+    "commandStorming",
+    "contextMapping",
+    "storyMapping"
+  ]
+contexts:
+  [
+    "bankwealth"
+  ]

@@ -18,6 +18,7 @@ export function checkProjections(snapshot) {
 
 function main() {
   const args = process.argv.slice(2);
+  if (args.shift() !== '--historical') throw new Error('Historical preview projection. Current generation uses tools/truthsrc-project.mjs; historical use requires --historical.');
   if (args.some((arg) => !['--check', '--write'].includes(arg)) || args.length > 1) throw new Error('Usage: node tools/project.mjs [--check|--write]');
   const snapshot = loadSnapshot();
   const validation = { proposals: validateArtifacts(snapshot), declarations: validateDeclarations(snapshot), cashContract: validateCashContract(snapshot) };

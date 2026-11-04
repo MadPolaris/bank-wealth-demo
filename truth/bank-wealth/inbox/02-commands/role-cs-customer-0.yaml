@@ -1,0 +1,69 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: role
+name: customer
+id: customer
+origin:
+  stage: commandStorming
+  board: current-bank-knowledge
+  seq: 0
+payload:
+  {
+    "type": "role",
+    "name": "customer",
+    "id": "customer",
+    "context": "bankwealth",
+    "description": "配置中的已认证客户，只能通过闭集服务DTO表达现金申购及本人定投创建/修订/暂停/恢复意图，并查看本人读模型。",
+    "can_issue": [],
+    "can_view": [
+      "bank-account-view",
+      "bank-cash-request-view",
+      "bank-order-view",
+      "bank-sip-plan-view",
+      "bank-sip-occurrence-view"
+    ],
+    "entrypoints": [
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankCashSubmitPort"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankSipCreatePort"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankSipRevisePort"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankSipPausePort"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankSipResumePort"
+      }
+    ],
+    "boundary": "can_issue为空是保守的直接聚合命令权限说明，不表示客户没有上述服务动作。RecordCashRequestSource、RequestFundPurchaseSettlement、Create/Append/Seal、TA回执、退款、tick和terminal等含可信参数或机器职责，不直接开放给客户。Pause/Resume的tick同样由宿主从原计划取值。这里不声称服务鉴权已由角色便签机器编译。",
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P28-1; P29-2; P30-1..P30-4; P31-2)",
+      "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala",
+      "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+      "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+      "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+      "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+    ]
+  }

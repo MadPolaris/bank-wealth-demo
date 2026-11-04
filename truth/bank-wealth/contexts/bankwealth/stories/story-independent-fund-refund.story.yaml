@@ -1,0 +1,45 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: story
+name: IndependentFundRefund
+id: independent-fund-refund
+payload:
+  {
+    "id": "independent-fund-refund",
+    "name": "IndependentFundRefund",
+    "context": "bankwealth",
+    "role": "customer",
+    "goal": "在已付款申购遭TA拒绝时看到原全本金的真实返回进度。",
+    "description": "退款由可信拒绝驱动，客户不能指定退款账户或本金。独立退款不抹掉原付款成功；退款处理中、补偿或未知不是到账。",
+    "links": [
+      {
+        "relation": "covers",
+        "target": "use-case:RefundTaRejectedPurchase"
+      }
+    ],
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "role",
+        "owner": [],
+        "id": "customer"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "use-case",
+        "owner": [],
+        "id": "RefundTaRejectedPurchase"
+      }
+    ],
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/pipelines/bank-independent-refund-v1.pipeline.yaml",
+      "truth/bank-wealth/contexts/bankwealth/sagas/bank-independent-refund-v1.saga.yaml",
+      "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+      "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
+      "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+    ]
+  }

@@ -1,0 +1,358 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: question
+name: BankV1Implementation
+origin:
+  stage: refining
+  board: bank-v1
+  seq: 0
+payload:
+  {
+    "type": "question",
+    "name": "BankV1Implementation",
+    "stage": "refining",
+    "info": {
+      "artifact": {
+        "id": "decision.bank-v1-implementation",
+        "category": "bank-v1-source-contract",
+        "status": "selected-demo-design",
+        "provenance": {
+          "author": "agent-assisted-bank-v1",
+          "workshopHeld": false,
+          "approvedBy": "user-approved-p24-p25-bank-joint",
+          "sourceVersion": "bank-v1-p23-design-2"
+        },
+        "body": {
+          "version": "bank-v1-joint-1",
+          "inheritedSources": [
+            {
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/inheritedSources/0/value",
+              "interpretation": "historical-frozen-reference",
+              "originalFile": "tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml",
+              "originalPointer": "/payload/info/artifact"
+            },
+            {
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/inheritedSources/1/value",
+              "interpretation": "historical-frozen-reference",
+              "originalFile": "tree/inbox/refining/question-rf-cash-purchase-v2-contract-0.yaml",
+              "originalPointer": "/payload/info/artifact"
+            },
+            {
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/inheritedSources/2/value",
+              "interpretation": "historical-frozen-reference",
+              "originalFile": "tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml",
+              "originalPointer": "/payload/info/artifact"
+            }
+          ],
+          "scope": [
+            "payment",
+            "ta",
+            "refund",
+            "sip"
+          ],
+          "excluded": [
+            "legacy-external-bank",
+            "automatic-old-plan-migration",
+            "production-financial-policy"
+          ],
+          "money": {
+            "type": "Money",
+            "binding": "truthsrc.project.json#/exactTypes",
+            "domainRules": "contexts/bankwealth/aggregates/credit-balance/slices/reserve-funds.slice.yaml",
+            "historicalDecision": {
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/money"
+            }
+          },
+          "taExactText": {
+            "type": "TaExactText",
+            "declaration": "contexts/bankwealth/value-objects/ta-exact-text.vo.yaml",
+            "historicalDecision": {
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/taExactText"
+            }
+          },
+          "sourceRelations": [
+            {
+              "id": "decision.p23-bank-v1-handoff",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/inheritedSources/0/value",
+              "interpretation": "historical-frozen-reference"
+            },
+            {
+              "id": "contract.cash-purchase-v2",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/inheritedSources/1/value",
+              "interpretation": "historical-frozen-reference"
+            },
+            {
+              "id": "decision.cash-entry-prerequisites",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/inheritedSources/2/value",
+              "interpretation": "historical-frozen-reference"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "PAY-success",
+              "flow": "payment",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/0",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "PurchaseFundWithCash"
+            },
+            {
+              "id": "PAY-repeat",
+              "flow": "payment",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/1",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "PurchaseFundWithCash"
+            },
+            {
+              "id": "PAY-conflict",
+              "flow": "payment",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/2",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "PurchaseFundWithCash"
+            },
+            {
+              "id": "PAY-early-reject",
+              "flow": "payment",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/3",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "PurchaseFundWithCash"
+            },
+            {
+              "id": "PAY-unknown-recover",
+              "flow": "payment",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/4",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "PurchaseFundWithCash"
+            },
+            {
+              "id": "PAY-cancel-before-prepare",
+              "flow": "payment",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/5",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "PurchaseFundWithCash"
+            },
+            {
+              "id": "TA-confirm",
+              "flow": "ta",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/6",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "SettlePaidFundOrderWithTa"
+            },
+            {
+              "id": "TA-repeat",
+              "flow": "ta",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/7",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "SettlePaidFundOrderWithTa"
+            },
+            {
+              "id": "TA-conflicting-body",
+              "flow": "ta",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/8",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "SettlePaidFundOrderWithTa"
+            },
+            {
+              "id": "TA-unknown-confirm",
+              "flow": "ta",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/9",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "SettlePaidFundOrderWithTa"
+            },
+            {
+              "id": "TA-before-payment",
+              "flow": "ta",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/10",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "SettlePaidFundOrderWithTa"
+            },
+            {
+              "id": "TA-wrong-resource",
+              "flow": "ta",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/11",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "SettlePaidFundOrderWithTa"
+            },
+            {
+              "id": "TA-accepted-only",
+              "flow": "ta",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/12",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "SettlePaidFundOrderWithTa"
+            },
+            {
+              "id": "REFUND-success",
+              "flow": "refund",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/13",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RefundTaRejectedPurchase"
+            },
+            {
+              "id": "REFUND-repeat",
+              "flow": "refund",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/14",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RefundTaRejectedPurchase"
+            },
+            {
+              "id": "REFUND-substitute",
+              "flow": "refund",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/15",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RefundTaRejectedPurchase"
+            },
+            {
+              "id": "REFUND-unknown-recover",
+              "flow": "refund",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/16",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RefundTaRejectedPurchase"
+            },
+            {
+              "id": "REFUND-no-TA-reject",
+              "flow": "refund",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/17",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RefundTaRejectedPurchase"
+            },
+            {
+              "id": "REFUND-conflicting-terminal",
+              "flow": "refund",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/18",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RefundTaRejectedPurchase"
+            },
+            {
+              "id": "SIP-success",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/19",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            },
+            {
+              "id": "SIP-repeat-slot",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/20",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            },
+            {
+              "id": "SIP-conflict-config",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/21",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            },
+            {
+              "id": "SIP-unknown-recover",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/22",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            },
+            {
+              "id": "SIP-no-effects-failure",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/23",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            },
+            {
+              "id": "SIP-pause-backlog",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/24",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            },
+            {
+              "id": "SIP-inflight-pause",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/25",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            },
+            {
+              "id": "SIP-revision-backlog",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/26",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            },
+            {
+              "id": "SIP-late-terminal",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/27",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            },
+            {
+              "id": "SIP-refund-count-boundary",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/28",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            },
+            {
+              "id": "SIP-catch-up-order",
+              "flow": "sip",
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/scenarios/29",
+              "interpretation": "historical-acceptance-scenario",
+              "currentUseCase": "RunFiniteSipPlan"
+            }
+          ],
+          "entryOwnership": {
+            "payment": "bank-cash-payment-v1",
+            "refund": "bank-independent-refund-v1",
+            "ta": "bank-ta-submission-v1",
+            "sip": "bank-sip-dispatch-v1"
+          },
+          "readiness": {
+            "historicalDeclaration": {
+              "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "pointer": "/payload/info/artifact/body/readiness"
+            },
+            "acceptedRelease": "v1/integration/RELEASE-SIGNOUT-1134.md",
+            "currentGeneration": "Run the root truthsrc.project.json; status is derived, not authored."
+          }
+        }
+      }
+    }
+  }

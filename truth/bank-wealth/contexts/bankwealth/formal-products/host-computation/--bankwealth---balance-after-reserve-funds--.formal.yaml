@@ -1,0 +1,96 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: host-computation
+id: "[\"bankwealth\",\"BalanceAfterReserveFunds\"]"
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": {
+      "context": "bankwealth",
+      "kind": "port",
+      "owner": [],
+      "id": "BalanceAfterReserveFunds"
+    },
+    "version": "bank-v1-1",
+    "command": {
+      "context": "bankwealth",
+      "kind": "command",
+      "owner": [
+        "CreditBalance"
+      ],
+      "id": "ReserveFunds"
+    },
+    "outputType": {
+      "form": "nominal",
+      "ref": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "Money"
+      }
+    },
+    "inputDependencies": [
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "CreditBalance",
+          "ReserveFunds"
+        ],
+        "id": "txid"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "CreditBalance",
+          "ReserveFunds"
+        ],
+        "id": "resource"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "parameter",
+        "owner": [
+          "CreditBalance",
+          "ReserveFunds"
+        ],
+        "id": "amount"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "state-field",
+        "owner": [
+          "CreditBalance"
+        ],
+        "id": "accountBalance"
+      }
+    ],
+    "stableIdentityContract": {
+      "id": "BalanceAfterReserveFunds-identity",
+      "version": "1",
+      "keys": [
+        {
+          "context": "bankwealth",
+          "kind": "parameter",
+          "owner": [
+            "CreditBalance",
+            "ReserveFunds"
+          ],
+          "id": "txid"
+        },
+        {
+          "context": "bankwealth",
+          "kind": "parameter",
+          "owner": [
+            "CreditBalance",
+            "ReserveFunds"
+          ],
+          "id": "resource"
+        }
+      ]
+    }
+  }

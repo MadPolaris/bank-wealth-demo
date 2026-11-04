@@ -1,0 +1,300 @@
+{
+  "schemaVersion": "truthsrc.project/v1",
+  "tree": "truth/bank-wealth",
+  "canonicalId": "bank-v1",
+  "context": "bankwealth",
+  "products": [
+    {
+      "id": "reference-layout",
+      "version": "1"
+    },
+    {
+      "id": "exact-value-types",
+      "version": "1"
+    },
+    {
+      "id": "exact-value-codecs",
+      "version": "1"
+    },
+    {
+      "id": "domain-decision",
+      "version": "4"
+    },
+    {
+      "id": "domain-dependencies",
+      "version": "6"
+    },
+    {
+      "id": "domain-folds",
+      "version": "6"
+    },
+    {
+      "id": "domain-external-events",
+      "version": "2"
+    },
+    {
+      "id": "saga-contract",
+      "version": "1"
+    },
+    {
+      "id": "saga-runtime-contract",
+      "version": "1"
+    },
+    {
+      "id": "execution-contract",
+      "version": "1"
+    },
+    {
+      "id": "artifact-contract",
+      "version": "3"
+    },
+    {
+      "id": "saga-host-contract",
+      "version": "2"
+    },
+    {
+      "id": "effect-host-contract",
+      "version": "2"
+    },
+    {
+      "id": "product-design",
+      "version": "1"
+    }
+  ],
+  "exactTypes": [
+    {
+      "domain": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "Money"
+      },
+      "version": "bank-v1-1",
+      "form": "unit-decimal",
+      "precision": 38,
+      "scale": 2,
+      "amountMember": {
+        "context": "bankwealth",
+        "kind": "member",
+        "owner": [
+          "Money"
+        ],
+        "id": "amount"
+      },
+      "unitMember": {
+        "context": "bankwealth",
+        "kind": "member",
+        "owner": [
+          "Money"
+        ],
+        "id": "currency"
+      },
+      "units": [
+        "CNY"
+      ]
+    },
+    {
+      "domain": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "AmountDecimal"
+      },
+      "version": "bank-v1-1",
+      "form": "decimal",
+      "precision": 38,
+      "scale": 2,
+      "amountMember": null,
+      "unitMember": null,
+      "units": []
+    }
+  ],
+  "exactCodecs": [
+    {
+      "domain": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "Money"
+      },
+      "domainVersion": "bank-v1-1",
+      "id": "bank-v1-Money-minor-units",
+      "version": "1",
+      "format": "minor-units-text",
+      "wire": {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "type",
+          "owner": [],
+          "id": "MoneyWire"
+        },
+        "version": "bank-v1-1",
+        "amountMember": {
+          "context": "bankwealth",
+          "kind": "member",
+          "owner": [
+            "MoneyWire"
+          ],
+          "id": "minorUnits"
+        },
+        "unitMember": {
+          "context": "bankwealth",
+          "kind": "member",
+          "owner": [
+            "MoneyWire"
+          ],
+          "id": "currency"
+        }
+      },
+      "po": {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "type",
+          "owner": [],
+          "id": "MoneyPO"
+        },
+        "version": "bank-v1-1",
+        "amountMember": {
+          "context": "bankwealth",
+          "kind": "member",
+          "owner": [
+            "MoneyPO"
+          ],
+          "id": "minorUnits"
+        },
+        "unitMember": {
+          "context": "bankwealth",
+          "kind": "member",
+          "owner": [
+            "MoneyPO"
+          ],
+          "id": "currency"
+        }
+      }
+    },
+    {
+      "domain": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "AmountDecimal"
+      },
+      "domainVersion": "bank-v1-1",
+      "id": "bank-v1-AmountDecimal-minor-units",
+      "version": "1",
+      "format": "minor-units-text",
+      "wire": {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "type",
+          "owner": [],
+          "id": "AmountDecimalWire"
+        },
+        "version": "bank-v1-1",
+        "amountMember": null,
+        "unitMember": null
+      },
+      "po": {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "type",
+          "owner": [],
+          "id": "AmountDecimalPO"
+        },
+        "version": "bank-v1-1",
+        "amountMember": null,
+        "unitMember": null
+      }
+    }
+  ],
+  "documents": [
+    {
+      "id": "payment-sagas",
+      "file": "bindings/implementation/payment-sagas.json"
+    },
+    {
+      "id": "payment-runtime",
+      "file": "bindings/implementation/payment-runtime.json"
+    },
+    {
+      "id": "payment-execution",
+      "file": "bindings/implementation/payment-execution.json"
+    },
+    {
+      "id": "refund-sagas",
+      "file": "bindings/implementation/refund-sagas.json"
+    },
+    {
+      "id": "refund-runtime",
+      "file": "bindings/implementation/refund-runtime.json"
+    },
+    {
+      "id": "refund-execution",
+      "file": "bindings/implementation/refund-execution.json"
+    },
+    {
+      "id": "sip-execution",
+      "file": "bindings/implementation/sip-execution.json"
+    },
+    {
+      "id": "ta-execution",
+      "file": "bindings/implementation/ta-execution.json"
+    }
+  ],
+  "assemblies": [
+    {
+      "id": "sagas",
+      "kind": "saga-bindings-union",
+      "sources": [
+        "payment-sagas",
+        "refund-sagas"
+      ]
+    },
+    {
+      "id": "runtime",
+      "kind": "runtime-bindings-union",
+      "sources": [
+        "payment-runtime",
+        "refund-runtime"
+      ]
+    },
+    {
+      "id": "execution",
+      "kind": "execution-bindings-union",
+      "sources": [
+        "payment-execution",
+        "refund-execution",
+        "sip-execution",
+        "ta-execution"
+      ],
+      "sagaBinding": "sagas"
+    }
+  ],
+  "roles": {
+    "sagaBinding": "sagas",
+    "runtimeBinding": "runtime",
+    "executionBinding": "execution"
+  },
+  "generator": "scala-cqrs-play-service",
+  "options": {
+    "packages": [
+      {
+        "context": "bankwealth",
+        "package": "example.bankwealth"
+      }
+    ],
+    "verificationCases": [],
+    "runtimeArtifact": {
+      "coordinate": "net.imadz:saga-core_2.13:0.2.1-p23.20261027.1",
+      "sha256": "f20ad61eba670d2766cd39a1f75bd236351d0069b0480bb85d7335ffff93f8cf",
+      "repository": "./.local/truthsrc-runtime/maven",
+      "symbolicTarget": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT"
+    },
+    "service": {
+      "artifact": "bank-service",
+      "externalSourceRoots": [
+        "./v1/handwritten/scala"
+      ]
+    }
+  }
+}

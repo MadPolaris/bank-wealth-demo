@@ -6,6 +6,7 @@ import { validateCashContract } from './cash-contract.mjs';
 import { checkProjections } from './project.mjs';
 
 const args = process.argv.slice(2);
+if (args.shift() !== '--historical') throw new Error('Historical root-tree validator. Use tools/truthsrc-project.mjs validate for the current project; historical use requires --historical.');
 if (args.some((arg) => !['--roundtrip', '--check-projections'].includes(arg))) throw new Error('Usage: node tools/validate.mjs [--roundtrip] [--check-projections]');
 const snapshot = loadSnapshot();
 const baseline = JSON.parse(readFileSync(join(ROOT, 'docs/BASELINE.json'), 'utf8'));

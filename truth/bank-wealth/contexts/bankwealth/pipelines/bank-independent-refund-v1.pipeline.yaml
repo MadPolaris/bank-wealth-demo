@@ -1,0 +1,210 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: pipeline
+id: bank-independent-refund-v1
+name: "Bank V1 sole trusted independent refund"
+steps:
+  [
+    {
+      "id": "return-principal",
+      "name": "Return original full principal through independent refund Saga",
+      "description": "Only trusted correlated TA rejection and known original payment success may start this durable refund.",
+      "execution": {
+        "invokeSaga": {
+          "ref": {
+            "sagaId": "bank-independent-refund-v1",
+            "version": "bank-v1-1"
+          },
+          "args": [
+            {
+              "slot": "fundCollectionAccountId",
+              "type": "AccountId",
+              "ref": "input:fundCollectionAccountId"
+            },
+            {
+              "slot": "investorAccountId",
+              "type": "AccountId",
+              "ref": "input:investorAccountId"
+            },
+            {
+              "slot": "amount",
+              "type": "Money",
+              "ref": "input:amount"
+            }
+          ],
+          "transactionIdentity": {
+            "type": "TxId",
+            "derivation": "durable-source-stage",
+            "source": {
+              "ref": "input:refundOperationId",
+              "type": "OperationId"
+            },
+            "stageId": "return-principal",
+            "stageOccurrence": {
+              "ref": "input:refundOperationId",
+              "type": "OperationId"
+            },
+            "scope": "saga-version",
+            "conflict": "reject-different-args"
+          },
+          "start": "durable-intent-before-start",
+          "completionMode": "await-terminal",
+          "results": [
+            {
+              "resultKind": "succeeded",
+              "code": "Succeeded",
+              "outputs": [
+                {
+                  "slot": "txid",
+                  "ref": "result:txid",
+                  "type": "TxId"
+                }
+              ]
+            },
+            {
+              "resultKind": "rejected-before-effects",
+              "code": "Rejected",
+              "outputs": []
+            },
+            {
+              "resultKind": "compensated",
+              "code": "Compensated",
+              "outputs": []
+            },
+            {
+              "resultKind": "recovery-required",
+              "code": "RecoveryRequired",
+              "outputs": []
+            },
+            {
+              "resultKind": "outcome-unknown",
+              "code": "Unknown",
+              "outputs": []
+            }
+          ]
+        },
+        "reads": [
+          {
+            "slot": "refundOperationId",
+            "type": "OperationId",
+            "ref": "input:refundOperationId"
+          },
+          {
+            "slot": "fundCollectionAccountId",
+            "type": "AccountId",
+            "ref": "input:fundCollectionAccountId"
+          },
+          {
+            "slot": "investorAccountId",
+            "type": "AccountId",
+            "ref": "input:investorAccountId"
+          },
+          {
+            "slot": "amount",
+            "type": "Money",
+            "ref": "input:amount"
+          }
+        ],
+        "writes": [
+          {
+            "id": "refundTxid",
+            "slot": "txid",
+            "type": "TxId",
+            "durability": "durable-reference"
+          }
+        ],
+        "outcomes": [
+          {
+            "code": "Succeeded",
+            "kind": "success",
+            "action": "continue"
+          },
+          {
+            "code": "Rejected",
+            "kind": "business-rejection",
+            "action": "stop"
+          },
+          {
+            "code": "Compensated",
+            "kind": "business-rejection",
+            "action": "stop"
+          },
+          {
+            "code": "RecoveryRequired",
+            "kind": "infrastructure-failure",
+            "action": "manual-recovery"
+          },
+          {
+            "code": "Unknown",
+            "kind": "unknown-effect",
+            "action": "manual-recovery"
+          }
+        ]
+      }
+    }
+  ]
+execution:
+  {
+    "schemaVersion": "truthsrc.execution/v1",
+    "inputs": [
+      {
+        "id": "fundOrderId",
+        "type": "FundOrderId",
+        "durability": "start-record"
+      },
+      {
+        "id": "paymentTxId",
+        "type": "TxId",
+        "durability": "start-record"
+      },
+      {
+        "id": "investorAccountId",
+        "type": "AccountId",
+        "durability": "start-record"
+      },
+      {
+        "id": "fundCollectionAccountId",
+        "type": "AccountId",
+        "durability": "start-record"
+      },
+      {
+        "id": "amount",
+        "type": "Money",
+        "durability": "start-record"
+      },
+      {
+        "id": "refundOperationId",
+        "type": "OperationId",
+        "durability": "start-record"
+      }
+    ],
+    "outputs": [
+      {
+        "id": "refundTxid",
+        "ref": "step:return-principal:refundTxid",
+        "type": "TxId"
+      }
+    ],
+    "recovery": {
+      "inputResponsibility": "host",
+      "inputs": [
+        "input:fundOrderId",
+        "input:paymentTxId",
+        "input:investorAccountId",
+        "input:fundCollectionAccountId",
+        "input:amount",
+        "input:refundOperationId"
+      ],
+      "planVersion": "bank-v1-1",
+      "planCompatibility": "exact",
+      "checkpoint": "confirmed-prefix",
+      "unknownEffect": "reconcile-before-resume",
+      "ownership": "single-writer"
+    },
+    "admission": {
+      "maxConcurrentRuns": 1,
+      "maxInFlightSteps": 1,
+      "maxItemsPerChunk": 1,
+      "maxInFlightChunks": 1
+    }
+  }

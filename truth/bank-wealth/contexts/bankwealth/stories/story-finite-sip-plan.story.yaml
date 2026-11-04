@@ -1,0 +1,47 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: story
+name: FiniteSipPlan
+id: finite-sip-plan
+payload:
+  {
+    "id": "finite-sip-plan",
+    "name": "FiniteSipPlan",
+    "context": "bankwealth",
+    "role": "customer",
+    "goal": "管理有限现金定投的未来安排，并逐期看到不重复扣款、不重复计数的真实结果。",
+    "description": "完整日程先留存，修订只影响未来，暂停不消灭backlog且不复活跳期。显式业务tick驱动派发，首次相关终态才计数；三败不自动暂停。",
+    "links": [
+      {
+        "relation": "covers",
+        "target": "use-case:RunFiniteSipPlan"
+      }
+    ],
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "role",
+        "owner": [],
+        "id": "customer"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "use-case",
+        "owner": [],
+        "id": "RunFiniteSipPlan"
+      }
+    ],
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/aggregate.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-create-intent.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/pipelines/bank-sip-dispatch-v1.pipeline.yaml",
+      "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+      "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+      "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+    ]
+  }

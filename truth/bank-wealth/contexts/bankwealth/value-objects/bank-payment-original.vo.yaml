@@ -1,0 +1,37 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: BankPaymentOriginal
+seq: 19
+payload:
+  {
+    "name": "BankPaymentOriginal",
+    "context": "bankwealth",
+    "version": "bank-v1-1",
+    "fields": [
+      {
+        "name": "operationId",
+        "dataType": "OperationId"
+      },
+      {
+        "name": "fundOrderId",
+        "dataType": "FundOrderId"
+      },
+      {
+        "name": "investorAccountId",
+        "dataType": "AccountId"
+      },
+      {
+        "name": "fundCollectionAccountId",
+        "dataType": "AccountId"
+      },
+      {
+        "name": "fundCode",
+        "dataType": "String"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money"
+      }
+    ]
+  }

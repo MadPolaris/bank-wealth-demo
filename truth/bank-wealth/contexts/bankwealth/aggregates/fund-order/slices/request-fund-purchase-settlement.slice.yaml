@@ -1,0 +1,198 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RequestFundPurchaseSettlement
+payload:
+  {
+    "name": "RequestFundPurchaseSettlement",
+    "parameters": [
+      {
+        "name": "operationId",
+        "dataType": "OperationId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "fundOrderId",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "investorAccountId",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "fundCollectionAccountId",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "fundCode",
+        "dataType": "String",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "CASH_ADMITTED_PAYMENT_MATCH",
+        "errCode": "CASH_ADMITTED_PAYMENT_MATCH",
+        "cond": "state.cashRequestSource.isEmpty || (state.cashRequestOriginals.contains(\"original\") && param.operationId == state.cashRequestOriginals(\"original\").payment.operationId && param.fundOrderId == state.cashRequestOriginals(\"original\").payment.fundOrderId && param.investorAccountId == state.cashRequestOriginals(\"original\").payment.investorAccountId && param.fundCollectionAccountId == state.cashRequestOriginals(\"original\").payment.fundCollectionAccountId && param.fundCode == state.cashRequestOriginals(\"original\").payment.fundCode && param.amount == state.cashRequestOriginals(\"original\").payment.amount)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_RESOURCE",
+        "errCode": "ORDER_RESOURCE",
+        "cond": "param.fundOrderId == state.id",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_REPLAY_CONFLICT",
+        "errCode": "ORDER_REPLAY_CONFLICT",
+        "cond": "state.status == \"new\" || (param.operationId == state.operationId && param.investorAccountId == state.investorAccountId && param.fundCollectionAccountId == state.fundCollectionAccountId && param.fundCode == state.fundCode && param.amount == state.amount)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_REQUEST_ONCE",
+        "errCode": "ORDER_REQUEST_ONCE",
+        "cond": "state.status == \"new\"",
+        "onFail": "succeed-empty"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_ACCOUNTS",
+        "errCode": "ORDER_ACCOUNTS",
+        "cond": "param.investorAccountId != param.fundCollectionAccountId",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_AMOUNT",
+        "errCode": "ORDER_AMOUNT",
+        "cond": "param.amount.currency == \"CNY\" && param.amount.amount > 0.00",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_OPERATION",
+        "errCode": "ORDER_OPERATION",
+        "cond": "param.operationId.value.nonEmpty && param.fundCode.nonEmpty",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "FundPurchaseSettlementRequested"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "payment/ta/refund",
+      "serviceIntegration": {
+        "author": "agent-assisted-bank-v1-service-integration",
+        "workshopHeld": false,
+        "sourceVersion": "bank-v1-service-integration-619",
+        "sourceFlow": "P26-P32",
+        "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+      }
+    }
+  }
+events:
+  {
+    "FundPurchaseSettlementRequested": {
+      "name": "FundPurchaseSettlementRequested",
+      "payloads": [
+        {
+          "name": "operationId",
+          "dataType": "OperationId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "fundOrderId",
+          "dataType": "FundOrderId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "investorAccountId",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "fundCollectionAccountId",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "fundCode",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "operationId",
+          "expr": "param.operationId"
+        },
+        {
+          "slot": "fundOrderId",
+          "expr": "param.fundOrderId"
+        },
+        {
+          "slot": "investorAccountId",
+          "expr": "param.investorAccountId"
+        },
+        {
+          "slot": "fundCollectionAccountId",
+          "expr": "param.fundCollectionAccountId"
+        },
+        {
+          "slot": "fundCode",
+          "expr": "param.fundCode"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "operationId",
+          "expr": "event.operationId"
+        },
+        {
+          "slot": "investorAccountId",
+          "expr": "event.investorAccountId"
+        },
+        {
+          "slot": "fundCollectionAccountId",
+          "expr": "event.fundCollectionAccountId"
+        },
+        {
+          "slot": "fundCode",
+          "expr": "event.fundCode"
+        },
+        {
+          "slot": "amount",
+          "expr": "event.amount"
+        },
+        {
+          "slot": "status",
+          "expr": "literal:payment-requested"
+        }
+      ]
+    }
+  }

@@ -1,0 +1,102 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: read-model
+name: BankAccountView
+id: bank-account-view
+payload:
+  {
+    "id": "bank-account-view",
+    "name": "BankAccountView",
+    "context": "bankwealth",
+    "description": "本人账户的已投影初始化标志、CNY可用金额与预留总额；不是投资组合估值或跨账户总余额。",
+    "sourceAggregate": "CreditBalance",
+    "visible_to": [
+      "customer"
+    ],
+    "fields": [
+      {
+        "name": "accountId",
+        "dataType": "AccountId",
+        "source": "aggregateIdentity",
+        "description": "BankReadside.accountMe从可信principal账户映射定位CreditBalance；请求不能换账户。"
+      },
+      {
+        "name": "initialized",
+        "dataType": "Boolean",
+        "source": "Documentation only: CreditBalance.initialized: default false; AccountInitialized fold sets true",
+        "description": "投影是否已见初始化事实；不能据当前余额反推原seed。"
+      },
+      {
+        "name": "available",
+        "dataType": "MoneyWire",
+        "source": "Documentation only: BankReadside.accountMe: generated CreditBalance.accountBalance[CNY], default 0.00 only inside an existing projected state, converted by MoneyToWire",
+        "description": "来自AccountInitialized.amount与ReserveFundsConfirmed/ReleaseReservedFundsConfirmed/CommitIncomingCreditsConfirmed.available的现有fold；不是只取初始化金额。无投影状态返回无view。"
+      },
+      {
+        "name": "reserved",
+        "dataType": "MoneyWire",
+        "source": "Documentation only: BankReadside.accountMe: exact sum of CNY entries in CreditBalance.reservedAmount, converted by MoneyToWire",
+        "description": "ReserveFundsConfirmed按txid放入，DeductFundsConfirmed或ReleaseReservedFundsConfirmed移除；不是incomingCredits之和。"
+      }
+    ],
+    "queries": [
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankAccountQuery"
+      }
+    ],
+    "metadata": {
+      "description": "每个查询响应的BankReadMetadata信封，不是金融终态，不并入下列业务DTO字段。所有来源说明均为文档，不声明新的可执行投影。",
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "dataType": "String",
+          "source": "Documentation only: BankReadsideSchema.version",
+          "description": "当前查询schema为bank-query-v1。"
+        },
+        {
+          "name": "disposition",
+          "dataType": "String",
+          "source": "Documentation only: BankReadside.metadata(rows, completeSet, absent)",
+          "description": "完整所需集合且有水位且全部caught-up才返回caught-up；该条件下业务值缺席才not-found。否则unknown，不能把缺行或空列表当不存在。"
+        },
+        {
+          "name": "watermarks",
+          "dataType": "Vector[BankProjectionWatermark]",
+          "source": "Documentation only: BankReadside.metadata: each distinct stream Row.pid/last/observed",
+          "description": "每PID分别报告lastSequence与observedSequence。相等为caught-up，observed更大为catching-up，其余unknown；不是全局日志顺序或跨账户原子快照。"
+        }
+      ],
+      "semantics": [
+        "BankReadside.project在同一事务保存原event、生成状态、索引和连续checkpoint；PID＋seq相同须字节一致，冲突或gap拒绝且不跳水位。",
+        "catchUp仅观察某PID的有界frontier；后续live事件将observed清空。关闭排空后frontier失效，不把上次caught-up当永久新鲜。",
+        "plans和pending无有界全索引发现frontier，completeSet=false，整页metadata.disposition保持unknown，即使已列行的水位caught-up。",
+        "occurrences按due_slot分页并在查询时关联订单；关联缺失可稍后重查，不生成假订单或全局chronology。",
+        "查询先认证及归属判断；GET不启动账户、订单、付款、退款或补期。Unavailable/NotAuthorized等查询失败与金融失败分开。"
+      ],
+      "evidence": [
+        "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+        "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+        "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+        "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+        "truth/bank-wealth/contexts/bankwealth/value-objects/bank-read-metadata.vo.yaml",
+        "truth/bank-wealth/contexts/bankwealth/value-objects/bank-projection-watermark.vo.yaml"
+      ]
+    },
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+      "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+      "truth/bank-wealth/contexts/bankwealth/value-objects/bank-account-view.vo.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/aggregate.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/slices/initialize-account.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/slices/reserve-funds.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/slices/deduct-funds.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/slices/release-reserved-funds.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/slices/commit-incoming-credits.slice.yaml",
+      "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala"
+    ]
+  }

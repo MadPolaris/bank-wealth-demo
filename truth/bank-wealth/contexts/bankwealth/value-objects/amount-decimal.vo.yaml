@@ -1,0 +1,14 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: AmountDecimal
+seq: 8
+payload:
+  {
+    "name": "AmountDecimal",
+    "context": "bankwealth",
+    "version": "bank-v1-1",
+    "dataType": "Decimal",
+    "description": "Exact scale-2 amount observation consumed at the TA boundary; capacity is explicitly pinned by the type binding.",
+    "fields": []
+  }

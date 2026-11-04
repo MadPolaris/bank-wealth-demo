@@ -1,0 +1,1554 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: use-cases
+name: BankWealthCurrentFlows
+payload:
+  {
+    "context": "bankwealth",
+    "description": "当前四流的描述性用例。steps、qualified references、readEvidence及evidence用于阅读和追溯，不是新的执行DSL、授权policy、事件定义或审批记录。readEvidence列相关观察面，不授予每个参与者全部视图权限；实际可见性见role/can_view与read-model/visible_to。",
+    "useCases": [
+      {
+        "useCase": "PurchaseFundWithCash",
+        "name": "PurchaseFundWithCash",
+        "id": "purchase-fund-with-cash",
+        "context": "bankwealth",
+        "actor": "customer",
+        "actorRef": {
+          "context": "bankwealth",
+          "kind": "role",
+          "owner": [],
+          "id": "customer"
+        },
+        "intent": "用本人可信账户的现金申购，并能按原客户请求查询付款进度；受理不等于付款或投资成功。",
+        "readEvidence": [
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-account-view"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-cash-request-view"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-order-view"
+          }
+        ],
+        "preconditions": [
+          "principal、账户归属、fund对应募集户及seed版本来自受信配置；客户不能初始化账户。",
+          "客户只提交BankCashSubmit中的clientRequestId、fundCode和精确MoneyWire；不提交operation、账户、交易身份或结果。",
+          "POST经认证、Origin及CSRF检查；正CNY金额和不同出入账户由现有可信入站及切片校验。"
+        ],
+        "steps": [
+          {
+            "id": "submit-intent",
+            "actor": "customer",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "customer"
+            },
+            "intent": "提交闭集现金DTO；服务以principal＋clientRequestId确定原身份，不以正文铸新操作。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankCashSubmitPort"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankCashSubmit"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+              "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+              "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala"
+            ]
+          },
+          {
+            "id": "retain-original",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "受信服务先保留完整原请求、配置版本和固定付款参数；同身份异正文拒绝，不靠重发补造来源。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RecordCashRequestSource"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "CashRequestSourceRecorded"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-cash-request-source.slice.yaml"
+            ],
+            "aggregate": "FundOrder",
+            "command": "RecordCashRequestSource",
+            "emissions": [
+              "CashRequestSourceRecorded"
+            ]
+          },
+          {
+            "id": "request-payment",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "使用已留存的原参数请求付款，再确保唯一现金父流程；现金确认丢失后仍查原请求。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RequestFundPurchaseSettlement"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundPurchaseSettlementRequested"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-settlement.slice.yaml"
+            ],
+            "aggregate": "FundOrder",
+            "command": "RequestFundPurchaseSettlement",
+            "emissions": [
+              "FundPurchaseSettlementRequested"
+            ]
+          },
+          {
+            "id": "pay-original",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "现金pipeline负责耐久阶段，三participant Saga负责投资人出款、募集户入款、订单确认；订单最后commit。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "pipeline",
+                "owner": [],
+                "id": "bank-cash-payment-v1"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "saga",
+                "owner": [],
+                "id": "bank-cash-payment-v1"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "aggregate",
+                "owner": [],
+                "id": "CreditBalance"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "aggregate",
+                "owner": [],
+                "id": "FundOrder"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-cash-payment-v1.pipeline.yaml",
+              "truth/bank-wealth/contexts/bankwealth/sagas/bank-cash-payment-v1.saga.yaml",
+              "v1/handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala"
+            ]
+          },
+          {
+            "id": "retain-payment-success",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "这里只描述succeeded分支：保存原交易的付款结果；不是TA份额确认。其它四kind按原合同交付。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RecordFundCashPaymentSucceeded"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundCashPaymentSucceeded"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml"
+            ],
+            "aggregate": "FundOrder",
+            "command": "RecordFundCashPaymentSucceeded",
+            "emissions": [
+              "FundCashPaymentSucceeded"
+            ]
+          },
+          {
+            "id": "observe-original",
+            "actor": "customer",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "customer"
+            },
+            "intent": "只读原请求、订单和本人余额；先看查询水位，再分别看付款、TA和退款状态。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankCashOriginalQuery"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankOrderQuery"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankAccountQuery"
+              }
+            ],
+            "evidence": [
+              "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+            ]
+          }
+        ],
+        "extensions": [
+          {
+            "condition": "同principal＋clientRequestId重入或正文冲突",
+            "behavior": "同正文维持原身份；异正文409。并发、ACK丢失及已持久未start不产生第二资金效果。",
+            "evidence": [
+              "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)",
+              "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+              "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-cash-request-source.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-settlement.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-cash-payment-v1.pipeline.yaml",
+              "truth/bank-wealth/contexts/bankwealth/sagas/bank-cash-payment-v1.saga.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/confirm-fund-subscription-payment.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+              "v1/handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala",
+              "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+            ]
+          },
+          {
+            "condition": "取消fence、早拒绝或补偿",
+            "behavior": "late Prepare不得产生资金效果；rejected-before-effects及compensated均不能显示付款或退款成功。这里不声明客户取消HTTP入口。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "CancelCashFundSubscription"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundCashPaymentRejectedBeforeEffects"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundCashPaymentCompensated"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/cancel-cash-fund-subscription.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-rejected-before-effects.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-compensated.slice.yaml",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P27-3)"
+            ]
+          },
+          {
+            "condition": "付款证据暂不可得或结果需恢复",
+            "behavior": "outcome-unknown/recovery-required保留原父流程和目标；耐久commit决定后只同身份向前恢复，不重新Prepare或补偿。五kind交付及ACK恢复不改原交易。",
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-outcome-unknown.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-recovery-required.slice.yaml",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P27-2, P27-4, P27-5)"
+            ]
+          }
+        ],
+        "evidence": [
+          "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)",
+          "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+          "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-cash-request-source.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-settlement.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/pipelines/bank-cash-payment-v1.pipeline.yaml",
+          "truth/bank-wealth/contexts/bankwealth/sagas/bank-cash-payment-v1.saga.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/confirm-fund-subscription-payment.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+          "v1/handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala",
+          "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        ]
+      },
+      {
+        "useCase": "SettlePaidFundOrderWithTa",
+        "name": "SettlePaidFundOrderWithTa",
+        "id": "settle-paid-fund-order-with-ta",
+        "context": "bankwealth",
+        "actor": "system",
+        "actorRef": {
+          "context": "bankwealth",
+          "kind": "role",
+          "owner": [],
+          "id": "system"
+        },
+        "beneficiary": "customer",
+        "intent": "让真实已付款订单进入模拟TA的受理及份额确认，并向客户展示尚未终态和真实终态的区别。",
+        "readEvidence": [
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-order-view"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-cash-request-view"
+          }
+        ],
+        "preconditions": [
+          "核对原订单、原付款交易及真实付款成功记录；未付款不能提交TA。",
+          "scenario来自受信demo配置，客户不能指定forced result；TA是允许的模拟，不是真实基金公司集成。"
+        ],
+        "steps": [
+          {
+            "id": "register-original-ta",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "受信应用对原已付款订单固定taRequestId；原paymentTxId、资源及正文保持关联。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RegisterFundTASubmission"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundTASubmissionRegistered"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml"
+            ],
+            "aggregate": "FundOrder",
+            "command": "RegisterFundTASubmission",
+            "emissions": [
+              "FundTASubmissionRegistered"
+            ]
+          },
+          {
+            "id": "submit-or-observe",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "TA pipeline提交或恢复原请求；technical confirmed只表示已知提交观察，不表示投资成功。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "pipeline",
+                "owner": [],
+                "id": "bank-ta-submission-v1"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankTaEffectExecute"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-ta-submission-v1.pipeline.yaml",
+              "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+            ]
+          },
+          {
+            "id": "record-accepted",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "若收到受信accepted回执，精确校验原资源、正文及receipt；accepted仍在等待业务终态。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RecordFundTAAccepted"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundTAAccepted"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml"
+            ],
+            "aggregate": "FundOrder",
+            "command": "RecordFundTAAccepted",
+            "emissions": [
+              "FundTAAccepted"
+            ]
+          },
+          {
+            "id": "record-shares",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "成功分支只接受相关份额确认；shares与NAV保留原文本。实际事件ID为FundTASharesConfirmed，不另造TAConfirmed。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RecordFundTAConfirmed"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundTASharesConfirmed"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml"
+            ],
+            "aggregate": "FundOrder",
+            "command": "RecordFundTAConfirmed",
+            "emissions": [
+              "FundTASharesConfirmed"
+            ]
+          },
+          {
+            "id": "observe-investment",
+            "actor": "customer",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "customer"
+            },
+            "intent": "在本人订单分别观察paymentStatus和taStatus；只有相关份额确认才可称投资成功。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "read-model",
+                "owner": [],
+                "id": "bank-order-view"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankOrderQuery"
+              }
+            ],
+            "evidence": [
+              "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+            ]
+          }
+        ],
+        "extensions": [
+          {
+            "condition": "可信拒绝",
+            "behavior": "RecordFundTARejected产生FundTARejected；进入独立退款用例，不撤销原付款成功事实。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RecordFundTARejected"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundTARejected"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "use-case",
+                "owner": [],
+                "id": "RefundTaRejectedPurchase"
+              }
+            ],
+            "evidence": [
+              "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-ta-submission-v1.pipeline.yaml",
+              "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+              "v1/handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala"
+            ]
+          },
+          {
+            "condition": "UNKNOWN或仅accepted",
+            "behavior": "RecordFundTAUnknown/FundTAUnknown保留未知；不伪造拒绝、份额成功或退款授权。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RecordFundTAUnknown"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundTAUnknown"
+              }
+            ],
+            "evidence": [
+              "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-ta-submission-v1.pipeline.yaml",
+              "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+              "v1/handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala"
+            ]
+          },
+          {
+            "condition": "register→submit→accept→ingest间中断",
+            "behavior": "从耐久订单恢复原TA请求与原父流程；worker或应用重启不能重复提交，也不能用技术effect完成代替业务回执。",
+            "evidence": [
+              "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-ta-submission-v1.pipeline.yaml",
+              "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+              "v1/handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala"
+            ]
+          }
+        ],
+        "evidence": [
+          "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/pipelines/bank-ta-submission-v1.pipeline.yaml",
+          "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "v1/handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala"
+        ]
+      },
+      {
+        "useCase": "RefundTaRejectedPurchase",
+        "name": "RefundTaRejectedPurchase",
+        "id": "refund-ta-rejected-purchase",
+        "context": "bankwealth",
+        "actor": "system",
+        "actorRef": {
+          "context": "bankwealth",
+          "kind": "role",
+          "owner": [],
+          "id": "system"
+        },
+        "beneficiary": "customer",
+        "intent": "已付款订单遭可信TA拒绝后，将原全本金从原募集户返回原投资人，同时保留原付款成功事实。",
+        "readEvidence": [
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-order-view"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-account-view"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-pending-operation-view"
+          }
+        ],
+        "preconditions": [
+          "原付款已成功，且TA拒绝回执与原订单、付款交易、TA请求和正文精确关联。",
+          "无客户端退款目的地或替换本金输入；退款不是已commit付款Saga的补偿。"
+        ],
+        "steps": [
+          {
+            "id": "retain-refund-intent",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "可信拒绝后先持久唯一refund intent；原反向账户及全本金来自已留存付款，固定新的独立退款身份。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RequestFundPurchaseRefund"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundPurchaseRefundRequested"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml"
+            ],
+            "aggregate": "FundOrder",
+            "command": "RequestFundPurchaseRefund",
+            "emissions": [
+              "FundPurchaseRefundRequested"
+            ]
+          },
+          {
+            "id": "return-original-principal",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "独立退款pipeline驱动独立反向Saga；募集户出款、投资人入款沿用原本金，恢复只继续已有intent/parent/transaction。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "pipeline",
+                "owner": [],
+                "id": "bank-independent-refund-v1"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "saga",
+                "owner": [],
+                "id": "bank-independent-refund-v1"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "aggregate",
+                "owner": [],
+                "id": "CreditBalance"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-independent-refund-v1.pipeline.yaml",
+              "truth/bank-wealth/contexts/bankwealth/sagas/bank-independent-refund-v1.saga.yaml",
+              "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+              "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala"
+            ]
+          },
+          {
+            "id": "retain-returned-principal",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "只在原全本金实际返回的成功分支记录退款成功；实际事件名为FundRefundSucceeded。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RecordFundRefundSucceeded"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundRefundSucceeded"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml"
+            ],
+            "aggregate": "FundOrder",
+            "command": "RecordFundRefundSucceeded",
+            "emissions": [
+              "FundRefundSucceeded"
+            ]
+          },
+          {
+            "id": "observe-refund",
+            "actor": "customer",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "customer"
+            },
+            "intent": "通过本人订单和账户只读观察退款；同时保留paymentStatus=succeeded与TA拒绝，不把退款等待显示为已到账。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "read-model",
+                "owner": [],
+                "id": "bank-order-view"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "read-model",
+                "owner": [],
+                "id": "bank-account-view"
+              }
+            ],
+            "evidence": [
+              "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+            ]
+          },
+          {
+            "id": "recover-existing-refund",
+            "actor": "operator",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "operator"
+            },
+            "intent": "需要人工操作时仅按已有operationId请求恢复；系统从真实原记录查询身份，操作员不提供新金额、目标或TA结果。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankReconcileExistingPort"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "read-model",
+                "owner": [],
+                "id": "bank-pending-operation-view"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+              "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+            ]
+          }
+        ],
+        "extensions": [
+          {
+            "condition": "拒绝发生在资金效果前，或退款交易已补偿",
+            "behavior": "FundRefundRejectedBeforeEffects/FundRefundCompensated不是本金已退；不能冒充FundRefundSucceeded。",
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-rejected-before-effects.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-compensated.slice.yaml",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P29-1)"
+            ]
+          },
+          {
+            "condition": "退款UNKNOWN或recovery-required",
+            "behavior": "从既有耐久证据恢复同身份；募集Prepare/Commit、投资人Commit或结果ACK间隙不能触发第二退款。",
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-outcome-unknown.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-recovery-required.slice.yaml",
+              "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-independent-refund-v1.pipeline.yaml",
+              "truth/bank-wealth/contexts/bankwealth/sagas/bank-independent-refund-v1.saga.yaml",
+              "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+              "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
+              "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+            ]
+          },
+          {
+            "condition": "重复、冲突或替换请求",
+            "behavior": "保持原反向资金参数与唯一结果交付；客户没有直接RequestFundPurchaseRefund权限。",
+            "evidence": [
+              "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-independent-refund-v1.pipeline.yaml",
+              "truth/bank-wealth/contexts/bankwealth/sagas/bank-independent-refund-v1.saga.yaml",
+              "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+              "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
+              "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+            ]
+          }
+        ],
+        "evidence": [
+          "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/pipelines/bank-independent-refund-v1.pipeline.yaml",
+          "truth/bank-wealth/contexts/bankwealth/sagas/bank-independent-refund-v1.saga.yaml",
+          "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
+          "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        ]
+      },
+      {
+        "useCase": "RunFiniteSipPlan",
+        "name": "RunFiniteSipPlan",
+        "id": "run-finite-sip-plan",
+        "context": "bankwealth",
+        "actor": "customer",
+        "actorRef": {
+          "context": "bankwealth",
+          "kind": "role",
+          "owner": [],
+          "id": "customer"
+        },
+        "intent": "创建有限现金定投日程，管理未来修订与暂停/恢复，逐期观察真实投资终态而不重复扣款或计数。",
+        "readEvidence": [
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-sip-plan-view"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-sip-occurrence-view"
+          },
+          {
+            "context": "bankwealth",
+            "kind": "read-model",
+            "owner": [],
+            "id": "bank-order-view"
+          }
+        ],
+        "preconditions": [
+          "可信入站检查正CNY金额、账户/fund配置及完整有限严格递增dueSlots；当前上限1024项，effectiveSlot非负。",
+          "principal＋clientRequestId确定planId；没有首个显式业务tick时不使用墙钟虚构到期期次。"
+        ],
+        "steps": [
+          {
+            "id": "submit-finite-intent",
+            "actor": "customer",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "customer"
+            },
+            "intent": "经BankSipCreatePort提交完整有限vector；账户映射由受信服务补齐。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankSipCreatePort"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankSipCreate"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+              "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+            ]
+          },
+          {
+            "id": "retain-full-vector",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "先原子保留完整创建意图；恢复不依赖客户重发或内存日程。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "RecordSipCreateIntent"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "SipCreateIntentRecorded"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-create-intent.slice.yaml"
+            ],
+            "aggregate": "SipPlan",
+            "command": "RecordSipCreateIntent",
+            "emissions": [
+              "SipCreateIntentRecorded"
+            ]
+          },
+          {
+            "id": "create-plan",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "从同一创建意图幂等建立原计划与初始revision。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "CreateSipPlan"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "SipPlanCreated"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/create-sip-plan.slice.yaml"
+            ],
+            "aggregate": "SipPlan",
+            "command": "CreateSipPlan",
+            "emissions": [
+              "SipPlanCreated"
+            ]
+          },
+          {
+            "id": "append-exact-prefix",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "按完整原vector的精确位置补齐尚未持久的前缀尾部；不重排或新增期次。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "AppendSipDueSlot"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "SipDueSlotAppended"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/append-sip-due-slot.slice.yaml"
+            ],
+            "aggregate": "SipPlan",
+            "command": "AppendSipDueSlot",
+            "emissions": [
+              "SipDueSlotAppended"
+            ]
+          },
+          {
+            "id": "seal-schedule",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "原有限日程完整后封口；重复Create/Append/Seal不重置修订、已派发或终态。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "SealSipSchedule"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "SipScheduleSealed"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/seal-sip-schedule.slice.yaml"
+            ],
+            "aggregate": "SipPlan",
+            "command": "SealSipSchedule",
+            "emissions": [
+              "SipScheduleSealed"
+            ]
+          },
+          {
+            "id": "advance-business-time",
+            "actor": "operator",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "operator"
+            },
+            "intent": "经BankBusinessTickPort显式推进业务slot；应用先检查现有计划时钟，不把它描述成已部署的cron。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankBusinessTickPort"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+              "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala (tick)"
+            ]
+          },
+          {
+            "id": "retain-tick",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "计划保留单调tick，低于原tick拒绝；不靠客户端改变历史。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "AdvanceSipClock"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "SipClockAdvanced"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/advance-sip-clock.slice.yaml"
+            ],
+            "aggregate": "SipPlan",
+            "command": "AdvanceSipClock",
+            "emissions": [
+              "SipClockAdvanced"
+            ]
+          },
+          {
+            "id": "classify-due",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "按序把可观察的到期slot记为backlog；暂停期的跳期走单独分支。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "ObserveSipDueSlot"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "SipDueSlotObserved"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/observe-sip-due-slot.slice.yaml"
+            ],
+            "aggregate": "SipPlan",
+            "command": "ObserveSipDueSlot",
+            "emissions": [
+              "SipDueSlotObserved"
+            ]
+          },
+          {
+            "id": "retain-occurrence",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "按固定期次身份、原revision和资金参数先持久occurrence，再派发。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "TriggerSipInstallment"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "SipInstallmentTriggered"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml"
+            ],
+            "aggregate": "SipPlan",
+            "command": "TriggerSipInstallment",
+            "emissions": [
+              "SipInstallmentTriggered"
+            ]
+          },
+          {
+            "id": "dispatch-original-cash",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "SIP dispatch pipeline启动原现金入口，不新增资金状态机；按序补期而不等待前一期TA终态。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "pipeline",
+                "owner": [],
+                "id": "bank-sip-dispatch-v1"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankSipDispatchExecute"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "RequestFundPurchaseSettlement"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "pipeline",
+                "owner": [],
+                "id": "bank-cash-payment-v1"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-sip-dispatch-v1.pipeline.yaml",
+              "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+              "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala"
+            ]
+          },
+          {
+            "id": "count-first-success",
+            "actor": "system",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "system"
+            },
+            "intent": "成功分支由可信终态桥核原occurrence及相关份额确认，只记录第一次terminal并增加successTotal。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "RecordSipInstallmentSucceeded"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "SipInstallmentSucceeded"
+              }
+            ],
+            "evidence": [
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml"
+            ],
+            "aggregate": "SipPlan",
+            "command": "RecordSipInstallmentSucceeded",
+            "emissions": [
+              "SipInstallmentSucceeded"
+            ]
+          },
+          {
+            "id": "observe-installments",
+            "actor": "customer",
+            "actorRef": {
+              "context": "bankwealth",
+              "kind": "role",
+              "owner": [],
+              "id": "customer"
+            },
+            "intent": "查看本人计划、各occurrence及相关订单；计划列表顺序不冒充事件时间线，缺订单关联仍为unknown。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankSipPlansQuery"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankSipPlanQuery"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankSipOccurrencesQuery"
+              }
+            ],
+            "evidence": [
+              "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+            ]
+          }
+        ],
+        "extensions": [
+          {
+            "condition": "客户修订未来配置",
+            "behavior": "BankSipRevisePort先验证本人原创建意图；ReviseSipPlan/SipPlanRevised只影响未来区间，不重写已派发occurrence的金额或身份。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankSipRevisePort"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "ReviseSipPlan"
+              }
+            ],
+            "evidence": [
+              "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/revise-sip-plan.slice.yaml",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P30-2)"
+            ]
+          },
+          {
+            "condition": "客户暂停或恢复",
+            "behavior": "BankSipPausePort/BankSipResumePort使用计划已留存tick。PauseSipPlan保留backlog，SkipPausedSipDueSlot跳过暂停期due，in-flight继续；ResumeSipPlan不复活已跳期，AdvanceSkippedSipSlot仅推进位置。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "PauseSipPlan"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "SkipPausedSipDueSlot"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "ResumeSipPlan"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "AdvanceSkippedSipSlot"
+              }
+            ],
+            "evidence": [
+              "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/pause-sip-plan.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/skip-paused-sip-due-slot.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/resume-sip-plan.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/advance-skipped-sip-slot.slice.yaml",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P30-2)"
+            ]
+          },
+          {
+            "condition": "可信失败终态",
+            "behavior": "RecordSipInstallmentFailed/SipInstallmentFailed只计首terminal：付款早拒绝、付款已补偿，或TA拒绝且独立退款完成。failureTotal不清零，三败不自动暂停。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "RecordSipInstallmentFailed"
+              }
+            ],
+            "evidence": [
+              "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P30-4)"
+            ]
+          },
+          {
+            "condition": "仅付款成功、TA accepted、UNKNOWN、recovery-required或退款未完成",
+            "behavior": "保留期次进度但不计终态；晚到及重复terminal不增加次数，不从页面猜测终态。",
+            "references": [
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "RecordSipInstallmentPending"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "RecordSipInstallmentOutcomeUnknown"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "RecordSipInstallmentRecoveryRequired"
+              },
+              {
+                "context": "bankwealth",
+                "kind": "command",
+                "owner": [
+                  "SipPlan"
+                ],
+                "id": "RecordSipInstallmentRefundInProgress"
+              }
+            ],
+            "evidence": [
+              "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P30-3, P30-4)"
+            ]
+          },
+          {
+            "condition": "创建、派发或终态回桥中断",
+            "behavior": "从原完整vector、原occurrence及相关订单恢复精确前缀与原现金parent；终态已存但ACK丢失也不重复计数。",
+            "evidence": [
+              "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+              "v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/aggregate.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-create-intent.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+              "truth/bank-wealth/contexts/bankwealth/pipelines/bank-sip-dispatch-v1.pipeline.yaml",
+              "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+              "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+              "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+            ]
+          }
+        ],
+        "evidence": [
+          "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/aggregate.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-create-intent.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+          "truth/bank-wealth/contexts/bankwealth/pipelines/bank-sip-dispatch-v1.pipeline.yaml",
+          "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+          "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+        ]
+      }
+    ],
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P30-4; P31-1..P31-2)",
+      "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+    ]
+  }

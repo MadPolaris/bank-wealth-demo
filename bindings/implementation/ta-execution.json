@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "truthsrc.execution-binding/v1",
+  "pipelines": [
+    {
+      "pipelineId": "bank-ta-submission-v1",
+      "engine": "monarch-persistence/0.2.1",
+      "module": "bankwealth.TaSubmission",
+      "codec": {
+        "id": "BankTaSubmissionState",
+        "version": "bank-v1-1",
+        "compatibleVersions": [
+          "bank-v1-1"
+        ]
+      },
+      "types": [
+        {
+          "id": "TaRequestId",
+          "implementation": "example.bankwealth.domain.values.TaRequestId"
+        },
+        {
+          "id": "FundOrderId",
+          "implementation": "example.bankwealth.domain.values.FundOrderId"
+        },
+        {
+          "id": "TxId",
+          "implementation": "example.bankwealth.domain.values.TxId"
+        }
+      ],
+      "ports": [
+        {
+          "id": "SubmitPaidTaRequest",
+          "implementation": "bankwealth.SubmitPaidTaRequest",
+          "effect": "external",
+          "confirmation": "durable-ack",
+          "idempotency": {
+            "mode": "keyed",
+            "key": "taRequestId"
+          },
+          "inputs": [
+            {
+              "slot": "taRequestId",
+              "type": "TaRequestId"
+            },
+            {
+              "slot": "fundOrderId",
+              "type": "FundOrderId"
+            },
+            {
+              "slot": "paymentTxId",
+              "type": "TxId"
+            }
+          ],
+          "outputs": [
+            {
+              "slot": "taRequestId",
+              "type": "TaRequestId"
+            }
+          ],
+          "outcomes": [
+            {
+              "code": "Observed",
+              "kind": "success"
+            },
+            {
+              "code": "Refused",
+              "kind": "business-rejection"
+            },
+            {
+              "code": "Unavailable",
+              "kind": "infrastructure-failure"
+            },
+            {
+              "code": "Unknown",
+              "kind": "unknown-effect"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

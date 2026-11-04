@@ -164,8 +164,11 @@ export function writeBankDomainInputs(target) {
     requestBytes: Buffer.byteLength(JSON.stringify(request)), applicationRequests: 0, runtimeVerified: false };
 }
 
-export function bankApplicationRequest({ domainRequest } = {}) {
-  if (!domainRequest) return JSON.parse(readFileSync(join(ROOT, 'v1/formal-inputs/payment-376/request.json'), 'utf8'));
+export function bankApplicationRequest({ domainRequest, historical = false } = {}) {
+  if (!domainRequest) {
+    assert.equal(historical, true, 'Frozen request requires explicit historical:true; current input comes from root truthsrc.project.json');
+    return JSON.parse(readFileSync(join(ROOT, 'v1/formal-inputs/payment-376/request.json'), 'utf8'));
+  }
   const request = structuredClone(domainRequest), canonical = request.documents[0];
   const sources = [['payment', 'payment-authored-165', ['sagas', 'runtime', 'execution']],
     ['refund', 'refund-authored-282', ['sagas', 'runtime', 'execution']],
@@ -205,7 +208,7 @@ export function bankApplicationRequest({ domainRequest } = {}) {
 export function writeBankApplicationInputs(target, scope, options) {
   assert.ok(!existsSync(target), 'application request needs a fresh owned directory');
   const before = filesUnder(V1_TREE).map(file => [file, sha256(readFileSync(file))]);
-  const request = bankApplicationRequest(), compiled = compileProductSet(request);
+  const request = bankApplicationRequest({ historical: true }), compiled = compileProductSet(request);
   assert.deepEqual(compiled.diagnostics, []);
   const text = JSON.stringify(compiled.result) + '\n';
   assert.ok(Buffer.byteLength(text) <= 8 * 1024 * 1024, 'complete compact product set exceeds public capacity');
@@ -222,6 +225,7 @@ export function writeBankApplicationInputs(target, scope, options) {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const args = process.argv.slice(2);
+  if (args.shift() !== '--historical') throw new Error('Frozen V1 source adapter. Current generation uses tools/truthsrc-project.mjs; historical use requires --historical.');
   if (args.length === 2 && args[0] === '--write-domain') {
     console.log(JSON.stringify(writeBankDomainInputs(args[1])));
   } else {

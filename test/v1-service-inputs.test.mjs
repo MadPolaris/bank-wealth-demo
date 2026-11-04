@@ -22,7 +22,7 @@ test('service source and historical application inputs are explicit separate com
  assert.deepEqual(compileProductSet(previous).diagnostics,[]);
  const result=compileProductSet(request);assert.deepEqual(result.diagnostics,[]);assert.equal(result.result.products.length,14);
  for(const [id,version] of [['artifact-contract','3'],['saga-host-contract','2'],['effect-host-contract','2']]) assert.equal(result.result.products.find(p=>p.id===id).version,version);
- const old=bankApplicationRequest();assert.ok(!old.documents.find(d=>d.id==='bank-v1').value.artifactContracts.some(a=>a.deployment.service));
+ const old=bankApplicationRequest({historical:true});assert.ok(!old.documents.find(d=>d.id==='bank-v1').value.artifactContracts.some(a=>a.deployment.service));
  assert.deepEqual(compileProductSet(old).diagnostics,[]);
 });
 

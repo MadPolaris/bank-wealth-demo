@@ -1,0 +1,99 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: pipeline
+id: bank-sip-dispatch-v1
+name: "Bank V1 finite SIP occurrence cash dispatch"
+steps:
+  [
+    {
+      "id": "dispatch-cash",
+      "name": "Dispatch one durable SIP occurrence to the sole cash pipeline",
+      "description": "Dispatch success is not investment success; only correlated business terminal updates SipPlan counters.",
+      "execution": {
+        "port": "DispatchSipCash",
+        "reads": [
+          {
+            "slot": "occurrenceId",
+            "type": "OccurrenceId",
+            "ref": "input:occurrenceId"
+          },
+          {
+            "slot": "occurrence",
+            "type": "SipOccurrence",
+            "ref": "input:occurrence"
+          }
+        ],
+        "writes": [
+          {
+            "id": "operationId",
+            "slot": "operationId",
+            "type": "OperationId",
+            "durability": "checkpoint"
+          }
+        ],
+        "outcomes": [
+          {
+            "code": "Dispatched",
+            "kind": "success",
+            "action": "continue"
+          },
+          {
+            "code": "Refused",
+            "kind": "business-rejection",
+            "action": "stop"
+          },
+          {
+            "code": "Unavailable",
+            "kind": "infrastructure-failure",
+            "action": "manual-recovery"
+          },
+          {
+            "code": "Unknown",
+            "kind": "unknown-effect",
+            "action": "manual-recovery"
+          }
+        ]
+      }
+    }
+  ]
+execution:
+  {
+    "schemaVersion": "truthsrc.execution/v1",
+    "inputs": [
+      {
+        "id": "occurrenceId",
+        "type": "OccurrenceId",
+        "durability": "start-record"
+      },
+      {
+        "id": "occurrence",
+        "type": "SipOccurrence",
+        "durability": "start-record"
+      }
+    ],
+    "outputs": [
+      {
+        "id": "operationId",
+        "ref": "step:dispatch-cash:operationId",
+        "type": "OperationId"
+      }
+    ],
+    "recovery": {
+      "inputResponsibility": "host",
+      "inputs": [
+        "input:occurrenceId",
+        "input:occurrence"
+      ],
+      "planVersion": "bank-v1-1",
+      "planCompatibility": "exact",
+      "checkpoint": "confirmed-prefix",
+      "unknownEffect": "reconcile-before-resume",
+      "ownership": "single-writer"
+    },
+    "admission": {
+      "maxConcurrentRuns": 1,
+      "maxInFlightSteps": 1,
+      "maxItemsPerChunk": 1,
+      "maxInFlightChunks": 1
+    }
+  }

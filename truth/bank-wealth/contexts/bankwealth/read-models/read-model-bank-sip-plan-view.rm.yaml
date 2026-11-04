@@ -1,0 +1,172 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: read-model
+name: BankSipPlanView
+id: bank-sip-plan-view
+payload:
+  {
+    "id": "bank-sip-plan-view",
+    "name": "BankSipPlanView",
+    "context": "bankwealth",
+    "description": "本人有限定投计划的完整原意图、日程、修订、时钟和首次终态累计；列表与单计划共享该业务DTO但新鲜度条件不同。",
+    "sourceAggregate": "SipPlan",
+    "visible_to": [
+      "customer"
+    ],
+    "fields": [
+      {
+        "name": "planId",
+        "dataType": "PlanId",
+        "source": "aggregateIdentity",
+        "description": "已验证owner的计划身份；列表按resource_id/pid_key排序，不是事件时间顺序。"
+      },
+      {
+        "name": "original",
+        "dataType": "Option[BankSipCreateIntent]",
+        "source": "eventField:SipCreateIntentRecorded.source",
+        "description": "原完整有限vector及受信配置，不以当前已append前缀替代原意图。"
+      },
+      {
+        "name": "initialized",
+        "dataType": "Boolean",
+        "source": "Documentation only: SipPlan.initialized: default false; SipPlanCreated fold sets true",
+        "description": "与已保留create intent、scheduleSealed是不同阶段。"
+      },
+      {
+        "name": "scheduleSealed",
+        "dataType": "Boolean",
+        "source": "eventField:SipScheduleSealed.sealed",
+        "description": "未封口默认false；表示原vector已完整append。"
+      },
+      {
+        "name": "paused",
+        "dataType": "Boolean",
+        "source": "Documentation only: SipPlan.paused: default false; SipPlanPaused sets true, SipPlanResumed sets false",
+        "description": "三次失败不会自动改变此字段。"
+      },
+      {
+        "name": "currentTick",
+        "dataType": "Long",
+        "source": "eventField:SipClockAdvanced.tick",
+        "description": "沿用已持久显式业务tick；无首tick的初始状态不能冒充墙钟。"
+      },
+      {
+        "name": "dueSlots",
+        "dataType": "Vector[Long]",
+        "source": "Documentation only: BankReadside.planView: SipPlan.slots sorted by position, populated by SipDueSlotAppended.position/dueSlot",
+        "description": "这是已append的有序日程，可与原完整intent区分。"
+      },
+      {
+        "name": "revisions",
+        "dataType": "Vector[BankSipRevisionView]",
+        "source": "Documentation only: BankReadside.planView: SipPlan.revisions sorted by effectiveSlot/revision, joined with revisionEnds; SipPlanCreated.config and SipPlanRevised.config/previousRevision folds",
+        "description": "每项含原配置及可选区间终点，不改历史occurrence。"
+      },
+      {
+        "name": "scheduleCount",
+        "dataType": "Long",
+        "source": "Documentation only: SipPlan.scheduleCount: initial zero plus each admitted SipDueSlotAppended fold",
+        "description": "已追加日程数，不等于已付款数。"
+      },
+      {
+        "name": "observedCount",
+        "dataType": "Long",
+        "source": "Documentation only: SipPlan.observedCount: SipDueSlotObserved and SipPausedDueSlotSkipped increment once per admitted position",
+        "description": "已分类数，包含跳过的暂停期due。"
+      },
+      {
+        "name": "startCount",
+        "dataType": "Long",
+        "source": "Documentation only: SipPlan.startCount: SipInstallmentTriggered and SipSkippedSlotAdvanced increment the position",
+        "description": "已推进的位置数，包含跳期推进，不能命名为实际付款成功数。"
+      },
+      {
+        "name": "successTotal",
+        "dataType": "Long",
+        "source": "Documentation only: SipPlan.successTotal: initial zero; SipInstallmentSucceeded first-terminal fold increments once",
+        "description": "只计相关份额确认的首terminal。"
+      },
+      {
+        "name": "failureTotal",
+        "dataType": "Long",
+        "source": "Documentation only: SipPlan.failureTotal: initial zero; SipInstallmentFailed first-terminal fold increments once",
+        "description": "累计失败不清零，三败不自动暂停；不是连续失败计数。"
+      }
+    ],
+    "queries": [
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankSipPlansQuery"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankSipPlanQuery"
+      }
+    ],
+    "metadata": {
+      "description": "每个查询响应的BankReadMetadata信封，不是金融终态，不并入下列业务DTO字段。所有来源说明均为文档，不声明新的可执行投影。",
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "dataType": "String",
+          "source": "Documentation only: BankReadsideSchema.version",
+          "description": "当前查询schema为bank-query-v1。"
+        },
+        {
+          "name": "disposition",
+          "dataType": "String",
+          "source": "Documentation only: BankReadside.metadata(rows, completeSet, absent)",
+          "description": "完整所需集合且有水位且全部caught-up才返回caught-up；该条件下业务值缺席才not-found。否则unknown，不能把缺行或空列表当不存在。"
+        },
+        {
+          "name": "watermarks",
+          "dataType": "Vector[BankProjectionWatermark]",
+          "source": "Documentation only: BankReadside.metadata: each distinct stream Row.pid/last/observed",
+          "description": "每PID分别报告lastSequence与observedSequence。相等为caught-up，observed更大为catching-up，其余unknown；不是全局日志顺序或跨账户原子快照。"
+        }
+      ],
+      "semantics": [
+        "BankReadside.project在同一事务保存原event、生成状态、索引和连续checkpoint；PID＋seq相同须字节一致，冲突或gap拒绝且不跳水位。",
+        "catchUp仅观察某PID的有界frontier；后续live事件将observed清空。关闭排空后frontier失效，不把上次caught-up当永久新鲜。",
+        "plans和pending无有界全索引发现frontier，completeSet=false，整页metadata.disposition保持unknown，即使已列行的水位caught-up。",
+        "occurrences按due_slot分页并在查询时关联订单；关联缺失可稍后重查，不生成假订单或全局chronology。",
+        "查询先认证及归属判断；GET不启动账户、订单、付款、退款或补期。Unavailable/NotAuthorized等查询失败与金融失败分开。"
+      ],
+      "evidence": [
+        "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+        "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+        "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+        "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+        "truth/bank-wealth/contexts/bankwealth/value-objects/bank-read-metadata.vo.yaml",
+        "truth/bank-wealth/contexts/bankwealth/value-objects/bank-projection-watermark.vo.yaml"
+      ]
+    },
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+      "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+      "truth/bank-wealth/contexts/bankwealth/value-objects/bank-sip-plan-view.vo.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/aggregate.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-create-intent.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/create-sip-plan.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/append-sip-due-slot.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/seal-sip-schedule.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/advance-sip-clock.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/pause-sip-plan.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/resume-sip-plan.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/revise-sip-plan.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/observe-sip-due-slot.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/skip-paused-sip-due-slot.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/advance-skipped-sip-slot.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+      "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+      "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+    ]
+  }

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "truthsrc.execution-binding/v1",
+  "pipelines": [
+    {
+      "pipelineId": "bank-independent-refund-v1",
+      "engine": "monarch-persistence/0.2.1",
+      "module": "bankwealth.RefundPipeline",
+      "codec": {
+        "id": "CashPurchasePipelineCodec",
+        "version": "bank-v1-1",
+        "compatibleVersions": [
+          "bank-v1-1"
+        ]
+      },
+      "types": [
+        {
+          "id": "TxId",
+          "implementation": "example.bankwealth.domain.values.TxId"
+        },
+        {
+          "id": "OperationId",
+          "implementation": "example.bankwealth.domain.values.OperationId"
+        },
+        {
+          "id": "AccountId",
+          "implementation": "example.bankwealth.domain.values.AccountId"
+        },
+        {
+          "id": "FundOrderId",
+          "implementation": "example.bankwealth.domain.values.FundOrderId"
+        },
+        {
+          "id": "Money",
+          "implementation": "example.bankwealth.domain.values.Money"
+        },
+        {
+          "id": "Text",
+          "implementation": "java.lang.String"
+        }
+      ],
+      "ports": [],
+      "invocations": [
+        {
+          "stepId": "return-principal",
+          "ref": {
+            "sagaId": "bank-independent-refund-v1",
+            "version": "bank-v1-1"
+          },
+          "adapter": "bankwealth.RefundInvocation",
+          "runtime": {
+            "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+            "apiMode": "strict",
+            "entrypoint": "bankwealth.RefundEntry"
+          },
+          "argsCodec": {
+            "id": "BankRefundArgs",
+            "version": "bank-v1-1",
+            "mapper": "bankwealth.RefundArgsCodec"
+          },
+          "resultCodec": {
+            "id": "SagaResultCodec",
+            "version": "bank-v1-1",
+            "mapper": "fixture.wealth.pay.SagaResultCodec"
+          },
+          "transactionIdentity": {
+            "mapper": "fixture.wealth.pay.DurableSourceStageIdentity",
+            "derivation": "durable-source-stage",
+            "payloadCompatibility": "exact"
+          }
+        }
+      ]
+    }
+  ]
+}

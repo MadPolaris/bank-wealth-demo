@@ -1,0 +1,3811 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: saga-host
+id: bank-payment-host
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "bank-payment-host",
+    "version": "bank-v1-1",
+    "saga": {
+      "ref": {
+        "context": "bankwealth",
+        "kind": "saga",
+        "owner": [],
+        "id": "bank-cash-payment-v1"
+      },
+      "version": "bank-v1-1"
+    },
+    "argsType": {
+      "form": "nominal",
+      "ref": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "BankPaymentArgs"
+      }
+    },
+    "entry": {
+      "triggerId": "bank-cash-request",
+      "kind": "event",
+      "source": {
+        "context": "bankwealth",
+        "kind": "event",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "FundPurchaseSettlementRequested"
+      },
+      "inputType": {
+        "form": "nominal",
+        "ref": {
+          "context": "bankwealth",
+          "kind": "type",
+          "owner": [],
+          "id": "BankPaymentOriginal"
+        }
+      },
+      "port": {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankPaymentEntry"
+        },
+        "version": "bank-v1-1"
+      },
+      "startOwner": {
+        "kind": "pipeline",
+        "ref": {
+          "context": "bankwealth",
+          "kind": "pipeline",
+          "owner": [],
+          "id": "bank-cash-payment-v1"
+        },
+        "stepId": "pay-cash-purchase"
+      }
+    },
+    "association": {
+      "id": "bank-payment-original",
+      "version": "bank-v1-1",
+      "port": {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankPaymentAssociation"
+        },
+        "version": "bank-v1-1"
+      },
+      "inputKeys": [
+        {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "FundPurchaseSettlementRequested"
+          ],
+          "id": "operationId"
+        }
+      ],
+      "originalInputs": [
+        {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "FundPurchaseSettlementRequested"
+          ],
+          "id": "operationId"
+        },
+        {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "FundPurchaseSettlementRequested"
+          ],
+          "id": "fundOrderId"
+        },
+        {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "FundPurchaseSettlementRequested"
+          ],
+          "id": "investorAccountId"
+        },
+        {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "FundPurchaseSettlementRequested"
+          ],
+          "id": "fundCollectionAccountId"
+        },
+        {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "FundPurchaseSettlementRequested"
+          ],
+          "id": "fundCode"
+        },
+        {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "FundPurchaseSettlementRequested"
+          ],
+          "id": "amount"
+        }
+      ],
+      "encoding": "length-prefixed-utf8",
+      "before": "phase-effects",
+      "conflict": "reject-different-input"
+    },
+    "participants": [
+      {
+        "stepId": "reserve-investor-funds",
+        "participantId": "investorCreditBalance",
+        "aggregate": {
+          "context": "bankwealth",
+          "kind": "aggregate",
+          "owner": [],
+          "id": "CreditBalance"
+        },
+        "resourceInput": {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "FundPurchaseSettlementRequested"
+          ],
+          "id": "investorAccountId"
+        },
+        "phases": [
+          {
+            "phase": "prepare",
+            "command": {
+              "context": "bankwealth",
+              "kind": "command",
+              "owner": [
+                "CreditBalance"
+              ],
+              "id": "ReserveFunds"
+            },
+            "parameters": [
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "ReserveFunds"
+                  ],
+                  "id": "txid"
+                },
+                "input": {
+                  "kind": "transaction-id"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "ReserveFunds"
+                  ],
+                  "id": "resource"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "investorAccountId"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "ReserveFunds"
+                  ],
+                  "id": "amount"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "amount"
+                }
+              }
+            ],
+            "inputType": {
+              "form": "nominal",
+              "ref": {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankPayment0PrepareInput"
+              }
+            },
+            "executePort": {
+              "ref": {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankPayment0PrepareExecute"
+              },
+              "version": "bank-v1-1"
+            },
+            "confirmation": {
+              "event": {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "CreditBalance"
+                ],
+                "id": "ReserveFundsConfirmed"
+              },
+              "outputs": [
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "ReserveFundsConfirmed"
+                    ],
+                    "id": "txid"
+                  },
+                  "output": "txid"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "ReserveFundsConfirmed"
+                    ],
+                    "id": "resource"
+                  },
+                  "output": "resource"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "ReserveFundsConfirmed"
+                    ],
+                    "id": "amount"
+                  },
+                  "output": "amount"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "ReserveFundsConfirmed"
+                    ],
+                    "id": "currency"
+                  },
+                  "output": "currency"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "ReserveFundsConfirmed"
+                    ],
+                    "id": "available"
+                  },
+                  "output": "available"
+                }
+              ]
+            },
+            "query": {
+              "port": {
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "port",
+                  "owner": [],
+                  "id": "BankPayment0PrepareQueryPort"
+                },
+                "version": "bank-v1-1"
+              },
+              "inputType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment0PrepareQuery"
+                }
+              },
+              "mode": "read-only",
+              "identity": [
+                "txid",
+                "definition-version",
+                "args-digest",
+                "participant",
+                "resource",
+                "step",
+                "phase"
+              ]
+            },
+            "evidence": {
+              "kind": "typed-record",
+              "receiptType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment0PrepareReceipt"
+                }
+              },
+              "identity": [
+                {
+                  "key": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "transaction"
+                  }
+                },
+                {
+                  "key": "definition-version",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "definitionVersion"
+                  }
+                },
+                {
+                  "key": "args-digest",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "argsDigest"
+                  }
+                },
+                {
+                  "key": "participant",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "participant"
+                  }
+                },
+                {
+                  "key": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "resource"
+                  }
+                },
+                {
+                  "key": "step",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "step"
+                  }
+                },
+                {
+                  "key": "phase",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "phase"
+                  }
+                }
+              ],
+              "payload": [
+                {
+                  "output": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "payloadTxid"
+                  }
+                },
+                {
+                  "output": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "payloadResource"
+                  }
+                },
+                {
+                  "output": "amount",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "payloadAmount"
+                  }
+                },
+                {
+                  "output": "currency",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "payloadCurrency"
+                  }
+                },
+                {
+                  "output": "available",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0PrepareReceipt"
+                    ],
+                    "id": "payloadAvailable"
+                  }
+                }
+              ],
+              "codec": {
+                "contract": {
+                  "id": "bank-payment-reserve-investor-funds-prepare",
+                  "version": "bank-v1-1"
+                },
+                "runtime": {
+                  "id": "bank-payment-reserve-investor-funds-prepare",
+                  "version": 1
+                }
+              },
+              "payloadCompatibility": "exact"
+            }
+          },
+          {
+            "phase": "commit",
+            "command": {
+              "context": "bankwealth",
+              "kind": "command",
+              "owner": [
+                "CreditBalance"
+              ],
+              "id": "DeductFunds"
+            },
+            "parameters": [
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "DeductFunds"
+                  ],
+                  "id": "txid"
+                },
+                "input": {
+                  "kind": "transaction-id"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "DeductFunds"
+                  ],
+                  "id": "resource"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "investorAccountId"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "DeductFunds"
+                  ],
+                  "id": "amount"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "amount"
+                }
+              }
+            ],
+            "inputType": {
+              "form": "nominal",
+              "ref": {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankPayment0CommitInput"
+              }
+            },
+            "executePort": {
+              "ref": {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankPayment0CommitExecute"
+              },
+              "version": "bank-v1-1"
+            },
+            "confirmation": {
+              "event": {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "CreditBalance"
+                ],
+                "id": "DeductFundsConfirmed"
+              },
+              "outputs": [
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "DeductFundsConfirmed"
+                    ],
+                    "id": "txid"
+                  },
+                  "output": "txid"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "DeductFundsConfirmed"
+                    ],
+                    "id": "resource"
+                  },
+                  "output": "resource"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "DeductFundsConfirmed"
+                    ],
+                    "id": "amount"
+                  },
+                  "output": "amount"
+                }
+              ]
+            },
+            "query": {
+              "port": {
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "port",
+                  "owner": [],
+                  "id": "BankPayment0CommitQueryPort"
+                },
+                "version": "bank-v1-1"
+              },
+              "inputType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment0CommitQuery"
+                }
+              },
+              "mode": "read-only",
+              "identity": [
+                "txid",
+                "definition-version",
+                "args-digest",
+                "participant",
+                "resource",
+                "step",
+                "phase"
+              ]
+            },
+            "evidence": {
+              "kind": "typed-record",
+              "receiptType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment0CommitReceipt"
+                }
+              },
+              "identity": [
+                {
+                  "key": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CommitReceipt"
+                    ],
+                    "id": "transaction"
+                  }
+                },
+                {
+                  "key": "definition-version",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CommitReceipt"
+                    ],
+                    "id": "definitionVersion"
+                  }
+                },
+                {
+                  "key": "args-digest",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CommitReceipt"
+                    ],
+                    "id": "argsDigest"
+                  }
+                },
+                {
+                  "key": "participant",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CommitReceipt"
+                    ],
+                    "id": "participant"
+                  }
+                },
+                {
+                  "key": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CommitReceipt"
+                    ],
+                    "id": "resource"
+                  }
+                },
+                {
+                  "key": "step",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CommitReceipt"
+                    ],
+                    "id": "step"
+                  }
+                },
+                {
+                  "key": "phase",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CommitReceipt"
+                    ],
+                    "id": "phase"
+                  }
+                }
+              ],
+              "payload": [
+                {
+                  "output": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CommitReceipt"
+                    ],
+                    "id": "payloadTxid"
+                  }
+                },
+                {
+                  "output": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CommitReceipt"
+                    ],
+                    "id": "payloadResource"
+                  }
+                },
+                {
+                  "output": "amount",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CommitReceipt"
+                    ],
+                    "id": "payloadAmount"
+                  }
+                }
+              ],
+              "codec": {
+                "contract": {
+                  "id": "bank-payment-reserve-investor-funds-commit",
+                  "version": "bank-v1-1"
+                },
+                "runtime": {
+                  "id": "bank-payment-reserve-investor-funds-commit",
+                  "version": 1
+                }
+              },
+              "payloadCompatibility": "exact"
+            }
+          },
+          {
+            "phase": "compensate",
+            "command": {
+              "context": "bankwealth",
+              "kind": "command",
+              "owner": [
+                "CreditBalance"
+              ],
+              "id": "ReleaseReservedFunds"
+            },
+            "parameters": [
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "ReleaseReservedFunds"
+                  ],
+                  "id": "txid"
+                },
+                "input": {
+                  "kind": "transaction-id"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "ReleaseReservedFunds"
+                  ],
+                  "id": "resource"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "investorAccountId"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "ReleaseReservedFunds"
+                  ],
+                  "id": "amount"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "amount"
+                }
+              }
+            ],
+            "inputType": {
+              "form": "nominal",
+              "ref": {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankPayment0CompensateInput"
+              }
+            },
+            "executePort": {
+              "ref": {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankPayment0CompensateExecute"
+              },
+              "version": "bank-v1-1"
+            },
+            "confirmation": {
+              "event": {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "CreditBalance"
+                ],
+                "id": "ReleaseReservedFundsConfirmed"
+              },
+              "outputs": [
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "ReleaseReservedFundsConfirmed"
+                    ],
+                    "id": "txid"
+                  },
+                  "output": "txid"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "ReleaseReservedFundsConfirmed"
+                    ],
+                    "id": "resource"
+                  },
+                  "output": "resource"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "ReleaseReservedFundsConfirmed"
+                    ],
+                    "id": "amount"
+                  },
+                  "output": "amount"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "ReleaseReservedFundsConfirmed"
+                    ],
+                    "id": "currency"
+                  },
+                  "output": "currency"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "ReleaseReservedFundsConfirmed"
+                    ],
+                    "id": "available"
+                  },
+                  "output": "available"
+                }
+              ]
+            },
+            "query": {
+              "port": {
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "port",
+                  "owner": [],
+                  "id": "BankPayment0CompensateQueryPort"
+                },
+                "version": "bank-v1-1"
+              },
+              "inputType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment0CompensateQuery"
+                }
+              },
+              "mode": "read-only",
+              "identity": [
+                "txid",
+                "definition-version",
+                "args-digest",
+                "participant",
+                "resource",
+                "step",
+                "phase"
+              ]
+            },
+            "evidence": {
+              "kind": "typed-record",
+              "receiptType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment0CompensateReceipt"
+                }
+              },
+              "identity": [
+                {
+                  "key": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "transaction"
+                  }
+                },
+                {
+                  "key": "definition-version",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "definitionVersion"
+                  }
+                },
+                {
+                  "key": "args-digest",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "argsDigest"
+                  }
+                },
+                {
+                  "key": "participant",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "participant"
+                  }
+                },
+                {
+                  "key": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "resource"
+                  }
+                },
+                {
+                  "key": "step",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "step"
+                  }
+                },
+                {
+                  "key": "phase",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "phase"
+                  }
+                }
+              ],
+              "payload": [
+                {
+                  "output": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "payloadTxid"
+                  }
+                },
+                {
+                  "output": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "payloadResource"
+                  }
+                },
+                {
+                  "output": "amount",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "payloadAmount"
+                  }
+                },
+                {
+                  "output": "currency",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "payloadCurrency"
+                  }
+                },
+                {
+                  "output": "available",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment0CompensateReceipt"
+                    ],
+                    "id": "payloadAvailable"
+                  }
+                }
+              ],
+              "codec": {
+                "contract": {
+                  "id": "bank-payment-reserve-investor-funds-compensate",
+                  "version": "bank-v1-1"
+                },
+                "runtime": {
+                  "id": "bank-payment-reserve-investor-funds-compensate",
+                  "version": 1
+                }
+              },
+              "payloadCompatibility": "exact"
+            }
+          }
+        ]
+      },
+      {
+        "stepId": "credit-fund-collection",
+        "participantId": "collectionCreditBalance",
+        "aggregate": {
+          "context": "bankwealth",
+          "kind": "aggregate",
+          "owner": [],
+          "id": "CreditBalance"
+        },
+        "resourceInput": {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "FundPurchaseSettlementRequested"
+          ],
+          "id": "fundCollectionAccountId"
+        },
+        "phases": [
+          {
+            "phase": "prepare",
+            "command": {
+              "context": "bankwealth",
+              "kind": "command",
+              "owner": [
+                "CreditBalance"
+              ],
+              "id": "RecordIncomingCredits"
+            },
+            "parameters": [
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "RecordIncomingCredits"
+                  ],
+                  "id": "txid"
+                },
+                "input": {
+                  "kind": "transaction-id"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "RecordIncomingCredits"
+                  ],
+                  "id": "resource"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "fundCollectionAccountId"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "RecordIncomingCredits"
+                  ],
+                  "id": "amount"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "amount"
+                }
+              }
+            ],
+            "inputType": {
+              "form": "nominal",
+              "ref": {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankPayment1PrepareInput"
+              }
+            },
+            "executePort": {
+              "ref": {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankPayment1PrepareExecute"
+              },
+              "version": "bank-v1-1"
+            },
+            "confirmation": {
+              "event": {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "CreditBalance"
+                ],
+                "id": "RecordIncomingCreditsConfirmed"
+              },
+              "outputs": [
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "RecordIncomingCreditsConfirmed"
+                    ],
+                    "id": "txid"
+                  },
+                  "output": "txid"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "RecordIncomingCreditsConfirmed"
+                    ],
+                    "id": "resource"
+                  },
+                  "output": "resource"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "RecordIncomingCreditsConfirmed"
+                    ],
+                    "id": "amount"
+                  },
+                  "output": "amount"
+                }
+              ]
+            },
+            "query": {
+              "port": {
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "port",
+                  "owner": [],
+                  "id": "BankPayment1PrepareQueryPort"
+                },
+                "version": "bank-v1-1"
+              },
+              "inputType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment1PrepareQuery"
+                }
+              },
+              "mode": "read-only",
+              "identity": [
+                "txid",
+                "definition-version",
+                "args-digest",
+                "participant",
+                "resource",
+                "step",
+                "phase"
+              ]
+            },
+            "evidence": {
+              "kind": "typed-record",
+              "receiptType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment1PrepareReceipt"
+                }
+              },
+              "identity": [
+                {
+                  "key": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1PrepareReceipt"
+                    ],
+                    "id": "transaction"
+                  }
+                },
+                {
+                  "key": "definition-version",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1PrepareReceipt"
+                    ],
+                    "id": "definitionVersion"
+                  }
+                },
+                {
+                  "key": "args-digest",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1PrepareReceipt"
+                    ],
+                    "id": "argsDigest"
+                  }
+                },
+                {
+                  "key": "participant",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1PrepareReceipt"
+                    ],
+                    "id": "participant"
+                  }
+                },
+                {
+                  "key": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1PrepareReceipt"
+                    ],
+                    "id": "resource"
+                  }
+                },
+                {
+                  "key": "step",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1PrepareReceipt"
+                    ],
+                    "id": "step"
+                  }
+                },
+                {
+                  "key": "phase",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1PrepareReceipt"
+                    ],
+                    "id": "phase"
+                  }
+                }
+              ],
+              "payload": [
+                {
+                  "output": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1PrepareReceipt"
+                    ],
+                    "id": "payloadTxid"
+                  }
+                },
+                {
+                  "output": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1PrepareReceipt"
+                    ],
+                    "id": "payloadResource"
+                  }
+                },
+                {
+                  "output": "amount",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1PrepareReceipt"
+                    ],
+                    "id": "payloadAmount"
+                  }
+                }
+              ],
+              "codec": {
+                "contract": {
+                  "id": "bank-payment-credit-fund-collection-prepare",
+                  "version": "bank-v1-1"
+                },
+                "runtime": {
+                  "id": "bank-payment-credit-fund-collection-prepare",
+                  "version": 1
+                }
+              },
+              "payloadCompatibility": "exact"
+            }
+          },
+          {
+            "phase": "commit",
+            "command": {
+              "context": "bankwealth",
+              "kind": "command",
+              "owner": [
+                "CreditBalance"
+              ],
+              "id": "CommitIncomingCredits"
+            },
+            "parameters": [
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "CommitIncomingCredits"
+                  ],
+                  "id": "txid"
+                },
+                "input": {
+                  "kind": "transaction-id"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "CommitIncomingCredits"
+                  ],
+                  "id": "resource"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "fundCollectionAccountId"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "CommitIncomingCredits"
+                  ],
+                  "id": "amount"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "amount"
+                }
+              }
+            ],
+            "inputType": {
+              "form": "nominal",
+              "ref": {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankPayment1CommitInput"
+              }
+            },
+            "executePort": {
+              "ref": {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankPayment1CommitExecute"
+              },
+              "version": "bank-v1-1"
+            },
+            "confirmation": {
+              "event": {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "CreditBalance"
+                ],
+                "id": "CommitIncomingCreditsConfirmed"
+              },
+              "outputs": [
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "CommitIncomingCreditsConfirmed"
+                    ],
+                    "id": "txid"
+                  },
+                  "output": "txid"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "CommitIncomingCreditsConfirmed"
+                    ],
+                    "id": "resource"
+                  },
+                  "output": "resource"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "CommitIncomingCreditsConfirmed"
+                    ],
+                    "id": "amount"
+                  },
+                  "output": "amount"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "CommitIncomingCreditsConfirmed"
+                    ],
+                    "id": "currency"
+                  },
+                  "output": "currency"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "CommitIncomingCreditsConfirmed"
+                    ],
+                    "id": "available"
+                  },
+                  "output": "available"
+                }
+              ]
+            },
+            "query": {
+              "port": {
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "port",
+                  "owner": [],
+                  "id": "BankPayment1CommitQueryPort"
+                },
+                "version": "bank-v1-1"
+              },
+              "inputType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment1CommitQuery"
+                }
+              },
+              "mode": "read-only",
+              "identity": [
+                "txid",
+                "definition-version",
+                "args-digest",
+                "participant",
+                "resource",
+                "step",
+                "phase"
+              ]
+            },
+            "evidence": {
+              "kind": "typed-record",
+              "receiptType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment1CommitReceipt"
+                }
+              },
+              "identity": [
+                {
+                  "key": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "transaction"
+                  }
+                },
+                {
+                  "key": "definition-version",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "definitionVersion"
+                  }
+                },
+                {
+                  "key": "args-digest",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "argsDigest"
+                  }
+                },
+                {
+                  "key": "participant",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "participant"
+                  }
+                },
+                {
+                  "key": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "resource"
+                  }
+                },
+                {
+                  "key": "step",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "step"
+                  }
+                },
+                {
+                  "key": "phase",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "phase"
+                  }
+                }
+              ],
+              "payload": [
+                {
+                  "output": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "payloadTxid"
+                  }
+                },
+                {
+                  "output": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "payloadResource"
+                  }
+                },
+                {
+                  "output": "amount",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "payloadAmount"
+                  }
+                },
+                {
+                  "output": "currency",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "payloadCurrency"
+                  }
+                },
+                {
+                  "output": "available",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CommitReceipt"
+                    ],
+                    "id": "payloadAvailable"
+                  }
+                }
+              ],
+              "codec": {
+                "contract": {
+                  "id": "bank-payment-credit-fund-collection-commit",
+                  "version": "bank-v1-1"
+                },
+                "runtime": {
+                  "id": "bank-payment-credit-fund-collection-commit",
+                  "version": 1
+                }
+              },
+              "payloadCompatibility": "exact"
+            }
+          },
+          {
+            "phase": "compensate",
+            "command": {
+              "context": "bankwealth",
+              "kind": "command",
+              "owner": [
+                "CreditBalance"
+              ],
+              "id": "CancelIncomingCredit"
+            },
+            "parameters": [
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "CancelIncomingCredit"
+                  ],
+                  "id": "txid"
+                },
+                "input": {
+                  "kind": "transaction-id"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "CancelIncomingCredit"
+                  ],
+                  "id": "resource"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "fundCollectionAccountId"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "CreditBalance",
+                    "CancelIncomingCredit"
+                  ],
+                  "id": "amount"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "amount"
+                }
+              }
+            ],
+            "inputType": {
+              "form": "nominal",
+              "ref": {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankPayment1CompensateInput"
+              }
+            },
+            "executePort": {
+              "ref": {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankPayment1CompensateExecute"
+              },
+              "version": "bank-v1-1"
+            },
+            "confirmation": {
+              "event": {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "CreditBalance"
+                ],
+                "id": "CancelIncomingCreditConfirmed"
+              },
+              "outputs": [
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "CancelIncomingCreditConfirmed"
+                    ],
+                    "id": "txid"
+                  },
+                  "output": "txid"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "CancelIncomingCreditConfirmed"
+                    ],
+                    "id": "resource"
+                  },
+                  "output": "resource"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "CreditBalance",
+                      "CancelIncomingCreditConfirmed"
+                    ],
+                    "id": "amount"
+                  },
+                  "output": "amount"
+                }
+              ]
+            },
+            "query": {
+              "port": {
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "port",
+                  "owner": [],
+                  "id": "BankPayment1CompensateQueryPort"
+                },
+                "version": "bank-v1-1"
+              },
+              "inputType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment1CompensateQuery"
+                }
+              },
+              "mode": "read-only",
+              "identity": [
+                "txid",
+                "definition-version",
+                "args-digest",
+                "participant",
+                "resource",
+                "step",
+                "phase"
+              ]
+            },
+            "evidence": {
+              "kind": "typed-record",
+              "receiptType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment1CompensateReceipt"
+                }
+              },
+              "identity": [
+                {
+                  "key": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CompensateReceipt"
+                    ],
+                    "id": "transaction"
+                  }
+                },
+                {
+                  "key": "definition-version",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CompensateReceipt"
+                    ],
+                    "id": "definitionVersion"
+                  }
+                },
+                {
+                  "key": "args-digest",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CompensateReceipt"
+                    ],
+                    "id": "argsDigest"
+                  }
+                },
+                {
+                  "key": "participant",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CompensateReceipt"
+                    ],
+                    "id": "participant"
+                  }
+                },
+                {
+                  "key": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CompensateReceipt"
+                    ],
+                    "id": "resource"
+                  }
+                },
+                {
+                  "key": "step",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CompensateReceipt"
+                    ],
+                    "id": "step"
+                  }
+                },
+                {
+                  "key": "phase",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CompensateReceipt"
+                    ],
+                    "id": "phase"
+                  }
+                }
+              ],
+              "payload": [
+                {
+                  "output": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CompensateReceipt"
+                    ],
+                    "id": "payloadTxid"
+                  }
+                },
+                {
+                  "output": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CompensateReceipt"
+                    ],
+                    "id": "payloadResource"
+                  }
+                },
+                {
+                  "output": "amount",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment1CompensateReceipt"
+                    ],
+                    "id": "payloadAmount"
+                  }
+                }
+              ],
+              "codec": {
+                "contract": {
+                  "id": "bank-payment-credit-fund-collection-compensate",
+                  "version": "bank-v1-1"
+                },
+                "runtime": {
+                  "id": "bank-payment-credit-fund-collection-compensate",
+                  "version": 1
+                }
+              },
+              "payloadCompatibility": "exact"
+            }
+          }
+        ]
+      },
+      {
+        "stepId": "reserve-cash-fund-order",
+        "participantId": "orderFundOrderTCC",
+        "aggregate": {
+          "context": "bankwealth",
+          "kind": "aggregate",
+          "owner": [],
+          "id": "FundOrder"
+        },
+        "resourceInput": {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "FundPurchaseSettlementRequested"
+          ],
+          "id": "fundOrderId"
+        },
+        "phases": [
+          {
+            "phase": "prepare",
+            "command": {
+              "context": "bankwealth",
+              "kind": "command",
+              "owner": [
+                "FundOrder"
+              ],
+              "id": "ReserveFundSubscription"
+            },
+            "parameters": [
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "FundOrder",
+                    "ReserveFundSubscription"
+                  ],
+                  "id": "txid"
+                },
+                "input": {
+                  "kind": "transaction-id"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "FundOrder",
+                    "ReserveFundSubscription"
+                  ],
+                  "id": "resource"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "fundOrderId"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "FundOrder",
+                    "ReserveFundSubscription"
+                  ],
+                  "id": "amount"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "amount"
+                }
+              }
+            ],
+            "inputType": {
+              "form": "nominal",
+              "ref": {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankPayment2PrepareInput"
+              }
+            },
+            "executePort": {
+              "ref": {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankPayment2PrepareExecute"
+              },
+              "version": "bank-v1-1"
+            },
+            "confirmation": {
+              "event": {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "ReserveFundSubscriptionConfirmed"
+              },
+              "outputs": [
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "FundOrder",
+                      "ReserveFundSubscriptionConfirmed"
+                    ],
+                    "id": "txid"
+                  },
+                  "output": "txid"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "FundOrder",
+                      "ReserveFundSubscriptionConfirmed"
+                    ],
+                    "id": "resource"
+                  },
+                  "output": "resource"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "FundOrder",
+                      "ReserveFundSubscriptionConfirmed"
+                    ],
+                    "id": "amount"
+                  },
+                  "output": "amount"
+                }
+              ]
+            },
+            "query": {
+              "port": {
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "port",
+                  "owner": [],
+                  "id": "BankPayment2PrepareQueryPort"
+                },
+                "version": "bank-v1-1"
+              },
+              "inputType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment2PrepareQuery"
+                }
+              },
+              "mode": "read-only",
+              "identity": [
+                "txid",
+                "definition-version",
+                "args-digest",
+                "participant",
+                "resource",
+                "step",
+                "phase"
+              ]
+            },
+            "evidence": {
+              "kind": "typed-record",
+              "receiptType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment2PrepareReceipt"
+                }
+              },
+              "identity": [
+                {
+                  "key": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2PrepareReceipt"
+                    ],
+                    "id": "transaction"
+                  }
+                },
+                {
+                  "key": "definition-version",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2PrepareReceipt"
+                    ],
+                    "id": "definitionVersion"
+                  }
+                },
+                {
+                  "key": "args-digest",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2PrepareReceipt"
+                    ],
+                    "id": "argsDigest"
+                  }
+                },
+                {
+                  "key": "participant",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2PrepareReceipt"
+                    ],
+                    "id": "participant"
+                  }
+                },
+                {
+                  "key": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2PrepareReceipt"
+                    ],
+                    "id": "resource"
+                  }
+                },
+                {
+                  "key": "step",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2PrepareReceipt"
+                    ],
+                    "id": "step"
+                  }
+                },
+                {
+                  "key": "phase",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2PrepareReceipt"
+                    ],
+                    "id": "phase"
+                  }
+                }
+              ],
+              "payload": [
+                {
+                  "output": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2PrepareReceipt"
+                    ],
+                    "id": "payloadTxid"
+                  }
+                },
+                {
+                  "output": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2PrepareReceipt"
+                    ],
+                    "id": "payloadResource"
+                  }
+                },
+                {
+                  "output": "amount",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2PrepareReceipt"
+                    ],
+                    "id": "payloadAmount"
+                  }
+                }
+              ],
+              "codec": {
+                "contract": {
+                  "id": "bank-payment-reserve-cash-fund-order-prepare",
+                  "version": "bank-v1-1"
+                },
+                "runtime": {
+                  "id": "bank-payment-reserve-cash-fund-order-prepare",
+                  "version": 1
+                }
+              },
+              "payloadCompatibility": "exact"
+            }
+          },
+          {
+            "phase": "commit",
+            "command": {
+              "context": "bankwealth",
+              "kind": "command",
+              "owner": [
+                "FundOrder"
+              ],
+              "id": "ConfirmFundSubscriptionPayment"
+            },
+            "parameters": [
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "FundOrder",
+                    "ConfirmFundSubscriptionPayment"
+                  ],
+                  "id": "txid"
+                },
+                "input": {
+                  "kind": "transaction-id"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "FundOrder",
+                    "ConfirmFundSubscriptionPayment"
+                  ],
+                  "id": "resource"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "fundOrderId"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "FundOrder",
+                    "ConfirmFundSubscriptionPayment"
+                  ],
+                  "id": "amount"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "amount"
+                }
+              }
+            ],
+            "inputType": {
+              "form": "nominal",
+              "ref": {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankPayment2CommitInput"
+              }
+            },
+            "executePort": {
+              "ref": {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankPayment2CommitExecute"
+              },
+              "version": "bank-v1-1"
+            },
+            "confirmation": {
+              "event": {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "FundSubscriptionPaymentConfirmed"
+              },
+              "outputs": [
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "FundOrder",
+                      "FundSubscriptionPaymentConfirmed"
+                    ],
+                    "id": "txid"
+                  },
+                  "output": "txid"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "FundOrder",
+                      "FundSubscriptionPaymentConfirmed"
+                    ],
+                    "id": "resource"
+                  },
+                  "output": "resource"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "FundOrder",
+                      "FundSubscriptionPaymentConfirmed"
+                    ],
+                    "id": "amount"
+                  },
+                  "output": "amount"
+                }
+              ]
+            },
+            "query": {
+              "port": {
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "port",
+                  "owner": [],
+                  "id": "BankPayment2CommitQueryPort"
+                },
+                "version": "bank-v1-1"
+              },
+              "inputType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment2CommitQuery"
+                }
+              },
+              "mode": "read-only",
+              "identity": [
+                "txid",
+                "definition-version",
+                "args-digest",
+                "participant",
+                "resource",
+                "step",
+                "phase"
+              ]
+            },
+            "evidence": {
+              "kind": "typed-record",
+              "receiptType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment2CommitReceipt"
+                }
+              },
+              "identity": [
+                {
+                  "key": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CommitReceipt"
+                    ],
+                    "id": "transaction"
+                  }
+                },
+                {
+                  "key": "definition-version",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CommitReceipt"
+                    ],
+                    "id": "definitionVersion"
+                  }
+                },
+                {
+                  "key": "args-digest",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CommitReceipt"
+                    ],
+                    "id": "argsDigest"
+                  }
+                },
+                {
+                  "key": "participant",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CommitReceipt"
+                    ],
+                    "id": "participant"
+                  }
+                },
+                {
+                  "key": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CommitReceipt"
+                    ],
+                    "id": "resource"
+                  }
+                },
+                {
+                  "key": "step",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CommitReceipt"
+                    ],
+                    "id": "step"
+                  }
+                },
+                {
+                  "key": "phase",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CommitReceipt"
+                    ],
+                    "id": "phase"
+                  }
+                }
+              ],
+              "payload": [
+                {
+                  "output": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CommitReceipt"
+                    ],
+                    "id": "payloadTxid"
+                  }
+                },
+                {
+                  "output": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CommitReceipt"
+                    ],
+                    "id": "payloadResource"
+                  }
+                },
+                {
+                  "output": "amount",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CommitReceipt"
+                    ],
+                    "id": "payloadAmount"
+                  }
+                }
+              ],
+              "codec": {
+                "contract": {
+                  "id": "bank-payment-reserve-cash-fund-order-commit",
+                  "version": "bank-v1-1"
+                },
+                "runtime": {
+                  "id": "bank-payment-reserve-cash-fund-order-commit",
+                  "version": 1
+                }
+              },
+              "payloadCompatibility": "exact"
+            }
+          },
+          {
+            "phase": "compensate",
+            "command": {
+              "context": "bankwealth",
+              "kind": "command",
+              "owner": [
+                "FundOrder"
+              ],
+              "id": "CancelCashFundSubscription"
+            },
+            "parameters": [
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "FundOrder",
+                    "CancelCashFundSubscription"
+                  ],
+                  "id": "txid"
+                },
+                "input": {
+                  "kind": "transaction-id"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "FundOrder",
+                    "CancelCashFundSubscription"
+                  ],
+                  "id": "resource"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "fundOrderId"
+                }
+              },
+              {
+                "parameter": {
+                  "context": "bankwealth",
+                  "kind": "parameter",
+                  "owner": [
+                    "FundOrder",
+                    "CancelCashFundSubscription"
+                  ],
+                  "id": "amount"
+                },
+                "input": {
+                  "kind": "args",
+                  "slot": "amount"
+                }
+              }
+            ],
+            "inputType": {
+              "form": "nominal",
+              "ref": {
+                "context": "bankwealth",
+                "kind": "type",
+                "owner": [],
+                "id": "BankPayment2CompensateInput"
+              }
+            },
+            "executePort": {
+              "ref": {
+                "context": "bankwealth",
+                "kind": "port",
+                "owner": [],
+                "id": "BankPayment2CompensateExecute"
+              },
+              "version": "bank-v1-1"
+            },
+            "confirmation": {
+              "event": {
+                "context": "bankwealth",
+                "kind": "event",
+                "owner": [
+                  "FundOrder"
+                ],
+                "id": "CashFundSubscriptionCanceled"
+              },
+              "outputs": [
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "FundOrder",
+                      "CashFundSubscriptionCanceled"
+                    ],
+                    "id": "txid"
+                  },
+                  "output": "txid"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "FundOrder",
+                      "CashFundSubscriptionCanceled"
+                    ],
+                    "id": "resource"
+                  },
+                  "output": "resource"
+                },
+                {
+                  "slot": {
+                    "context": "bankwealth",
+                    "kind": "event-slot",
+                    "owner": [
+                      "FundOrder",
+                      "CashFundSubscriptionCanceled"
+                    ],
+                    "id": "amount"
+                  },
+                  "output": "amount"
+                }
+              ]
+            },
+            "query": {
+              "port": {
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "port",
+                  "owner": [],
+                  "id": "BankPayment2CompensateQueryPort"
+                },
+                "version": "bank-v1-1"
+              },
+              "inputType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment2CompensateQuery"
+                }
+              },
+              "mode": "read-only",
+              "identity": [
+                "txid",
+                "definition-version",
+                "args-digest",
+                "participant",
+                "resource",
+                "step",
+                "phase"
+              ]
+            },
+            "evidence": {
+              "kind": "typed-record",
+              "receiptType": {
+                "form": "nominal",
+                "ref": {
+                  "context": "bankwealth",
+                  "kind": "type",
+                  "owner": [],
+                  "id": "BankPayment2CompensateReceipt"
+                }
+              },
+              "identity": [
+                {
+                  "key": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CompensateReceipt"
+                    ],
+                    "id": "transaction"
+                  }
+                },
+                {
+                  "key": "definition-version",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CompensateReceipt"
+                    ],
+                    "id": "definitionVersion"
+                  }
+                },
+                {
+                  "key": "args-digest",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CompensateReceipt"
+                    ],
+                    "id": "argsDigest"
+                  }
+                },
+                {
+                  "key": "participant",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CompensateReceipt"
+                    ],
+                    "id": "participant"
+                  }
+                },
+                {
+                  "key": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CompensateReceipt"
+                    ],
+                    "id": "resource"
+                  }
+                },
+                {
+                  "key": "step",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CompensateReceipt"
+                    ],
+                    "id": "step"
+                  }
+                },
+                {
+                  "key": "phase",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CompensateReceipt"
+                    ],
+                    "id": "phase"
+                  }
+                }
+              ],
+              "payload": [
+                {
+                  "output": "txid",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CompensateReceipt"
+                    ],
+                    "id": "payloadTxid"
+                  }
+                },
+                {
+                  "output": "resource",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CompensateReceipt"
+                    ],
+                    "id": "payloadResource"
+                  }
+                },
+                {
+                  "output": "amount",
+                  "member": {
+                    "context": "bankwealth",
+                    "kind": "member",
+                    "owner": [
+                      "BankPayment2CompensateReceipt"
+                    ],
+                    "id": "payloadAmount"
+                  }
+                }
+              ],
+              "codec": {
+                "contract": {
+                  "id": "bank-payment-reserve-cash-fund-order-compensate",
+                  "version": "bank-v1-1"
+                },
+                "runtime": {
+                  "id": "bank-payment-reserve-cash-fund-order-compensate",
+                  "version": 1
+                }
+              },
+              "payloadCompatibility": "exact"
+            }
+          }
+        ]
+      }
+    ],
+    "results": [
+      {
+        "kind": "succeeded",
+        "event": {
+          "context": "bankwealth",
+          "kind": "event",
+          "owner": [
+            "FundOrder"
+          ],
+          "id": "BankPaymentResultSucceeded"
+        },
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankPaymentResult"
+          }
+        },
+        "inputs": [
+          {
+            "slot": {
+              "context": "bankwealth",
+              "kind": "event-slot",
+              "owner": [
+                "FundOrder",
+                "BankPaymentResultSucceeded"
+              ],
+              "id": "txid"
+            },
+            "input": {
+              "kind": "transaction-id"
+            }
+          }
+        ],
+        "destination": {
+          "aggregate": {
+            "context": "bankwealth",
+            "kind": "aggregate",
+            "owner": [],
+            "id": "FundOrder"
+          },
+          "resourceInput": {
+            "context": "bankwealth",
+            "kind": "event-slot",
+            "owner": [
+              "FundOrder",
+              "FundPurchaseSettlementRequested"
+            ],
+            "id": "fundOrderId"
+          }
+        },
+        "authorityPort": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentSucceededAuthority"
+          },
+          "version": "bank-v1-1"
+        },
+        "deliveryPort": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentSucceededDelivery"
+          },
+          "version": "bank-v1-1"
+        },
+        "associationVersion": "bank-v1-1"
+      },
+      {
+        "kind": "rejected-before-effects",
+        "event": {
+          "context": "bankwealth",
+          "kind": "event",
+          "owner": [
+            "FundOrder"
+          ],
+          "id": "BankPaymentResultRejectedBeforeEffects"
+        },
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankPaymentResult"
+          }
+        },
+        "inputs": [
+          {
+            "slot": {
+              "context": "bankwealth",
+              "kind": "event-slot",
+              "owner": [
+                "FundOrder",
+                "BankPaymentResultRejectedBeforeEffects"
+              ],
+              "id": "txid"
+            },
+            "input": {
+              "kind": "transaction-id"
+            }
+          }
+        ],
+        "destination": {
+          "aggregate": {
+            "context": "bankwealth",
+            "kind": "aggregate",
+            "owner": [],
+            "id": "FundOrder"
+          },
+          "resourceInput": {
+            "context": "bankwealth",
+            "kind": "event-slot",
+            "owner": [
+              "FundOrder",
+              "FundPurchaseSettlementRequested"
+            ],
+            "id": "fundOrderId"
+          }
+        },
+        "authorityPort": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentRejectedBeforeEffectsAuthority"
+          },
+          "version": "bank-v1-1"
+        },
+        "deliveryPort": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentRejectedBeforeEffectsDelivery"
+          },
+          "version": "bank-v1-1"
+        },
+        "associationVersion": "bank-v1-1"
+      },
+      {
+        "kind": "compensated",
+        "event": {
+          "context": "bankwealth",
+          "kind": "event",
+          "owner": [
+            "FundOrder"
+          ],
+          "id": "BankPaymentResultCompensated"
+        },
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankPaymentResult"
+          }
+        },
+        "inputs": [
+          {
+            "slot": {
+              "context": "bankwealth",
+              "kind": "event-slot",
+              "owner": [
+                "FundOrder",
+                "BankPaymentResultCompensated"
+              ],
+              "id": "txid"
+            },
+            "input": {
+              "kind": "transaction-id"
+            }
+          }
+        ],
+        "destination": {
+          "aggregate": {
+            "context": "bankwealth",
+            "kind": "aggregate",
+            "owner": [],
+            "id": "FundOrder"
+          },
+          "resourceInput": {
+            "context": "bankwealth",
+            "kind": "event-slot",
+            "owner": [
+              "FundOrder",
+              "FundPurchaseSettlementRequested"
+            ],
+            "id": "fundOrderId"
+          }
+        },
+        "authorityPort": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentCompensatedAuthority"
+          },
+          "version": "bank-v1-1"
+        },
+        "deliveryPort": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentCompensatedDelivery"
+          },
+          "version": "bank-v1-1"
+        },
+        "associationVersion": "bank-v1-1"
+      },
+      {
+        "kind": "recovery-required",
+        "event": {
+          "context": "bankwealth",
+          "kind": "event",
+          "owner": [
+            "FundOrder"
+          ],
+          "id": "BankPaymentResultRecoveryRequired"
+        },
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankPaymentResult"
+          }
+        },
+        "inputs": [
+          {
+            "slot": {
+              "context": "bankwealth",
+              "kind": "event-slot",
+              "owner": [
+                "FundOrder",
+                "BankPaymentResultRecoveryRequired"
+              ],
+              "id": "txid"
+            },
+            "input": {
+              "kind": "transaction-id"
+            }
+          }
+        ],
+        "destination": {
+          "aggregate": {
+            "context": "bankwealth",
+            "kind": "aggregate",
+            "owner": [],
+            "id": "FundOrder"
+          },
+          "resourceInput": {
+            "context": "bankwealth",
+            "kind": "event-slot",
+            "owner": [
+              "FundOrder",
+              "FundPurchaseSettlementRequested"
+            ],
+            "id": "fundOrderId"
+          }
+        },
+        "authorityPort": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentRecoveryRequiredAuthority"
+          },
+          "version": "bank-v1-1"
+        },
+        "deliveryPort": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentRecoveryRequiredDelivery"
+          },
+          "version": "bank-v1-1"
+        },
+        "associationVersion": "bank-v1-1"
+      },
+      {
+        "kind": "outcome-unknown",
+        "event": {
+          "context": "bankwealth",
+          "kind": "event",
+          "owner": [
+            "FundOrder"
+          ],
+          "id": "BankPaymentResultOutcomeUnknown"
+        },
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankPaymentResult"
+          }
+        },
+        "inputs": [
+          {
+            "slot": {
+              "context": "bankwealth",
+              "kind": "event-slot",
+              "owner": [
+                "FundOrder",
+                "BankPaymentResultOutcomeUnknown"
+              ],
+              "id": "txid"
+            },
+            "input": {
+              "kind": "transaction-id"
+            }
+          }
+        ],
+        "destination": {
+          "aggregate": {
+            "context": "bankwealth",
+            "kind": "aggregate",
+            "owner": [],
+            "id": "FundOrder"
+          },
+          "resourceInput": {
+            "context": "bankwealth",
+            "kind": "event-slot",
+            "owner": [
+              "FundOrder",
+              "FundPurchaseSettlementRequested"
+            ],
+            "id": "fundOrderId"
+          }
+        },
+        "authorityPort": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentOutcomeUnknownAuthority"
+          },
+          "version": "bank-v1-1"
+        },
+        "deliveryPort": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentOutcomeUnknownDelivery"
+          },
+          "version": "bank-v1-1"
+        },
+        "associationVersion": "bank-v1-1"
+      }
+    ],
+    "technicalPorts": [
+      {
+        "role": "entry",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentEntry"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentEntry",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "association",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentAssociation"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentAssociation",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-execute",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment0PrepareExecute"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment0PrepareExecute",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-query",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment0PrepareQueryPort"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment0PrepareQueryPort",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-execute",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment0CommitExecute"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment0CommitExecute",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-query",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment0CommitQueryPort"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment0CommitQueryPort",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-execute",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment0CompensateExecute"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment0CompensateExecute",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-query",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment0CompensateQueryPort"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment0CompensateQueryPort",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-execute",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment1PrepareExecute"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment1PrepareExecute",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-query",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment1PrepareQueryPort"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment1PrepareQueryPort",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-execute",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment1CommitExecute"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment1CommitExecute",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-query",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment1CommitQueryPort"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment1CommitQueryPort",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-execute",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment1CompensateExecute"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment1CompensateExecute",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-query",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment1CompensateQueryPort"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment1CompensateQueryPort",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-execute",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment2PrepareExecute"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment2PrepareExecute",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-query",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment2PrepareQueryPort"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment2PrepareQueryPort",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-execute",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment2CommitExecute"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment2CommitExecute",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-query",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment2CommitQueryPort"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment2CommitQueryPort",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-execute",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment2CompensateExecute"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment2CompensateExecute",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "phase-query",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPayment2CompensateQueryPort"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPayment2CompensateQueryPort",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "authority",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentSucceededAuthority"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentSucceededAuthority",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "result-delivery",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentSucceededDelivery"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentSucceededDelivery",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "authority",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentRejectedBeforeEffectsAuthority"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentRejectedBeforeEffectsAuthority",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "result-delivery",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentRejectedBeforeEffectsDelivery"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentRejectedBeforeEffectsDelivery",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "authority",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentCompensatedAuthority"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentCompensatedAuthority",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "result-delivery",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentCompensatedDelivery"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentCompensatedDelivery",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "authority",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentRecoveryRequiredAuthority"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentRecoveryRequiredAuthority",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "result-delivery",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentRecoveryRequiredDelivery"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentRecoveryRequiredDelivery",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "authority",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentOutcomeUnknownAuthority"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentOutcomeUnknownAuthority",
+          "version": "bank-v1-1"
+        }
+      },
+      {
+        "role": "result-delivery",
+        "port": {
+          "ref": {
+            "context": "bankwealth",
+            "kind": "port",
+            "owner": [],
+            "id": "BankPaymentOutcomeUnknownDelivery"
+          },
+          "version": "bank-v1-1"
+        },
+        "implementation": {
+          "id": "bankwealth.BankPaymentOutcomeUnknownDelivery",
+          "version": "bank-v1-1"
+        }
+      }
+    ]
+  }

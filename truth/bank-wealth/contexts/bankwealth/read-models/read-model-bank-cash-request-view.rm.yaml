@@ -1,0 +1,115 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: read-model
+name: BankCashRequestView
+id: bank-cash-request-view
+payload:
+  {
+    "id": "bank-cash-request-view",
+    "name": "BankCashRequestView",
+    "context": "bankwealth",
+    "description": "按本人principal＋clientRequestId查询完整原现金请求及三层当前状态；GET不补建现金parent。",
+    "sourceAggregate": "FundOrder",
+    "visible_to": [
+      "customer"
+    ],
+    "fields": [
+      {
+        "name": "original",
+        "dataType": "BankCashOriginal",
+        "source": "eventField:CashRequestSourceRecorded.source",
+        "description": "cashRequestSource非空时展示其中BankCashOriginal；source须包含事件original。原身份、原闭集请求、authorityVersion及固定付款参数一起保留。"
+      },
+      {
+        "name": "paymentStatus",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.paymentStatus: FundOrder.cashPaymentFinalResults[selectedPaymentTxId], else nonempty paymentOutcome, else intent-recorded for status=new, else status",
+        "description": "付款自身结果，含中间状态及五kind；succeeded不是投资成功。"
+      },
+      {
+        "name": "taStatus",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.taStatus: nonempty FundOrder.taStatus, else not-submitted",
+        "description": "submitted/accepted/unknown与confirmed/rejected分开；实际确认事件是FundTASharesConfirmed。"
+      },
+      {
+        "name": "refundStatus",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.refundStatus: nonempty FundOrder.refundOutcome, else refund-in-progress for TA rejected plus payment succeeded, else not-required",
+        "description": "独立退款状态；只有succeeded表示已退本金，不覆盖付款成功事实。"
+      }
+    ],
+    "queries": [
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankCashOriginalQuery"
+      }
+    ],
+    "metadata": {
+      "description": "每个查询响应的BankReadMetadata信封，不是金融终态，不并入下列业务DTO字段。所有来源说明均为文档，不声明新的可执行投影。",
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "dataType": "String",
+          "source": "Documentation only: BankReadsideSchema.version",
+          "description": "当前查询schema为bank-query-v1。"
+        },
+        {
+          "name": "disposition",
+          "dataType": "String",
+          "source": "Documentation only: BankReadside.metadata(rows, completeSet, absent)",
+          "description": "完整所需集合且有水位且全部caught-up才返回caught-up；该条件下业务值缺席才not-found。否则unknown，不能把缺行或空列表当不存在。"
+        },
+        {
+          "name": "watermarks",
+          "dataType": "Vector[BankProjectionWatermark]",
+          "source": "Documentation only: BankReadside.metadata: each distinct stream Row.pid/last/observed",
+          "description": "每PID分别报告lastSequence与observedSequence。相等为caught-up，observed更大为catching-up，其余unknown；不是全局日志顺序或跨账户原子快照。"
+        }
+      ],
+      "semantics": [
+        "BankReadside.project在同一事务保存原event、生成状态、索引和连续checkpoint；PID＋seq相同须字节一致，冲突或gap拒绝且不跳水位。",
+        "catchUp仅观察某PID的有界frontier；后续live事件将observed清空。关闭排空后frontier失效，不把上次caught-up当永久新鲜。",
+        "plans和pending无有界全索引发现frontier，completeSet=false，整页metadata.disposition保持unknown，即使已列行的水位caught-up。",
+        "occurrences按due_slot分页并在查询时关联订单；关联缺失可稍后重查，不生成假订单或全局chronology。",
+        "查询先认证及归属判断；GET不启动账户、订单、付款、退款或补期。Unavailable/NotAuthorized等查询失败与金融失败分开。"
+      ],
+      "evidence": [
+        "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+        "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+        "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+        "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+        "truth/bank-wealth/contexts/bankwealth/value-objects/bank-read-metadata.vo.yaml",
+        "truth/bank-wealth/contexts/bankwealth/value-objects/bank-projection-watermark.vo.yaml"
+      ]
+    },
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+      "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+      "truth/bank-wealth/contexts/bankwealth/value-objects/bank-cash-request-view.vo.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-cash-request-source.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/aggregate.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-rejected-before-effects.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-compensated.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-outcome-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-recovery-required.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-rejected-before-effects.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-compensated.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-outcome-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-recovery-required.slice.yaml",
+      "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+      "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala"
+    ]
+  }

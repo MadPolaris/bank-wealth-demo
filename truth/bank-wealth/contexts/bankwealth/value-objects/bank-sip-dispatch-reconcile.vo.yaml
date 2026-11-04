@@ -1,0 +1,33 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: BankSipDispatchReconcile
+seq: 79
+payload:
+  {
+    "name": "BankSipDispatchReconcile",
+    "context": "bankwealth",
+    "version": "bank-v1-1",
+    "fields": [
+      {
+        "name": "operation",
+        "dataType": "String"
+      },
+      {
+        "name": "request",
+        "dataType": "BankSipDispatchRequest"
+      },
+      {
+        "name": "decision",
+        "dataType": "String"
+      },
+      {
+        "name": "evidence",
+        "dataType": "Option[BankSipDispatchObservation]"
+      },
+      {
+        "name": "authorization",
+        "dataType": "String"
+      }
+    ]
+  }

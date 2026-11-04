@@ -1,0 +1,72 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: BankSipPlanView
+seq: 105
+payload:
+  {
+    "name": "BankSipPlanView",
+    "context": "bankwealth",
+    "version": "bank-v1-service-1",
+    "fields": [
+      {
+        "name": "planId",
+        "dataType": "PlanId"
+      },
+      {
+        "name": "original",
+        "dataType": "Option[BankSipCreateIntent]"
+      },
+      {
+        "name": "initialized",
+        "dataType": "Boolean"
+      },
+      {
+        "name": "scheduleSealed",
+        "dataType": "Boolean"
+      },
+      {
+        "name": "paused",
+        "dataType": "Boolean"
+      },
+      {
+        "name": "currentTick",
+        "dataType": "Long"
+      },
+      {
+        "name": "dueSlots",
+        "dataType": "Vector[Long]"
+      },
+      {
+        "name": "revisions",
+        "dataType": "Vector[BankSipRevisionView]"
+      },
+      {
+        "name": "scheduleCount",
+        "dataType": "Long"
+      },
+      {
+        "name": "observedCount",
+        "dataType": "Long"
+      },
+      {
+        "name": "startCount",
+        "dataType": "Long"
+      },
+      {
+        "name": "successTotal",
+        "dataType": "Long"
+      },
+      {
+        "name": "failureTotal",
+        "dataType": "Long"
+      }
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1-service-integration",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-service-integration-619",
+      "sourceFlow": "P26-P32",
+      "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+    }
+  }

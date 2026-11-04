@@ -1,0 +1,166 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: read-model
+name: BankPendingOperationView
+id: bank-pending-operation-view
+payload:
+  {
+    "id": "bank-pending-operation-view",
+    "name": "BankPendingOperationView",
+    "context": "bankwealth",
+    "description": "操作员跨付款、TA、退款与SIP派发的待跟进索引；来自FundOrder及SipPlan，没有诚实的单一sourceAggregate，也不是完整任务执行状态机。",
+    "visible_to": [
+      "operator"
+    ],
+    "fields": [
+      {
+        "name": "operationId",
+        "dataType": "OperationId",
+        "source": "Documentation only: BankReadside.indexes: order operationId or cashRequestSource.payment.operationId for payment/TA; refundOperationId for refund; occurrence.operationId for sip-dispatch",
+        "description": "每flow保留其原操作身份。"
+      },
+      {
+        "name": "flow",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.indexes assigns payment, ta, refund or sip-dispatch",
+        "description": "业务跟进分类，不是新增执行policy。"
+      },
+      {
+        "name": "orderId",
+        "dataType": "Option[FundOrderId]",
+        "source": "Documentation only: BankReadside.indexes: order Row.resource or SipOccurrence.fundOrderId",
+        "description": "原关联订单。"
+      },
+      {
+        "name": "planId",
+        "dataType": "Option[PlanId]",
+        "source": "Documentation only: BankReadside.indexes: SipOccurrence.planId for sip-dispatch, None for order flows",
+        "description": "只有期次派发行带此字段。"
+      },
+      {
+        "name": "occurrenceId",
+        "dataType": "Option[OccurrenceId]",
+        "source": "Documentation only: BankReadside.indexes: SipOccurrence.occurrenceId for sip-dispatch, None for order flows",
+        "description": "不是从页面参数铸造的新身份。"
+      },
+      {
+        "name": "phase",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.indexes assigns payment, ta, refund or installment",
+        "description": "展示标签，不是Saga当前phase或任意技术执行游标。"
+      },
+      {
+        "name": "status",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.indexes: paymentStatus/taStatus/refundStatus for order flows; occurrenceProgress with pending fallback for sip-dispatch",
+        "description": "沿用现有状态派生，不推断金融成功。"
+      },
+      {
+        "name": "recoverable",
+        "dataType": "Boolean",
+        "source": "Documentation only: BankReadside.indexes supplies true for each included pending row",
+        "description": "当前实现的跟进提示；不是操作授权、自动重试保证或一定可成功恢复的判定。"
+      }
+    ],
+    "queries": [
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankPendingOperationsQuery"
+      }
+    ],
+    "metadata": {
+      "description": "每个查询响应的BankReadMetadata信封，不是金融终态，不并入下列业务DTO字段。所有来源说明均为文档，不声明新的可执行投影。",
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "dataType": "String",
+          "source": "Documentation only: BankReadsideSchema.version",
+          "description": "当前查询schema为bank-query-v1。"
+        },
+        {
+          "name": "disposition",
+          "dataType": "String",
+          "source": "Documentation only: BankReadside.metadata(rows, completeSet, absent)",
+          "description": "完整所需集合且有水位且全部caught-up才返回caught-up；该条件下业务值缺席才not-found。否则unknown，不能把缺行或空列表当不存在。"
+        },
+        {
+          "name": "watermarks",
+          "dataType": "Vector[BankProjectionWatermark]",
+          "source": "Documentation only: BankReadside.metadata: each distinct stream Row.pid/last/observed",
+          "description": "每PID分别报告lastSequence与observedSequence。相等为caught-up，observed更大为catching-up，其余unknown；不是全局日志顺序或跨账户原子快照。"
+        }
+      ],
+      "semantics": [
+        "BankReadside.project在同一事务保存原event、生成状态、索引和连续checkpoint；PID＋seq相同须字节一致，冲突或gap拒绝且不跳水位。",
+        "catchUp仅观察某PID的有界frontier；后续live事件将observed清空。关闭排空后frontier失效，不把上次caught-up当永久新鲜。",
+        "plans和pending无有界全索引发现frontier，completeSet=false，整页metadata.disposition保持unknown，即使已列行的水位caught-up。",
+        "occurrences按due_slot分页并在查询时关联订单；关联缺失可稍后重查，不生成假订单或全局chronology。",
+        "查询先认证及归属判断；GET不启动账户、订单、付款、退款或补期。Unavailable/NotAuthorized等查询失败与金融失败分开。"
+      ],
+      "evidence": [
+        "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+        "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+        "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+        "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+        "truth/bank-wealth/contexts/bankwealth/value-objects/bank-read-metadata.vo.yaml",
+        "truth/bank-wealth/contexts/bankwealth/value-objects/bank-projection-watermark.vo.yaml"
+      ]
+    },
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+      "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+      "truth/bank-wealth/contexts/bankwealth/value-objects/bank-pending-operation-view.vo.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/aggregate.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/aggregate.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-rejected-before-effects.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-compensated.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-outcome-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-recovery-required.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-rejected-before-effects.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-compensated.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-outcome-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-recovery-required.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+      "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+      "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala"
+    ],
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "aggregate",
+        "owner": [],
+        "id": "FundOrder"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "aggregate",
+        "owner": [],
+        "id": "SipPlan"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "role",
+        "owner": [],
+        "id": "operator"
+      }
+    ],
+    "inclusion": [
+      "付款结果不在succeeded/rejected-before-effects/compensated时保留payment行。",
+      "付款succeeded且TA不在confirmed/rejected时保留ta行。",
+      "已有refundOperationId且refundStatus不是succeeded时保留refund行，包括早拒绝或补偿；不能把列表存在等同暂态。",
+      "occurrence尚无firstTerminal时保留sip-dispatch行；结果回桥后移除。",
+      "按operation_id/flow分页；无全局发现frontier，所以空页也不证明全部完成。"
+    ]
+  }

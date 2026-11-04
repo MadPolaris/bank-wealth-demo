@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "truthsrc.execution-binding/v1",
+  "pipelines": [
+    {
+      "pipelineId": "bank-cash-payment-v1",
+      "engine": "monarch-persistence/0.2.1",
+      "module": "bankwealth.PaymentPipeline",
+      "codec": {
+        "id": "CashPurchasePipelineCodec",
+        "version": "bank-v1-1",
+        "compatibleVersions": [
+          "bank-v1-1"
+        ]
+      },
+      "types": [
+        {
+          "id": "TxId",
+          "implementation": "example.bankwealth.domain.values.TxId"
+        },
+        {
+          "id": "OperationId",
+          "implementation": "example.bankwealth.domain.values.OperationId"
+        },
+        {
+          "id": "AccountId",
+          "implementation": "example.bankwealth.domain.values.AccountId"
+        },
+        {
+          "id": "FundOrderId",
+          "implementation": "example.bankwealth.domain.values.FundOrderId"
+        },
+        {
+          "id": "Money",
+          "implementation": "example.bankwealth.domain.values.Money"
+        },
+        {
+          "id": "Text",
+          "implementation": "java.lang.String"
+        }
+      ],
+      "ports": [],
+      "invocations": [
+        {
+          "stepId": "pay-cash-purchase",
+          "ref": {
+            "sagaId": "bank-cash-payment-v1",
+            "version": "bank-v1-1"
+          },
+          "adapter": "bankwealth.PaymentInvocation",
+          "runtime": {
+            "artifact": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT",
+            "apiMode": "strict",
+            "entrypoint": "bankwealth.PaymentEntry"
+          },
+          "argsCodec": {
+            "id": "BankPaymentArgs",
+            "version": "bank-v1-1",
+            "mapper": "bankwealth.PaymentArgsCodec"
+          },
+          "resultCodec": {
+            "id": "SagaResultCodec",
+            "version": "bank-v1-1",
+            "mapper": "fixture.wealth.pay.SagaResultCodec"
+          },
+          "transactionIdentity": {
+            "mapper": "fixture.wealth.pay.DurableSourceStageIdentity",
+            "derivation": "durable-source-stage",
+            "payloadCompatibility": "exact"
+          }
+        }
+      ]
+    }
+  ]
+}

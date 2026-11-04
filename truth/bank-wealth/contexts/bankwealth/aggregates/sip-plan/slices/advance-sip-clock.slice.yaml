@@ -1,0 +1,87 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: AdvanceSipClock
+payload:
+  {
+    "name": "AdvanceSipClock",
+    "parameters": [
+      {
+        "name": "tick",
+        "dataType": "Long",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INITIALIZED",
+        "errCode": "SIP_INITIALIZED",
+        "cond": "state.initialized",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_SCHEDULE_SEALED",
+        "errCode": "SIP_SCHEDULE_SEALED",
+        "cond": "state.scheduleSealed",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_CLOCK_MONOTONE",
+        "errCode": "SIP_CLOCK_MONOTONE",
+        "cond": "param.tick >= state.currentTick && param.tick >= 0",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_CLOCK_ONCE",
+        "errCode": "SIP_CLOCK_ONCE",
+        "cond": "param.tick != state.currentTick",
+        "onFail": "succeed-empty"
+      }
+    ],
+    "produces": [
+      "SipClockAdvanced"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ]
+    }
+  }
+events:
+  {
+    "SipClockAdvanced": {
+      "name": "SipClockAdvanced",
+      "payloads": [
+        {
+          "name": "tick",
+          "dataType": "Long",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "tick",
+          "expr": "param.tick"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "currentTick",
+          "expr": "event.tick"
+        }
+      ]
+    }
+  }

@@ -52,7 +52,7 @@ export function checkedTarget(target) {
 }
 
 export function checkInputs() {
-  const before = fingerprints(V1_TREE), request = bankApplicationRequest(), compilation = compileProductSet(request);
+  const before = fingerprints(V1_TREE), request = bankApplicationRequest({ historical: true }), compilation = compileProductSet(request);
   assert.deepEqual(compilation.diagnostics, []);
   const scopes = flows.map(flow => {
     const directory = inputDirectory(flow), captured = readProductRequest(join(directory, 'files.json'));
@@ -117,6 +117,7 @@ export async function testTarget(target, evidencePrefix) {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const args = process.argv.slice(2);
+  if (args.shift() !== '--historical') throw new Error('Frozen P24/P25 joint input. Use the root truthsrc.project.json for current generation; replay requires --historical.');
   if (args.length === 1 && args[0] === '--check') console.log(JSON.stringify(checkInputs()));
   else if (args.length === 2 && args[0] === '--plan') console.log(JSON.stringify(await planFlow(args[1])));
   else if (args.length === 4 && args[0] === '--test-target' && args[2] === '--evidence') console.log(JSON.stringify(await testTarget(args[1], args[3])));

@@ -1,0 +1,46 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: role
+name: operator
+id: operator
+origin:
+  stage: commandStorming
+  board: current-bank-knowledge
+  seq: 1
+payload:
+  {
+    "type": "role",
+    "name": "operator",
+    "id": "operator",
+    "context": "bankwealth",
+    "description": "配置中的操作员可查看待跟进索引、请求恢复已有operation及显式推进业务tick；不是客户查询的万能角色。",
+    "can_issue": [],
+    "can_view": [
+      "bank-pending-operation-view"
+    ],
+    "entrypoints": [
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankReconcileExistingPort"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankBusinessTickPort"
+      }
+    ],
+    "boundary": "服务端口不是切片命令，不能伪填到can_issue。单独operator身份不能查客户账户/订单/计划；配置同时赋予customer才可按自己的customer归属查询。恢复只从原事实取身份和资金参数；pending.recoverable不是额外权限。",
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P27-4..P27-5; P29-2..P29-3; P30-2; P31-2)",
+      "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala",
+      "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+      "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+      "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+    ]
+  }

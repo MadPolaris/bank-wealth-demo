@@ -1,0 +1,33 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: BankTaEffectReconcile
+seq: 74
+payload:
+  {
+    "name": "BankTaEffectReconcile",
+    "context": "bankwealth",
+    "version": "bank-v1-1",
+    "fields": [
+      {
+        "name": "operation",
+        "dataType": "String"
+      },
+      {
+        "name": "request",
+        "dataType": "BankTaEffectRequest"
+      },
+      {
+        "name": "decision",
+        "dataType": "String"
+      },
+      {
+        "name": "evidence",
+        "dataType": "Option[BankTaEffectObservation]"
+      },
+      {
+        "name": "authorization",
+        "dataType": "String"
+      }
+    ]
+  }

@@ -1,0 +1,155 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: artifact-contract
+id: bank-ta-technical
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "bank-ta-technical",
+    "version": "bank-v1-1",
+    "artifact": {
+      "context": "bankwealth",
+      "kind": "artifact",
+      "owner": [],
+      "id": "BankTaTechnical"
+    },
+    "status": "selected",
+    "provenance": [
+      {
+        "document": "bank-v1",
+        "pointer": "/pipelines/3"
+      }
+    ],
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "pipeline",
+        "owner": [],
+        "id": "bank-ta-submission-v1"
+      }
+    ],
+    "ports": [
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankTaEffectExecute"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankTaEffectOperation"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankTaEffectObservation"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankTaEffectQuery"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankTaEffectOperation"
+          }
+        },
+        "outputType": {
+          "form": "optional",
+          "element": {
+            "form": "nominal",
+            "ref": {
+              "context": "bankwealth",
+              "kind": "type",
+              "owner": [],
+              "id": "BankTaEffectObservation"
+            }
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankTaEffectReconcilePort"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankTaEffectReconcile"
+          }
+        },
+        "outputType": {
+          "form": "primitive",
+          "name": "boolean"
+        },
+        "required": true
+      }
+    ],
+    "deployment": {
+      "id": "bank-owned-mock-ta-worker",
+      "version": "bank-v1-1",
+      "secretRefs": []
+    },
+    "implementations": [
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankTaEffectExecute"
+        },
+        "id": "bankwealth.BankTaEffectExecute",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankTaEffectQuery"
+        },
+        "id": "bankwealth.BankTaEffectQuery",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankTaEffectReconcilePort"
+        },
+        "id": "bankwealth.BankTaEffectReconcilePort",
+        "version": "bank-v1-1"
+      }
+    ]
+  }

@@ -1,0 +1,139 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: CreditBalance
+command: CancelIncomingCredit
+payload:
+  {
+    "name": "CancelIncomingCredit",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_RESOURCE",
+        "errCode": "LEDGER_RESOURCE",
+        "cond": "state.initialized && param.resource == state.id",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_CNY",
+        "errCode": "LEDGER_CNY",
+        "cond": "param.amount.currency == \"CNY\"",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_POSITIVE",
+        "errCode": "LEDGER_POSITIVE",
+        "cond": "param.amount.amount > 0.00",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_COMPENSATEDINCOMING_MATCH",
+        "errCode": "LEDGER_COMPENSATEDINCOMING_MATCH",
+        "cond": "!state.compensatedIncoming.contains(param.txid) || state.compensatedIncoming(param.txid) == param.amount",
+        "onFail": "reject"
+      },
+      {
+        "ruleId": "LEDGER_COMPENSATE_ONCE",
+        "errCode": "LEDGER_COMPENSATE_ONCE",
+        "onFail": "succeed-empty",
+        "when": {
+          "form": "map-absent",
+          "map": "compensatedIncoming",
+          "key": "param.txid"
+        }
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_NOT_COMMITTED",
+        "errCode": "LEDGER_NOT_COMMITTED",
+        "cond": "!state.committedIncoming.contains(param.txid)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_INCOMINGCREDITS_MATCH",
+        "errCode": "LEDGER_INCOMINGCREDITS_MATCH",
+        "cond": "!state.incomingCredits.contains(param.txid) || state.incomingCredits(param.txid) == param.amount",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "CancelIncomingCreditConfirmed"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "approvedBy": "user-approved-p24-p25-bank-joint",
+      "sourceVersion": "bank-v1-p23-design-2"
+    }
+  }
+events:
+  {
+    "CancelIncomingCreditConfirmed": {
+      "name": "CancelIncomingCreditConfirmed",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "resource",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        },
+        {
+          "slot": "resource",
+          "expr": "param.resource"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "incomingCredits",
+          "op": "remove",
+          "key": "event.txid"
+        },
+        {
+          "slot": "compensatedIncoming",
+          "op": "put",
+          "key": "event.txid",
+          "value": "event.amount"
+        }
+      ]
+    }
+  }

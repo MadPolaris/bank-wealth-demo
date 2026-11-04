@@ -1,0 +1,46 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: story
+name: FundTaSettlement
+id: fund-ta-settlement
+payload:
+  {
+    "id": "fund-ta-settlement",
+    "name": "FundTaSettlement",
+    "context": "bankwealth",
+    "role": "customer",
+    "goal": "知道已付款订单是否仅被TA受理，还是已确认份额、被拒绝或仍然未知。",
+    "description": "TA由受信应用对已付款订单推进，客户只观察；模拟TA的相关份额确认才表示投资成功，shares/NAV原文保留。",
+    "links": [
+      {
+        "relation": "covers",
+        "target": "use-case:SettlePaidFundOrderWithTa"
+      }
+    ],
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "role",
+        "owner": [],
+        "id": "customer"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "use-case",
+        "owner": [],
+        "id": "SettlePaidFundOrderWithTa"
+      }
+    ],
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/pipelines/bank-ta-submission-v1.pipeline.yaml",
+      "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+      "v1/handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala"
+    ]
+  }

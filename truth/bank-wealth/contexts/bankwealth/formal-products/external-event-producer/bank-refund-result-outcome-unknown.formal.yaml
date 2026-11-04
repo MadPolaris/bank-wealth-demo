@@ -1,0 +1,72 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: external-event-producer
+id: bank-refund-result-outcome-unknown
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "bank-refund-result-outcome-unknown",
+    "version": "bank-v1-1",
+    "kind": "saga-completion",
+    "event": {
+      "context": "bankwealth",
+      "kind": "event",
+      "owner": [
+        "FundOrder"
+      ],
+      "id": "BankRefundResultOutcomeUnknown"
+    },
+    "port": {
+      "context": "bankwealth",
+      "kind": "port",
+      "owner": [],
+      "id": "BankRefundOutcomeUnknownAuthority"
+    },
+    "outputType": {
+      "form": "nominal",
+      "ref": {
+        "context": "bankwealth",
+        "kind": "type",
+        "owner": [],
+        "id": "BankRefundResult"
+      }
+    },
+    "slotMappings": [
+      {
+        "slot": {
+          "context": "bankwealth",
+          "kind": "event-slot",
+          "owner": [
+            "FundOrder",
+            "BankRefundResultOutcomeUnknown"
+          ],
+          "id": "txid"
+        },
+        "member": {
+          "context": "bankwealth",
+          "kind": "member",
+          "owner": [
+            "BankRefundResult"
+          ],
+          "id": "txid"
+        }
+      }
+    ],
+    "stableIdentityContract": {
+      "id": "bank-refund-result-outcome-unknown",
+      "version": "bank-v1-1",
+      "keys": [
+        {
+          "context": "bankwealth",
+          "kind": "member",
+          "owner": [
+            "BankRefundResult"
+          ],
+          "id": "txid"
+        }
+      ]
+    }
+  }

@@ -1,0 +1,125 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: context
+name: bankwealth
+id: bankwealth
+origin:
+  stage: contextMapping
+  board: current-bank-knowledge
+  seq: 0
+payload:
+  {
+    "type": "context",
+    "name": "bankwealth",
+    "id": "bankwealth",
+    "context": "bankwealth",
+    "description": "当前银行财富demo采用一个显式bankwealth上下文：账户现金、基金订单付款/TA/独立退款及有限现金定投四流。这里解释范围，不新增上下文或战略划分决定。",
+    "responsibility": "CreditBalance持有账户金额与事务资金事实；FundOrder持有原现金请求、付款结果、TA关联和退款intent/结果；SipPlan持有完整有限日程、期次身份及首次终态计数。跨聚合资金由独立Saga协作，pipeline只管耐久阶段。",
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "aggregate",
+        "owner": [],
+        "id": "CreditBalance"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "aggregate",
+        "owner": [],
+        "id": "FundOrder"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "aggregate",
+        "owner": [],
+        "id": "SipPlan"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "pipeline",
+        "owner": [],
+        "id": "bank-cash-payment-v1"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "pipeline",
+        "owner": [],
+        "id": "bank-ta-submission-v1"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "pipeline",
+        "owner": [],
+        "id": "bank-independent-refund-v1"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "pipeline",
+        "owner": [],
+        "id": "bank-sip-dispatch-v1"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "saga",
+        "owner": [],
+        "id": "bank-cash-payment-v1"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "saga",
+        "owner": [],
+        "id": "bank-independent-refund-v1"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "use-case",
+        "owner": [],
+        "id": "PurchaseFundWithCash"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "use-case",
+        "owner": [],
+        "id": "SettlePaidFundOrderWithTa"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "use-case",
+        "owner": [],
+        "id": "RefundTaRejectedPurchase"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "use-case",
+        "owner": [],
+        "id": "RunFiniteSipPlan"
+      }
+    ],
+    "boundaries": [
+      "基金公司/TA为获准模拟的外部边界，不声明一个新已实施的TA上下文，也不宣称真实外部银行或基金公司集成。",
+      "不把旧外部银行充值或跨行定投带入当前现金范围；旧ledger/payments/fund候选分类不是当前已批准的三上下文。",
+      "付款成功不等份额成功；独立退款不等付款补偿；SIP派发成功不等首次投资终态。规则只在现有切片、协作合同和可信实现中定义，此处连接其含义。",
+      "查询为可重建只读投影；六个业务视图不等五张技术表。bank-service当前projections为空数组，实际查询由BankReadside承担；新增描述不自动生成或替换投影。",
+      "1134只接受既定本地demo的25项；本说明不是重新签出、生产认证或完整五层产品设计批准。既有product-design的proposal/approvalSource状态不由此改变。",
+      "retry/backoff/deadline仍OPEN、未修复且未被接受为合理限制；指定恢复窗通过不等自动重试策略全部贯通。本次不定义新重试policy。"
+    ],
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26..P30; P31-1..P31-2; 1134适用边界)",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/aggregate.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/aggregate.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/aggregate.yaml",
+      "truth/bank-wealth/contexts/bankwealth/pipelines/bank-cash-payment-v1.pipeline.yaml",
+      "truth/bank-wealth/contexts/bankwealth/pipelines/bank-ta-submission-v1.pipeline.yaml",
+      "truth/bank-wealth/contexts/bankwealth/pipelines/bank-independent-refund-v1.pipeline.yaml",
+      "truth/bank-wealth/contexts/bankwealth/pipelines/bank-sip-dispatch-v1.pipeline.yaml",
+      "truth/bank-wealth/contexts/bankwealth/sagas/bank-cash-payment-v1.saga.yaml",
+      "truth/bank-wealth/contexts/bankwealth/sagas/bank-independent-refund-v1.saga.yaml",
+      "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+      "docs/TRUTH-MIGRATION.md (四流、当前范围与旧候选的区别)",
+      "docs/TRUTHSRC-CONTINUATION.md (第3节：重试挂账OPEN)"
+    ]
+  }

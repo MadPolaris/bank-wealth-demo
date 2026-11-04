@@ -1,0 +1,122 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RecordCashRequestSource
+payload:
+  {
+    "name": "RecordCashRequestSource",
+    "parameters": [
+      {
+        "name": "original",
+        "dataType": "BankCashOriginal",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "source",
+        "dataType": "Option[BankCashOriginal]",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "CASH_SOURCE_OPTION",
+        "errCode": "CASH_SOURCE_OPTION",
+        "cond": "param.source.contains(param.original)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "CASH_SOURCE_RESOURCE",
+        "errCode": "CASH_SOURCE_RESOURCE",
+        "cond": "param.original.payment.fundOrderId == state.id",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "CASH_SOURCE_BODY",
+        "errCode": "CASH_SOURCE_BODY",
+        "cond": "param.original.principalId.nonEmpty && param.original.clientRequestId.nonEmpty && param.original.authorityVersion.nonEmpty && param.original.clientRequestId == param.original.request.clientRequestId && param.original.request.fundCode == param.original.payment.fundCode && param.original.request.amount.currency == param.original.payment.amount.currency",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "CASH_SOURCE_CONFLICT",
+        "errCode": "CASH_SOURCE_CONFLICT",
+        "cond": "state.cashRequestSource.isEmpty || state.cashRequestSource.contains(param.original)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "CASH_SOURCE_PAYMENT",
+        "errCode": "CASH_SOURCE_PAYMENT",
+        "cond": "state.status == \"new\" || (param.original.payment.operationId == state.operationId && param.original.payment.investorAccountId == state.investorAccountId && param.original.payment.fundCollectionAccountId == state.fundCollectionAccountId && param.original.payment.fundCode == state.fundCode && param.original.payment.amount == state.amount)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "CASH_SOURCE_ONCE",
+        "errCode": "CASH_SOURCE_ONCE",
+        "cond": "state.cashRequestSource.isEmpty",
+        "onFail": "succeed-empty"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "CASH_SOURCE_BEFORE_SETTLEMENT",
+        "errCode": "CASH_SOURCE_BEFORE_SETTLEMENT",
+        "cond": "state.status == \"new\"",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "CashRequestSourceRecorded"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1-service-integration",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-service-integration-619",
+      "sourceFlow": "P26-P32",
+      "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+    }
+  }
+events:
+  {
+    "CashRequestSourceRecorded": {
+      "name": "CashRequestSourceRecorded",
+      "payloads": [
+        {
+          "name": "original",
+          "dataType": "BankCashOriginal",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "source",
+          "dataType": "Option[BankCashOriginal]",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "original",
+          "expr": "param.original"
+        },
+        {
+          "slot": "source",
+          "expr": "param.source"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "cashRequestSource",
+          "expr": "event.source"
+        },
+        {
+          "slot": "cashRequestOriginals",
+          "op": "put",
+          "key": "literal:original",
+          "value": "event.original"
+        }
+      ]
+    }
+  }

@@ -1,0 +1,197 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: CreditBalance
+command: ReserveFunds
+payload:
+  {
+    "name": "ReserveFunds",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "AccountId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_RESOURCE",
+        "errCode": "LEDGER_RESOURCE",
+        "cond": "state.initialized && param.resource == state.id",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_CNY",
+        "errCode": "LEDGER_CNY",
+        "cond": "param.amount.currency == \"CNY\"",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_POSITIVE",
+        "errCode": "LEDGER_POSITIVE",
+        "cond": "param.amount.amount > 0.00",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_COMMITTEDOUTGOING_MATCH",
+        "errCode": "LEDGER_COMMITTEDOUTGOING_MATCH",
+        "cond": "!state.committedOutgoing.contains(param.txid) || state.committedOutgoing(param.txid) == param.amount",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_COMPENSATEDOUTGOING_MATCH",
+        "errCode": "LEDGER_COMPENSATEDOUTGOING_MATCH",
+        "cond": "!state.compensatedOutgoing.contains(param.txid) || state.compensatedOutgoing(param.txid) == param.amount",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "LEDGER_RESERVEDAMOUNT_MATCH",
+        "errCode": "LEDGER_RESERVEDAMOUNT_MATCH",
+        "cond": "!state.reservedAmount.contains(param.txid) || state.reservedAmount(param.txid) == param.amount",
+        "onFail": "reject"
+      },
+      {
+        "ruleId": "LEDGER_ALREADY_COMMITTED",
+        "errCode": "LEDGER_ALREADY_COMMITTED",
+        "onFail": "succeed-empty",
+        "when": {
+          "form": "map-absent",
+          "map": "committedOutgoing",
+          "key": "param.txid"
+        }
+      },
+      {
+        "ruleId": "LEDGER_ALREADY_COMPENSATED",
+        "errCode": "LEDGER_ALREADY_COMPENSATED",
+        "onFail": "succeed-empty",
+        "when": {
+          "form": "map-absent",
+          "map": "compensatedOutgoing",
+          "key": "param.txid"
+        }
+      },
+      {
+        "ruleId": "LEDGER_ALREADY_PREPARED",
+        "errCode": "LEDGER_ALREADY_PREPARED",
+        "onFail": "succeed-empty",
+        "when": {
+          "form": "map-absent",
+          "map": "reservedAmount",
+          "key": "param.txid"
+        }
+      },
+      {
+        "ruleId": "LEDGER_SUFFICIENT",
+        "errCode": "LEDGER_SUFFICIENT",
+        "onFail": "reject",
+        "when": {
+          "form": "money-sufficient",
+          "amount": "param.amount",
+          "in": "accountBalance"
+        }
+      }
+    ],
+    "produces": [
+      "ReserveFundsConfirmed"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "approvedBy": "user-approved-p24-p25-bank-joint",
+      "sourceVersion": "bank-v1-p23-design-2"
+    }
+  }
+events:
+  {
+    "ReserveFundsConfirmed": {
+      "name": "ReserveFundsConfirmed",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "resource",
+          "dataType": "AccountId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "currency",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "available",
+          "dataType": "Money",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        },
+        {
+          "slot": "resource",
+          "expr": "param.resource"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        },
+        {
+          "slot": "currency",
+          "expr": "literal:CNY"
+        },
+        {
+          "slot": "available",
+          "expr": {
+            "form": "host",
+            "id": {
+              "context": "bankwealth",
+              "kind": "port",
+              "owner": [],
+              "id": "BalanceAfterReserveFunds"
+            },
+            "version": "bank-v1-1"
+          }
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "reservedAmount",
+          "op": "put",
+          "key": "event.txid",
+          "value": "event.amount"
+        },
+        {
+          "slot": "accountBalance",
+          "op": "put",
+          "key": "event.currency",
+          "value": "event.available"
+        }
+      ]
+    }
+  }

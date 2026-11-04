@@ -1,0 +1,21 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: value-object
+name: BankSipDispatchRequest
+seq: 75
+payload:
+  {
+    "name": "BankSipDispatchRequest",
+    "context": "bankwealth",
+    "version": "bank-v1-1",
+    "fields": [
+      {
+        "name": "occurrenceId",
+        "dataType": "OccurrenceId"
+      },
+      {
+        "name": "occurrence",
+        "dataType": "SipOccurrence"
+      }
+    ]
+  }

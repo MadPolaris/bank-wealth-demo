@@ -1,0 +1,313 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: note
+type: role
+name: system
+id: system
+origin:
+  stage: commandStorming
+  board: current-bank-knowledge
+  seq: 2
+payload:
+  {
+    "type": "role",
+    "name": "system",
+    "id": "system",
+    "context": "bankwealth",
+    "description": "叙事中的受信银行应用/事务宿主/回执桥执行者，不是BankDemoAuthority可登录的principal角色。所列仅为本叙事直接引用的内部命令，不是所有runtime入口的完整权限表。",
+    "can_issue": [
+      "RecordCashRequestSource",
+      "RequestFundPurchaseSettlement",
+      "RecordFundCashPaymentSucceeded",
+      "RegisterFundTASubmission",
+      "RecordFundTAAccepted",
+      "RecordFundTAConfirmed",
+      "RequestFundPurchaseRefund",
+      "RecordFundRefundSucceeded",
+      "RecordSipCreateIntent",
+      "CreateSipPlan",
+      "AppendSipDueSlot",
+      "SealSipSchedule",
+      "AdvanceSipClock",
+      "ObserveSipDueSlot",
+      "TriggerSipInstallment",
+      "RecordSipInstallmentSucceeded",
+      "RecordFundTARejected",
+      "RecordFundTAUnknown",
+      "ReviseSipPlan",
+      "PauseSipPlan",
+      "ResumeSipPlan",
+      "SkipPausedSipDueSlot",
+      "AdvanceSkippedSipSlot",
+      "RecordSipInstallmentFailed",
+      "RecordSipInstallmentPending",
+      "RecordSipInstallmentOutcomeUnknown",
+      "RecordSipInstallmentRecoveryRequired",
+      "RecordSipInstallmentRefundInProgress"
+    ],
+    "can_view": [],
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RecordCashRequestSource"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RequestFundPurchaseSettlement"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RecordFundCashPaymentSucceeded"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RegisterFundTASubmission"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RecordFundTAAccepted"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RecordFundTAConfirmed"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RequestFundPurchaseRefund"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RecordFundRefundSucceeded"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "RecordSipCreateIntent"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "CreateSipPlan"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "AppendSipDueSlot"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "SealSipSchedule"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "AdvanceSipClock"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "ObserveSipDueSlot"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "TriggerSipInstallment"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "RecordSipInstallmentSucceeded"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RecordFundTARejected"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "FundOrder"
+        ],
+        "id": "RecordFundTAUnknown"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "ReviseSipPlan"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "PauseSipPlan"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "ResumeSipPlan"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "SkipPausedSipDueSlot"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "AdvanceSkippedSipSlot"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "RecordSipInstallmentFailed"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "RecordSipInstallmentPending"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "RecordSipInstallmentOutcomeUnknown"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "RecordSipInstallmentRecoveryRequired"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "command",
+        "owner": [
+          "SipPlan"
+        ],
+        "id": "RecordSipInstallmentRefundInProgress"
+      }
+    ],
+    "boundary": "按已授权入站、原持久身份与相关可信证据调用既有命令；不能由客户注入机器参数或TA/期次终态。内部恢复读取原日志/聚合证据，并不因此获得客户HTTP读模型权限。角色说明不新增策略、凭证或审批。",
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26-3; P28-1..P28-3; P29-1..P29-3; P30-1..P30-4)",
+      "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala",
+      "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+      "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+      "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+      "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-cash-request-source.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-settlement.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-create-intent.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/create-sip-plan.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/append-sip-due-slot.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/seal-sip-schedule.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/advance-sip-clock.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/observe-sip-due-slot.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/revise-sip-plan.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/pause-sip-plan.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/resume-sip-plan.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/skip-paused-sip-due-slot.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/advance-skipped-sip-slot.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-pending.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-outcome-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-recovery-required.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-refund-in-progress.slice.yaml"
+    ]
+  }

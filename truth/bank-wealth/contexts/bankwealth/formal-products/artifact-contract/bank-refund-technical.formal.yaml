@@ -1,0 +1,944 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: artifact-contract
+id: bank-refund-technical
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "bank-refund-technical",
+    "version": "bank-v1-1",
+    "artifact": {
+      "context": "bankwealth",
+      "kind": "artifact",
+      "owner": [],
+      "id": "BankRefundTechnical"
+    },
+    "status": "selected",
+    "provenance": [
+      {
+        "document": "bank-v1",
+        "pointer": "/sagas/1"
+      }
+    ],
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "saga",
+        "owner": [],
+        "id": "bank-independent-refund-v1"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "pipeline",
+        "owner": [],
+        "id": "bank-independent-refund-v1"
+      }
+    ],
+    "ports": [
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundEntry"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundOriginal"
+          }
+        },
+        "outputType": {
+          "form": "primitive",
+          "name": "boolean"
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundAssociation"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundOriginal"
+          }
+        },
+        "outputType": {
+          "form": "primitive",
+          "name": "boolean"
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0PrepareExecute"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund0PrepareInput"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund0PrepareReceipt"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0PrepareQueryPort"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund0PrepareQuery"
+          }
+        },
+        "outputType": {
+          "form": "optional",
+          "element": {
+            "form": "nominal",
+            "ref": {
+              "context": "bankwealth",
+              "kind": "type",
+              "owner": [],
+              "id": "BankRefund0PrepareReceipt"
+            }
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0CommitExecute"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund0CommitInput"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund0CommitReceipt"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0CommitQueryPort"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund0CommitQuery"
+          }
+        },
+        "outputType": {
+          "form": "optional",
+          "element": {
+            "form": "nominal",
+            "ref": {
+              "context": "bankwealth",
+              "kind": "type",
+              "owner": [],
+              "id": "BankRefund0CommitReceipt"
+            }
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0CompensateExecute"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund0CompensateInput"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund0CompensateReceipt"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0CompensateQueryPort"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund0CompensateQuery"
+          }
+        },
+        "outputType": {
+          "form": "optional",
+          "element": {
+            "form": "nominal",
+            "ref": {
+              "context": "bankwealth",
+              "kind": "type",
+              "owner": [],
+              "id": "BankRefund0CompensateReceipt"
+            }
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1PrepareExecute"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund1PrepareInput"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund1PrepareReceipt"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1PrepareQueryPort"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund1PrepareQuery"
+          }
+        },
+        "outputType": {
+          "form": "optional",
+          "element": {
+            "form": "nominal",
+            "ref": {
+              "context": "bankwealth",
+              "kind": "type",
+              "owner": [],
+              "id": "BankRefund1PrepareReceipt"
+            }
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1CommitExecute"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund1CommitInput"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund1CommitReceipt"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1CommitQueryPort"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund1CommitQuery"
+          }
+        },
+        "outputType": {
+          "form": "optional",
+          "element": {
+            "form": "nominal",
+            "ref": {
+              "context": "bankwealth",
+              "kind": "type",
+              "owner": [],
+              "id": "BankRefund1CommitReceipt"
+            }
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1CompensateExecute"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund1CompensateInput"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund1CompensateReceipt"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1CompensateQueryPort"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefund1CompensateQuery"
+          }
+        },
+        "outputType": {
+          "form": "optional",
+          "element": {
+            "form": "nominal",
+            "ref": {
+              "context": "bankwealth",
+              "kind": "type",
+              "owner": [],
+              "id": "BankRefund1CompensateReceipt"
+            }
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundSucceededAuthority"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundOriginal"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundResult"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundSucceededDelivery"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundResult"
+          }
+        },
+        "outputType": {
+          "form": "primitive",
+          "name": "boolean"
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundRejectedBeforeEffectsAuthority"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundOriginal"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundResult"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundRejectedBeforeEffectsDelivery"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundResult"
+          }
+        },
+        "outputType": {
+          "form": "primitive",
+          "name": "boolean"
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundCompensatedAuthority"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundOriginal"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundResult"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundCompensatedDelivery"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundResult"
+          }
+        },
+        "outputType": {
+          "form": "primitive",
+          "name": "boolean"
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundRecoveryRequiredAuthority"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundOriginal"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundResult"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundRecoveryRequiredDelivery"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundResult"
+          }
+        },
+        "outputType": {
+          "form": "primitive",
+          "name": "boolean"
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundOutcomeUnknownAuthority"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundOriginal"
+          }
+        },
+        "outputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundResult"
+          }
+        },
+        "required": true
+      },
+      {
+        "ref": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundOutcomeUnknownDelivery"
+        },
+        "version": "bank-v1-1",
+        "inputType": {
+          "form": "nominal",
+          "ref": {
+            "context": "bankwealth",
+            "kind": "type",
+            "owner": [],
+            "id": "BankRefundResult"
+          }
+        },
+        "outputType": {
+          "form": "primitive",
+          "name": "boolean"
+        },
+        "required": true
+      }
+    ],
+    "deployment": {
+      "id": "bank-owned-local-refund",
+      "version": "bank-v1-1",
+      "secretRefs": []
+    },
+    "implementations": [
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundEntry"
+        },
+        "id": "bankwealth.BankRefundEntry",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundAssociation"
+        },
+        "id": "bankwealth.BankRefundAssociation",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0PrepareExecute"
+        },
+        "id": "bankwealth.BankRefund0PrepareExecute",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0PrepareQueryPort"
+        },
+        "id": "bankwealth.BankRefund0PrepareQueryPort",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0CommitExecute"
+        },
+        "id": "bankwealth.BankRefund0CommitExecute",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0CommitQueryPort"
+        },
+        "id": "bankwealth.BankRefund0CommitQueryPort",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0CompensateExecute"
+        },
+        "id": "bankwealth.BankRefund0CompensateExecute",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund0CompensateQueryPort"
+        },
+        "id": "bankwealth.BankRefund0CompensateQueryPort",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1PrepareExecute"
+        },
+        "id": "bankwealth.BankRefund1PrepareExecute",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1PrepareQueryPort"
+        },
+        "id": "bankwealth.BankRefund1PrepareQueryPort",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1CommitExecute"
+        },
+        "id": "bankwealth.BankRefund1CommitExecute",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1CommitQueryPort"
+        },
+        "id": "bankwealth.BankRefund1CommitQueryPort",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1CompensateExecute"
+        },
+        "id": "bankwealth.BankRefund1CompensateExecute",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefund1CompensateQueryPort"
+        },
+        "id": "bankwealth.BankRefund1CompensateQueryPort",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundSucceededAuthority"
+        },
+        "id": "bankwealth.BankRefundSucceededAuthority",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundSucceededDelivery"
+        },
+        "id": "bankwealth.BankRefundSucceededDelivery",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundRejectedBeforeEffectsAuthority"
+        },
+        "id": "bankwealth.BankRefundRejectedBeforeEffectsAuthority",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundRejectedBeforeEffectsDelivery"
+        },
+        "id": "bankwealth.BankRefundRejectedBeforeEffectsDelivery",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundCompensatedAuthority"
+        },
+        "id": "bankwealth.BankRefundCompensatedAuthority",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundCompensatedDelivery"
+        },
+        "id": "bankwealth.BankRefundCompensatedDelivery",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundRecoveryRequiredAuthority"
+        },
+        "id": "bankwealth.BankRefundRecoveryRequiredAuthority",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundRecoveryRequiredDelivery"
+        },
+        "id": "bankwealth.BankRefundRecoveryRequiredDelivery",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundOutcomeUnknownAuthority"
+        },
+        "id": "bankwealth.BankRefundOutcomeUnknownAuthority",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": {
+          "context": "bankwealth",
+          "kind": "port",
+          "owner": [],
+          "id": "BankRefundOutcomeUnknownDelivery"
+        },
+        "id": "bankwealth.BankRefundOutcomeUnknownDelivery",
+        "version": "bank-v1-1"
+      }
+    ]
+  }

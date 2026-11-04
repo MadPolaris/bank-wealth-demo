@@ -1,0 +1,2669 @@
+{
+  "schemaVersion": "bank.truth-migration-evidence/v1",
+  "oldTree": "v1/tree",
+  "currentTree": "truth/bank-wealth",
+  "sourceFiles": [
+    {
+      "file": "v1/tree/aggregates/credit-balance/aggregate.yaml",
+      "sha256": "3cc6782602fa688233e76e1ee4d05e71b799514cb447c636bf7133bd716afca6"
+    },
+    {
+      "file": "v1/tree/aggregates/credit-balance/slices/cancel-incoming-credit.slice.yaml",
+      "sha256": "c50aebe3537e1e9db5c747542450b2a55b8e9c45e6da0b7dd832b9c653d4c689"
+    },
+    {
+      "file": "v1/tree/aggregates/credit-balance/slices/commit-incoming-credits.slice.yaml",
+      "sha256": "b9646a3768ce9ddbb78a8fb3fa1459d8e3036a94bc74139cc5235beab9028662"
+    },
+    {
+      "file": "v1/tree/aggregates/credit-balance/slices/deduct-funds.slice.yaml",
+      "sha256": "787732430382e6b1c980e893b15422c324fa2d78f36ab1fff17c2898afb0c4bd"
+    },
+    {
+      "file": "v1/tree/aggregates/credit-balance/slices/initialize-account.slice.yaml",
+      "sha256": "a77d174bd7f51501a65da391d8fa3a8fcbbebab08886721b83b08660f377ab78"
+    },
+    {
+      "file": "v1/tree/aggregates/credit-balance/slices/record-incoming-credits.slice.yaml",
+      "sha256": "243c7f57ce63620d4622da620d157575f358293655d214dbc88679a4481a8849"
+    },
+    {
+      "file": "v1/tree/aggregates/credit-balance/slices/release-reserved-funds.slice.yaml",
+      "sha256": "a28a4ef2da8febf3274fd72805dbf88908c848300bde6b5042049e0bf184fe19"
+    },
+    {
+      "file": "v1/tree/aggregates/credit-balance/slices/reserve-funds.slice.yaml",
+      "sha256": "ad65a6e2b1712237faba716a2c72ab21626601e303084ef40ed5aa63fa4894b5"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/aggregate.yaml",
+      "sha256": "a669b4d442ae58464ef9b664e29fb5697d2e39ccb402a85ff9bb93f446a6d079"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/cancel-cash-fund-subscription.slice.yaml",
+      "sha256": "0cde664a2dadf8e968c23809f24d2c597ae834864f18a997622d86bf2f6c91a6"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/confirm-fund-subscription-payment.slice.yaml",
+      "sha256": "9ad81d7206832774414da747fe1b79ba283b15f7bd52dab26bbccc1a2f81dad6"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-cash-request-source.slice.yaml",
+      "sha256": "76109595a91868eb716f439e8f4c856f8aa0164bca758a110a9a16ee00a4daef"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-cash-payment-compensated.slice.yaml",
+      "sha256": "38d5e227a26387fb3743cce0c20012f1ce18495c266121240b999517d6e8bff1"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-cash-payment-outcome-unknown.slice.yaml",
+      "sha256": "f3d671c8298667916b10f3e63e65a6621d96afb9a5f180653c9b87ad13c17efc"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-cash-payment-recovery-required.slice.yaml",
+      "sha256": "dfefd7200bcdc20df06ea88e82e0344ff4fc32072be037240408aa1f3d25ab1c"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-cash-payment-rejected-before-effects.slice.yaml",
+      "sha256": "753690dee2ae427d5617884baf80faaa627d717acdafd60c05e3a2cd0a6264cd"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+      "sha256": "9cad1752ee8c69b1080fe384f51b30d322c4a186888eeea74245727e9495b74c"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-refund-compensated.slice.yaml",
+      "sha256": "c82f80f3938b899230bd90165b12d32e5a2d20a8d3190e45ecb6cd4e28baebd0"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-refund-outcome-unknown.slice.yaml",
+      "sha256": "29a530657567e361f2cefeda5adb276d92d1e7ffe29cbb40312543875b7956f3"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-refund-recovery-required.slice.yaml",
+      "sha256": "28994903260194ae36d3e2c289a7ae7ab5de609dcb34c99eef354da141676713"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-refund-rejected-before-effects.slice.yaml",
+      "sha256": "360bde5d61c39bd37cd0a8e4f02a9db0faefca5e4158687aec00b03c98717b0d"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+      "sha256": "a731fc35ac110f701910c6609fad0bd9fc0c3f2f33fc21a18c207c367605dc02"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+      "sha256": "5e1a7ce9f2e3b747bbf03e4f23eb85f94df5646e660b9e6729e9b67e51b2cf2e"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+      "sha256": "6d40256cf0453bb01d64103ee4492630e6db2c246ba7aa6e2832c78eb0ef7677"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+      "sha256": "ffeb79c8e75cbba4e7c73e87d75ec0c2cdf5f0a9658a0526b65a8fa105109e5e"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+      "sha256": "54de0544ab3486fb8bdda97506c0ef22ef388543c3cc80a6652164f34a38a412"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+      "sha256": "36ca202e273b0edec2d056e977a518aba14ab2cc27f3ceba3ed2acd17276ee31"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+      "sha256": "dbfb9ac939456120d187a31984654b73b42a5061f73beff9ab0881aa617c59c8"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/request-fund-purchase-settlement.slice.yaml",
+      "sha256": "206eb13fc4cb6c09c16b1b0e29b273560b624cf8e840e438f6c3b6c7c0aeb5ed"
+    },
+    {
+      "file": "v1/tree/aggregates/fund-order/slices/reserve-fund-subscription.slice.yaml",
+      "sha256": "2c5ef74f747478026363962d01191b5ec8396456dc1e680503037c2c8242b193"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/aggregate.yaml",
+      "sha256": "cb70792fe5a045d0a8c2b7bbcd0666e91c1c370ed321be16c4c8f1e8704c8269"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/advance-sip-clock.slice.yaml",
+      "sha256": "60d2aa8a307577e9765e65878dbc3bbf93b4f46e1378e84286745f1563ea4210"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/advance-skipped-sip-slot.slice.yaml",
+      "sha256": "1f1328c4a8c4fba0f56277233cb4d80c23684ea131ef333bcc6d33abb2e10755"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/append-sip-due-slot.slice.yaml",
+      "sha256": "85bd99ff0f8bb9037239bd8cba03c67351743689b59ca4a74c2e6bc9f0e6d882"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/create-sip-plan.slice.yaml",
+      "sha256": "13971a03c83ea7ecb2a400a2580d145819051a7601bad7dacc54797d004a38e9"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/observe-sip-due-slot.slice.yaml",
+      "sha256": "281d8dbe9203d5d57632fc0dc7b1f985fdeb7b7c12140329b40f04940e732f4f"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/pause-sip-plan.slice.yaml",
+      "sha256": "929f2247b5b16780e838c055fd37643e39de15fc90396bcfd866b25ec8800675"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/record-sip-create-intent.slice.yaml",
+      "sha256": "d105f769c46f29f467d3bf06aae77d6242881685578e965ab52892b302f4df21"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+      "sha256": "ab89fee4326f2af3bb2626fa1e379b2e27155c855964e7fbf56427e46bacf55a"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/record-sip-installment-outcome-unknown.slice.yaml",
+      "sha256": "5ca62b2427f07d9fce049d3c5211227cb99777fb056dcbfd3a975b928765a0d7"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/record-sip-installment-pending.slice.yaml",
+      "sha256": "386621d2d733728c1421ca08205208235b6fa35d68c08ab1ef53758e683fef5c"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/record-sip-installment-recovery-required.slice.yaml",
+      "sha256": "a339fef4d763f0b3a6f3bb96d59483d3155ae4c5e59227f1010815b9da49380b"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/record-sip-installment-refund-in-progress.slice.yaml",
+      "sha256": "7de388f875afc04434e28ad814c5cca44b24df714ff14fb27df4f50519773eb1"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
+      "sha256": "7f89b799fa319e8dad7d1bb84cba3c0d0a338ef317e84efb50153f6b0febfc6a"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/resume-sip-plan.slice.yaml",
+      "sha256": "041f99a56c47953ea923e79441faabe11280ef5516d0f5dcfd92321b78bd6e14"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/revise-sip-plan.slice.yaml",
+      "sha256": "23f68737fe20bc0db526c351ca4b312d168ee7947d7d8304688a9d10382bf8d2"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/seal-sip-schedule.slice.yaml",
+      "sha256": "7ac4d89d0ea4a66000cecb4d4ac5b38ddf3b2c2dd4d878e14eff0b9448bd2434"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/skip-paused-sip-due-slot.slice.yaml",
+      "sha256": "79a41ece2bd778e5429b0e4296c91c920df408cd6f3eb823c5c90547da6aed40"
+    },
+    {
+      "file": "v1/tree/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+      "sha256": "fd928a3a9246b59cf284eccd0762b43c85896c1c6c7ccc0266518c83f3e10d15"
+    },
+    {
+      "file": "v1/tree/formal-products/artifact-contract/bank-payment-technical.formal.yaml",
+      "sha256": "06b64d4305a79c3bb0b1a3ec1fdd3960547c8468ea049a2d61f9ea834cf34419"
+    },
+    {
+      "file": "v1/tree/formal-products/artifact-contract/bank-refund-technical.formal.yaml",
+      "sha256": "8ae6645ec472215a665c6ddaa34cec16b4db59b220edc096bc816a67376fc374"
+    },
+    {
+      "file": "v1/tree/formal-products/artifact-contract/bank-service.formal.yaml",
+      "sha256": "0abe7058be86a1558d2a4d25253178741da0d29518030eaa9c6b6f075e0459c2"
+    },
+    {
+      "file": "v1/tree/formal-products/artifact-contract/bank-sip-technical.formal.yaml",
+      "sha256": "b903f35914988b6374c0fd546e44238ca89b97bd37121dcfd7340373e4a7bffc"
+    },
+    {
+      "file": "v1/tree/formal-products/artifact-contract/bank-ta-technical.formal.yaml",
+      "sha256": "c511c0a2b82d2b6d43ca95c795ebbb6f49ef938e37f749b881503f8e2b60d85d"
+    },
+    {
+      "file": "v1/tree/formal-products/effect-host/bank-sip-dispatch.formal.yaml",
+      "sha256": "3d51d0433c917b9f966360c0c34126280fd37b92a0016824d4e1e9e841d9163e"
+    },
+    {
+      "file": "v1/tree/formal-products/effect-host/bank-ta-effect.formal.yaml",
+      "sha256": "b99b22916c2d81aeec25203e32cd13857bafb99d11e3bcf228f1ddcbd9de4dad"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-payment-result-compensated.formal.yaml",
+      "sha256": "c3a62c01e055279890c160fad6adea395cce83285655d5ecec0aa46fb59e759e"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-payment-result-outcome-unknown.formal.yaml",
+      "sha256": "07e735de6229922c937d6a25e5de3023360acd61ef569545caa73437af8c4571"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-payment-result-recovery-required.formal.yaml",
+      "sha256": "53ba94970c43465e744ac914fb025c73f3cfab767a0c1703b383284f5083caa1"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-payment-result-rejected-before-effects.formal.yaml",
+      "sha256": "fddfa63b3dec8b69920de5a22d70d6c74a5fadae3e4812485419b9771448da7b"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-payment-result-succeeded.formal.yaml",
+      "sha256": "a0238e96fef6d647cef029db231ffd4b273064da853730d8a8e6e7e624a089ee"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-refund-result-compensated.formal.yaml",
+      "sha256": "1127f8f96cf02d78d73c37a6f907655fdd6959361e932db59c7150d51f787984"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-refund-result-outcome-unknown.formal.yaml",
+      "sha256": "bf7012951363388f5538b8815a9db895626a7ed560d8254287a04e63e1a5c2d3"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-refund-result-recovery-required.formal.yaml",
+      "sha256": "27312de42ee199c95d068c34f1bc89fb6f0a9f7c22a3183ad364c4be5299667f"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-refund-result-rejected-before-effects.formal.yaml",
+      "sha256": "e3f6b7004275e109ae698a22ad2eb9c85475656045c0afb77a6617817b43e330"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-refund-result-succeeded.formal.yaml",
+      "sha256": "d4fd7646e2c92137f97aa8f088e344c751a408ec73e9e21e8e4d8a6615495389"
+    },
+    {
+      "file": "v1/tree/formal-products/external-event-producer/bank-ta-receipt-observation.formal.yaml",
+      "sha256": "19ed53215b278faf7a0dc11574de4d655e54f304bb4f0e8a6ba703661de34f9c"
+    },
+    {
+      "file": "v1/tree/formal-products/host-computation/--bankwealth---balance-after-commit-incoming-credits--.formal.yaml",
+      "sha256": "c3ac5757578bd58faa8f4605f06fa796c83c8e3fa5555a62c16f597cef7dcef3"
+    },
+    {
+      "file": "v1/tree/formal-products/host-computation/--bankwealth---balance-after-release-reserved-funds--.formal.yaml",
+      "sha256": "13f827ab2a1fb6dd3ef3fd7ce0fa4a8476abe53260b23983490ed23183fdee28"
+    },
+    {
+      "file": "v1/tree/formal-products/host-computation/--bankwealth---balance-after-reserve-funds--.formal.yaml",
+      "sha256": "f7c7739a9c0463bcc6ac3c379ee0461c6795d1db0bcad30b52032b7d2c6b7e13"
+    },
+    {
+      "file": "v1/tree/formal-products/host-computation/--bankwealth---stable-refund-operation-id--.formal.yaml",
+      "sha256": "caa911680abbe09b63b881a41b8f749a6d4412f62646b2a6cf4bf5e4a2c07d13"
+    },
+    {
+      "file": "v1/tree/formal-products/host-computation/--bankwealth---stable-sip-occurrence--.formal.yaml",
+      "sha256": "3abb4be9f388e1fd562d9836e534f294206ef8b5a063ef03e65f52fa5e9fb905"
+    },
+    {
+      "file": "v1/tree/formal-products/host-computation/--bankwealth---stable-ta-request-id--.formal.yaml",
+      "sha256": "cbee92e0cddad31266b2fbd66295d2c3982739007197b87fffb1be979206d792"
+    },
+    {
+      "file": "v1/tree/formal-products/product-design/bank-payment-review.formal.yaml",
+      "sha256": "b38a12f93a5b411d7d0c67f515535e4ec9f1d159aa252565dc7a1fd8761af183"
+    },
+    {
+      "file": "v1/tree/formal-products/product-design/bank-refund-review.formal.yaml",
+      "sha256": "b228fd1a71c2d5230bde74c00a63712c11a4d43c72d2358e353215550235c665"
+    },
+    {
+      "file": "v1/tree/formal-products/product-design/bank-sip-review.formal.yaml",
+      "sha256": "7a3d20af519f2bff09813fb34f5434fa0854a365a7236ab270a88633ea4ca745"
+    },
+    {
+      "file": "v1/tree/formal-products/product-design/bank-ta-review.formal.yaml",
+      "sha256": "4b3dbfa5f9bba72ad8b488422fde6096869af20d426397b3979e40fe9c33adac"
+    },
+    {
+      "file": "v1/tree/formal-products/saga-host/bank-payment-host.formal.yaml",
+      "sha256": "b754ec3c63ef26ce57f991867768faf7688f921ac9afe71d18fe6f4435def09d"
+    },
+    {
+      "file": "v1/tree/formal-products/saga-host/bank-refund-host.formal.yaml",
+      "sha256": "df6d129ec18d9614cfee873d63fd1063fb4f764a141c2029f75b114974cc658c"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/balance-after-commit-incoming-credits.formal.yaml",
+      "sha256": "de01265a89b4cde88986869bc580f820ce27dcc93ebbbb868e79224dca3a1085"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/balance-after-release-reserved-funds.formal.yaml",
+      "sha256": "0ccd35c32078967800a89fe6ce47b56d930e44c39767245f1f8c38806c626c9a"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/balance-after-reserve-funds.formal.yaml",
+      "sha256": "ba1204ad586a5107d1269afee330ae568a65f258ccd96026046c641c4fd5a93f"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-account-query.formal.yaml",
+      "sha256": "5ee3f7ffd8200ec3a33fa96a5bc61a1c67c4cae98f9460cabfdde142a3bd984f"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-business-tick-port.formal.yaml",
+      "sha256": "1de8a5189761ee32a46a5f8d4fe4a55d2ae9789f13c1eda11ed47c15f2684738"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-cash-original-query.formal.yaml",
+      "sha256": "f61b3999fa4b78e673ddb614bf47c9b180ad684d37987f465f15c69b5fdea013"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-cash-submit-port.formal.yaml",
+      "sha256": "f5da4996373bca46d714b05df9df0a63f441511dd1fbdbe5dbe3fe969077a6bd"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-order-query.formal.yaml",
+      "sha256": "f77687306d96b8f70d8888a091391141c83477d91815a0d0d8cc15e05ad74e0d"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-association.formal.yaml",
+      "sha256": "e78c0de72550c382e50cfc190c9d475706ecae8d645b89f2d9b8c48e4a3fe2b1"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-compensated-authority.formal.yaml",
+      "sha256": "b35e7a66e3d919d964b8a8c698a33b129012e251352bf857458b8a7c6a659046"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-compensated-delivery.formal.yaml",
+      "sha256": "7778fa25a72d3e8ebd594ab6b9f305c95dbf3368ee6c0c03e21c80fc637e7f71"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-entry.formal.yaml",
+      "sha256": "c21c10183b9202cfb308efb2387c53170c27c3edb80687ea446dc8de9065523b"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-outcome-unknown-authority.formal.yaml",
+      "sha256": "66730d289788a3dd12bfd0f147ae79469f5c3208f334da404268f0f5fd75d251"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-outcome-unknown-delivery.formal.yaml",
+      "sha256": "5ee8e30cf33460267911bd0cb4d41394d1c601369c36b9a1be76f89763bd7e7b"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-recovery-required-authority.formal.yaml",
+      "sha256": "51d224e7fbad464b124213280945e6341eeb0355e5ebbcbfb603135494d95cb3"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-recovery-required-delivery.formal.yaml",
+      "sha256": "ae153b677b9669eb13ca122b21de224b1c113fcbea3cdb167eba6ed6723abdfb"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-rejected-before-effects-authority.formal.yaml",
+      "sha256": "0450bf4e30350794bb21790730657fca1dad549d8b826117cea5fb77dfcf707f"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-rejected-before-effects-delivery.formal.yaml",
+      "sha256": "e0640d508dd4f7675b89447d88fffa90f9a3734750dae3e1d15f46ec7e134d6f"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-succeeded-authority.formal.yaml",
+      "sha256": "5449d5c9a7981f63b9b8e85b0c84c5bee46aac00e141e7aa105a5aa54bd4b82e"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment-succeeded-delivery.formal.yaml",
+      "sha256": "24348d6db7d50b8fd17fcca8d1d270db141ea16a16952e6e419ed4c59c0b70d3"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment0-commit-execute.formal.yaml",
+      "sha256": "a9cb4caf8140bee6edfae56727ddd96452b988eb1e92c88b9347228032825377"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment0-commit-query-port.formal.yaml",
+      "sha256": "716f4691ed27f0289380dcadff1fe4f2758c851c66f1cf297d00cbf1540c0da1"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment0-compensate-execute.formal.yaml",
+      "sha256": "1a9e6dc46ad2f3a02b55e7726ceede07d85ac6e190f0084cbb750315fff1d72e"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment0-compensate-query-port.formal.yaml",
+      "sha256": "2e3218606d2b6ed49c724ed0df8437ad15878201afa5dcb7a03ab145c4beb058"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment0-prepare-execute.formal.yaml",
+      "sha256": "b6f44b5f5b43302958021530157d2817a9e864a23be1281ab94e60fc33b8f6ed"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment0-prepare-query-port.formal.yaml",
+      "sha256": "77dc1416b78a2a49e17c6c64ae7781db94fcdf849ccfa785713151a166a07f42"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment1-commit-execute.formal.yaml",
+      "sha256": "12412d196997a85398976432b8af681eeacfb4bc21eae39a60af878c36a5545d"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment1-commit-query-port.formal.yaml",
+      "sha256": "e7b50606393da3c246caee14f11cf5d51b802f3f3845be113f989e608f7569bb"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment1-compensate-execute.formal.yaml",
+      "sha256": "c35632519e88a1acf283186c8964e965a64101895b9006888ce8fabd356a372e"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment1-compensate-query-port.formal.yaml",
+      "sha256": "e720a69d2f9335718d8e94c5b70e783d6ee2c171652ff3776c8308b3371f2fd5"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment1-prepare-execute.formal.yaml",
+      "sha256": "e0782c463f9c2bd2fc249ae9caa4ec2eb7415dee542c8b96066918db7a6b8786"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment1-prepare-query-port.formal.yaml",
+      "sha256": "9aa845dbbcd3afbfbb71812436a3645406d49db3e0f3c0e6c5e240b7a8cc355d"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment2-commit-execute.formal.yaml",
+      "sha256": "b2bf3ef49180d10abd7f65300e9a1f58606672d9d0f50788477e5905ad6a8a03"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment2-commit-query-port.formal.yaml",
+      "sha256": "96e89598077125d093b766a04cc3d6fe7868c1aa06bc3f51b07070bdd183f218"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment2-compensate-execute.formal.yaml",
+      "sha256": "2e7642ca10e881c0c2191871b224fa103b614c1d334a3ef50c48c4066d644007"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment2-compensate-query-port.formal.yaml",
+      "sha256": "f4c672080d9ade074ad48780ef8171aea5f8216e9c9ec65b28ff353d47b89183"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment2-prepare-execute.formal.yaml",
+      "sha256": "483a4d5ad88dec6fef083df9542795e501ef31f02c2b5a35ad6bd889c1f2d0b4"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-payment2-prepare-query-port.formal.yaml",
+      "sha256": "7d459b7edd3f63fed352ffcec59e9982ade14fc12b061bd58806ce321f225200"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-pending-operations-query.formal.yaml",
+      "sha256": "a18859434a894e8d1933d9c67bf57b64a25fd09ff9583691dbd2df738c46fc85"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-reconcile-existing-port.formal.yaml",
+      "sha256": "faa47446e720507d087723d1514f8fd61411f770331d8cef3fcc8c3a21fadaf7"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-association.formal.yaml",
+      "sha256": "f9030063e3fc7b9ad6ff8c8e7d51e4a303065713c0b0805c5340e0f64a8c684d"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-compensated-authority.formal.yaml",
+      "sha256": "f224a1d19eb6982e7c186471c4192c6c89d5e7fe17672ad0a7f2336f0c39018a"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-compensated-delivery.formal.yaml",
+      "sha256": "a616d20269afc5a83ce27a3a7a7ea1c2d4ee05149da5f6b69fceaf7eb0f71e86"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-entry.formal.yaml",
+      "sha256": "f6b651aa456375d5eb45fde73c3e411a38f897e306b53927b6275701a8e2452a"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-outcome-unknown-authority.formal.yaml",
+      "sha256": "c6e616703edf742475216dfeb8c21e50ede25fce750f57395d833dcc2af7c7a7"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-outcome-unknown-delivery.formal.yaml",
+      "sha256": "84c24d63e5c4028e149dff187a47192e8042ca922259e7b3a39f969dc25e748e"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-recovery-required-authority.formal.yaml",
+      "sha256": "531928be243a20b0f0523f575280513397e21375eaa900d8df6cdc3dd4cb17cc"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-recovery-required-delivery.formal.yaml",
+      "sha256": "0b0eda7ec57d773c193e31cf091fc1fa8bffada6848b3f5a90d78a8859f8b8b5"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-rejected-before-effects-authority.formal.yaml",
+      "sha256": "e8e16fe857804591b3aed8bbb91b001603256f16fcdf68c755d43facb7f58285"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-rejected-before-effects-delivery.formal.yaml",
+      "sha256": "a4fc5f8b05cbdd4cb66614143fe818dd37704405e8ff46f35fb1a81adeed0ec9"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-succeeded-authority.formal.yaml",
+      "sha256": "d29af5161008642ecb1e391796061afc991235f7a25be4646272ad7593df870d"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund-succeeded-delivery.formal.yaml",
+      "sha256": "7677bb7ce80f4ee10e287c8f791dce485da748ae473fc11f8145b73daed5b5cb"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund0-commit-execute.formal.yaml",
+      "sha256": "2aee943e1be129d8b54421f60c53ca0941148a434081600e69952145230391b3"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund0-commit-query-port.formal.yaml",
+      "sha256": "730b95cf44a347d0f770566ed35f33808bce84ca8dc401fd5ac36b36eb8dce27"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund0-compensate-execute.formal.yaml",
+      "sha256": "bbb374505d0e76a0d114a1f91c508893f24d638e1377ded1d72db72aa9cd4598"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund0-compensate-query-port.formal.yaml",
+      "sha256": "5feb88645fc402982cf7ad05be1a81883ca114e90bdd5b36187c0039291c44ed"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund0-prepare-execute.formal.yaml",
+      "sha256": "d8be028554851d6b830fe967fe7441825aebe5365f0bcd158dd666c8da4aea2d"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund0-prepare-query-port.formal.yaml",
+      "sha256": "f9320d22da455c00229a158fce1fa6a16459391945bbc29b97989cae7e2d9ade"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund1-commit-execute.formal.yaml",
+      "sha256": "f655520c3efae67106c2afd1be09bfedd1618e24e07d4c2e7b3356a19732181f"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund1-commit-query-port.formal.yaml",
+      "sha256": "60850380658ce46bf398986e7757738dfb150838036c833e593f6881d456afa9"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund1-compensate-execute.formal.yaml",
+      "sha256": "e326ea71667ec2af301d92331013258cc68ca5efec6b26d59585dbcd3924e4c6"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund1-compensate-query-port.formal.yaml",
+      "sha256": "e21487a182651dc27940e417c313ef584f534a918ee25bee0b90df2b48fe3e92"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund1-prepare-execute.formal.yaml",
+      "sha256": "7032efabf4493a766928f439a3a8640fbbd68be48d85e02304b28aba585ae3a6"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-refund1-prepare-query-port.formal.yaml",
+      "sha256": "a186cec70f66f77d801b434c35a2d20e6c1f60ff555ae09a9722ce0efe66a2ae"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-service-bootstrap.formal.yaml",
+      "sha256": "acc274581e2e056617a312e845f2e2c1a5d58d8af6de8a9e04aa14deef050107"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-sip-create-port.formal.yaml",
+      "sha256": "a06069aef77e5569fb2de56f23852fb5c6fcce495759d6d2fa77f0ec6ab41fd6"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-sip-dispatch-execute.formal.yaml",
+      "sha256": "82a7e27b4ac6dac9c71abc8230ef0b4816f181ab8ede78e0da004c3daabddebe"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-sip-dispatch-query.formal.yaml",
+      "sha256": "9adf87709b73b8f96e2766a0aabaee2160aca103dca0b4e0d105b004761705ce"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-sip-dispatch-reconcile-port.formal.yaml",
+      "sha256": "c2433d544b645542206793c851b147f6a43ad9cfe8f46812a928496436d3e098"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-sip-occurrences-query.formal.yaml",
+      "sha256": "9d8ceafa5c53b69f0acb5f78cd83a3b7e2d21c0f01e32ad895d682baad041e6f"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-sip-pause-port.formal.yaml",
+      "sha256": "eb49f5225e9b883e363ce216497b008bf8a2f680d489a7cd9760324361caca02"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-sip-plan-query.formal.yaml",
+      "sha256": "433cbdeca6877b90744797abb990ccf8c3559f9ce0db7400f015ba80c8652f75"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-sip-plans-query.formal.yaml",
+      "sha256": "e0309cfbd204c1be1a180e58f6f4b68daf5acec15e02bddb106f9c6bd87ccfbd"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-sip-resume-port.formal.yaml",
+      "sha256": "302226f0223cd16b99e63e67719f68d4a3a01a77e65d2dd2bbf14fa53f3b23df"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-sip-revise-port.formal.yaml",
+      "sha256": "6fd1866fc3b91a4c82ace910806b198fdbc5898d5ee0bdfba29ff41b1c3bf1d7"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-ta-effect-execute.formal.yaml",
+      "sha256": "6eb8366d175133425a3b6313c4dc3b51b2a8473de315cd46873ddad6bc849616"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-ta-effect-query.formal.yaml",
+      "sha256": "ae296734fee840ffb1937d26b6e38520899cdd5f5257d2b2ea3140f6c52bc5f6"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-ta-effect-reconcile-port.formal.yaml",
+      "sha256": "b06c06acc0e34e590cd973826b2eefbe662fa16840f8fa6638e2370cff6d8525"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/bank-ta-receipt-ingress.formal.yaml",
+      "sha256": "17cf8b2c1d431494dbf58beacae9989ef8f1501a1fb5d7e03d629d6b248d9ed1"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/stable-refund-operation-id.formal.yaml",
+      "sha256": "4a84559e8058a3fd23dea9107d1eddd67be8ea4638d46f6ceb8c901e46fc56e8"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/stable-sip-occurrence.formal.yaml",
+      "sha256": "0d10682fe5eecfdde21a95bc0d72451c05110ef1960ab296f65160e2d503695e"
+    },
+    {
+      "file": "v1/tree/formal-products/technical-port/stable-ta-request-id.formal.yaml",
+      "sha256": "5fe20ec02d5774843fcbeaa4f9142b6d722e9da01b1684e62bb8d2f55cde1b1b"
+    },
+    {
+      "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+      "sha256": "45e8f86970a83b224fb08edb3923af52729c4247086cab9dd693b627c4e42077"
+    },
+    {
+      "file": "v1/tree/pipelines/bank-cash-payment-v1.pipeline.yaml",
+      "sha256": "7b987549ba8603a8874612d63c23fad00eeaf45d14d243cbe7a18dfa9d9bd7e9"
+    },
+    {
+      "file": "v1/tree/pipelines/bank-independent-refund-v1.pipeline.yaml",
+      "sha256": "c6cba8e5f8c9cf67c3e12e9a385a3ec8c45c2f4002ca1c3aa06ee150f8ffd82f"
+    },
+    {
+      "file": "v1/tree/pipelines/bank-sip-dispatch-v1.pipeline.yaml",
+      "sha256": "bfb074146eeb287683ae089f1e2e1443cb3ec26d2ff3a9991b9b7be6ff5d655c"
+    },
+    {
+      "file": "v1/tree/pipelines/bank-ta-submission-v1.pipeline.yaml",
+      "sha256": "46bad8ea8cde64686659b2e436a4714e5eb21814a1782940dd74ed92a1e03a20"
+    },
+    {
+      "file": "v1/tree/sagas/bank-cash-payment-v1.saga.yaml",
+      "sha256": "49468f736d7dc8c11e21d838e8c37977a7c24bfc07573a8f98ce352739e141cf"
+    },
+    {
+      "file": "v1/tree/sagas/bank-independent-refund-v1.saga.yaml",
+      "sha256": "a38bbe4d695d4fd28f8e908fa7b0e20cee23f566ca65108b45ffd141988c08f2"
+    },
+    {
+      "file": "v1/tree/value-objects/account-id.vo.yaml",
+      "sha256": "e2b9ba283d3579ecb34c27f26880eda2724e224ac4b492a2e275486f2769994c"
+    },
+    {
+      "file": "v1/tree/value-objects/amount-decimal-po.vo.yaml",
+      "sha256": "ffb97428e591b440234daf12631c0eb5633bcfdf51a5705cf8d306f7bb6f6277"
+    },
+    {
+      "file": "v1/tree/value-objects/amount-decimal-wire.vo.yaml",
+      "sha256": "eed51a92d890a535a16a5f408826d9feeea0fa417e9705be04acc3f7c3f320c0"
+    },
+    {
+      "file": "v1/tree/value-objects/amount-decimal.vo.yaml",
+      "sha256": "352594cd60ea0a75520e0a10b07c3a385c0b5197b060ced13090e388f2b2155f"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-account-key.vo.yaml",
+      "sha256": "f73cc6e64f5bedd12b6710bf06a3be3a9129dc04d2bc2ccc49611da365ac8048"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-account-response.vo.yaml",
+      "sha256": "57eb432eb17eebdfee956caf4816dee217a484b2ce76d3a3d1e693502e00f0c8"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-account-view.vo.yaml",
+      "sha256": "866315af6e1a7d8399962453666d7ca4626ee03bd7668ff417a4f83b41c59b2a"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-cash-acknowledgement.vo.yaml",
+      "sha256": "526aa13263c9db6c15c9e72522e77d3977b5bad412d7de42c8071142b1d0bc33"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-cash-original.vo.yaml",
+      "sha256": "17969f04b2f7caa2888f8a8350f9a7758313ef756f0c68f3f74ed5e35873c00b"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-cash-request-key.vo.yaml",
+      "sha256": "ceeb0270ca346a003822004061a32f65644ecfa556873609bdd60aa4b8f37d9b"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-cash-request-response.vo.yaml",
+      "sha256": "4749263b1b402d17c862a34807cc1128ba87d202a8dfde2d9102103e6fbd6e31"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-cash-request-view.vo.yaml",
+      "sha256": "f02410aa6a8c33772f2c7868d7cff5a7cdae1607d3a1ab6d351c5d93c1b28c9d"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-cash-submit.vo.yaml",
+      "sha256": "a26475e113c21f77fcc13f502e327ccdd05665399cc6c83b02aca1ccbe0559a8"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-occurrence-page-key.vo.yaml",
+      "sha256": "d4d8c9ef0bbdeb3100686a9c1a8ab63e2eb70747948270918f96b311b6518d8e"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-operation-key.vo.yaml",
+      "sha256": "227240e1d2e61a174fe8e2ca3891caedff955df2b47400ab8a215d8af0fa503b"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-order-key.vo.yaml",
+      "sha256": "4fe3580ac2f9d866dc81d57bee147ed29ae869485a052e9f9164f2caac2e9e71"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-order-response.vo.yaml",
+      "sha256": "8b664b7814a98886425b7f6af250962499ea846fb488688637725c923f97f8e5"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-order-view.vo.yaml",
+      "sha256": "b7a6a9ae8825637f300611857739e6b6d670b83bb5d98df662dfe354cf33b6e5"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment-args.vo.yaml",
+      "sha256": "accf0849492b7d7e448f579cc8863470077bd82ec83d8acd172c51067ac2d566"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment-original.vo.yaml",
+      "sha256": "aeb4c4e5c5d1a7cc30b0ca1193b0a5ab388f23c315a286b15eea10d21d9cabe4"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment-result.vo.yaml",
+      "sha256": "fb21a9dec8d951f661a1d10206d35d1ed71330ad4d9adf8908b4f8d2c761015f"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment0-commit-input.vo.yaml",
+      "sha256": "2578ce57ae1a2d797b3f372576249b318656aaf428ca77c76625013ab69004b7"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment0-commit-query.vo.yaml",
+      "sha256": "e91038d005ab4cd8b2ac67f9ca6df60ba3c46ce3f572a04f41d039fa8da5ebd6"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment0-commit-receipt.vo.yaml",
+      "sha256": "8eadb57dbfea71047aad8b16fa692336db2619848c3974ebad76b8d4fceaafda"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment0-compensate-input.vo.yaml",
+      "sha256": "fde203c658867cd28aea2210283524a4264a08b5ac0510fe445cdd714449458e"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment0-compensate-query.vo.yaml",
+      "sha256": "8d5b6347e8e12dbd51c763722a71f5a0f3c1a0a3c600c68fea8e6e8448481571"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment0-compensate-receipt.vo.yaml",
+      "sha256": "37124f582ce2c133269543df2961946850a1515e9a22635d2e5cc7f42dab04b3"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment0-prepare-input.vo.yaml",
+      "sha256": "ed7a6d018066d78c7a1076413fea6acb02e600dcd5953f325bbc77445e47bb9a"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment0-prepare-query.vo.yaml",
+      "sha256": "5000835f8f0b51540b6309d7de1720b8441c9ca90ef8c7e4087a0bfe19cce32e"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment0-prepare-receipt.vo.yaml",
+      "sha256": "dead25345f7c71f5d4b2aa37a845116810c37bb5525005a8714497b9f6626cbe"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment1-commit-input.vo.yaml",
+      "sha256": "5248bb868acf474b7c1b34e5c434643f18410e3d2760b4e46b0c1296e07c06e0"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment1-commit-query.vo.yaml",
+      "sha256": "db1c2116d7124dfb79a3df8ef5617a9264d57212baf9fa59dcd660b4b3257e88"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment1-commit-receipt.vo.yaml",
+      "sha256": "c9ede046b18c664978e3af7f4ab21b1bc38c0a4ef3b035083d8955c939651409"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment1-compensate-input.vo.yaml",
+      "sha256": "9deeb4a4238e138d39d3a1c798895bbdb19bdf5f641fabb9ca912ba9f138c123"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment1-compensate-query.vo.yaml",
+      "sha256": "4a64645448cd2ed0aa0afaa6c1e73d4cedb3eefa84c65c2726b8dfeda27982aa"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment1-compensate-receipt.vo.yaml",
+      "sha256": "3d98b0e749aa20337bc955ee9d444ccfc1c1e8e65930f90c61b01e7656fe623a"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment1-prepare-input.vo.yaml",
+      "sha256": "6d2872c1a2f2384e81a82c8e156195cadce7637073fb214ec8cbccc390f2f59d"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment1-prepare-query.vo.yaml",
+      "sha256": "b3397ca9011067109b34accdf3616e1b787f811f65993236ca9c4c7fbbda955a"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment1-prepare-receipt.vo.yaml",
+      "sha256": "b65b0d8d2ccd63f7172d794daf6b87481180234fb3085d32c7c19717e2d56ddd"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment2-commit-input.vo.yaml",
+      "sha256": "d73a75a408ab377a72fb48f4e29514d45a3b914b9f712cf22027ab2f46bd0b12"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment2-commit-query.vo.yaml",
+      "sha256": "aa7ef569d630e11323622d1b596b3370a58c33bb12d0f7e3d2a52d6e5a5d3972"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment2-commit-receipt.vo.yaml",
+      "sha256": "355a77f43f3a39b352a4622aa4d03002c3317c754d56b805c174f8df0d479e2d"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment2-compensate-input.vo.yaml",
+      "sha256": "fa8c76edf1e0984df563437f74ed934e4dc1591079c570b2e403d0682f2cd7ab"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment2-compensate-query.vo.yaml",
+      "sha256": "bf1b407d46f960088a69d130125c41e7083420faaaf66662fb0e636e4a5d602a"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment2-compensate-receipt.vo.yaml",
+      "sha256": "f97a26498ed665459e1b81cb83f0a5d227eb1a8e3987402f5a0c9aff03a915a9"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment2-prepare-input.vo.yaml",
+      "sha256": "dd5beffdd87c3af89b51bed73afa24b4fc75855b0b9a4110655d9ad992b23fa4"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment2-prepare-query.vo.yaml",
+      "sha256": "60e0127921be03b54230f3f73b370fd065fe9dc51720cd157f38ea118fb19d2d"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-payment2-prepare-receipt.vo.yaml",
+      "sha256": "f990adda62463a1461c22a7952dd9c5592ac958095f2259ae239d174923839e0"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-pending-operation-view.vo.yaml",
+      "sha256": "eca2daff1ce6ea163fb48ca799e160e7d4ae0da3bf8f4cfa37f1bf27ceed2f4e"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-pending-page-key.vo.yaml",
+      "sha256": "33792d60b2b3b8fe513a39acfeacf504d3e1e334f7ce40341897611545475694"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-pending-response.vo.yaml",
+      "sha256": "b7298dd977b58ba3136cc9ea979873c020f31dd01e6cb98d91545185e6cd67e1"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-plan-key.vo.yaml",
+      "sha256": "78cda4d5e2f1e91652250b4c37777c8000c4dd5d4543d1454b1d2c7df141a5d1"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-plan-page-key.vo.yaml",
+      "sha256": "26acd44ded6131239280f023f72ad01d34a2c5715c1a979b5c805df49dbcf7e9"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-projection-watermark.vo.yaml",
+      "sha256": "c7e021993a6165a9b7cd6ab64e02a446b609483f6184886946b7a6d91b5af0ff"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-read-metadata.vo.yaml",
+      "sha256": "14a77b51127bbe9c897ce1643c4f6879a5bf6b1369c09d3aad781733e30e8b17"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-recovery-acknowledgement.vo.yaml",
+      "sha256": "f3aab043b04bb2851ef0a8f49bd165a48d8db94bb32cce138dbdce87b8b933f3"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund-args.vo.yaml",
+      "sha256": "302fd3455040a30e18e60847bf44de0ebf234eaf6ac42224ba6d2ea405f4a4ea"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund-original.vo.yaml",
+      "sha256": "18d924ab00b6b98aee7617a19780cb382da05a1514cb1aaab4f7ae7b06251fcd"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund-result.vo.yaml",
+      "sha256": "447baeb701a590532a666ae48c1e859b72429c63391eac80110aa7cf8fc42ab3"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund0-commit-input.vo.yaml",
+      "sha256": "121cd0f126fdb202dc71180f2669fbdff0d61990df689b3a8798742ea5b773f2"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund0-commit-query.vo.yaml",
+      "sha256": "c9fb880ac398e9b4722d9ba04cd85805e399d74a9168cf1247c00eb3002c31ca"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund0-commit-receipt.vo.yaml",
+      "sha256": "b08b6d30e38a1d279b1ef589ded553d83be91d7bbb244e106e4567fdc45a7878"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund0-compensate-input.vo.yaml",
+      "sha256": "adea821770ec3eda8713a7b60a7bdf9acd44306f1b5a980bdcb897de34f727e1"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund0-compensate-query.vo.yaml",
+      "sha256": "0b328da231727117181b9a324c8813410b6339f567ce4e7b8345501b414bc894"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund0-compensate-receipt.vo.yaml",
+      "sha256": "2f147c9984af0ffe4c514a9c8782aa2f5b4c37b7d1abadc10588d4335da10796"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund0-prepare-input.vo.yaml",
+      "sha256": "c894528eede15eb72f7ffe1313a883e2a824f53cd1ec50b5d21dc09b7e8ccca5"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund0-prepare-query.vo.yaml",
+      "sha256": "819e423666150872614c69b5f19c2e6ceb0525e3fc2d3bb89de7d9e4c4e81074"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund0-prepare-receipt.vo.yaml",
+      "sha256": "9aec0383333d80304e39f599e097265b161eb5defe902e3be3674da501c8214e"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund1-commit-input.vo.yaml",
+      "sha256": "340238f6a8ea3c0bd8ceae6cf2c6557cabe57b98a1f90c697a23d85c6ceda7da"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund1-commit-query.vo.yaml",
+      "sha256": "303335a50ab3a49dcda0e612a980637fd7ee749f227ee84afd29fee7a40a0e37"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund1-commit-receipt.vo.yaml",
+      "sha256": "efff062fe396a5027c4d8384af9894aaaf68ab43c198e7115bf0f3e29da9d5ff"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund1-compensate-input.vo.yaml",
+      "sha256": "9001c4bac84a85069dc55b34a23c7ae5d284ae4f07f33597c2a991afd6258a8c"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund1-compensate-query.vo.yaml",
+      "sha256": "f395334cedd2db7d310a40bf82289e4c6a8d9858a4c8e4eba1ebf2e61e0dccb3"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund1-compensate-receipt.vo.yaml",
+      "sha256": "863195071caf53906c5d3880959630950ec8af9de159a544f0fee481d5152892"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund1-prepare-input.vo.yaml",
+      "sha256": "e48a4d439f14205a7350ae0314e056956f44dd01f003fdd33a438a64db2bee37"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund1-prepare-query.vo.yaml",
+      "sha256": "1db43271711c0a9cb83d53acd0ab30b328cca4df72fa7bf9c63663b525bb6356"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-refund1-prepare-receipt.vo.yaml",
+      "sha256": "b285f16d03c45381b546ba60e6c80cb173acd4e2ae7f126156da4873af990e1d"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-service-bootstrap-acknowledgement.vo.yaml",
+      "sha256": "4ef8187f8ad4b1f2f4177bf3bcb0675c57946db233fb1680abb2748f86d585be"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-service-bootstrap-input.vo.yaml",
+      "sha256": "ca8ae92ba2343da6cc7e9a5dc986a9efedc4aa7316c465c153a696c1814290b4"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-acknowledgement.vo.yaml",
+      "sha256": "152a183f898c75bbd6912840b55d65bf80a4ba3aa1b9bf6381280a4efdcfbe07"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-create-intent.vo.yaml",
+      "sha256": "f99033f7355e081c4cb5959386c1c0a7927958cd7764f1eac5d03715b0f2cc37"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-create.vo.yaml",
+      "sha256": "8e6d703a2cab80a67ff47c565648a26a64206599bcd0e3bfc98255ea105e5c20"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-dispatch-observation.vo.yaml",
+      "sha256": "e5dc700a4e9b65e24b301f2c84b32b5b7a816e5c82d5b74b22d70f46fb3fa63d"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-dispatch-operation.vo.yaml",
+      "sha256": "896f1f5ea856dc8c1522b263fd36c30847e3fda51e9c9cbe7d9055a42cdea637"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-dispatch-reconcile.vo.yaml",
+      "sha256": "956ffa0d7b04174f049e20e5ca775a4d7005d89ddfb8e135d6974044f1ca6a87"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-dispatch-request.vo.yaml",
+      "sha256": "f81b291ceed17d7a62fa3ae306d39369cc0e79e572e95ef0f2ec114c983027cf"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-dispatch-result.vo.yaml",
+      "sha256": "4aefb23c5e19acd3059f462690110b89a33554a9541afd9a604199d41d0a09af"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-occurrence-page.vo.yaml",
+      "sha256": "decc7edcbc39a277cbbcede7a703f3346dccb715f6dc8351fff32f57185728b4"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-occurrence-view.vo.yaml",
+      "sha256": "069fd2e3f244216e13f37add973dd57404533f50925d83a29674ab7c606a7de3"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-plan-page.vo.yaml",
+      "sha256": "69cc9b658ca9fde6d8faf00e0880749e22c2c06941977fc575ba8bbfdb777c3b"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-plan-response.vo.yaml",
+      "sha256": "b00e670e4755d58200a79c5a8cda2768318b545d2da7c614a59dab15daee09be"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-plan-view.vo.yaml",
+      "sha256": "7a83a308ec3a25e8f525cb8f936f7ed8203389af2ebb759b015cbfb8bba4e084"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-revise.vo.yaml",
+      "sha256": "e434b0174cd676f1448e24ece794dd285e1bee8285efae84f331710b733dc7f0"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-revision-input.vo.yaml",
+      "sha256": "1b90486da224ac44765d5c8e556c4733c2803e14436cbff6a72acd707925e865"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-sip-revision-view.vo.yaml",
+      "sha256": "6c9e82fa5d09740c48a158bc2b73f60b781b7472655b1dcdd128a8ce493960b7"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-ta-effect-observation.vo.yaml",
+      "sha256": "8a735f22b2a9c3f401ab4a363d0774f3cc2063b9a89aecd463f630835901c9cf"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-ta-effect-operation.vo.yaml",
+      "sha256": "22b19d1dea96dc75aec32b1deafbf6282c4185c0fca7b13ea62345100b8e270a"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-ta-effect-reconcile.vo.yaml",
+      "sha256": "9117c4e16108c6dee269dadf9db3992c9704a67fb9b5e0300692542584f5cc0d"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-ta-effect-request.vo.yaml",
+      "sha256": "3cb24026053aa69b12fa9790f469ca804d88ca2bc54b4b3cca80f292608386fb"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-ta-effect-result.vo.yaml",
+      "sha256": "c1189bc9f16e593f21756c1ee312aa2e0f4d46a851db1e19c227621386a8d994"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-ta-shares-view.vo.yaml",
+      "sha256": "b0819eeee3c8e5db981c8d01f7a31bdd32a6827fe4064062879fa4cbad14a93a"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-tick-acknowledgement.vo.yaml",
+      "sha256": "e6ec5e479f16f49b88d81db9e098d9cc0dd90a1cb4fd2775012f9bd334082355"
+    },
+    {
+      "file": "v1/tree/value-objects/bank-tick.vo.yaml",
+      "sha256": "067c50d6a6f85e44599f449e3cc073f3626798f5cb9c96552f91233fd7862e9b"
+    },
+    {
+      "file": "v1/tree/value-objects/fund-order-id.vo.yaml",
+      "sha256": "3c9747e2bbe1d754ab2c5243db56bd23dfc2b7c55b8346aeb0e34734d6893ab3"
+    },
+    {
+      "file": "v1/tree/value-objects/fund-share.vo.yaml",
+      "sha256": "91f70bf13e85cbc8c72415e44247e6ff9d766d6239555e9452494f01b10aac65"
+    },
+    {
+      "file": "v1/tree/value-objects/money-po.vo.yaml",
+      "sha256": "39544bf434a5ccac98e0433c33859571e6b6cab5ba5a7c14fc68f62baf9a7b91"
+    },
+    {
+      "file": "v1/tree/value-objects/money-wire.vo.yaml",
+      "sha256": "061ad5a08a5cc677d189f94fe657a81911eeb0048b4a21552526232052e97deb"
+    },
+    {
+      "file": "v1/tree/value-objects/money.vo.yaml",
+      "sha256": "375de01c4b3ba88db079af6b3dd0de0a0e09c9007b0de1f9b950ebbb008affba"
+    },
+    {
+      "file": "v1/tree/value-objects/occurrence-id.vo.yaml",
+      "sha256": "d63ce21c85b3a84115355fae1757b1a4f54ef46a8749aba724577b3ce0f118c7"
+    },
+    {
+      "file": "v1/tree/value-objects/operation-id.vo.yaml",
+      "sha256": "159f459fa43e4e218b628003300b03054fc35783900f35b4512793b9c20f33a1"
+    },
+    {
+      "file": "v1/tree/value-objects/plan-id.vo.yaml",
+      "sha256": "6f610b538a92dc714e1bc7bcf2f0c6ccad20a8223fe567c86e4a3a4b59f8cb32"
+    },
+    {
+      "file": "v1/tree/value-objects/revision-id.vo.yaml",
+      "sha256": "235a41a3f4c1b4dba613a7e1524c6a4fa0790f4415f920bb42674d81ca43b29f"
+    },
+    {
+      "file": "v1/tree/value-objects/sip-occurrence.vo.yaml",
+      "sha256": "adfaeb3ffbb49e3ffddc7f32de6699afafdd5c03512f0318982d9609f99bdc5a"
+    },
+    {
+      "file": "v1/tree/value-objects/sip-revision-config.vo.yaml",
+      "sha256": "416e353e71dd87fbcc6a50bc04f3f80136e7ca125b7954b4babfeb42c3a21886"
+    },
+    {
+      "file": "v1/tree/value-objects/ta-exact-text.vo.yaml",
+      "sha256": "39ee1001d70c74cd7a41e5059f307c3f127db7827714475a865d84a2d68683ec"
+    },
+    {
+      "file": "v1/tree/value-objects/ta-receipt.vo.yaml",
+      "sha256": "09a8ce903f829aa15932dd8ca6c9527f85118b173aa8f959b9c7e2a2ec5112b2"
+    },
+    {
+      "file": "v1/tree/value-objects/ta-request-id.vo.yaml",
+      "sha256": "592ef71b3a53f55977ca1d7a616d0d96e1b74d5eff2f6e4a530a3bff86b2b57a"
+    },
+    {
+      "file": "v1/tree/value-objects/tx-id.vo.yaml",
+      "sha256": "39fb3542b5250c044373750e13c6a6a6f37214dfdea3d89a1f2b5eb4b7d1a20f"
+    },
+    {
+      "file": "v1/tree/workshop.yaml",
+      "sha256": "5426a55d0f80688536b5bbb36ebde6d8ac72799fdce3297507962c4cee7d48a9"
+    }
+  ],
+  "representationProof": {
+    "semanticEqual": true,
+    "atoms": 287,
+    "frozenSeq": true,
+    "legacyNoteIds": true,
+    "storedDecisionsAndFolds": true
+  },
+  "mappings": [
+    {
+      "from": "inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+      "to": "inbox/06-aggregate-detail/question-rf-bank-v1-implementation-0.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/credit-balance/aggregate.yaml",
+      "to": "contexts/bankwealth/aggregates/credit-balance/aggregate.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/credit-balance/slices/cancel-incoming-credit.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/credit-balance/slices/cancel-incoming-credit.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/credit-balance/slices/commit-incoming-credits.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/credit-balance/slices/commit-incoming-credits.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/credit-balance/slices/deduct-funds.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/credit-balance/slices/deduct-funds.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/credit-balance/slices/initialize-account.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/credit-balance/slices/initialize-account.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/credit-balance/slices/record-incoming-credits.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/credit-balance/slices/record-incoming-credits.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/credit-balance/slices/release-reserved-funds.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/credit-balance/slices/release-reserved-funds.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/credit-balance/slices/reserve-funds.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/credit-balance/slices/reserve-funds.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/aggregate.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/aggregate.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/cancel-cash-fund-subscription.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/cancel-cash-fund-subscription.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/confirm-fund-subscription-payment.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/confirm-fund-subscription-payment.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-cash-request-source.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-cash-request-source.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-cash-payment-compensated.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-compensated.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-cash-payment-outcome-unknown.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-outcome-unknown.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-cash-payment-recovery-required.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-recovery-required.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-cash-payment-rejected-before-effects.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-rejected-before-effects.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-refund-compensated.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-compensated.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-refund-outcome-unknown.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-outcome-unknown.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-refund-recovery-required.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-recovery-required.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-refund-rejected-before-effects.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-rejected-before-effects.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/request-fund-purchase-settlement.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-settlement.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/fund-order/slices/reserve-fund-subscription.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/fund-order/slices/reserve-fund-subscription.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/aggregate.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/aggregate.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/advance-sip-clock.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/advance-sip-clock.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/advance-skipped-sip-slot.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/advance-skipped-sip-slot.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/append-sip-due-slot.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/append-sip-due-slot.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/create-sip-plan.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/create-sip-plan.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/observe-sip-due-slot.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/observe-sip-due-slot.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/pause-sip-plan.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/pause-sip-plan.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/record-sip-create-intent.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/record-sip-create-intent.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/record-sip-installment-outcome-unknown.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-outcome-unknown.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/record-sip-installment-pending.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-pending.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/record-sip-installment-recovery-required.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-recovery-required.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/record-sip-installment-refund-in-progress.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-refund-in-progress.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/resume-sip-plan.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/resume-sip-plan.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/revise-sip-plan.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/revise-sip-plan.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/seal-sip-schedule.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/seal-sip-schedule.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/skip-paused-sip-due-slot.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/skip-paused-sip-due-slot.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+      "to": "contexts/bankwealth/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/account-id.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/account-id.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/amount-decimal-po.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/amount-decimal-po.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/amount-decimal-wire.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/amount-decimal-wire.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/amount-decimal.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/amount-decimal.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-account-key.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-account-key.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-account-response.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-account-response.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-account-view.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-account-view.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-cash-acknowledgement.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-cash-acknowledgement.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-cash-original.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-cash-original.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-cash-request-key.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-cash-request-key.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-cash-request-response.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-cash-request-response.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-cash-request-view.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-cash-request-view.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-cash-submit.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-cash-submit.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-occurrence-page-key.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-occurrence-page-key.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-operation-key.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-operation-key.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-order-key.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-order-key.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-order-response.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-order-response.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-order-view.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-order-view.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment-args.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment-args.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment-original.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment-original.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment-result.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment-result.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment0-commit-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment0-commit-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment0-commit-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment0-commit-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment0-commit-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment0-commit-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment0-compensate-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment0-compensate-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment0-compensate-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment0-compensate-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment0-compensate-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment0-compensate-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment0-prepare-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment0-prepare-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment0-prepare-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment0-prepare-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment0-prepare-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment0-prepare-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment1-commit-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment1-commit-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment1-commit-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment1-commit-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment1-commit-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment1-commit-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment1-compensate-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment1-compensate-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment1-compensate-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment1-compensate-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment1-compensate-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment1-compensate-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment1-prepare-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment1-prepare-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment1-prepare-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment1-prepare-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment1-prepare-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment1-prepare-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment2-commit-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment2-commit-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment2-commit-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment2-commit-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment2-commit-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment2-commit-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment2-compensate-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment2-compensate-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment2-compensate-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment2-compensate-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment2-compensate-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment2-compensate-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment2-prepare-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment2-prepare-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment2-prepare-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment2-prepare-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-payment2-prepare-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-payment2-prepare-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-pending-operation-view.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-pending-operation-view.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-pending-page-key.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-pending-page-key.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-pending-response.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-pending-response.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-plan-key.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-plan-key.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-plan-page-key.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-plan-page-key.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-projection-watermark.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-projection-watermark.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-read-metadata.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-read-metadata.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-recovery-acknowledgement.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-recovery-acknowledgement.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund-args.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund-args.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund-original.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund-original.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund-result.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund-result.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund0-commit-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund0-commit-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund0-commit-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund0-commit-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund0-commit-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund0-commit-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund0-compensate-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund0-compensate-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund0-compensate-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund0-compensate-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund0-compensate-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund0-compensate-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund0-prepare-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund0-prepare-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund0-prepare-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund0-prepare-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund0-prepare-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund0-prepare-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund1-commit-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund1-commit-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund1-commit-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund1-commit-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund1-commit-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund1-commit-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund1-compensate-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund1-compensate-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund1-compensate-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund1-compensate-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund1-compensate-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund1-compensate-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund1-prepare-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund1-prepare-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund1-prepare-query.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund1-prepare-query.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-refund1-prepare-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-refund1-prepare-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-service-bootstrap-acknowledgement.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-service-bootstrap-acknowledgement.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-service-bootstrap-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-service-bootstrap-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-acknowledgement.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-acknowledgement.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-create-intent.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-create-intent.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-create.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-create.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-dispatch-observation.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-dispatch-observation.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-dispatch-operation.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-dispatch-operation.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-dispatch-reconcile.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-dispatch-reconcile.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-dispatch-request.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-dispatch-request.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-dispatch-result.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-dispatch-result.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-occurrence-page.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-occurrence-page.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-occurrence-view.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-occurrence-view.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-plan-page.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-plan-page.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-plan-response.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-plan-response.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-plan-view.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-plan-view.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-revise.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-revise.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-revision-input.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-revision-input.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-sip-revision-view.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-sip-revision-view.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-ta-effect-observation.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-ta-effect-observation.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-ta-effect-operation.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-ta-effect-operation.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-ta-effect-reconcile.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-ta-effect-reconcile.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-ta-effect-request.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-ta-effect-request.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-ta-effect-result.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-ta-effect-result.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-ta-shares-view.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-ta-shares-view.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-tick-acknowledgement.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-tick-acknowledgement.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/bank-tick.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/bank-tick.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/fund-order-id.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/fund-order-id.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/fund-share.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/fund-share.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/money-po.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/money-po.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/money-wire.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/money-wire.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/money.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/money.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/occurrence-id.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/occurrence-id.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/operation-id.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/operation-id.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/plan-id.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/plan-id.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/revision-id.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/revision-id.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/sip-occurrence.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/sip-occurrence.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/sip-revision-config.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/sip-revision-config.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/ta-exact-text.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/ta-exact-text.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/ta-receipt.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/ta-receipt.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/ta-request-id.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/ta-request-id.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "value-objects/tx-id.vo.yaml",
+      "to": "contexts/bankwealth/value-objects/tx-id.vo.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "pipelines/bank-cash-payment-v1.pipeline.yaml",
+      "to": "contexts/bankwealth/pipelines/bank-cash-payment-v1.pipeline.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "pipelines/bank-independent-refund-v1.pipeline.yaml",
+      "to": "contexts/bankwealth/pipelines/bank-independent-refund-v1.pipeline.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "pipelines/bank-sip-dispatch-v1.pipeline.yaml",
+      "to": "contexts/bankwealth/pipelines/bank-sip-dispatch-v1.pipeline.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "pipelines/bank-ta-submission-v1.pipeline.yaml",
+      "to": "contexts/bankwealth/pipelines/bank-ta-submission-v1.pipeline.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "sagas/bank-cash-payment-v1.saga.yaml",
+      "to": "contexts/bankwealth/sagas/bank-cash-payment-v1.saga.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "sagas/bank-independent-refund-v1.saga.yaml",
+      "to": "contexts/bankwealth/sagas/bank-independent-refund-v1.saga.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/artifact-contract/bank-payment-technical.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/artifact-contract/bank-payment-technical.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/artifact-contract/bank-refund-technical.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/artifact-contract/bank-refund-technical.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/artifact-contract/bank-service.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/artifact-contract/bank-sip-technical.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/artifact-contract/bank-sip-technical.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/artifact-contract/bank-ta-technical.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/artifact-contract/bank-ta-technical.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/balance-after-commit-incoming-credits.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/balance-after-commit-incoming-credits.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/balance-after-release-reserved-funds.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/balance-after-release-reserved-funds.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/balance-after-reserve-funds.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/balance-after-reserve-funds.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-account-query.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-account-query.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-business-tick-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-business-tick-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-cash-original-query.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-cash-original-query.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-cash-submit-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-cash-submit-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-order-query.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-order-query.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-association.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-association.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-compensated-authority.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-compensated-authority.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-compensated-delivery.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-compensated-delivery.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-entry.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-entry.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-outcome-unknown-authority.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-outcome-unknown-authority.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-outcome-unknown-delivery.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-outcome-unknown-delivery.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-recovery-required-authority.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-recovery-required-authority.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-recovery-required-delivery.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-recovery-required-delivery.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-rejected-before-effects-authority.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-rejected-before-effects-authority.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-rejected-before-effects-delivery.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-rejected-before-effects-delivery.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-succeeded-authority.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-succeeded-authority.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment-succeeded-delivery.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment-succeeded-delivery.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment0-commit-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment0-commit-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment0-commit-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment0-commit-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment0-compensate-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment0-compensate-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment0-compensate-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment0-compensate-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment0-prepare-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment0-prepare-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment0-prepare-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment0-prepare-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment1-commit-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment1-commit-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment1-commit-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment1-commit-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment1-compensate-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment1-compensate-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment1-compensate-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment1-compensate-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment1-prepare-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment1-prepare-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment1-prepare-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment1-prepare-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment2-commit-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment2-commit-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment2-commit-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment2-commit-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment2-compensate-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment2-compensate-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment2-compensate-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment2-compensate-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment2-prepare-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment2-prepare-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-payment2-prepare-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-payment2-prepare-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-pending-operations-query.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-pending-operations-query.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-reconcile-existing-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-reconcile-existing-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-association.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-association.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-compensated-authority.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-compensated-authority.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-compensated-delivery.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-compensated-delivery.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-entry.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-entry.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-outcome-unknown-authority.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-outcome-unknown-authority.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-outcome-unknown-delivery.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-outcome-unknown-delivery.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-recovery-required-authority.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-recovery-required-authority.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-recovery-required-delivery.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-recovery-required-delivery.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-rejected-before-effects-authority.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-rejected-before-effects-authority.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-rejected-before-effects-delivery.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-rejected-before-effects-delivery.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-succeeded-authority.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-succeeded-authority.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund-succeeded-delivery.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund-succeeded-delivery.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund0-commit-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund0-commit-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund0-commit-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund0-commit-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund0-compensate-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund0-compensate-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund0-compensate-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund0-compensate-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund0-prepare-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund0-prepare-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund0-prepare-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund0-prepare-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund1-commit-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund1-commit-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund1-commit-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund1-commit-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund1-compensate-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund1-compensate-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund1-compensate-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund1-compensate-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund1-prepare-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund1-prepare-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-refund1-prepare-query-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-refund1-prepare-query-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-service-bootstrap.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-service-bootstrap.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-sip-create-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-sip-create-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-sip-dispatch-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-sip-dispatch-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-sip-dispatch-query.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-sip-dispatch-query.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-sip-dispatch-reconcile-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-sip-dispatch-reconcile-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-sip-occurrences-query.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-sip-occurrences-query.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-sip-pause-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-sip-pause-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-sip-plan-query.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-sip-plan-query.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-sip-plans-query.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-sip-plans-query.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-sip-resume-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-sip-resume-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-sip-revise-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-sip-revise-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-ta-effect-execute.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-ta-effect-execute.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-ta-effect-query.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-ta-effect-query.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-ta-effect-reconcile-port.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-ta-effect-reconcile-port.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/bank-ta-receipt-ingress.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/bank-ta-receipt-ingress.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/stable-refund-operation-id.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/stable-refund-operation-id.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/stable-sip-occurrence.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/stable-sip-occurrence.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/technical-port/stable-ta-request-id.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/technical-port/stable-ta-request-id.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/saga-host/bank-payment-host.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/saga-host/bank-payment-host.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/saga-host/bank-refund-host.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/saga-host/bank-refund-host.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/effect-host/bank-sip-dispatch.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/effect-host/bank-sip-dispatch.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/effect-host/bank-ta-effect.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/effect-host/bank-ta-effect.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/host-computation/--bankwealth---balance-after-commit-incoming-credits--.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/host-computation/--bankwealth---balance-after-commit-incoming-credits--.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/host-computation/--bankwealth---balance-after-release-reserved-funds--.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/host-computation/--bankwealth---balance-after-release-reserved-funds--.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/host-computation/--bankwealth---balance-after-reserve-funds--.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/host-computation/--bankwealth---balance-after-reserve-funds--.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/host-computation/--bankwealth---stable-refund-operation-id--.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/host-computation/--bankwealth---stable-refund-operation-id--.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/host-computation/--bankwealth---stable-sip-occurrence--.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/host-computation/--bankwealth---stable-sip-occurrence--.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/host-computation/--bankwealth---stable-ta-request-id--.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/host-computation/--bankwealth---stable-ta-request-id--.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-payment-result-compensated.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-payment-result-compensated.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-payment-result-outcome-unknown.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-payment-result-outcome-unknown.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-payment-result-recovery-required.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-payment-result-recovery-required.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-payment-result-rejected-before-effects.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-payment-result-rejected-before-effects.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-payment-result-succeeded.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-payment-result-succeeded.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-refund-result-compensated.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-refund-result-compensated.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-refund-result-outcome-unknown.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-refund-result-outcome-unknown.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-refund-result-recovery-required.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-refund-result-recovery-required.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-refund-result-rejected-before-effects.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-refund-result-rejected-before-effects.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-refund-result-succeeded.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-refund-result-succeeded.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/external-event-producer/bank-ta-receipt-observation.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/external-event-producer/bank-ta-receipt-observation.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/product-design/bank-payment-review.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/product-design/bank-payment-review.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/product-design/bank-refund-review.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/product-design/bank-refund-review.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/product-design/bank-sip-review.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/product-design/bank-sip-review.formal.yaml",
+      "relation": "representation-only"
+    },
+    {
+      "from": "formal-products/product-design/bank-ta-review.formal.yaml",
+      "to": "contexts/bankwealth/formal-products/product-design/bank-ta-review.formal.yaml",
+      "relation": "representation-only"
+    }
+  ],
+  "knowledgeChanges": {
+    "historicalCopiesReplacedWithReferences": [
+      "inbox/06-aggregate-detail/question-rf-bank-v1-implementation-0.yaml"
+    ],
+    "newNarrativeAtoms": [
+      "contexts/bankwealth/read-models/read-model-bank-account-view.rm.yaml",
+      "contexts/bankwealth/read-models/read-model-bank-cash-request-view.rm.yaml",
+      "contexts/bankwealth/read-models/read-model-bank-order-view.rm.yaml",
+      "contexts/bankwealth/read-models/read-model-bank-pending-operation-view.rm.yaml",
+      "contexts/bankwealth/read-models/read-model-bank-sip-occurrence-view.rm.yaml",
+      "contexts/bankwealth/read-models/read-model-bank-sip-plan-view.rm.yaml",
+      "contexts/bankwealth/stories/story-cash-fund-purchase.story.yaml",
+      "contexts/bankwealth/stories/story-finite-sip-plan.story.yaml",
+      "contexts/bankwealth/stories/story-fund-ta-settlement.story.yaml",
+      "contexts/bankwealth/stories/story-independent-fund-refund.story.yaml",
+      "contexts/bankwealth/use-cases.yaml",
+      "inbox/02-commands/role-cs-customer-0.yaml",
+      "inbox/02-commands/role-cs-operator-1.yaml",
+      "inbox/02-commands/role-cs-system-2.yaml",
+      "inbox/05-context-map/context-cm-bankwealth-0.yaml"
+    ],
+    "executionDeclarationsUnchanged": true
+  },
+  "bindings": [
+    {
+      "source": "v1/formal-inputs/payment-authored-165/sagas.json",
+      "sourceSha256": "8fd830794d6f699f2d0dee8329f8820d9774abb3f7c61e5f20135b627ddb53d1",
+      "target": "bindings/implementation/payment-sagas.json",
+      "removedDuplicateSagaBinding": false
+    },
+    {
+      "source": "v1/formal-inputs/payment-authored-165/runtime.json",
+      "sourceSha256": "9425502e7ff0b2c109ee8e94113b0c65ab105544a877b45f1a4fa8de54e52a15",
+      "target": "bindings/implementation/payment-runtime.json",
+      "removedDuplicateSagaBinding": false
+    },
+    {
+      "source": "v1/formal-inputs/payment-authored-165/execution.json",
+      "sourceSha256": "02049c1782732bc939406442d98e355d0127a42dad96871c852d88fac3f5f3f0",
+      "target": "bindings/implementation/payment-execution.json",
+      "removedDuplicateSagaBinding": true
+    },
+    {
+      "source": "v1/formal-inputs/refund-authored-282/sagas.json",
+      "sourceSha256": "f91fd99fd5e2d53a491590b64e3df4bc79b488da92f40899216bc868852dae95",
+      "target": "bindings/implementation/refund-sagas.json",
+      "removedDuplicateSagaBinding": false
+    },
+    {
+      "source": "v1/formal-inputs/refund-authored-282/runtime.json",
+      "sourceSha256": "054b4fc0a3ac7bc7584036a996b690b2d4c2662397b0213ceb2cb86039159bb7",
+      "target": "bindings/implementation/refund-runtime.json",
+      "removedDuplicateSagaBinding": false
+    },
+    {
+      "source": "v1/formal-inputs/refund-authored-282/execution.json",
+      "sourceSha256": "99000beedcbf235bbf045b75ce815522bead8d16b76f8f0461300d0a9be16626",
+      "target": "bindings/implementation/refund-execution.json",
+      "removedDuplicateSagaBinding": true
+    },
+    {
+      "source": "v1/formal-inputs/sip-authored-307/execution.json",
+      "sourceSha256": "4d3bf3a31cbc34f5ff53d9e03622ff6dd6430596528c0634fd633f5bbf893836",
+      "target": "bindings/implementation/sip-execution.json",
+      "removedDuplicateSagaBinding": false
+    },
+    {
+      "source": "v1/formal-inputs/ta-authored-297/execution.json",
+      "sourceSha256": "4830d9e7e2ea4dc3289de500bb0bba1c8e60a9051e8a78573d9c598953ecd7a1",
+      "target": "bindings/implementation/ta-execution.json",
+      "removedDuplicateSagaBinding": false
+    }
+  ],
+  "oldTreeUnchanged": true,
+  "runtimeRebuilt": false
+}

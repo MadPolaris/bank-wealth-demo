@@ -1,0 +1,48 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: story
+name: CashFundPurchase
+id: cash-fund-purchase
+payload:
+  {
+    "id": "cash-fund-purchase",
+    "name": "CashFundPurchase",
+    "context": "bankwealth",
+    "role": "customer",
+    "goal": "用自己的现金申购，并在重入或响应丢失后找到原请求而不是再次扣款。",
+    "description": "客户提交闭集请求，可信服务固定原身份和资金参数。展示受理、付款及投资结果的区别；付款的三participant事务不是TA终态。",
+    "links": [
+      {
+        "relation": "covers",
+        "target": "use-case:PurchaseFundWithCash"
+      }
+    ],
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "role",
+        "owner": [],
+        "id": "customer"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "use-case",
+        "owner": [],
+        "id": "PurchaseFundWithCash"
+      }
+    ],
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)",
+      "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+      "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-cash-request-source.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-settlement.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/pipelines/bank-cash-payment-v1.pipeline.yaml",
+      "truth/bank-wealth/contexts/bankwealth/sagas/bank-cash-payment-v1.saga.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/confirm-fund-subscription-payment.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+      "v1/handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala",
+      "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+    ]
+  }

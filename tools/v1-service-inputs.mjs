@@ -144,6 +144,7 @@ export function writeBankServiceInputs(target, options, scope) {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
+  if (args.shift() !== '--historical') throw new Error('Frozen V1 source service-input adapter. Current generation uses tools/truthsrc-project.mjs; historical use requires --historical.');
   if (args.length === 1 && args[0] === '--check-service') {
     const request = bankServiceRequest(), compiled = compileProductSet(request);
     assert.deepEqual(compiled.diagnostics, []); assert.ok(compiled.result);

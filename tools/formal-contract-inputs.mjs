@@ -171,6 +171,7 @@ export function prepareFormalInputs(out) {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const args = process.argv.slice(2);
+    if (args.shift() !== '--historical') throw new Error('Legacy three-contract input. Use the root truthsrc.project.json for current generation; historical use requires --historical.');
     if (args.length !== 2 || args[0] !== '--out') throw new Error('Usage: node tools/formal-contract-inputs.mjs --out <new absolute bank .scratch directory>');
     const { target, receipt } = prepareFormalInputs(args[1]);
     console.log(JSON.stringify({ status: receipt.status, target, products: receipt.products, readiness: receipt.readiness }, null, 2));

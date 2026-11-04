@@ -1,0 +1,151 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: ConfirmFundSubscriptionPayment
+payload:
+  {
+    "name": "ConfirmFundSubscriptionPayment",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "resource",
+        "dataType": "FundOrderId",
+        "origin": "BUSINESS_INPUT"
+      },
+      {
+        "name": "amount",
+        "dataType": "Money",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_PHASE_RESOURCE",
+        "errCode": "ORDER_PHASE_RESOURCE",
+        "cond": "param.resource == state.id",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_PHASE_POSITIVE",
+        "errCode": "ORDER_PHASE_POSITIVE",
+        "cond": "param.amount.currency == \"CNY\" && param.amount.amount > 0.00",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_COMMITTEDSUBSCRIPTIONS_MATCH",
+        "errCode": "ORDER_COMMITTEDSUBSCRIPTIONS_MATCH",
+        "cond": "!state.committedSubscriptions.contains(param.txid) || state.committedSubscriptions(param.txid) == param.amount",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_COMMIT_ONCE",
+        "errCode": "ORDER_COMMIT_ONCE",
+        "cond": "!state.committedSubscriptions.contains(param.txid)",
+        "onFail": "succeed-empty"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_NOT_CANCELED",
+        "errCode": "ORDER_NOT_CANCELED",
+        "cond": "!state.compensatedSubscriptions.contains(param.txid)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_PREPARED",
+        "errCode": "ORDER_PREPARED",
+        "cond": "state.reservedSubscriptions.contains(param.txid)",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_RESERVEDSUBSCRIPTIONS_MATCH",
+        "errCode": "ORDER_RESERVEDSUBSCRIPTIONS_MATCH",
+        "cond": "!state.reservedSubscriptions.contains(param.txid) || state.reservedSubscriptions(param.txid) == param.amount",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "ORDER_COMMIT_AMOUNT",
+        "errCode": "ORDER_COMMIT_AMOUNT",
+        "cond": "param.amount == state.amount",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "FundSubscriptionPaymentConfirmed"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "payment/ta/refund"
+    }
+  }
+events:
+  {
+    "FundSubscriptionPaymentConfirmed": {
+      "name": "FundSubscriptionPaymentConfirmed",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "resource",
+          "dataType": "FundOrderId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "amount",
+          "dataType": "Money",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        },
+        {
+          "slot": "resource",
+          "expr": "param.resource"
+        },
+        {
+          "slot": "amount",
+          "expr": "param.amount"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "reservedSubscriptions",
+          "op": "remove",
+          "key": "event.txid"
+        },
+        {
+          "slot": "committedSubscriptions",
+          "op": "put",
+          "key": "event.txid",
+          "value": "event.amount"
+        },
+        {
+          "slot": "selectedPaymentTxId",
+          "expr": "event.txid"
+        },
+        {
+          "slot": "status",
+          "expr": "literal:payment-committed"
+        }
+      ]
+    }
+  }

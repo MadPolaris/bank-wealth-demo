@@ -1,5 +1,7 @@
 .scratch/
 .local/mock-ta/
+.local/truthsrc-runtime/
+/generated/
 node_modules/
 /dist
 /target

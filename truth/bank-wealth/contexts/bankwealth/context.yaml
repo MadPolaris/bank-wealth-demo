@@ -1,0 +1,7 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: context
+schemaVersion: "truthsrc.context/v1"
+id: bankwealth
+name: bankwealth
+responsibility: "在一个教学限界上下文内拥有现金基金购买、TA模拟确认、独立退款及有限本地定投；不声明生产银行或跨行集成能力。"

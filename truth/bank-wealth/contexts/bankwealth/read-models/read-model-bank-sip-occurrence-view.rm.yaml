@@ -1,0 +1,153 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: read-model
+name: BankSipOccurrenceView
+id: bank-sip-occurrence-view
+payload:
+  {
+    "id": "bank-sip-occurrence-view",
+    "name": "BankSipOccurrenceView",
+    "context": "bankwealth",
+    "description": "本人计划的已持久期次，查询时关联其原FundOrder；尚未派发的slot不凭空变成occurrence。",
+    "sourceAggregate": "SipPlan",
+    "visible_to": [
+      "customer"
+    ],
+    "fields": [
+      {
+        "name": "occurrence",
+        "dataType": "SipOccurrence",
+        "source": "eventField:SipInstallmentTriggered.occurrence",
+        "description": "保留plan/due/revision、operation/order及原资金配置；按due_slot分页。"
+      },
+      {
+        "name": "slotDisposition",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.occurrences: SipPlan.slotDisposition[occurrence.dueSlot], else unknown; SipDueSlotObserved/SipPausedDueSlotSkipped.disposition",
+        "description": "读现有期次所对应的分类，不虚构跳期的订单。"
+      },
+      {
+        "name": "progress",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.occurrences: SipPlan.occurrenceProgress[occurrenceId], else unknown; trigger pending plus six SipInstallment progress/terminal events",
+        "description": "pending/outcome-unknown/recovery-required/refund-in-progress与succeeded/failed分开。"
+      },
+      {
+        "name": "paymentStatus",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.occurrences joins owned FundOrder by occurrence.fundOrderId, uses orderView.paymentStatus, else unknown",
+        "description": "付款自身结果，含中间状态及五kind；succeeded不是投资成功。"
+      },
+      {
+        "name": "taStatus",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.occurrences joins owned FundOrder by occurrence.fundOrderId, uses orderView.taStatus, else unknown",
+        "description": "submitted/accepted/unknown与confirmed/rejected分开；实际确认事件是FundTASharesConfirmed。"
+      },
+      {
+        "name": "refundStatus",
+        "dataType": "String",
+        "source": "Documentation only: BankReadside.occurrences joins owned FundOrder by occurrence.fundOrderId, uses orderView.refundStatus, else unknown",
+        "description": "独立退款状态；只有succeeded表示已退本金，不覆盖付款成功事实。"
+      },
+      {
+        "name": "firstTerminal",
+        "dataType": "Option[String]",
+        "source": "Documentation only: SipPlan.firstTerminals[occurrenceId], written only by SipInstallmentSucceeded.outcome or SipInstallmentFailed.outcome",
+        "description": "可信桥确认后只保留首次终态；付款或TA accepted不是terminal。"
+      }
+    ],
+    "queries": [
+      {
+        "context": "bankwealth",
+        "kind": "port",
+        "owner": [],
+        "id": "BankSipOccurrencesQuery"
+      }
+    ],
+    "metadata": {
+      "description": "每个查询响应的BankReadMetadata信封，不是金融终态，不并入下列业务DTO字段。所有来源说明均为文档，不声明新的可执行投影。",
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "dataType": "String",
+          "source": "Documentation only: BankReadsideSchema.version",
+          "description": "当前查询schema为bank-query-v1。"
+        },
+        {
+          "name": "disposition",
+          "dataType": "String",
+          "source": "Documentation only: BankReadside.metadata(rows, completeSet, absent)",
+          "description": "完整所需集合且有水位且全部caught-up才返回caught-up；该条件下业务值缺席才not-found。否则unknown，不能把缺行或空列表当不存在。"
+        },
+        {
+          "name": "watermarks",
+          "dataType": "Vector[BankProjectionWatermark]",
+          "source": "Documentation only: BankReadside.metadata: each distinct stream Row.pid/last/observed",
+          "description": "每PID分别报告lastSequence与observedSequence。相等为caught-up，observed更大为catching-up，其余unknown；不是全局日志顺序或跨账户原子快照。"
+        }
+      ],
+      "semantics": [
+        "BankReadside.project在同一事务保存原event、生成状态、索引和连续checkpoint；PID＋seq相同须字节一致，冲突或gap拒绝且不跳水位。",
+        "catchUp仅观察某PID的有界frontier；后续live事件将observed清空。关闭排空后frontier失效，不把上次caught-up当永久新鲜。",
+        "plans和pending无有界全索引发现frontier，completeSet=false，整页metadata.disposition保持unknown，即使已列行的水位caught-up。",
+        "occurrences按due_slot分页并在查询时关联订单；关联缺失可稍后重查，不生成假订单或全局chronology。",
+        "查询先认证及归属判断；GET不启动账户、订单、付款、退款或补期。Unavailable/NotAuthorized等查询失败与金融失败分开。"
+      ],
+      "evidence": [
+        "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+        "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+        "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+        "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+        "truth/bank-wealth/contexts/bankwealth/value-objects/bank-read-metadata.vo.yaml",
+        "truth/bank-wealth/contexts/bankwealth/value-objects/bank-projection-watermark.vo.yaml"
+      ]
+    },
+    "evidence": [
+      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+      "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
+      "truth/bank-wealth/contexts/bankwealth/value-objects/bank-sip-occurrence-view.vo.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/observe-sip-due-slot.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/skip-paused-sip-due-slot.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-pending.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-outcome-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-recovery-required.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-refund-in-progress.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-rejected-before-effects.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-compensated.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-outcome-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-recovery-required.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/register-fund-ta-submission.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-accepted.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-confirmed.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-rejected.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-ta-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-rejected-before-effects.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-compensated.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-outcome-unknown.slice.yaml",
+      "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-recovery-required.slice.yaml",
+      "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+    ],
+    "references": [
+      {
+        "context": "bankwealth",
+        "kind": "aggregate",
+        "owner": [],
+        "id": "SipPlan"
+      },
+      {
+        "context": "bankwealth",
+        "kind": "aggregate",
+        "owner": [],
+        "id": "FundOrder"
+      }
+    ]
+  }

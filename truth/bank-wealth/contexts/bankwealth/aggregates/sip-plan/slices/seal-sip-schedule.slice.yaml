@@ -1,0 +1,91 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: SealSipSchedule
+payload:
+  {
+    "name": "SealSipSchedule",
+    "parameters": [],
+    "guards": [
+      {
+        "ruleId": "SIP_ADMITTED_SCHEDULE_COVERED",
+        "errCode": "SIP_ADMITTED_SCHEDULE_COVERED",
+        "onFail": "reject",
+        "when": {
+          "form": "collection-covered",
+          "map": "intentAppendedDueSlots",
+          "collection": "state.createIntentDueSlots"
+        }
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_INITIALIZED",
+        "errCode": "SIP_INITIALIZED",
+        "cond": "state.initialized",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_SEAL_ONCE",
+        "errCode": "SIP_SEAL_ONCE",
+        "cond": "!state.scheduleSealed",
+        "onFail": "succeed-empty"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "SIP_FINITE_SCHEDULE",
+        "errCode": "SIP_FINITE_SCHEDULE",
+        "cond": "state.scheduleCount > 0",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "SipScheduleSealed"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ],
+      "serviceIntegration": {
+        "author": "agent-assisted-bank-v1-service-integration",
+        "workshopHeld": false,
+        "sourceVersion": "bank-v1-service-integration-619",
+        "sourceFlow": "P26-P32",
+        "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+      }
+    }
+  }
+events:
+  {
+    "SipScheduleSealed": {
+      "name": "SipScheduleSealed",
+      "payloads": [
+        {
+          "name": "sealed",
+          "dataType": "Boolean",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "sealed",
+          "expr": "literal:true"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "scheduleSealed",
+          "expr": "event.sealed"
+        }
+      ]
+    }
+  }

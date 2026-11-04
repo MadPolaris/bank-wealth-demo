@@ -1,0 +1,94 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RecordFundCashPaymentSucceeded
+payload:
+  {
+    "name": "RecordFundCashPaymentSucceeded",
+    "parameters": [
+      {
+        "name": "txid",
+        "dataType": "TxId",
+        "origin": "BUSINESS_INPUT"
+      }
+    ],
+    "guards": [
+      {
+        "kind": "invariantRef",
+        "ref": "PAYMENT_TERMINAL_CONFLICT",
+        "errCode": "PAYMENT_TERMINAL_CONFLICT",
+        "cond": "!state.cashPaymentFinalResults.contains(param.txid) || state.cashPaymentFinalResults(param.txid) == \"succeeded\"",
+        "onFail": "reject"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "PAYMENT_TERMINAL_ONCE",
+        "errCode": "PAYMENT_TERMINAL_ONCE",
+        "cond": "!state.cashPaymentFinalResults.contains(param.txid)",
+        "onFail": "succeed-empty"
+      },
+      {
+        "kind": "invariantRef",
+        "ref": "PAYMENT_COMMIT_PROOF",
+        "errCode": "PAYMENT_COMMIT_PROOF",
+        "cond": "state.committedSubscriptions.contains(param.txid) && param.txid == state.selectedPaymentTxId",
+        "onFail": "reject"
+      }
+    ],
+    "produces": [
+      "FundCashPaymentSucceeded"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "payment/ta/refund"
+    }
+  }
+events:
+  {
+    "FundCashPaymentSucceeded": {
+      "name": "FundCashPaymentSucceeded",
+      "payloads": [
+        {
+          "name": "txid",
+          "dataType": "TxId",
+          "origin": "PROPAGATED"
+        },
+        {
+          "name": "kind",
+          "dataType": "String",
+          "origin": "PROPAGATED"
+        }
+      ],
+      "bindings": [
+        {
+          "slot": "txid",
+          "expr": "param.txid"
+        },
+        {
+          "slot": "kind",
+          "expr": "literal:succeeded"
+        }
+      ],
+      "foldAssignments": [
+        {
+          "slot": "cashPaymentResults",
+          "op": "put",
+          "key": "event.txid",
+          "value": "event.kind"
+        },
+        {
+          "slot": "paymentOutcome",
+          "expr": "event.kind"
+        },
+        {
+          "slot": "cashPaymentFinalResults",
+          "op": "put",
+          "key": "event.txid",
+          "value": "event.kind"
+        }
+      ]
+    }
+  }
