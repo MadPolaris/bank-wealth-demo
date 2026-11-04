@@ -118,7 +118,7 @@ export function extractUpdateLock(updateReports) {
 }
 
 // Small XML reader: no DTD, external entities, resolver, or dependency on a host toolchain.
-function xml(text) {
+export function xml(text) {
   assert.ok(text.length <= 4 * 1024 * 1024 && !/<!DOCTYPE|<!ENTITY/iu.test(text), 'unsupported/oversized XML metadata');
   const decode = s => s.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos);/giu, (_, e) => e[0] === '#' ? String.fromCodePoint(e[1].toLowerCase() === 'x' ? parseInt(e.slice(2), 16) : Number(e.slice(1))) : ({ amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" })[e]);
   const document = { name: '', children: [], text: '' }, stack = [document];

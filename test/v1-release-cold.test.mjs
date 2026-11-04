@@ -3,8 +3,42 @@ import test from 'node:test';
 import { createHash } from 'node:crypto';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, realpathSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { coldRepositoryText, coldBootProperties, validateBridgeComponents, validateColdSourceMounts, coldCommand } from '../tools/v1-release-cold.mjs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { coldRepositoryText, coldBootProperties, validateBridgeComponents, validateColdSourceMounts, validateColdTestSupport, coldCommand } from '../tools/v1-release-cold.mjs';
+
+test('captured test support pins inventory and emits only fixed full-suite settings', () => {
+  const bank = dirname(dirname(fileURLToPath(import.meta.url)));
+  const owned = mkdtempSync(join(bank, '.scratch/p26-p32-bank-v1-test-'));
+  const root = join(owned, 'test-support-fixture');
+  mkdirSync(root);
+  const files = {};
+  const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+  try {
+    for (const file of ['bin/node', 'bank/tools/v1-service-mock-ta-worker.mjs', 'bank/tools/v1-mock-ta-worker.mjs',
+      'bank/tools/truth-source.mjs', 'bank/simulator/mock-ta.mjs', 'metarch-truthsrc/lib/compile.mjs', 'tests/scala/BankFixtureSpec.scala']) {
+      mkdirSync(dirname(join(root, file)), { recursive: true });
+      writeFileSync(join(root, file), file);
+      files[file] = 'sha256:' + digest(file);
+    }
+    const bytes = JSON.stringify({ schemaVersion: 'bank-cold-test-support/v1', files });
+    writeFileSync(join(root, 'TEST-SUPPORT.json'), bytes);
+    const config = { root, manifestSha256: digest(bytes) };
+    const result = validateColdTestSupport(config);
+    assert.equal(result.tests.length, 1);
+    assert.ok(result.tasks.some(t => t.includes('bank.mock-ta.joint-root')));
+    assert.ok(result.tasks.some(t => t.includes('Test / unmanagedSourceDirectories')));
+    assert.ok(result.tasks.some(t => t.includes('"GIT_CEILING_DIRECTORIES" -> ' + JSON.stringify(root))));
+    assert.ok(result.tasks.every(t => !t.includes('testOnly') && !t.includes('service.test.suites')));
+    assert.throws(() => validateColdTestSupport({ ...config, command: 'arbitrary' }));
+    assert.throws(() => validateColdTestSupport({ ...config, manifestSha256: '0'.repeat(64) }), /manifest hash/);
+    writeFileSync(join(root, 'tests/scala/BankFixtureSpec.scala'), 'changed');
+    assert.throws(() => validateColdTestSupport(config), /inventory differs/);
+    writeFileSync(join(root, 'tests/scala/BankFixtureSpec.scala'), 'tests/scala/BankFixtureSpec.scala');
+    writeFileSync(join(root, 'unlisted'), 'extra');
+    assert.throws(() => validateColdTestSupport(config), /inventory differs/);
+  } finally { rmSync(owned, { recursive: true }); }
+});
 
 test('cold repository and bootstrap configuration include only explicit local supplies', () => {
   const root = mkdtempSync(join(realpathSync(tmpdir()), 'bank-cold-test-'));

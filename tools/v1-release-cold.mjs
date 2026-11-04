@@ -117,10 +117,49 @@ export function validateColdSourceMounts(settings, repositories) {
   });
 }
 
+export function validateColdTestSupport(support) {
+  assert.deepEqual(Object.keys(support).sort(), ['manifestSha256', 'root']);
+  plainPath(support.root);
+  assert.match(support.manifestSha256, /^[a-f0-9]{64}$/u);
+  const parts = relative(join(ROOT, '.scratch'), support.root).split('/');
+  assert.ok(parts.length === 2 && /^p26-p32-bank-v1-[A-Za-z0-9_-]+$/u.test(parts[0]) && /^test-support-[A-Za-z0-9_-]+$/u.test(parts[1]), 'owned test support root required');
+  const manifestFile = join(support.root, 'TEST-SUPPORT.json');
+  plainPath(manifestFile);
+  assert.equal(sha(manifestFile), support.manifestSha256, 'test support manifest hash differs');
+  const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'));
+  assert.equal(manifest.schemaVersion, 'bank-cold-test-support/v1');
+  const actual = sourceInventory(support.root);
+  delete actual['TEST-SUPPORT.json'];
+  for (const file of Object.keys(actual)) {
+    if (file.startsWith('bank/.scratch/p26-p32-bank-v1-59o__arv/') || file.startsWith('bank/.scratch/p24-p25-bank-joint-fkcd3jwe/')) delete actual[file];
+  }
+  assert.deepEqual(actual, manifest.files, 'test support inventory differs');
+  for (const file of ['bin/node', 'bank/tools/v1-service-mock-ta-worker.mjs', 'bank/tools/v1-mock-ta-worker.mjs',
+    'bank/tools/truth-source.mjs', 'bank/simulator/mock-ta.mjs', 'metarch-truthsrc/lib/compile.mjs'])
+    assert.ok(Object.hasOwn(actual, file), 'test support required file missing: ' + file);
+  const tests = Object.keys(actual).filter(f => f.startsWith('tests/scala/') && f.endsWith('Spec.scala'));
+  assert.ok(tests.length > 0, 'bank test sources required');
+  const path = name => join(support.root, name);
+  const jointRoot = path('bank/.scratch/p24-p25-bank-joint-fkcd3jwe');
+  const ownedRoot = path('bank/.scratch/p26-p32-bank-v1-59o__arv/ta-application-tests');
+  const properties = {
+    'bank.mock-ta.node': path('bin/node'), 'bank.mock-ta.worker': path('bank/tools/v1-service-mock-ta-worker.mjs'),
+    'bank.mock-ta.owned-root': ownedRoot, 'bank.mock-ta.joint-root': jointRoot
+  };
+  const tasks = ['debug',
+    'set Test / unmanagedSourceDirectories += file(' + JSON.stringify(path('tests/scala')) + ')',
+    'set libraryDependencies ++= Seq("com.h2database" % "h2" % "2.2.224" % Test, "com.typesafe.play" %% "play-test" % "2.8.18" % Test, "org.iq80.leveldb" % "leveldb" % "0.12" % Test)',
+    'set Test / javaOptions ++= Seq(' + Object.entries(properties).map(([k, v]) => JSON.stringify('-D' + k + '=' + v)).join(', ') + ')',
+    'set Test / envVars ++= Map("TRUTHSRC_ROOT" -> ' + JSON.stringify(path('metarch-truthsrc')) +
+      ', "GIT_CEILING_DIRECTORIES" -> ' + JSON.stringify(support.root) + ')'];
+  return { ...support, inventory: actual, tests, jointRoot, ownedRoot, tasks };
+}
+
 export async function runColdBuild(config) {
   const required = ['java', 'javac', 'launcher', 'ownedRoot', 'repositories', 'target'];
   assert.ok(required.every(key => Object.hasOwn(config, key)));
-  assert.ok(Object.keys(config).every(key => [...required, 'bridgeComponents', 'testPhase'].includes(key)));
+  assert.ok(Object.keys(config).every(key => [...required, 'bridgeComponents', 'testPhase', 'testSupport'].includes(key)));
+  if (config.testSupport) assert.equal(config.testPhase, true, 'test support requires full test phase');
   if (Object.hasOwn(config, 'testPhase')) assert.equal(typeof config.testPhase, 'boolean');
   for (const k of ['java', 'javac', 'launcher', 'target']) plainPath(config[k]);
   plainPath(config.ownedRoot, true);
@@ -136,6 +175,13 @@ export async function runColdBuild(config) {
   assert.doesNotMatch(settings, /\.rounds\//, 'cold generated build must not reference author runtime delivery directories');
   const supplies = config.repositories.map(r => ({ ...r, inventory: sourceInventory(r.root) }));
   const bridges = validateBridgeComponents(config.bridgeComponents ?? [], config.repositories);
+  const testSupport = config.testSupport ? validateColdTestSupport(config.testSupport) : null;
+  if (testSupport) {
+    for (const directory of [testSupport.jointRoot, testSupport.ownedRoot]) {
+      plainPath(directory, true);
+      mkdirSync(directory, { recursive: true });
+    }
+  }
   mkdirSync(config.ownedRoot);
   for (const name of ['home', 'boot', 'global', 'ivy', 'coursier', 'tmp', 'guard']) mkdirSync(join(config.ownedRoot, name));
   writeFileSync(join(config.ownedRoot, 'repositories'), repositories, { flag: 'wx' });
@@ -145,7 +191,7 @@ export async function runColdBuild(config) {
     PATH: dirname(config.java) + ':/usr/bin:/bin', LANG: 'en_US.UTF-8', TMPDIR: join(config.ownedRoot, 'tmp'),
     COURSIER_CACHE: join(config.ownedRoot, 'coursier'), COURSIER_REPOSITORIES: config.repositories.map(r => pathToFileURL(r.root).href).join('|') };
   const before = { source: sources, externalSources, supplies, toolchain: Object.fromEntries(['java', 'javac', 'launcher'].map(k => [k, { path: config[k], sha: sha(config[k]) }])),
-    bridgeComponents: bridges, cachesInitiallyEmpty: bridges.length === 0, prefilledDerivedBridges: bridges.length > 0, noNetwork: true, config };
+    bridgeComponents: bridges, testSupport, cachesInitiallyEmpty: bridges.length === 0, prefilledDerivedBridges: bridges.length > 0, noNetwork: true, config };
   save(join(config.ownedRoot, 'input.json'), before);
   for (const bridge of bridges) {
     const bytes = readFileSync(bridge.file);
@@ -164,7 +210,7 @@ export async function runColdBuild(config) {
     property('user.home', 'home'), property('sbt.boot.directory', 'boot'), property('sbt.global.base', 'global'), property('sbt.ivy.home', 'ivy'),
     property('coursier.cache', 'coursier'), property('java.io.tmpdir', 'tmp'), property('sbt.repository.config', 'repositories'),
     '-Dsbt.override.build.repos=true', property('sbt.boot.properties', 'sbt.boot.properties'), '-cp', join(config.ownedRoot, 'guard') + ':' + config.launcher,
-    'xsbt.boot.Boot', ...sbtTasks];
+    'xsbt.boot.Boot', ...(testSupport?.tasks ?? []), ...sbtTasks];
   const build = await coldCommand(config.java, args, config.target, env, join(config.ownedRoot, 'build'), 480);
   assert.deepEqual(sourceInventory(config.target, { afterBuild: true }), sources);
   for (const r of supplies) assert.deepEqual(sourceInventory(r.root), r.inventory);
@@ -176,7 +222,9 @@ export async function runColdBuild(config) {
     assert.equal(sha(bridge.file), bridge.sha256, 'bridge changed during build');
     assert.equal(sha(bridge.manifest.file), bridge.manifest.sha256, 'supply manifest changed during build');
   }
+  if (testSupport) assert.deepEqual(validateColdTestSupport(config.testSupport).inventory, testSupport.inventory);
   const result = { schemaVersion: 'bank-cold-build/v1', status: build.code === 0 && !build.timedOut && !build.cancelled ? 'passed' : 'blocked', build, testPhase: config.testPhase === true,
+    testSupport: testSupport ? { root: testSupport.root, manifestSha256: testSupport.manifestSha256, tests: testSupport.tests, sourceUnchanged: true } : null,
     noNetwork: true, cachesInitiallyEmpty: bridges.length === 0, prefilledDerivedBridges: bridges.map(b => ({ sha256: b.sha256 })), sourceUnchanged: true, externalSourcesUnchanged: true, suppliesUnchanged: true,
     scope: 'file-only build with declared optional bridge prefill; testPhase runs only suites mounted by the generated target, not full bank acceptance; not license approval, runtime deployment or release acceptance' };
   save(join(config.ownedRoot, 'result.json'), result);

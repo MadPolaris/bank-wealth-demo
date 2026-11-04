@@ -82,7 +82,8 @@ final class BankPaymentJointSpec extends AnyFunSuite {
       assert(orderReplies.receiveMessage().isInstanceOf[FundOrderAggregate.Refused])
       assert(journal.persistedInStorage("joint-order").size == beforePrematureTa)
       if (!sip && taScenario.nonEmpty) {
-        val root = java.nio.file.Paths.get("/Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/.scratch/p24-p25-bank-joint-fkcd3jwe")
+        val root = java.nio.file.Paths.get(sys.props.getOrElse("bank.mock-ta.joint-root",
+          throw new IllegalArgumentException("explicit test configuration required: bank.mock-ta.joint-root")))
         val directory = java.nio.file.Files.createTempDirectory(root, "mock-ta-joint-").toRealPath()
         val unpaidClient = new MockTAClient(directory.resolve("ta.jsonl"), directory.resolve("worker.jsonl"), directory.resolve("worker.stderr.log"))
         try {
@@ -200,7 +201,8 @@ final class BankPaymentJointSpec extends AnyFunSuite {
         host ! Host.Invoke(bindings.parentInput.copy(inputs = bindings.parentInput.inputs.copy(fundCode = "OTHER")), replies.ref)
         assert(replies.receiveMessage().isInstanceOf[Host.Conflict])
         taScenario.foreach { scenario =>
-          val root = java.nio.file.Paths.get("/Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/.scratch/p24-p25-bank-joint-fkcd3jwe")
+          val root = java.nio.file.Paths.get(sys.props.getOrElse("bank.mock-ta.joint-root",
+          throw new IllegalArgumentException("explicit test configuration required: bank.mock-ta.joint-root")))
           val directory = java.nio.file.Files.createTempDirectory(root, "mock-ta-joint-").toRealPath()
           var client = new MockTAClient(directory.resolve("ta.jsonl"), directory.resolve("worker.jsonl"), directory.resolve("worker.stderr.log"))
           try {
