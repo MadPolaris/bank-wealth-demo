@@ -28,8 +28,12 @@ Scala构建/服务运行另需JDK、sbt及依赖/存储，不能把生成当作�
 及生成测试源码编译；生成-only窗口23项通过。后续固定actor窗口又实际通过
 41项业务＋23项生成测试，覆盖四流原业务断言，详见[运行验收边界](TRUTH-RUNTIME-ACCEPTANCE.md)。
 actor持久化使用内存testkit，TA使用显式有来源fixture及本轮新journal；
-这些结果不是HTTP/真实数据库/跨JVM恢复或1134重签。复现与独占输出要求见
-[离线构建与受限测试](TRUTH-BUILD.md)。
+这些结果不是HTTP/真实数据库/跨JVM恢复或1134重签。后续独立runtime冷02编译并封存
+运行classpath后，runtime-crash02已通过24个指定跨JVM恢复窗（72次JVM）；不依赖Docker，
+也不等同于Mongo故障注入或自动重试策略认证。HTTP/数据库/页面仍以独立新回执为准。
+最终database11另完成真实Mongo/MySQL、生产Loader/Factory、三个浏览器流程与正常重启/读库重放，
+GET前后journal不变，21鉴权拒绝和5MySQL负例通过。它不是重新发行1134或BC现役切换。
+复现与独占输出要求见[离线构建与受限测试](TRUTH-BUILD.md)。
 
 ## 第一条垂直切片：预留现金
 

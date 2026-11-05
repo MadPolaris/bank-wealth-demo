@@ -12,6 +12,11 @@ import {
   ACTOR_FIXTURE, ACTOR_READ_DENIALS, ACTOR_SUPPORT, ACTOR_WORKER, actorOwnedRoot, actorReadProbeSource,
   actorSuiteNames, actorTestManifest, combineActorManifest, verifyActorWorkers,
 } from './truthsrc-actor-tests.mjs';
+import {
+  RUNTIME_MANIFEST_FILE, completeRuntimeCompilation, inspectRuntimeCompilation,
+  runtimeBuildTasks, runtimeClasspathInventory, runtimeTestManifest,
+} from './truthsrc-runtime-tests.mjs';
+import { jarManifestProbeSource, validateJarReferences, assertJarReferencesUnchanged } from './truthsrc-runtime-jars.mjs';
 
 // Deliberately independent of the historical release/cold-build drivers.
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -41,7 +46,7 @@ const usage = `Usage: node tools/verify-truthsrc-build.mjs \\
   --project-output <absolute-fresh-generated-root> \\
   --archive <absolute-clean-1134.tar.gz> --evidence <absolute-new-evidence-root> \\
   [--java-home <absolute-JDK11-home>] [--compile-generated-tests]
-  [--run-generated-tests | --run-actor-tests]
+  [--run-generated-tests | --run-actor-tests | --compile-runtime-tests]
 
 Output must be under this bank's generated/ or target/; evidence under target/.
 Parents must exist. No symlinks, path aliases, spaces, or .scratch paths.
@@ -49,8 +54,10 @@ Default: compile the service and original handwritten Scala. --compile-generated
 only compiles generated test sources. --run-generated-tests compiles and executes ONLY
 the admitted generated unit suites. --run-actor-tests additionally runs eight fixed
 business actor suites with testkit and a new, explicitly configured local TA journal.
-Both execution modes use the generated Test / test and forked unit JVM. No HTTP,
-database services, arbitrary sbt tasks, or whole-directory historical tests are accepted.
+Both execution modes use the generated Test / test and forked unit JVM.
+--compile-runtime-tests only compiles five fixed integration mains alongside generated
+tests and seals their classpath; it does not execute them. No HTTP, database services,
+arbitrary sbt tasks, or whole-directory historical tests are accepted.
 Each attempt needs a fresh candidate and a new evidence directory. No cleanup,
 network resolution, runtime rebuild/publish, or historical acceptance runner.`;
 
@@ -74,18 +81,18 @@ export function parseArgs(args) {
   for (let i = 0; i < args.length; i++) {
     const flag = args[i];
     assert.ok(!flags.has(flag), usage);
-    if (['--compile-generated-tests', '--run-generated-tests', '--run-actor-tests'].includes(flag)) { flags.set(flag, true); continue; }
+    if (['--compile-generated-tests', '--run-generated-tests', '--run-actor-tests', '--compile-runtime-tests'].includes(flag)) { flags.set(flag, true); continue; }
     assert.ok(['--project-output', '--archive', '--evidence', '--java-home'].includes(flag) &&
       args[i + 1] && !args[i + 1].startsWith('--'), usage);
     flags.set(flag, args[++i]);
   }
   for (const flag of ['--project-output', '--archive', '--evidence']) assert.ok(flags.has(flag), usage);
-  const runActors = flags.has('--run-actor-tests');
-  assert.ok(!(runActors && flags.has('--run-generated-tests')), 'choose one explicit execution mode');
+  const runActors = flags.has('--run-actor-tests'), compileRuntimeTests = flags.has('--compile-runtime-tests');
+  assert.ok([runActors, flags.has('--run-generated-tests'), compileRuntimeTests].filter(Boolean).length <= 1, 'choose one explicit execution mode');
   const runTests = runActors || flags.has('--run-generated-tests');
   return { output: flags.get('--project-output'), archive: flags.get('--archive'),
     evidence: flags.get('--evidence'), javaHome: flags.get('--java-home') ?? DEFAULT_JAVA_HOME,
-    compileTests: runTests || flags.has('--compile-generated-tests'), runTests, runActors };
+    compileTests: runTests || compileRuntimeTests || flags.has('--compile-generated-tests'), runTests, runActors, compileRuntimeTests };
 }
 
 export function generatedTestManifest(entries, { runTests = true } = {}) {
@@ -237,7 +244,7 @@ export function isMainModule(argv, moduleUrl) {
   catch { return pathToFileURL(resolve(argv)).href === moduleUrl; }
 }
 
-function safePath(file, kind = 'directory') {
+export function safePath(file, kind = 'directory') {
   assert.ok(typeof file === 'string' && isAbsolute(file) && resolve(file) === file &&
     /^\/(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]+$/.test(file), 'canonical plain absolute path required: ' + file);
   assert.ok(!file.split('/').some(part => ['.', '..', '.scratch'].includes(part)), 'forbidden path component: ' + file);
@@ -259,7 +266,7 @@ function safePath(file, kind = 'directory') {
   return file;
 }
 
-function fileDigest(file) {
+export function fileDigest(file) {
   const fd = openSync(file, 'r');
   try {
     const digest = createHash('sha256'), buffer = Buffer.allocUnsafe(1024 * 1024);
@@ -275,7 +282,7 @@ async function archiveDigest(file) {
   return digest.digest('hex');
 }
 
-function inventory(root, { afterBuild = false } = {}) {
+export function inventory(root, { afterBuild = false } = {}) {
   safePath(root);
   const files = {};
   function visit(dir) {
@@ -300,7 +307,7 @@ function inventory(root, { afterBuild = false } = {}) {
   return files;
 }
 
-function snapshotFiles(files) {
+export function snapshotFiles(files) {
   return Object.fromEntries(files.map(file => {
     safePath(file, 'file');
     const stat = lstatSync(file);
@@ -354,7 +361,10 @@ function assertFreshOutput(output) {
 
 // Only this fixed, local JS implementation is loaded. Never import from the
 // candidate, its ledger, an archive member, or a caller-selected generator.
-async function admitCandidate(output, options) {
+export async function admitCandidate(output, options, { afterBuild = false } = {}) {
+  safePath(output);
+  assert.ok([join(ROOT, 'generated'), join(ROOT, 'target')].some(root => within(root, output) && output !== root),
+    'candidate must be a child of bank generated/ or target/');
   safePath(TOOL);
   safePath(PROJECT, 'file');
   safePath(HANDWRITTEN);
@@ -375,7 +385,7 @@ async function admitCandidate(output, options) {
   const plan = projectPlan(captured, output); // In-memory plan; NEVER applyEntries/projectCli(generate).
   assert.equal(plan.generator.id, GENERATOR);
   assert.equal(plan.generator.version, '1');
-  const before = inventory(output);
+  const before = inventory(output, { afterBuild });
   const ledger = parseStrictJson(readFileSync(join(output, 'truthsrc.ledger.json')));
   const anchors = readAnchorsIndex(parseStrictJson(readFileSync(join(output, 'anchors.json'))));
   assert.equal(ledger.generator, GENERATOR);
@@ -767,14 +777,14 @@ export async function command(executable, args, cwd, env, base, timeoutMs, sandb
     for (const fd of descriptors) closeSync(fd);
   }
 }
-function succeeded(receipt) {
+export function succeeded(receipt) {
   assert.ok(receipt.code === 0 && !receipt.signal && !receipt.launchError && !receipt.timedOut && !receipt.cancelled &&
     receipt.directChildReaped && !receipt.leftoverGroup && !receipt.groupAliveAfter && !receipt.terminationErrors?.length,
     'command failed; inspect its exclusive receipt and logs');
 }
 
 async function verify(options) {
-  const { output, archive, evidence, javaHome, compileTests, runTests, runActors } = options;
+  const { output, archive, evidence, javaHome, compileTests, runTests, runActors, compileRuntimeTests } = options;
   assert.equal(process.platform, 'darwin', 'this captured toolchain is for Darwin, not a portable supply');
   safePath(output); safePath(archive, 'file'); safePath(evidence, 'new'); safePath(javaHome);
   assert.ok([join(ROOT, 'generated'), join(ROOT, 'target')].some(root => within(root, output) && output !== join(ROOT, 'target')),
@@ -790,14 +800,16 @@ async function verify(options) {
   mkdirSync(evidence, { mode: 0o700 }); // exclusive: no recursive parent creation or reuse
   const result = { schemaVersion: 'bank.truthsrc-build/v1', status: 'blocked', output, evidence,
     archive: { file: archive, expectedSha256: ARCHIVE_SHA }, javaHome, compileGeneratedTests: compileTests,
-    runGeneratedTests: runTests && !runActors, runActorTests: runActors, testsExecuted: false,
+    runGeneratedTests: runTests && !runActors, runActorTests: runActors, compileRuntimeTests, testsExecuted: false,
+    runtimeCompilation: { requested: !!compileRuntimeTests, passed: false },
     actorTests: { requested: runActors, passed: false },
     generatedTests: { requested: runTests && !runActors, evidenceState: 'not-dispatched', jvmStarted: false, started: false, completed: false, passed: false },
     servicesStarted: false, runtimeRebuilt: false, runtimePublished: false,
     release1134Resigned: false, runtimeRetryBackoffDeadline: 'OPEN', phases: {}, checks: {}, errors: [],
-    scope: runActors ? 'current JS bank service: fixed four-flow actor regression plus generated units; testkit and explicitly frozen TA fixture only; not HTTP, databases, multi-JVM recovery or 1134 acceptance' :
+    scope: compileRuntimeTests ? 'current JS bank service with five fixed runtime mains compiled; source-bound classpath only, no service/test execution' :
+      runActors ? 'current JS bank service: fixed four-flow actor regression plus generated units; testkit and explicitly frozen TA fixture only; not HTTP, databases, multi-JVM recovery or 1134 acceptance' :
       'current JS-generated bank service plus original handwritten Scala; optional generated-only unit compilation/execution; not four-flow, HTTP, database, multi-JVM recovery or 1134 acceptance' };
-  let admitted, supplyBefore, sandbox, cachesBefore, verifierBefore, actor, executionManifest;
+  let admitted, supplyBefore, sandbox, cachesBefore, verifierBefore, actor, executionManifest, runtimeManifest, runtimeBefore, runtimeObservation;
   let testObservation = { requested: runTests, evidenceState: 'not-dispatched', jvmStarted: false, started: false, completed: false, passed: false, errors: [] };
   const phases = result.phases;
   try {
@@ -807,6 +819,12 @@ async function verify(options) {
     const initiallyEmpty = Object.fromEntries(CACHE_DIRS.map(name => [name, Object.keys(cachesBefore[name]).length === 0]));
     save(join(evidence, 'cache-before.json'), cachesBefore);
     admitted = await admitCandidate(output, options);
+    if (compileRuntimeTests) {
+      runtimeManifest = runtimeTestManifest();
+      runtimeBefore = snapshotFiles([...runtimeManifest.sources.map(row => row.file), RUNTIME_MANIFEST_FILE, join(ROOT, 'tools/truthsrc-runtime-jars.mjs')]);
+      for (const row of runtimeManifest.sources) assert.equal(row.sha256, runtimeBefore[row.file].sha256, 'runtime source changed during capture');
+      save(join(evidence, 'runtime-inputs-before.json'), runtimeBefore);
+    }
     if (runActors) actor = await prepareActors(evidence, admitted.testManifest);
     executionManifest = actor?.manifest ?? admitted.testManifest;
     notCancelled();
@@ -828,6 +846,7 @@ async function verify(options) {
       toolchain: Object.fromEntries([java, javac, join(javaHome, 'release'), PYTHON, SANDBOX].map(file => [file, fileDigest(file)])),
       initiallyEmpty, compilerBridgePrefill: false, inheritedEnvironment: false, env, verifier: verifierBefore,
       testFiles: compileTests ? admitted.testFiles : [], testManifest: runTests ? executionManifest : null,
+      runtimeManifest: runtimeManifest ?? null,
       actor: actor ? { ownedRoot: actor.ownedRoot, fixtureSha256: actor.fixtureSha256, configSha256: actor.configSha256 } : null });
     sandbox = prepareSandbox(evidence, output, actor);
     await probeSandbox(sandbox, java, javac, output, evidence, env, phases);
@@ -870,10 +889,12 @@ async function verify(options) {
     // Cache/config hints only; confinement is inherited OS state, not removable
     // JAVA_TOOL_OPTIONS or Test / javaOptions. No Test runner/guard override.
     const buildEnv = { ...env, JAVA_TOOL_OPTIONS: javaOptions.join(' ') };
-    const tasks = buildTasks(admitted.testFiles, options, executionManifest, actor);
+    const tasks = compileRuntimeTests ? runtimeBuildTasks(admitted.testFiles, runtimeManifest)
+      : buildTasks(admitted.testFiles, options, executionManifest, actor);
     save(join(evidence, 'build-plan.json'), { javaOptions, tasks, env: buildEnv,
       sandbox: { profile: sandbox.profile, sha256: sandbox.profileSha256, subpaths: sandbox.subpaths, literals: sandbox.literals },
-      allowedAppArtifactDirectories: ARTIFACT_DIRS, historicalTestSourcesAppended: !!actor,
+      allowedAppArtifactDirectories: ARTIFACT_DIRS, historicalTestSourcesAppended: !!actor || !!runtimeManifest,
+      explicitFrozenRuntimeSources: runtimeManifest?.sources ?? [],
       explicitFrozenActorSources: actor ? actor.manifest.suites.filter(s => s.sourceKind === 'frozen-business-test').map(s => s.file) : [],
       testExecutionSupported: true, testExecutionRequested: runTests, testManifest: runTests ? executionManifest : null });
     checkSandbox(sandbox);
@@ -883,6 +904,7 @@ async function verify(options) {
     assert.deepEqual(inventory(HANDWRITTEN), admitted.handwritten, 'handwritten input changed before build');
     assert.deepEqual(inventory(RUNTIME), admitted.runtime, 'local runtime changed before build');
     if (actor) assert.deepEqual(snapshotFiles(Object.keys(actor.before)), actor.before, 'actor inputs changed before build');
+    if (runtimeBefore) assert.deepEqual(snapshotFiles(Object.keys(runtimeBefore)), runtimeBefore, 'runtime sources changed before build');
     notCancelled();
     // Cooperative output claim within the only allowed app-write territory.
     // Never remove another invocation's claim or clean/reuse old build outputs.
@@ -920,6 +942,24 @@ async function verify(options) {
       const expected = [...admitted.testFiles.map(file => join(actualRoot, file)), ...actor.manifest.suites.filter(s => s.sourceKind === 'frozen-business-test').map(s => s.file)].sort();
       assert.deepEqual(sourceMarkers[0][1].split(',').sort(), expected, 'actual compiled Test sources differ');
       result.checks.actualTestSourcesVerified = true;
+    }
+    if (runtimeManifest) {
+      const closure = inspectRuntimeCompilation(stdout.toString('utf8'), actualRoot, admitted.testFiles, runtimeManifest);
+      const classpathInventory = runtimeClasspathInventory(closure.classpath, actualRoot, evidence, { safePath, inventory, fileDigest });
+      const jarProbe = join(evidence, 'runtime-jars.py'), jarList = join(evidence, 'runtime-jars-input.json');
+      write(jarProbe, jarManifestProbeSource); save(jarList, closure.classpath.filter(file => file.endsWith('.jar')));
+      sandbox.controlsBefore[jarProbe] = fileDigest(jarProbe); sandbox.controlsBefore[jarList] = fileDigest(jarList);
+      phases.runtimeJars = await command(PYTHON, ['-I', '-S', jarProbe, jarList], evidence, env,
+        join(evidence, 'runtime-jars-probe'), 30_000, sandbox);
+      succeeded(phases.runtimeJars);
+      const jarRecords = JSON.parse(readFileSync(join(evidence, 'runtime-jars-probe.stdout.log'), 'utf8'));
+      const jarReferences = validateJarReferences(closure.classpath, jarRecords, { safePath, fileDigest });
+      save(join(evidence, 'runtime-jars.json'), jarReferences);
+      runtimeObservation = { schemaVersion: 'bank.truthsrc-runtime-build/v1', output, buildEvidence: evidence,
+        actualRoot, sources: closure.sources, manifest: runtimeManifest, classpath: closure.classpath, classpathInventory, jarReferences,
+        buildStdoutSha256: phases.build.stdoutSha256, testsExecuted: false, servicesStarted: false };
+      result.checks.actualRuntimeTestSourcesVerified = true;
+      result.checks.runtimeClasspathVerified = true;
     }
     succeeded(phases.build);
   } catch (error) {
@@ -963,6 +1003,17 @@ async function verify(options) {
       try { save(join(evidence, 'actor-journals-after.json'), inventory(actor.ownedRoot)); }
       catch (error) { result.errors.push(error.message); }
     }
+    if (runtimeBefore) {
+      try {
+        const after = snapshotFiles(Object.keys(runtimeBefore));
+        save(join(evidence, 'runtime-inputs-after.json'), after);
+        assert.deepEqual(after, runtimeBefore, 'runtime test/support inputs changed');
+        result.checks.runtimeTestInputsUnchanged = true;
+        if (runtimeObservation) assert.deepEqual(runtimeClasspathInventory(runtimeObservation.classpath, runtimeObservation.actualRoot, evidence,
+          { safePath, inventory, fileDigest }), runtimeObservation.classpathInventory, 'runtime classpath changed before sealing');
+        if (runtimeObservation) assertJarReferencesUnchanged(runtimeObservation.jarReferences, { safePath, fileDigest });
+      } catch (error) { result.checks.runtimeTestInputsUnchanged = false; result.errors.push(error.message); }
+    }
     if (sandbox) {
       try {
         save(join(evidence, 'sandbox-after.json'), checkSandbox(sandbox));
@@ -992,6 +1043,15 @@ async function verify(options) {
       if (!result[key].passed) result.errors.push('tests not verified: ' + result[key].errors.join('; '));
       try { save(join(evidence, runActors ? 'actor-tests.json' : 'generated-tests.json'), { ...result[key], stdoutSha256: phases.build?.stdoutSha256 ?? null }); }
       catch (error) { result[key].passed = false; result.checks[check] = false; result.errors.push(error.message); }
+    }
+    if (compileRuntimeTests) {
+      let processPassed = false;
+      try { succeeded(phases.build); processPassed = true; } catch { /* retained by the source-bound result */ }
+      result.runtimeCompilation = completeRuntimeCompilation(runtimeObservation, result.checks, processPassed, result.errors);
+      result.checks.runtimeCompilationPassed = result.runtimeCompilation.passed;
+      try { save(join(evidence, 'runtime-build.json'), result.runtimeCompilation); }
+      catch (error) { result.runtimeCompilation.passed = false; result.checks.runtimeCompilationPassed = false; result.errors.push(error.message); }
+      if (!result.runtimeCompilation.passed) result.errors.push('runtime compilation was not source-bound');
     }
     result.status = result.errors.length === 0 && result.checks.osSandboxEnforced && phases.build?.code === 0 &&
       (!runTests || result[runActors ? 'actorTests' : 'generatedTests'].passed) ? 'passed' : 'blocked';

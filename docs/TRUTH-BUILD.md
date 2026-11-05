@@ -4,6 +4,34 @@
 
 默认只运行服务 `compile`。`--compile-generated-tests` 只增加生成测试源码的 `Test / compile`；`--run-generated-tests` 隐含该编译步骤，并通过生成 build 的固定 `Test / test` 执行已准入的生成单元测试。另有独立`--run-actor-tests`模式，按固定清单增加八个冻结业务Suite，不是整目录历史测试；它仍用原fork/runner和OS禁网，详见[四流actor窗口](TRUTH-RUNTIME-ACCEPTANCE.md#四流actor窗口独立于服务数据库)。两个执行模式互斥，均无任意task、`testOnly`、`run`、`runMain`或HTTP入口。通过不表示完整1134重新签收，runtime retry/backoff/deadline设计仍为 **OPEN**。
 
+## 当前运行源码闭包与classpath交接：冷编译02 passed
+
+新增默认关闭的 `--compile-runtime-tests`，与两个测试执行模式互斥。它只编译六个当前生成测试文件和五个固定、按冻结SHA准入的集成main；额外的LevelDB 0.12/H2 2.2.224仅为Test依赖，仍只从固定1134供给解析，不执行任何main或测试。
+
+2026-11-05实际最终冷02：`target/truthsrc-runtime-build-20261105-02/result.json`、`runtime-build.json` passed/exit0。9PB、499main和11test冷编译成功，build66.540秒；199实际staging输入、35手写、7runtime及1065供给不变，全部14项checks true。`Test / fullClasspath`有194项：189个供给JAR、2个实际class目录及3个显式不存在的Play目录（包括`target/web/public/test`）。runtime01已编译成功但校验器误认该目录为public/main，原blocked回执保留，未补改。
+
+classpath目录的文件和空子目录均封存。Python在OS沙箱下逐个解析JAR manifest，记录Xalan/Serializer四个隐式相对引用均为固定位置不存在；运行前后复核，不能在这些地址放新JAR而仍通过。不存在的引用不是授权隐式下载或搜索旧缓存。
+
+独立 `tools/truthsrc-runtime-admission.mjs` 已对实际冷02进行完整准入成功，核对当前公共项目plan、原candidate/实际staging、11来源、构建进程及stdout/所有独占回执、toolchain/控制文件、classpath/供给/缓存。系统 `/usr/bin/python3` 是root拥有且不可组/其它写的多硬链接平台launcher；只对这个精确系统路径承认该事实，源码/测试/JAR仍拒绝硬链接。
+
+```bash
+node tools/verify-truthsrc-build.mjs \
+  --project-output "$PWD/target/truthsrc-runtime-candidate-<new-id>" \
+  --archive "$PWD/dist/bank-wealth-v1-darwin-x64-1134.tar.gz" \
+  --evidence "$PWD/target/truthsrc-runtime-build-<new-id>" \
+  --compile-runtime-tests
+npm run test:runtime-verifier
+```
+
+真正运行由独立 `verify-truthsrc-runtime.mjs` 消费成功交接，不能用编译回执冒称运行已验。范围和资源见 [运行验收说明](TRUTH-RUNTIME-ACCEPTANCE.md) / [本轮资源合同](TRUTH-RUNTIME-WINDOW-20261105.md)。不改原单元禁网profile、生成build或历史发行回执。
+
+## 当前跨JVM恢复：24/24 passed
+
+独立运行消费者读取runtime冷02后，`target/truthsrc-runtime-crash-20261105-02/result.json`
+实际通过24个固定窗口、72次JVM，所有原业务/恢复断言及来源对账通过；无网络/数据库服务，
+全部worker/journal锁正常归还，数据保留。该运行成果与本页compile-only结果分开，详见
+[运行验收边界](TRUTH-RUNTIME-ACCEPTANCE.md)。不能据此关闭HTTP、Mongo/MySQL或retry策略门。
+
 ## 最终四流actor执行：passed
 
 `target/truthsrc-actor-candidate-20261105-01`在新空缓存和相同禁网边界下通过

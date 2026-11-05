@@ -15,7 +15,7 @@
 | 跨JVM指定恢复窗 | 新独占LevelDB/snapshot/TA journal及本轮进程控制 | 在明确barrier后停止本轮自有进程，恢复并继续原身份，不手发替代业务恢复。 |
 | BC现役切换 | owner裁定七项后迁移，并对全部现役消费者切换 | 五产物全量保真、消费者只读新作者的机器派生物、旧树停止双写。兼容oracle不等于切换。 |
 
-此前生成单元窗口不启动服务/容器、不开放loopback。用户随后再次要求继续，本轮新增下述固定四流actor窗口：仍无网络/服务/容器，仅本轮新TA子进程/journal。内存testkit重建actor不冒称磁盘或跨JVM恢复；HTTP/真实数据库/浏览器窗口仍未执行。
+此前生成单元和actor窗口均不启动服务/容器、不开放loopback；内存testkit不冒称跨JVM。2026-11-05用户要求解决阻塞后，另外完成了runtime-crash02和database09独占窗口，具体实际证据与覆盖边界见下文；旧段落的未执行状态不覆盖这些新结果。
 
 ## 已定位的复用面，不是可原样重跑的旧命令
 
@@ -86,6 +86,70 @@ npm run test:actor-verifier
 TA终态由测试命令驱动，不经过同一个外部TA worker；部分恢复是显式Reconcile，
 另三refund例才是原RecoveryLoop。没有认证生产Factory、自动重试策略、HTTP、
 SQL投影/页面或跨JVM恢复。实际执行结论只以[验证记录](TRUTH-VALIDATION.md)为准。
+
+## 最终工具版本：database11通过
+
+`target/truthsrc-runtime-database-20261105-11/result.json` 为最终passed/exit0，
+`databasePassed/sourceBound/inputsUnchanged`全部true。传输截断帧、EOF和关闭错误路径修正后，
+再次完整实跑四阶段，而不是追认09回执：浏览器initial53次（GET42/POST11）、refund35次
+（GET30/POST5）、replay14次（全部GET），额外API仍32次GET。21鉴权拒绝及5个MySQL
+负例均通过，正常restart和新SQL schema replay的Mongo全库hash不变（journal147/213）。
+
+四个服务JVM均exit0且有close证据，四个TA worker均close/wait；8051个本轮容器exec
+（7891MySQL/160Mongo）全部closed/exit0，无帧或传输失败。两个DB容器Stopped、两个relay
+关闭、控制文件不变，最终无JVM/浏览器进程和18761–18763监听。新数据/内部网络、旧失败
+及09成功证据全部保留。最终Node合同384项中383通过/1显式socket opt-in跳过，socket
+独立5/5另有实跑。来源/制品不变，不重签1134，不发布runtime。
+
+## 已保留的首次完整数据库成功：database09
+
+`target/truthsrc-runtime-database-20261105-09/result.json` 实际passed/exit0。
+同一新候选按initial/restart/refund/replay四阶段验证真实Mongo、MySQL、生产Loader/Factory。
+三次Chromium分别执行首轮现金+两期SIP、可信TA拒绝后的独立退款、全新SQL schema的GET-only重放；
+正常restart为独立新JVM的API-only查询，不冒称崩溃恢复。
+
+| 已验阶段 | 浏览器GET/POST | 额外API GET/POST | 结果 |
+|---|---:|---:|---|
+| initial | 49/11 | 7/0 | 现金确认、有限SIP两期成功，88000/12000、预留0 |
+| restart | 未启动浏览器 | 7/0 | 原身份/状态保留，Mongo全库摘要不变（journal147→147） |
+| refund | 29/5 | 9/0 | TA拒绝后独立全本金退款，原付款成功事实不撤销 |
+| replay | 13/0 | 9/0 | 新SQL schema重建相同视图，Mongo全库摘要不变（journal213→213） |
+
+21个鉴权/CSRF/注入拒绝全部通过且Mongo journal不变；五个原MySQL负例全部通过。
+sourceBound/inputsUnchanged与DB controlsUnchanged全true，回调无错误、无timeout/输出溢出。
+两个owner+run标签的容器与两条internal网络保留，容器已停；两个本地API exec relay全部关闭，
+8019个exec（7863MySQL/156Mongo）均exit0且不再Running，16记录host PID消失、端口归还。
+应用的序列化warning和coordinated service-stop 5000ms warning保留；实际main的close/reap门另行通过。
+不表示生产负载/多writer认证，不重签1134或关闭retry策略账。
+
+独立审阅随后收紧exec截断帧/EOF与异步关闭失败路径，只改新验证器，不改业务；database10
+复验失败后修正后台stdin，最终database11已完整通过。09成功与10失败证据均不补写或追认。
+
+## 当前指定跨JVM恢复窗口：24/24通过
+
+`target/truthsrc-runtime-crash-20261105-02/result.json` 实际passed/exit0，执行509.445秒。
+消费来源绑定的runtime冷02；24个原固定case各三次JVM，共72个不同主进程和72个TA worker。
+24次在已核barrier后只SIGKILL该主JVM，24次原RecoveryLoop恢复、24次第三JVM稳定性核验全部通过。
+无timeout/取消/终止错误，全部主进程reap、worker闭合且不存在、无保留锁；最终
+`crashPassed/sourceBound/inputsUnchanged` 全true。旧case/main/oracle/手写/runtime未修改。
+
+每case的原始/后继完整PB与序列前缀、本金和身份、唯一TA提交、付款/退款父checkpoint、
+有限SIP原vector/期次/首terminal按既有断言比较；TA/SIP第三JVM的完整journal相等，
+基础窗只允许原合同限定的技术追加，不泛化为所有journal必须零追加。证据和LevelDB/TA
+数据保留于 `.local/mock-ta/truthsrc-runtime-crash-20261105-02/`。
+
+这是新当前候选的指定磁盘恢复验证，不是Mongo故障注入、并发多writer证明或重试策略完整验收；
+retry/backoff/deadline仍OPEN，1134不重签。HTTP/生产数据库/浏览器另有独立窗口。
+
+## 当前已解除的资源与接线阻塞
+
+2026-11-05用户要求解决阻塞，已按既有“必要集成允许Docker、单元不依赖Docker”约定登记本轮独占窗口，见 [本轮资源合同](TRUTH-RUNTIME-WINDOW-20261105.md)。不再将所有服务级验证笼统写为未授权。BC阶段裁决仍独立。
+
+- 新增 `--compile-runtime-tests`：仅编译五个冻结集成main＋六个生成测试文件，不执行 `Test / test`；固定SHA拒绝测试漂移。冷编译02已实际通过9PB／499main／11test、199来源、194classpath（189JAR、3显式不存在的Play目录）及14项保护检查。
+- 实际Test classpath和JAR manifest隐式引用单独封存；运行消费者从当前公共项目重新准入，并核对原候选与实际sbt staging、字节码/资源、旧测试、工具链和全部构建回执。旧成功回执不补字段，冷编译01失败保留。
+- 新运行TA adapter复用同一显式配置core和协议，支持新service/固定case根，EOF重开测试通过；不消费旧snapshot。
+- 跨JVM使用 `deny-all`；HTTP/DB使用明确的 `host-local-reserved-ports`。Seatbelt的localhost包含本机其它接口/wildcard，故不冒称恶意代码级exact-IPv4边界；固定源码/配置及实际listener检查另限127.0.0.1。独立probe已实际验证父子孙57次EPERM和18761 loopback往返。
+- 运行入口为 `tools/verify-truthsrc-runtime.mjs`，只消费新 `runtime-build.json` 和全新运行证据/TA根，固定 `crash|database|all`；未成功的运行门仍不能借编译通过关闭。
 
 ## 新资源窗口的必填边界
 

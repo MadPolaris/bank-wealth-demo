@@ -56,6 +56,25 @@ change frozen tests, or call this HTTP/database/cross-JVM acceptance.
 See `docs/TRUTH-RUNTIME-ACCEPTANCE.md`; `npm run test:actor-verifier` exercises the
 Node worker and verifier contracts with owned temporary journals, without a JVM.
 
+## Current runtime windows
+
+`--compile-runtime-tests` is compile-only and exclusive with both execution modes.
+It adds five SHA-pinned frozen integration mains to the six generated test sources,
+then seals the actual staged sources and ordered classpath. Its successful receipt
+is consumed only by `tools/verify-truthsrc-runtime.mjs`; old build/release receipts
+cannot be relabelled. `npm run test:runtime-verifier` runs the explicit Node contracts,
+not JVM/database acceptance or whole-repository discovery.
+
+Runtime evidence and TA roots must be new and disjoint from build evidence. Fixed
+24-case crash recovery remains OS deny-all; production HTTP/database uses the
+separate `host-local-reserved-ports` policy and reserved ports. Seatbelt localhost
+also matches local interfaces/wildcard: never claim exact-IP hostile-code isolation.
+The source-pinned server/config and actual listener checks separately require IPv4
+127.0.0.1. New database containers/networks/data and credentials are owned by the
+current window; no shared services, downloads, old credentials, data deletion or
+runtime publication. Stop only recorded owner-labelled containers/current process
+groups; retain data and failed evidence. See `docs/TRUTH-RUNTIME-WINDOW-20261105.md`.
+
 ## Semantics and protected history
 
 - Preserve payment, TA, independent refund and finite SIP. Saga transactions and

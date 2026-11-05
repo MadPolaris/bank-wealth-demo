@@ -52,6 +52,9 @@ function physical(input, kind, missing = false) {
   fail('WORKER_PATH', 'A filesystem root is not a worker input');
 }
 
+// Shared admission primitives; adapters do not weaken the default actor path policy.
+export { absolute as absoluteWorkerPath, physical as physicalWorkerPath };
+
 const sameIdentity = (a, b) => a && b && a.dev === b.dev && a.ino === b.ino;
 const sameVersion = (a, b) => sameIdentity(a, b) && a.size === b.size
   && a.mtimeMs === b.mtimeMs && a.ctimeMs === b.ctimeMs && b.isFile() && b.nlink === 1;
@@ -113,6 +116,7 @@ function loadInputs() {
   physical(journalPath, 'file', true);
   physical(`${journalPath}.lock`, 'file', true);
   return { journalPath, owned, roundRoot, roundIdentity, ownedIdentity,
+    receiptSchema: 'bank.truthsrc-actor-ta-worker/v1',
     configSha256, fixtureSha256: captured.sha256, configuration: fixture.configuration };
 }
 
@@ -143,7 +147,10 @@ const reply = (message) => new Promise((resolve, reject) => {
   process.stdout.write(`${canonicalJson(message)}\n`, (error) => error ? reject(error) : resolve());
 });
 
-export async function runWorker() {
+// loadInputs is a trusted internal, synchronous admission callback, never supplied
+// by JSON/argv. It returns validated paths/identities, pinned configuration and a
+// fixed receiptSchema. Protocol, state machine and close attestation stay shared.
+export async function runConfiguredWorker(loadInputs) {
   let ta;
   let closed = false;
   // Stream write errors are propagated by reply's callback rather than an uncaught event.
@@ -194,7 +201,7 @@ export async function runWorker() {
     // Attest only after the protocol loop and all stdout callbacks succeeded.
     // In particular, a broken close-response pipe must not leave closed:true.
     checkReceiptLocation();
-    fs.writeFileSync(receiptPath, `${canonicalJson({ schemaVersion: 'bank.truthsrc-actor-ta-worker/v1',
+    fs.writeFileSync(receiptPath, `${canonicalJson({ schemaVersion: inputs.receiptSchema,
       pid: process.pid, journalPath: inputs.journalPath, ownedRoot: inputs.owned, roundRoot: inputs.roundRoot,
       configSha256: inputs.configSha256, fixtureSha256: inputs.fixtureSha256, configurationDigest, closed: true })}\n`,
     { flag: 'wx', mode: 0o600 });
@@ -206,5 +213,7 @@ export async function runWorker() {
     catch (cleanup) { process.stderr.write(`WORKER_CLEANUP: ${cleanup.message}\n`); }
   } finally { process.stdin.destroy(); }
 }
+
+export async function runWorker() { return runConfiguredWorker(loadInputs); }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) await runWorker();
