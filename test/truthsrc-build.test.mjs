@@ -6,7 +6,7 @@ import { existsSync, mkdtempSync, readFileSync, realpathSync, symlinkSync, write
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { actualBuildSourceRoot, buildTasks, command, compareBuildSources, completeGeneratedTests, generatedTestManifest, inspectGeneratedTests, isMainModule, parseArgs } from '../tools/verify-truthsrc-build.mjs';
+import { actualBuildSourceRoot, buildTasks, command, compareBuildSources, completeGeneratedTests, generatedTestManifest, inspectGeneratedTests, isMainModule, parseArgs, plannedAnchorLocations, sortedAnchorLocations } from '../tools/verify-truthsrc-build.mjs';
 
 const cli = fileURLToPath(new URL('../tools/verify-truthsrc-build.mjs', import.meta.url));
 const args = ['--project-output', '/unused/generated', '--archive', '/unused/clean.tar.gz', '--evidence', '/unused/evidence'];
@@ -237,6 +237,19 @@ process.exit(0);`);
     assert.equal(report.outputPassed, true); assert.equal(report.passed, false); assert.equal(report.processPassed, false);
   }
   t.diagnostic('Owned supervisor receipts retained at ' + root);
+});
+
+test('anchor admission preserves multiple exact spans for one knowledge key in one file', () => {
+  const first = { start: 0, end: 3, text: 'one' }, second = { start: 4, end: 7, text: 'two' };
+  const entry = { path: 'Domain.scala', knowledgeIds: ['knowledge:a', 'knowledge:b'], codeMappings: [
+    { knowledgeKey: 'knowledge:a', span: first }, { knowledgeKey: 'knowledge:a', span: second }
+  ] };
+  const planned = plannedAnchorLocations([entry]);
+  assert.deepEqual(planned.get('knowledge:a'), [{ file: entry.path, span: first }, { file: entry.path, span: second }]);
+  assert.deepEqual(planned.get('knowledge:b'), [{ file: entry.path, span: null }]);
+  assert.deepEqual(sortedAnchorLocations([...planned.get('knowledge:a')].reverse()), planned.get('knowledge:a'));
+  assert.notDeepEqual(sortedAnchorLocations([{ file: entry.path, span: first }]), planned.get('knowledge:a'));
+  assert.notDeepEqual(sortedAnchorLocations([{ file: entry.path, span: null }]), planned.get('knowledge:a'));
 });
 
 test('actual sbt source must be the candidate or its fresh owned staging copy', () => {

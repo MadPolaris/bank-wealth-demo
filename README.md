@@ -6,7 +6,7 @@
 >
 > 阅读核对日期：2026-11-06。当前开发入口已收敛为根 `truthsrc.project.json` 和 [`truth/bank-wealth/`](truth/bank-wealth/)，先宏压缩、再受控微语法降噪；旧两树已退役。代码通过本地 SQLite 知识图导出的 AST 生成，再回锚同图。原1134发行和下文旧运行位置仍是历史证据，不与当前源码混用。
 >
-> **当前操作从 [真源教程](docs/TRUTH-TUTORIAL.md) 开始。** 本地无 npm 依赖的工具可安装为 `truthsrc` CLI；银行完整生成还需要已冻结runtime供给。完整 BC 混合管线模板对齐的差距见工具仓 `MINIMAL-DELIVERY.md`，不以局部模板相等冒全量完成。
+> **当前操作从 [真源教程](docs/TRUTH-TUTORIAL.md) 开始。** 本地无 npm 依赖的工具可安装为 `truthsrc` CLI；银行完整生成还需要已冻结runtime供给。用户选定的兼容分层／生成读侧已通过四流64项与读侧47项测试，见[验收记录](docs/TRUTH-COMPATIBLE-COMPOSITION.md)。BC家族与必要兼容差异见工具仓 `TEMPLATE-PARITY.md`，不冒称原样字节对齐或集群sharding。
 
 ## 先用一分钟回答最常见的问题
 
@@ -333,7 +333,7 @@ Command → 守卫与决策 → Event → 持久化 → event application 更新
 | `execution-contract`、`effect-host-contract` | 管线执行与持久外部 effect 宿主 |
 | `artifact-contract`、`product-design` | 软件构件／部署服务合同，以及产品体验描述 |
 
-某个生成器会直接消费其中一部分，其他产品为上游依赖或其他消费面服务。当前服务生成器声明 26 种输出 kind，但不是每种输入都会生成所有种类。
+某个生成器会直接消费其中一部分，其他产品为上游依赖或其他消费面服务。当前服务生成器声明32种输出kind，但不是每种输入都会生成所有种类；完整列表以`generator.json`为准。
 
 ### 7.2 银行使用的主要生成来源
 
@@ -342,7 +342,7 @@ JS 服务生成入口是 [`scala-cqrs-play-service/generate.mjs`](../metarch-tru
 | artifact kind／构件 | 主要来源 |
 |---|---|
 | `state`、`protocol`、`command-helpers`、`rules`、`event-handler` | [`render-domain.mjs`](../metarch-truthsrc/generators/scala-cqrs-domain/render-domain.mjs) |
-| `aggregate`：持久化 actor | [`render-actor.mjs`](../metarch-truthsrc/generators/scala-cqrs-domain/render-actor.mjs) |
+| 兼容actor、application Protocol/Behaviors/Factory、本地Repository与Bootstrap | service专用 [`render-aggregate-layers.mjs`](../metarch-truthsrc/generators/scala-cqrs-play-service/render-aggregate-layers.mjs)；旧domain/application profile仍使用原renderer |
 | `value-object` | [`render-values.mjs`](../metarch-truthsrc/generators/scala-cqrs-domain/render-values.mjs) |
 | `proto`、`converter`、`serialization-adapter` | [`render-serialization.mjs`](../metarch-truthsrc/generators/scala-cqrs-domain/render-serialization.mjs)、[`render-adapters.mjs`](../metarch-truthsrc/generators/scala-cqrs-domain/render-adapters.mjs) |
 | Saga definition、invocation host、technical port、host 协议与序列化 | application 的 [`produce.mjs`](../metarch-truthsrc/generators/scala-cqrs-application/produce.mjs) 连接各 `render-host*`、`render-invocation-*` 和 `render-technical-ports` |
@@ -350,7 +350,8 @@ JS 服务生成入口是 [`scala-cqrs-play-service/generate.mjs`](../metarch-tru
 | effect host、effect 协议与序列化 | [`produce-effect.mjs`](../metarch-truthsrc/generators/scala-cqrs-application/produce-effect.mjs) 及 effect renderers |
 | `service-port`、`service-runtime`、`service-config` | [`render-service.mjs`](../metarch-truthsrc/generators/scala-cqrs-play-service/render-service.mjs) |
 | `build`、`generated-test`、`service-test` | scaffold／build renderer 与各自 verification renderer；完整登记仍看 `generator.json` |
-| 银行 JDBC 投影与表结构 | **手写** [`BankReadside.scala`](v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala)、[`BankReadsideSchema.scala`](v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala) |
+| JDBC表/事务Repository、PB回放、checkpoint和订阅生命周期 | **生成** [`render-journal-readside.mjs`](../metarch-truthsrc/generators/scala-cqrs-play-service/render-journal-readside.mjs)及其repository/domain renderers；显式`projectionStore`驱动 |
+| 银行读侧owner、索引业务选择与查询DTO | **手写端口** [`BankReadside.scala`](v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala)调用生成实现；[`BankReadsideSchema.scala`](v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala)仅保留兼容名称 |
 | 银行 endpoint 实现、页面、业务装配 | **手写** [`BankServiceEndpoints.scala`](v1/handwritten/scala/example/bankwealth/integration/BankServiceEndpoints.scala)、[`BankBrowserPages.scala`](v1/handwritten/scala/example/bankwealth/web/BankBrowserPages.scala)、[`BankServiceFactory.scala`](v1/handwritten/scala/example/bankwealth/integration/BankServiceFactory.scala) |
 
 HTTP 方法、路径、类型、端口、页面挂载等合同在 [`bank-service.formal.yaml`](truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml)。生成端产出类型化接口、Loader 和 `Router.from` 路由，不是必须生成传统 `conf/routes` 文本。具体页面 renderer 和银行 endpoint 实现仍为手写边界，不能宣传成“所有前端／读模型自动生成”。
@@ -487,7 +488,8 @@ Customer                    Operator
   → 手写身份、请求校验与 BankServiceEndpoints
   → 生成的领域 actor／Saga 与 Monarch 宿主
   → 事件 journal
-  → 手写 BankReadside（复用生成的事件 fold／codec）
+  → 生成的JDBC Projection／Repository（复用生成的事件fold／codec）
+  → 手写BankReadside业务选择与查询DTO端口
   → JDBC 读模型
   → 查询接口与页面
 ```
@@ -597,11 +599,11 @@ MANUAL 块可以保留允许的手写片段，但它不是协作锁。两个 age
 
 **冻结银行发行：**[1134 签出](v1/integration/RELEASE-SIGNOUT-1134.md)记录原 25 项有界 demo 合同完成，包含双链完整冷构建、真实 HTTP、指定跨 JVM 恢复窗、Mongo／MySQL／浏览器和安装位置复演。该事实不因旧文档仍写“未完成”而消失，也不自动覆盖之后改动的工作树。
 
-**本次 README 编写：**实际执行了当前 V1 的 validate、roundtrip、canonical 编译、服务输入检查、14 产品编译、193 文件零写 plan，以及初始化账户的知识查询和文件锚核验。还在新临时目录实跑了新工具入口的微型建树、编译、生成与回锚。没有重跑银行冷构建、数据库或浏览器，也没有声称页面当前在线。
+**前期 README 编写时点：**当时执行了V1 validate、roundtrip、canonical编译、服务输入检查、14产品编译、193文件plan及文件锚核验。后续当前源码已经完成紧凑树、同图回锚和任务108兼容迁移；最新233项计划、534主源码编译、64四流测试及47读侧测试见[验收记录](docs/TRUTH-COMPATIBLE-COMPOSITION.md)。本轮没有重跑真实数据库／浏览器，也不声称页面当前在线。
 
 请特别注意：
 
-- 根 `npm test` 是明确选择的旧预览测试，不是当前 V1 全套验收。历史提交检查曾有旧 `projections/index.json` 工具指纹新鲜度失败，不能为了绿色去重写保护产物。
+- 根 `npm test` 是当前作者／14产品保真与历史读取的显式检查，不是全应用验收；`test:history`才是旧预览路线。新的四流/读侧运行以[独立回执](docs/TRUTH-COMPATIBLE-COMPOSITION.md)为准。历史`projections/index.json`不为消红重写。
 - [`test/domain-runner.test.mjs`](test/domain-runner.test.mjs)、`qualification/` 及相关 qualifier 是暂停材料，不作为本文命令运行。
 - 真源中的 proposal、`workshopHeld:false`、输入中的 `runtimeVerified:false` 等可能记录创作阶段，不能改成 true 冒充后来运行；运行结果有独立证据。
 - 不能从文件锚、一个测试通过或页面返回成功，推导生产金融认证、任意故障自动恢复、外部真实对接或整个链路 exactly-once。
@@ -612,7 +614,7 @@ MANUAL 块可以保留允许的手写片段，但它不是协作锁。两个 age
 
 按你的问题选择入口，不必把历史报告从头读完：
 
-- **想读业务：**[`v1/tree/`](v1/tree/)，再对照 [`v1/test/scala/`](v1/test/scala/) 的实际预期。
+- **想读业务：**[`truth/bank-wealth/`](truth/bank-wealth/)，再对照 [`v1/test/scala/`](v1/test/scala/) 的实际预期。旧树按[固定历史来源](docs/TRUTH-LEGACY-BASELINE.json)读取。
 - **想读银行运行装配：**[`BankServiceFactory.scala`](v1/handwritten/scala/example/bankwealth/integration/BankServiceFactory.scala)、[`integration/CONTRACT.md`](v1/integration/CONTRACT.md)。
 - **想读服务／页面合同：**[`bank-service.formal.yaml`](truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml)、[`PAGES-CONTRACT.md`](v1/integration/PAGES-CONTRACT.md)。
 - **想读工具：**sibling [`metarch-truthsrc/SCHEMA.md`](../metarch-truthsrc/SCHEMA.md)、[`PROJECT.md`](../metarch-truthsrc/PROJECT.md)、[`bin/truthsrc.js`](../metarch-truthsrc/bin/truthsrc.js)。这些跨仓链接在完整工作区有效，单独 clone 银行不会自动带来工具仓。

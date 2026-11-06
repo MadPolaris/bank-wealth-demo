@@ -357,6 +357,80 @@ payload:
           }
         ],
         "projections": [],
+        "projectionStore": {
+          "schemaVersion": "truthsrc.journal-readside/v1",
+          "id": "BankJournalReadside",
+          "version": "bank-query-v1",
+          "tablePrefix": "bank_read",
+          "pollIntervalMillis": 2000,
+          "closeTimeoutMillis": 20000,
+          "streams": [
+            {
+              "kind": "account",
+              "aggregate": "@ref(bankwealth:aggregate#CreditBalance)",
+              "identity": "@ref(bankwealth:state-field/CreditBalance#id)",
+              "allowEmptyIdentity": false,
+              "eventIdentities": [
+                {"event":"@ref(bankwealth:event/CreditBalance#AccountInitialized)","field":"@ref(bankwealth:event-slot/CreditBalance/AccountInitialized#resource)"},
+                {"event":"@ref(bankwealth:event/CreditBalance#ReserveFundsConfirmed)","field":"@ref(bankwealth:event-slot/CreditBalance/ReserveFundsConfirmed#resource)"},
+                {"event":"@ref(bankwealth:event/CreditBalance#DeductFundsConfirmed)","field":"@ref(bankwealth:event-slot/CreditBalance/DeductFundsConfirmed#resource)"},
+                {"event":"@ref(bankwealth:event/CreditBalance#ReleaseReservedFundsConfirmed)","field":"@ref(bankwealth:event-slot/CreditBalance/ReleaseReservedFundsConfirmed#resource)"},
+                {"event":"@ref(bankwealth:event/CreditBalance#RecordIncomingCreditsConfirmed)","field":"@ref(bankwealth:event-slot/CreditBalance/RecordIncomingCreditsConfirmed#resource)"},
+                {"event":"@ref(bankwealth:event/CreditBalance#CommitIncomingCreditsConfirmed)","field":"@ref(bankwealth:event-slot/CreditBalance/CommitIncomingCreditsConfirmed#resource)"},
+                {"event":"@ref(bankwealth:event/CreditBalance#CancelIncomingCreditConfirmed)","field":"@ref(bankwealth:event-slot/CreditBalance/CancelIncomingCreditConfirmed#resource)"}
+              ]
+            },
+            {
+              "kind": "order",
+              "aggregate": "@ref(bankwealth:aggregate#FundOrder)",
+              "identity": "@ref(bankwealth:state-field/FundOrder#id)",
+              "allowEmptyIdentity": false,
+              "eventIdentities": []
+            },
+            {
+              "kind": "plan",
+              "aggregate": "@ref(bankwealth:aggregate#SipPlan)",
+              "identity": "@ref(bankwealth:state-field/SipPlan#id)",
+              "allowEmptyIdentity": true,
+              "eventIdentities": []
+            }
+          ],
+          "technicalKinds": ["payment-saga","payment-host","payment-run","refund-saga","refund-host","refund-run","ta-host","ta-run","sip-host","sip-run"],
+          "indexes": [
+            {
+              "id": "Occurrence",
+              "table": "occurrence",
+              "columns": [
+                {"name":"plan_key","type":"digest","size":null,"nullable":false},
+                {"name":"due_slot","type":"long","size":null,"nullable":false},
+                {"name":"occurrence_key","type":"digest","size":null,"nullable":false},
+                {"name":"order_key","type":"digest","size":null,"nullable":false},
+                {"name":"owner_account","type":"text","size":1024,"nullable":false},
+                {"name":"occurrence_payload","type":"bytes","size":null,"nullable":false}
+              ],
+              "key": ["plan_key","due_slot"],
+              "queries": [{"id":"by_plan","where":["plan_key","owner_account"],"orderBy":["due_slot","plan_key"]}]
+            },
+            {
+              "id": "Pending",
+              "table": "pending",
+              "columns": [
+                {"name":"operation_key","type":"digest","size":null,"nullable":false},
+                {"name":"flow","type":"text","size":32,"nullable":false},
+                {"name":"operation_id","type":"text","size":2048,"nullable":false},
+                {"name":"order_id","type":"text","size":2048,"nullable":true},
+                {"name":"plan_id","type":"text","size":2048,"nullable":true},
+                {"name":"occurrence_id","type":"text","size":2048,"nullable":true},
+                {"name":"source_pid","type":"text","size":2048,"nullable":false},
+                {"name":"phase","type":"text","size":64,"nullable":false},
+                {"name":"status","type":"text","size":64,"nullable":false},
+                {"name":"recoverable","type":"boolean","size":null,"nullable":false}
+              ],
+              "key": ["operation_key","flow"],
+              "queries": [{"id":"listing","where":[],"orderBy":["operation_id","flow","operation_key"]}]
+            }
+          ]
+        },
         "pages": {
           "schemaVersion": "truthsrc.service-pages/v1",
           "shellPath": "/bank/v1",

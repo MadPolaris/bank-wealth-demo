@@ -1,5 +1,18 @@
 # 当前真源服务的离线编译与生成单元测试
 
+## 2026-11-06 兼容分层与生成读侧
+
+用户选择任务108兼容迁移后，候选03通过534份main/11份Test编译、47测试/10Suite；
+候选04通过534份main/14份Test编译、64测试/13Suite。对应读侧14项和actor15项来源/
+隔离检查全部true，两候选229份源码/配置逐字节相同。当前教学输出233项计划同步。
+详见[实施与验收](TRUTH-COMPATIBLE-COMPOSITION.md)，前期结果仍保留其时点。
+
+新增显式`--run-readside-tests`与其余执行模式互斥：原23生成测试加五份SHA固定的旧
+读侧/鉴权/DTO/页面suite共24项，使用Test-scoped H2 2.2.224内存数据库。仍走原
+fork和OS禁网，仅明确11份源码，不挂全目录，不创建TA worker，不启动HTTP/真实数据库。
+`npm run test:readside-verifier`只测Node准入/报告合同。构建准入现完整验证同一知识在
+同一文件中的多个真实span及其字节，不再假设一文件只有一个锚。
+
 ## 2026-11-06 紧凑真源与图链候选
 
 本轮 `target/truthsrc-minimal-candidate-20261106-02` 由压缩后的当前作者树经

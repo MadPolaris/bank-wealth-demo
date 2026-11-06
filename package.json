@@ -13,6 +13,7 @@
     "test:roadmap": "node --test test/roadmap-design.test.mjs",
     "test:current": "node --test test/unified-truth.test.mjs",
     "test:build-verifier": "node --test --test-concurrency=1 test/truthsrc-build.test.mjs",
+    "test:readside-verifier": "node --test --test-concurrency=1 test/truthsrc-build.test.mjs test/truthsrc-readside-tests.test.mjs",
     "test:actor-verifier": "node --test --test-concurrency=1 test/truthsrc-build.test.mjs test/truthsrc-actor-tests.test.mjs test/truthsrc-actor-ta.test.mjs",
     "test:runtime-verifier": "node --test --test-concurrency=1 test/truthsrc-build.test.mjs test/truthsrc-actor-tests.test.mjs test/truthsrc-actor-ta.test.mjs test/truthsrc-runtime-tests.test.mjs test/truthsrc-runtime-jars.test.mjs test/truthsrc-runtime-admission.test.mjs test/truthsrc-runtime-process.test.mjs test/truthsrc-runtime-sandbox.test.mjs test/truthsrc-runtime-ta.test.mjs test/truthsrc-runtime-config.test.mjs test/truthsrc-runtime-http.test.mjs test/truthsrc-runtime-controller.test.mjs test/truthsrc-runtime-databases.test.mjs test/truthsrc-runtime-db-relay.test.mjs test/truthsrc-runtime-db-exec.test.mjs",
     "test:historical-preview": "node --test test/truth.test.mjs test/projections.test.mjs test/cash-contract.test.mjs test/mock-ta.test.mjs test/i0-design.test.mjs test/cash-next-design.test.mjs test/roadmap-design.test.mjs",

@@ -22,13 +22,22 @@ const json = file => JSON.parse(readFileSync(file, 'utf8'));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const baseline = json(join(ROOT, 'docs/TRUTH-LEGACY-BASELINE.json'));
 const current = JSON.parse(compileTree(tree));
+const beforeCompatibleStore = value => {
+  const result = structuredClone(value);
+  const artifacts = Array.isArray(result) ? result : result.artifacts;
+  const service = artifacts.find(a => a.id === 'bank-service')?.deployment.service;
+  assert.equal(service?.projectionStore?.schemaVersion, 'truthsrc.journal-readside/v1');
+  assert.equal(service.projectionStore.id, 'BankJournalReadside');
+  delete service.projectionStore;
+  return result;
+};
 
 test('one root entry names current bank source; four execution flows retain all original semantics', () => {
   assert.equal(json(project).tree, 'truth/bank-wealth');
   assert.equal(current.authoring.system.id, 'bank-wealth');
   assert.equal(current.authoring.context.id, 'bankwealth');
   for (const { family, sha256 } of baseline.executionFamilies)
-    assert.equal(hash(JSON.stringify(current[family])), sha256, family + ' execution declaration changed');
+    assert.equal(hash(JSON.stringify(family === 'artifactContracts' ? beforeCompatibleStore(current[family]) : current[family])), sha256, family + ' execution declaration changed');
   assert.deepEqual(current.pipelines.map(p => p.id), ['bank-cash-payment-v1', 'bank-independent-refund-v1', 'bank-sip-dispatch-v1', 'bank-ta-submission-v1']);
   assert.equal(validateTree(tree).hard.length, 0);
   assert.deepEqual(roundtrip(tree), { ok: true, atoms: 157 });
@@ -56,7 +65,8 @@ test('current complete request uses only current tree and named technical choice
   const config = captured.config;
   for (const doc of config.documents) assert.ok(doc.file.startsWith('bindings/implementation/'));
   assert.deepEqual(captured.compilation.result.products.map(p => ({ id: p.id, version: p.version,
-    payloadSchemaVersion: p.payloadSchemaVersion, requires: p.requires, sha256: hash(JSON.stringify(p.payload)) })), baseline.products);
+    payloadSchemaVersion: p.payloadSchemaVersion, requires: p.requires,
+    sha256: hash(JSON.stringify(p.id === 'artifact-contract' ? beforeCompatibleStore(p.payload) : p.payload)) })), baseline.products);
 });
 
 test('current narrative references resolve to declared technical ports and real execution sources', () => {
@@ -90,9 +100,9 @@ test('full current service generates, queries, updates a teaching-only copy and 
   const out = join(parent, 'generated'), input = { project: configFile, out }, flags = ['--project', configFile, '--out', out];
   const planned = await projectCli('generate-project', [...flags, '--plan']);
   assert.equal(existsSync(out), false);
-  assert.equal(planned.plan.entries.filter(e => e.kind !== 'project-evidence').length, 199);
+  assert.equal(planned.plan.entries.filter(e => e.kind !== 'project-evidence').length, 229);
   const applied = await projectCli('generate-project', flags);
-  assert.equal(applied.result.written, 203); assert.equal(statusProject(input).synchronized, true);
+  assert.equal(applied.result.written, 233); assert.equal(statusProject(input).synchronized, true);
   const first = queryProject({ ...input, knowledge: 'ReserveFunds' });
   assert.ok(first.result.some(r => r.origins.some(o => o.file.endsWith('outgoing-funds.structure.yaml'))));
   const rules = first.result.flatMap(r => r.locations).find(l => l.file.endsWith('domain/invariant/CreditBalanceRules.scala'));
@@ -110,5 +120,5 @@ test('full current service generates, queries, updates a teaching-only copy and 
   assert.ok(readFileSync(join(out, rules.file), 'utf8').includes('LEDGER_POSITIVE_TEACHING'));
   assert.equal((await projectCli('generate-project', [...flags, '--update'])).result.written, 0);
   assert.equal(readFileSync(join(tree, 'contexts/bankwealth/structures/outgoing-funds.structure.yaml'), 'utf8'), bytes);
-  t.diagnostic(JSON.stringify({ products: 14, sourceFiles: 199, noHistoricalCompleteRequest: true, runtimeVerified: false, originalSourceUnchanged: true }));
+  t.diagnostic(JSON.stringify({ products: 14, sourceFiles: 229, noHistoricalCompleteRequest: true, runtimeVerified: false, originalSourceUnchanged: true }));
 });

@@ -17,6 +17,10 @@ import {
   runtimeBuildTasks, runtimeClasspathInventory, runtimeTestManifest,
 } from './truthsrc-runtime-tests.mjs';
 import { jarManifestProbeSource, validateJarReferences, assertJarReferencesUnchanged } from './truthsrc-runtime-jars.mjs';
+import {
+  READSIDE_DEPENDENCY, READSIDE_EXECUTION_CHECKS, READSIDE_MANIFEST_FILE, READSIDE_SCOPE, READSIDE_SOURCES_MARKER,
+  combineReadsideManifest, inspectReadsideSources, readsideSourceFiles, readsideSuiteNames, readsideTestManifest,
+} from './truthsrc-readside-tests.mjs';
 
 // Deliberately independent of the historical release/cold-build drivers.
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -46,7 +50,7 @@ const usage = `Usage: node tools/verify-truthsrc-build.mjs \\
   --project-output <absolute-fresh-generated-root> \\
   --archive <absolute-clean-1134.tar.gz> --evidence <absolute-new-evidence-root> \\
   [--java-home <absolute-JDK11-home>] [--compile-generated-tests]
-  [--run-generated-tests | --run-actor-tests | --compile-runtime-tests]
+  [--run-generated-tests | --run-actor-tests | --run-readside-tests | --compile-runtime-tests]
 
 Output must be under this bank's generated/ or target/; evidence under target/.
 Parents must exist. No symlinks, path aliases, spaces, or .scratch paths.
@@ -54,7 +58,10 @@ Default: compile the service and original handwritten Scala. --compile-generated
 only compiles generated test sources. --run-generated-tests compiles and executes ONLY
 the admitted generated unit suites. --run-actor-tests additionally runs eight fixed
 business actor suites with testkit and a new, explicitly configured local TA journal.
-Both execution modes use the generated Test / test and forked unit JVM.
+--run-readside-tests instead adds five SHA-pinned frozen readside suites (24 tests)
+to the six generated source files (23 tests), with embedded in-memory H2 2.2.224 only.
+No TA workers/journals, HTTP server, real MySQL, cross-JVM or 1134 acceptance is implied.
+All execution modes use the generated Test / test and forked unit JVM with OS network denial.
 --compile-runtime-tests only compiles five fixed integration mains alongside generated
 tests and seals their classpath; it does not execute them. No HTTP, database services,
 arbitrary sbt tasks, or whole-directory historical tests are accepted.
@@ -62,6 +69,7 @@ Each attempt needs a fresh candidate and a new evidence directory. No cleanup,
 network resolution, runtime rebuild/publish, or historical acceptance runner.`;
 
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const READSIDE_HELPER_SHA256 = fileDigest(READSIDE_MANIFEST_FILE);
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const save = (file, value) => writeFileSync(file, json(value), { flag: 'wx', mode: 0o600 });
 const write = (file, text) => writeFileSync(file, text, { flag: 'wx', mode: 0o600 });
@@ -81,18 +89,19 @@ export function parseArgs(args) {
   for (let i = 0; i < args.length; i++) {
     const flag = args[i];
     assert.ok(!flags.has(flag), usage);
-    if (['--compile-generated-tests', '--run-generated-tests', '--run-actor-tests', '--compile-runtime-tests'].includes(flag)) { flags.set(flag, true); continue; }
+    if (['--compile-generated-tests', '--run-generated-tests', '--run-actor-tests', '--run-readside-tests', '--compile-runtime-tests'].includes(flag)) { flags.set(flag, true); continue; }
     assert.ok(['--project-output', '--archive', '--evidence', '--java-home'].includes(flag) &&
       args[i + 1] && !args[i + 1].startsWith('--'), usage);
     flags.set(flag, args[++i]);
   }
   for (const flag of ['--project-output', '--archive', '--evidence']) assert.ok(flags.has(flag), usage);
-  const runActors = flags.has('--run-actor-tests'), compileRuntimeTests = flags.has('--compile-runtime-tests');
-  assert.ok([runActors, flags.has('--run-generated-tests'), compileRuntimeTests].filter(Boolean).length <= 1, 'choose one explicit execution mode');
-  const runTests = runActors || flags.has('--run-generated-tests');
+  const runActors = flags.has('--run-actor-tests'), runReadside = flags.has('--run-readside-tests');
+  const compileRuntimeTests = flags.has('--compile-runtime-tests');
+  assert.ok([runActors, runReadside, flags.has('--run-generated-tests'), compileRuntimeTests].filter(Boolean).length <= 1, 'choose one explicit execution mode');
+  const runTests = runActors || runReadside || flags.has('--run-generated-tests');
   return { output: flags.get('--project-output'), archive: flags.get('--archive'),
     evidence: flags.get('--evidence'), javaHome: flags.get('--java-home') ?? DEFAULT_JAVA_HOME,
-    compileTests: runTests || compileRuntimeTests || flags.has('--compile-generated-tests'), runTests, runActors, compileRuntimeTests };
+    compileTests: runTests || compileRuntimeTests || flags.has('--compile-generated-tests'), runTests, runActors, runReadside, compileRuntimeTests };
 }
 
 export function generatedTestManifest(entries, { runTests = true } = {}) {
@@ -118,17 +127,22 @@ export function generatedTestManifest(entries, { runTests = true } = {}) {
     zeroTestSuites: suites.filter(suite => suite.tests.length === 0).map(suite => suite.name) };
 }
 
-export function buildTasks(testFiles, { compileTests = false, runTests = false, runActors = false } = {}, manifest = null, actor = null) {
+export function buildTasks(testFiles, { compileTests = false, runTests = false, runActors = false, runReadside = false } = {}, manifest = null, actor = null) {
+  assert.ok(!(runActors && runReadside), 'choose one explicit execution mode');
   const actorFiles = runActors ? manifest.suites.filter(suite => suite.sourceKind === 'frozen-business-test').map(suite => suite.file).sort() : [];
   if (runActors) {
     assert.ok(runTests && actor, 'actor execution requires explicit manifest and configuration');
     assert.deepEqual(actorFiles.map(file => basename(file)).sort(), actorSuiteNames().map(name => name.split('.').at(-1) + '.scala').sort());
   }
-  const sources = [...testFiles.map(file => 'baseDirectory.value / ' + JSON.stringify(file)), ...actorFiles.map(file => 'file(' + JSON.stringify(file) + ')')];
+  if (runReadside) assert.ok(runTests && !actor, 'readside execution requires its own manifest, without actor configuration');
+  const readsideFiles = runReadside ? readsideSourceFiles(manifest, testFiles) : [];
+  const sources = [...testFiles.map(file => 'baseDirectory.value / ' + JSON.stringify(file)),
+    ...[...actorFiles, ...readsideFiles].map(file => 'file(' + JSON.stringify(file) + ')')];
   const tasks = [
     'set Test / unmanagedSourceDirectories := Seq(baseDirectory.value / "src" / "test" / "scala")',
     'set Test / unmanagedSources := Seq(' + sources.join(', ') + ')',
     'set Test / unmanagedResourceDirectories := Seq(baseDirectory.value / "src" / "test" / "resources")',
+    ...(runReadside ? ['set libraryDependencies += ' + READSIDE_DEPENDENCY.map(value => JSON.stringify(value)).join(' % ') + ' % Test'] : []),
     ...(runActors ? ['set Test / javaOptions ++= Seq(' + [
       '-Dbank.mock-ta.node=' + actor.node, '-Dbank.mock-ta.worker=' + actor.worker, '-Dbank.mock-ta.owned-root=' + actor.ownedRoot,
     ].map(value => JSON.stringify(value)).join(', ') + ')'] : []),
@@ -138,11 +152,11 @@ export function buildTasks(testFiles, { compileTests = false, runTests = false, 
   if (runTests) {
     assert.ok(manifest?.suites?.length, 'admitted generated test manifest required');
     const names = manifest.suites.map(suite => suite.name).sort();
-    assert.deepEqual(names, [...GENERATED_SUITES.map(([name]) => name), ...(runActors ? actorSuiteNames() : [])].sort(), 'unexpected test suites');
+    assert.deepEqual(names, [...GENERATED_SUITES.map(([name]) => name), ...(runActors ? actorSuiteNames() : runReadside ? readsideSuiteNames() : [])].sort(), 'unexpected test suites');
     // Add pre-fork assertions; do not replace the generated task or its manager.
-    const actualSources = runActors ? ' val sourcePaths = (Test / sources).value.map(_.getCanonicalPath).sorted; ' +
+    const actualSources = runActors || runReadside ? ' val sourcePaths = (Test / sources).value.map(_.getCanonicalPath).sorted; ' +
       'require(sourcePaths == Seq(' + sources.map(source => '(' + source + ').getCanonicalPath').join(', ') + ').sorted, "unexpected test source closure"); ' +
-      'println("TRUTHSRC-ACTOR-SOURCES=" + sourcePaths.mkString(",")); ' : ' ';
+      'println(' + JSON.stringify(runReadside ? READSIDE_SOURCES_MARKER : 'TRUTHSRC-ACTOR-SOURCES=') + ' + sourcePaths.mkString(",")); ' : ' ';
     tasks.push('set Test / javaOptions += { val suites = (Test / definedTests).value.map(_.name).sorted; ' +
       'require(suites == Seq(' + names.map(name => JSON.stringify(name)).join(', ') + '), "unexpected test suites"); ' +
       'println(' + JSON.stringify(SUITES_MARKER) + ' + suites.mkString(","));' + actualSources + '"-Dtruthsrc.unit-admitted=true" }',
@@ -220,8 +234,8 @@ export function completeGeneratedTests(observation, receipt, checks, cancellatio
   let processPassed = false;
   try { succeeded(receipt); processPassed = true; }
   catch (error) { errors.push(error.message); }
-  const requiredChecks = [...EXECUTION_CHECKS, ...(observation.expected?.businessTests ?
-    ['actorInputsUnchanged', 'actorWorkersVerified', 'actorBoundaryEnforced', 'actualTestSourcesVerified'] : [])];
+  const requiredChecks = [...EXECUTION_CHECKS, ...(observation.expected?.readsideTests ? READSIDE_EXECUTION_CHECKS :
+    observation.expected?.businessTests ? ['actorInputsUnchanged', 'actorWorkersVerified', 'actorBoundaryEnforced', 'actualTestSourcesVerified'] : [])];
   const unverified = requiredChecks.filter(name => checks[name] !== true);
   if (unverified.length) errors.push('unverified source/boundary checks: ' + unverified.join(', '));
   if (cancellation) errors.push('cancelled: ' + cancellation);
@@ -359,6 +373,23 @@ function assertFreshOutput(output) {
   }
 }
 
+export function plannedAnchorLocations(entries) {
+  const result = new Map();
+  for (const entry of entries) {
+    const keys = new Set([...(entry.knowledgeIds ?? []), ...(entry.noteIds ?? [])]);
+    for (const key of keys) {
+      const spans = (entry.codeMappings ?? []).filter(m => m.knowledgeKey === key).map(m => m.span);
+      const locations = (spans.length ? spans : [null]).map(span => ({ file: entry.path, span }));
+      if (!result.has(key)) result.set(key, []);
+      const existing = result.get(key);
+      for (const location of locations) if (!existing.some(row => isDeepStrictEqual(row, location))) existing.push(location);
+    }
+  }
+  return result;
+}
+export const sortedAnchorLocations = locations => locations.map(row => ({ file: row.file, span: row.span ?? null }))
+  .sort((a, b) => a.file.localeCompare(b.file) || (a.span?.start ?? -1) - (b.span?.start ?? -1) || (a.span?.end ?? -1) - (b.span?.end ?? -1));
+
 // Only this fixed, local JS implementation is loaded. Never import from the
 // candidate, its ledger, an archive member, or a caller-selected generator.
 export async function admitCandidate(output, options, { afterBuild = false } = {}) {
@@ -411,7 +442,7 @@ export async function admitCandidate(output, options, { afterBuild = false } = {
   assert.equal(inputs.validation?.hard?.length, 0, 'generation validation evidence required');
   assert.equal(inputs.validation?.roundtrip?.ok, true, 'successful generation roundtrip evidence required');
   const associations = entry => [...new Set([...(entry.knowledgeIds ?? []), ...(entry.noteIds ?? [])])].sort();
-  const expectedAnchors = new Map();
+  const expectedAnchors = plannedAnchorLocations(plan.entries);
   for (const entry of plan.entries) {
     assert.ok(!entry.noLedger && !entry.merge, 'unsupported shared/merged generation entry');
     const row = rows.get(entry.path), bytes = readFileSync(join(output, entry.path));
@@ -426,15 +457,11 @@ export async function admitCandidate(output, options, { afterBuild = false } = {
     if (entry.path !== '.truthsrc/inputs.json')
       assert.ok(bytes.equals(Buffer.from(entry.content)), 'not current JS generated bytes: ' + entry.path);
     assert.deepEqual(associations(row), associations(entry));
-    for (const key of associations(entry)) {
-      if (!expectedAnchors.has(key)) expectedAnchors.set(key, []);
-      expectedAnchors.get(key).push(entry.path);
-    }
   }
   assert.deepEqual(Object.keys(anchors.anchors).sort(), [...expectedAnchors.keys()].sort(), 'anchor membership differs');
-  for (const [key, files] of expectedAnchors) {
+  for (const [key, expectedLocations] of expectedAnchors) {
     const locations = anchors.anchors[key];
-    assert.deepEqual(locations.map(loc => loc.file).sort(), files.sort(), 'anchor file associations differ');
+    assert.deepEqual(sortedAnchorLocations(locations), sortedAnchorLocations(expectedLocations), 'anchor file/span associations differ');
     for (const loc of locations) {
       assert.equal(loc.repo, output, 'copied/foreign anchor repository');
       assert.equal(loc.generator, GENERATOR);
@@ -442,6 +469,12 @@ export async function admitCandidate(output, options, { afterBuild = false } = {
       assert.equal(loc.status, 'source-verified');
       assert.equal(loc.verification.fileVerified, true);
       assert.equal(loc.fingerprint, rows.get(loc.file).ownership.fingerprint);
+      assert.equal(loc.symbol, null, 'symbol parser evidence is not part of this generated profile');
+      if (loc.span) {
+        assert.equal(loc.verification.spanVerified, true);
+        const bytes = readFileSync(join(output, loc.file));
+        assert.ok(bytes.subarray(loc.span.start, loc.span.end).equals(Buffer.from(loc.span.text)), 'anchor span does not match final source bytes');
+      }
     }
   }
   const build = readFileSync(join(output, 'build.sbt'), 'utf8');
@@ -629,7 +662,7 @@ public final class TruthsrcSandboxProbe {
 }
 `;
 
-function prepareSandbox(evidence, output, actor = null) {
+function prepareSandbox(evidence, output, actor = null, runReadside = false) {
   // Existing ancestors are checked for symlinks/aliases by safePath; subpaths use
   // canonical kernel paths, never a lexical allowlist in a replaceable JVM guard.
   for (const root of [evidence, output]) assert.equal(realpathSync(safePath(root)), root);
@@ -659,7 +692,7 @@ function prepareSandbox(evidence, output, actor = null) {
   write(join(boundary, 'probe.py'), sandboxPythonSource);
   write(join(boundary, 'TruthsrcSandboxProbe.java'), sandboxJavaSource);
   const controlFiles = [profile, join(boundary, 'probe.py'), join(boundary, 'TruthsrcSandboxProbe.java'),
-    ...(actor ? [actor.config] : [])];
+    ...(actor ? [actor.config] : []), ...(runReadside ? [READSIDE_MANIFEST_FILE] : [])];
   const controlsBefore = Object.fromEntries(controlFiles.map(file => [file, fileDigest(file)]));
   const sandbox = { executable: SANDBOX, profile, profileSha256: hash(text), subpaths, literals,
     network: 'deny network* (unconditional)', defaultFileWrites: 'deny file-write*', deviceWriteExceptions: ['/dev/null'],
@@ -793,7 +826,7 @@ export function succeeded(receipt) {
 }
 
 async function verify(options) {
-  const { output, archive, evidence, javaHome, compileTests, runTests, runActors, compileRuntimeTests } = options;
+  const { output, archive, evidence, javaHome, compileTests, runTests, runActors, runReadside, compileRuntimeTests } = options;
   assert.equal(process.platform, 'darwin', 'this captured toolchain is for Darwin, not a portable supply');
   safePath(output); safePath(archive, 'file'); safePath(evidence, 'new'); safePath(javaHome);
   assert.ok([join(ROOT, 'generated'), join(ROOT, 'target')].some(root => within(root, output) && output !== join(ROOT, 'target')),
@@ -809,16 +842,19 @@ async function verify(options) {
   mkdirSync(evidence, { mode: 0o700 }); // exclusive: no recursive parent creation or reuse
   const result = { schemaVersion: 'bank.truthsrc-build/v1', status: 'blocked', output, evidence,
     archive: { file: archive, expectedSha256: ARCHIVE_SHA }, javaHome, compileGeneratedTests: compileTests,
-    runGeneratedTests: runTests && !runActors, runActorTests: runActors, compileRuntimeTests, testsExecuted: false,
+    runGeneratedTests: runTests && !runActors && !runReadside, runActorTests: runActors, runReadsideTests: runReadside, compileRuntimeTests, testsExecuted: false,
     runtimeCompilation: { requested: !!compileRuntimeTests, passed: false },
     actorTests: { requested: runActors, passed: false },
-    generatedTests: { requested: runTests && !runActors, evidenceState: 'not-dispatched', jvmStarted: false, started: false, completed: false, passed: false },
+    readsideTests: { requested: runReadside, evidenceState: 'not-dispatched', jvmStarted: false, started: false, completed: false, passed: false },
+    generatedTests: { requested: runTests && !runActors && !runReadside, evidenceState: 'not-dispatched', jvmStarted: false, started: false, completed: false, passed: false },
     servicesStarted: false, runtimeRebuilt: false, runtimePublished: false,
     release1134Resigned: false, runtimeRetryBackoffDeadline: 'OPEN', phases: {}, checks: {}, errors: [],
     scope: compileRuntimeTests ? 'current JS bank service with five fixed runtime mains compiled; source-bound classpath only, no service/test execution' :
       runActors ? 'current JS bank service: fixed four-flow actor regression plus generated units; testkit and explicitly frozen TA fixture only; not HTTP, databases, multi-JVM recovery or 1134 acceptance' :
+      runReadside ? 'current JS bank service: ' + READSIDE_SCOPE :
       'current JS-generated bank service plus original handwritten Scala; optional generated-only unit compilation/execution; not four-flow, HTTP, database, multi-JVM recovery or 1134 acceptance' };
   let admitted, supplyBefore, sandbox, cachesBefore, verifierBefore, actor, executionManifest, runtimeManifest, runtimeBefore, runtimeObservation;
+  let readsideManifest, readsideBefore;
   let testObservation = { requested: runTests, evidenceState: 'not-dispatched', jvmStarted: false, started: false, completed: false, passed: false, errors: [] };
   const phases = result.phases;
   try {
@@ -835,7 +871,15 @@ async function verify(options) {
       save(join(evidence, 'runtime-inputs-before.json'), runtimeBefore);
     }
     if (runActors) actor = await prepareActors(evidence, admitted.testManifest);
-    executionManifest = actor?.manifest ?? admitted.testManifest;
+    if (runReadside) {
+      readsideManifest = readsideTestManifest();
+      readsideBefore = snapshotFiles([...readsideManifest.suites.map(suite => suite.file), READSIDE_MANIFEST_FILE]);
+      assert.equal(readsideBefore[READSIDE_MANIFEST_FILE].sha256, READSIDE_HELPER_SHA256, 'readside helper changed since loading');
+      for (const suite of readsideManifest.suites) assert.equal(suite.sha256, readsideBefore[suite.file].sha256, 'readside source changed during capture');
+      save(join(evidence, 'readside-sources-before.json'), readsideBefore);
+    }
+    executionManifest = runReadside ? combineReadsideManifest(admitted.testManifest, readsideManifest) : actor?.manifest ?? admitted.testManifest;
+    testObservation.expected = executionManifest;
     notCancelled();
     save(join(evidence, 'sources-before.json'), { output: admitted.before, handwritten: admitted.handwritten, localRuntime: admitted.runtime });
     result.archive.sha256 = await archiveDigest(archive);
@@ -856,8 +900,9 @@ async function verify(options) {
       initiallyEmpty, compilerBridgePrefill: false, inheritedEnvironment: false, env, verifier: verifierBefore,
       testFiles: compileTests ? admitted.testFiles : [], testManifest: runTests ? executionManifest : null,
       runtimeManifest: runtimeManifest ?? null,
+      ...(runReadside ? { readsideManifest, readsideInputs: readsideBefore } : {}),
       actor: actor ? { ownedRoot: actor.ownedRoot, fixtureSha256: actor.fixtureSha256, configSha256: actor.configSha256 } : null });
-    sandbox = prepareSandbox(evidence, output, actor);
+    sandbox = prepareSandbox(evidence, output, actor, runReadside);
     await probeSandbox(sandbox, java, javac, output, evidence, env, phases);
     result.checks.osSandboxEnforced = true;
     if (actor) {
@@ -902,9 +947,10 @@ async function verify(options) {
       : buildTasks(admitted.testFiles, options, executionManifest, actor);
     save(join(evidence, 'build-plan.json'), { javaOptions, tasks, env: buildEnv,
       sandbox: { profile: sandbox.profile, sha256: sandbox.profileSha256, subpaths: sandbox.subpaths, literals: sandbox.literals },
-      allowedAppArtifactDirectories: ARTIFACT_DIRS, historicalTestSourcesAppended: !!actor || !!runtimeManifest,
+      allowedAppArtifactDirectories: ARTIFACT_DIRS, historicalTestSourcesAppended: !!actor || !!runtimeManifest || !!readsideManifest,
       explicitFrozenRuntimeSources: runtimeManifest?.sources ?? [],
       explicitFrozenActorSources: actor ? actor.manifest.suites.filter(s => s.sourceKind === 'frozen-business-test').map(s => s.file) : [],
+      ...(runReadside ? { explicitFrozenReadsideSources: readsideSourceFiles(executionManifest, admitted.testFiles) } : {}),
       testExecutionSupported: true, testExecutionRequested: runTests, testManifest: runTests ? executionManifest : null });
     checkSandbox(sandbox);
     assert.deepEqual(inventory(supply), supplyBefore, 'supply changed before build');
@@ -914,6 +960,10 @@ async function verify(options) {
     assert.deepEqual(inventory(RUNTIME), admitted.runtime, 'local runtime changed before build');
     if (actor) assert.deepEqual(snapshotFiles(Object.keys(actor.before)), actor.before, 'actor inputs changed before build');
     if (runtimeBefore) assert.deepEqual(snapshotFiles(Object.keys(runtimeBefore)), runtimeBefore, 'runtime sources changed before build');
+    if (readsideBefore) {
+      assert.deepEqual(snapshotFiles(Object.keys(readsideBefore)), readsideBefore, 'readside tests/helper changed before build');
+      assert.deepEqual(readsideTestManifest(), readsideManifest, 'readside source pins changed before build');
+    }
     notCancelled();
     // Cooperative output claim within the only allowed app-write territory.
     // Never remove another invocation's claim or clean/reuse old build outputs.
@@ -950,6 +1000,10 @@ async function verify(options) {
       assert.equal(sourceMarkers.length, 1, 'one actual Test sources marker required');
       const expected = [...admitted.testFiles.map(file => join(actualRoot, file)), ...actor.manifest.suites.filter(s => s.sourceKind === 'frozen-business-test').map(s => s.file)].sort();
       assert.deepEqual(sourceMarkers[0][1].split(',').sort(), expected, 'actual compiled Test sources differ');
+      result.checks.actualTestSourcesVerified = true;
+    }
+    if (runReadside) {
+      testObservation.sourceClosure = inspectReadsideSources(stdout.toString('utf8'), actualRoot, admitted.testFiles, executionManifest);
       result.checks.actualTestSourcesVerified = true;
     }
     if (runtimeManifest) {
@@ -1012,6 +1066,18 @@ async function verify(options) {
       try { save(join(evidence, 'actor-journals-after.json'), inventory(actor.ownedRoot)); }
       catch (error) { result.errors.push(error.message); }
     }
+    if (readsideBefore) {
+      try {
+        const after = snapshotFiles(Object.keys(readsideBefore));
+        save(join(evidence, 'readside-sources-after.json'), after);
+        assert.deepEqual(after, readsideBefore, 'readside test/helper inputs changed');
+        result.checks.readsideInputsUnchanged = true;
+      } catch (error) { result.checks.readsideInputsUnchanged = false; result.errors.push(error.message); }
+      try {
+        assert.deepEqual(readsideTestManifest(), readsideManifest, 'frozen readside source pins changed before sealing');
+        result.checks.readsideSourcesPinned = true;
+      } catch (error) { result.checks.readsideSourcesPinned = false; result.errors.push(error.message); }
+    }
     if (runtimeBefore) {
       try {
         const after = snapshotFiles(Object.keys(runtimeBefore));
@@ -1046,11 +1112,11 @@ async function verify(options) {
     result.cancelled = cancelled;
     if (cancelled) result.errors.push('cancelled: ' + cancelled);
     if (runTests) {
-      const key = runActors ? 'actorTests' : 'generatedTests', check = key + 'Passed';
+      const key = runActors ? 'actorTests' : runReadside ? 'readsideTests' : 'generatedTests', check = key + 'Passed';
       result[key] = completeGeneratedTests(testObservation, phases.build, result.checks, cancelled, result.errors);
       result.checks[check] = result[key].passed;
       if (!result[key].passed) result.errors.push('tests not verified: ' + result[key].errors.join('; '));
-      try { save(join(evidence, runActors ? 'actor-tests.json' : 'generated-tests.json'), { ...result[key], stdoutSha256: phases.build?.stdoutSha256 ?? null }); }
+      try { save(join(evidence, runActors ? 'actor-tests.json' : runReadside ? 'readside-tests.json' : 'generated-tests.json'), { ...result[key], stdoutSha256: phases.build?.stdoutSha256 ?? null }); }
       catch (error) { result[key].passed = false; result.checks[check] = false; result.errors.push(error.message); }
     }
     if (compileRuntimeTests) {
@@ -1062,12 +1128,13 @@ async function verify(options) {
       catch (error) { result.runtimeCompilation.passed = false; result.checks.runtimeCompilationPassed = false; result.errors.push(error.message); }
       if (!result.runtimeCompilation.passed) result.errors.push('runtime compilation was not source-bound');
     }
+    const executionPassed = runReadside ? result.readsideTests.passed : (!runTests || result[runActors ? 'actorTests' : 'generatedTests'].passed);
     result.status = result.errors.length === 0 && result.checks.osSandboxEnforced && phases.build?.code === 0 &&
-      (!runTests || result[runActors ? 'actorTests' : 'generatedTests'].passed) ? 'passed' : 'blocked';
+      executionPassed ? 'passed' : 'blocked';
     save(join(evidence, 'result.json'), result);
   }
   console.log(json({ status: result.status, evidence, receipt: join(evidence, 'result.json'), testsExecuted: result.testsExecuted,
-    generatedTestsPassed: result.generatedTests.passed, actorTestsPassed: result.actorTests.passed }));
+    generatedTestsPassed: result.generatedTests.passed, actorTestsPassed: result.actorTests.passed, readsideTestsPassed: result.readsideTests.passed }));
   if (result.status !== 'passed') process.exitCode = cancelled === 'SIGINT' ? 130 : cancelled === 'SIGTERM' ? 143 : 2;
 }
 

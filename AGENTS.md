@@ -56,6 +56,23 @@ change frozen tests, or call this HTTP/database/cross-JVM acceptance.
 See `docs/TRUTH-RUNTIME-ACCEPTANCE.md`; `npm run test:actor-verifier` exercises the
 Node worker and verifier contracts with owned temporary journals, without a JVM.
 
+## Compatible composition acceptance (2026-11-06)
+
+The user approved task108 compatible migration: generated local repositories and
+JDBC readside infrastructure are now consumed through three adjusted handwritten
+wiring files (`BankRuntime`, `BankReadside`, `BankReadsideSchema`). Other application
+behavior, public carriers/API, PB, PID, frozen tests/runtime and historical release
+remain protected. See `docs/TRUTH-COMPATIBLE-COMPOSITION.md`; this is not permission
+for arbitrary later handwritten rewrites.
+
+`--run-readside-tests` is an explicit isolated verifier mode, mutually exclusive
+with actor/unit/runtime modes. It appends exactly five SHA-pinned frozen suites
+(24 tests) to the six generated source files (23 tests), using embedded memory H2
+2.2.224 and existing testkit/network denial. It starts no HTTP server, TA worker or
+external database. `npm run test:readside-verifier` runs only the Node contracts.
+Actual readside47/actor64 successful receipts belong to separate fresh candidates;
+never relabel old evidence or change fixed test expectations to accommodate code.
+
 ## Current runtime windows
 
 `--compile-runtime-tests` is compile-only and exclusive with both execution modes.

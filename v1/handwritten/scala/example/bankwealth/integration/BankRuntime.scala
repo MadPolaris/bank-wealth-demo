@@ -30,9 +30,16 @@ final class BankRuntime(
   require(journal.namespace == namespace && reconcileAuthorizer != null && taBindings != null)
   private val actors = mutable.ArrayBuffer.empty[ActorRef[_]]
   private val activePersistenceIds = mutable.Set.empty[String]
-  private val accounts = mutable.Map.empty[AccountId, BankActorHandle[CreditBalanceAggregate.Request]]
-  private val orders = mutable.Map.empty[FundOrderId, BankActorHandle[FundOrderAggregate.Request]]
-  private val plans = mutable.Map.empty[PlanId, BankActorHandle[SipPlanAggregate.Request]]
+  private val accounts = new example.bankwealth.application.aggregates.CreditBalanceRepository[AccountId](ids.account,
+    (id, pid) => example.bankwealth.infrastructure.bootstrap.CreditBalanceBootstrap.create(pid, CreditBalanceState.empty.copy(id = id), BankBalanceComputations),
+    (pid, behavior) => spawn(pid, behavior).ref)
+  private val orders = new example.bankwealth.application.aggregates.FundOrderRepository[FundOrderId](ids.order,
+    (id, pid) => example.bankwealth.infrastructure.bootstrap.FundOrderBootstrap.create(pid, FundOrderState.empty.copy(id = id), StableOrderIdentity,
+      new FundOrderAggregate.ExternalAuthority { def authorize(producer: String, authorization: String, identity: Vector[String]): Boolean = false }),
+    (pid, behavior) => spawn(pid, behavior).ref)
+  private val plans = new example.bankwealth.application.aggregates.SipPlanRepository[PlanId](ids.plan,
+    (id, pid) => example.bankwealth.infrastructure.bootstrap.SipPlanBootstrap.create(pid, SipPlanState.empty.copy(id = id), StableSipIdentity),
+    (pid, behavior) => spawn(pid, behavior).ref)
   private val cashRuns = mutable.Map.empty[OperationId, Future[BankCashRuntime]]
   private val refundRuns = mutable.Map.empty[OperationId, Future[BankRefundRuntime]]
   private val taRuns = mutable.Map.empty[TaRequestId, Future[BankTaRuntime]]
@@ -49,16 +56,18 @@ final class BankRuntime(
   }
   def account(id: AccountId): Future[BankActorHandle[CreditBalanceAggregate.Request]] = synchronized {
     require(!closed)
-    Future.successful(accounts.getOrElseUpdate(id, spawn(ids.account(id), CreditBalanceAggregate(ids.account(id), CreditBalanceState.empty.copy(id = id), BankBalanceComputations))))
+    val handle = accounts.get(id)
+    Future.successful(BankActorHandle(handle.persistenceId, handle.ref))
   }
   def order(id: FundOrderId): Future[BankActorHandle[FundOrderAggregate.Request]] = synchronized {
     require(!closed)
-    Future.successful(orders.getOrElseUpdate(id, spawn(ids.order(id), FundOrderAggregate(ids.order(id), FundOrderState.empty.copy(id = id), StableOrderIdentity,
-      new FundOrderAggregate.ExternalAuthority { def authorize(producer: String, authorization: String, identity: Vector[String]): Boolean = false }))))
+    val handle = orders.get(id)
+    Future.successful(BankActorHandle(handle.persistenceId, handle.ref))
   }
   def plan(id: PlanId): Future[BankActorHandle[SipPlanAggregate.Request]] = synchronized {
     require(!closed)
-    Future.successful(plans.getOrElseUpdate(id, spawn(ids.plan(id), SipPlanAggregate(ids.plan(id), SipPlanState.empty.copy(id = id), StableSipIdentity))))
+    val handle = plans.get(id)
+    Future.successful(BankActorHandle(handle.persistenceId, handle.ref))
   }
   private def cached[K, V](map: mutable.Map[K, Future[V]], key: K, graphPid: String)(create: => Future[V]): Future[V] = synchronized {
     require(!closed)
@@ -154,6 +163,9 @@ final class BankRuntime(
   def close(): Unit = synchronized {
     if (!closed) {
       closed = true
+      accounts.close()
+      orders.close()
+      plans.close()
       val termination = actors.reverseIterator.map(ref => akka.pattern.gracefulStop(ref.toClassic, 10.seconds, akka.actor.PoisonPill)).toVector
       scala.concurrent.Await.result(Future.sequence(termination), 15.seconds)
       actors.clear()

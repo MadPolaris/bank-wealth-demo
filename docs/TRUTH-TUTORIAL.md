@@ -1,14 +1,18 @@
 # 银行财富：从真源到代码到回锚
 
-2026-11-06实施验收摘要见 [TRUTH-COMPACT-GRAPH-ACCEPTANCE.json](TRUTH-COMPACT-GRAPH-ACCEPTANCE.json)。
-该记录明确区分已完成的紧凑真源/图回锚闭环与尚未完成的全量BC模板迁移。
+2026-11-06当前兼容分层与生成读侧验收见 [实施记录](TRUTH-COMPATIBLE-COMPOSITION.md)：
+534份main源码编译，四流64测试和读侧47测试分别通过，教学输出233项计划同步。
+前一阶段摘要 [TRUTH-COMPACT-GRAPH-ACCEPTANCE.json](TRUTH-COMPACT-GRAPH-ACCEPTANCE.json)
+保留其当时模板边界未裁定的历史状态，不被回写成新验收。
 
 ## 当前项目与前置
 
 当前入口只有根 `truthsrc.project.json`。作者树为
 `truth/bank-wealth/`，上下文 `bankwealth`。157个YAML使用显式结构共享与受控微语法；
 旧 `tree/`、`v1/tree/`已移除，历史读取使用固定Git revision，不再双写。
-`*-376` 请求仅属历史复演。完整BC读侧/装配模板尚未全部迁移，见
+`*-376` 请求仅属历史复演。用户已选择兼容迁移：生成Entity/Behaviors/Factory/
+Bootstrap、本地Actor仓储及JDBC投影/DDL真实被消费；原公开载体、PB和PID不变。
+本地仓储不是集群sharding，读侧业务选择仍为显式手写端口，见
 [模板对照](../../metarch-truthsrc/TEMPLATE-PARITY.md)。
 
 本教程使用相邻 `metarch-truthsrc` 源码和 Node ≥22.5。完整服务生成额外
@@ -29,7 +33,9 @@ node tools/truthsrc-project.mjs generate --out "$PWD/generated/current"
 Saga副本，由公共assembly组装。配置中的runtime仓库和外部源路径相对
 项目解析。`prepare` 只提取六个已核SHA的JAR/POM，未编译/发布runtime。
 Scala构建/服务运行另需JDK、sbt及依赖/存储，不能把生成当作运行认证。
-本轮新候选另外通过505份应用Scala和14份测试源码编译，64测试/13Suite全部成功，
+同日兼容迁移后的新候选还通过534份main/14份Test源码编译及原64项四流/生成测试；
+独立读侧窗口通过534份main/11份Test编译及47项测试，见[兼容迁移记录](TRUTH-COMPATIBLE-COMPOSITION.md)。
+前一紧凑树候选通过505份应用Scala和14份测试源码编译，64测试/13Suite全部成功，
 见 [构建记录](TRUTH-BUILD.md#2026-11-06-紧凑真源与图链候选)。下面关于499源码、runtime冷02、
 database11的段落是2026-11-05历史结果，不代表本轮又启动了这些窗口。
 本轮前已在独立空缓存、仅本地供给和OS禁止网络的环境中通过499应用Scala源
@@ -55,7 +61,8 @@ GET前后journal不变，21鉴权拒绝和5MySQL负例通过。它不是重新�
    演进余额/预留，不在命令处理器直接改状态。
 4. 公共编译器派生decision/dependencies/folds，完整快照进入项目SQLite；
    从图导出已验证AST，再由唯一apply写入代码、ledger及最终字节锚，锚回到同图。
-   服务生成把规则核心放在`domain/invariant/`，旧入口保留兼容，不改冻结wire。
+   服务生成把规则核心放在`domain/invariant/`，事件fold放在`domain/entities/behaviors/`。
+   旧入口保留兼容，`BankRuntime`真实使用生成Repository/Bootstrap；不改冻结wire。
 
 以上相对文件位于 `truth/bank-wealth/contexts/bankwealth/`。
 
@@ -92,7 +99,8 @@ BANK_TRUTHSRC_INTEGRATION=1 node --test --test-concurrency=1 test/unified-truth.
 
 该测试在2026-11-06对紧凑树与图/AST链实跑 **6/6通过**，创建并清理自己的临时项目，
 不启动旧runner或服务：先生成、双向查询，再改变一条错误码、观察过期、受控update，
-最后重复生成零源码写入。正式当前树与冻结手写实现保持不变。
+最后重复生成零源码写入。测试不改正式当前树或手写实现；实际兼容迁移由用户另行批准，
+仅调整3份手写接线，冻结业务测试及runtime保持不变。
 
 实际开发使用 `generate ... --update --plan` 后 `generate ... --update`。
 更新仅接收同owner/生成器/类别且匹配成功基线的现有文件；冲突拒绝，不
@@ -122,6 +130,19 @@ BANK_TRUTHSRC_INTEGRATION=1 node --test --test-concurrency=1 test/unified-truth.
 `entryOwnership` 用实际四个pipeline名称，旧错名保留在原历史字节中。
 十三类知识覆盖及不适用/历史项见 [TRUTH-MIGRATION.md](TRUTH-MIGRATION.md)。
 全五层设计仍未成为必填；四份product-design保持proposal/null审批。
+
+## 生成读侧与显式手写端口
+
+`formal-products/artifact-contract/bank-service.formal.yaml`的`projectionStore`是技术
+执行声明，选择原PB状态回放、JDBC表/索引、查询键/排序和生命周期参数。生成文件位于
+`infrastructure/projection/BankJournalReadside{Schema,Repository,Projection,Domain}.scala`，
+DDL位于`conf/sql/BankJournalReadside.sql`。
+
+`BankReadside`仍负责银行特定owner/admission、pending选择、DTO与跨PID读时连接，
+但不再自己实现SQL、事务、checkpoint或订阅。这是显式端口分工，不是六份说明性
+read-model自动生成全部业务SQL。正式Factory无需换类名，其原构造入口现在使用
+新的生成读侧。`--run-readside-tests`在新候选中执行固定H2/testkit测试，详见
+[兼容迁移记录](TRUTH-COMPATIBLE-COMPOSITION.md)；它不启动数据库容器或HTTP服务。
 
 ## Agent、自定义生成器与历史复演
 

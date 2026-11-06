@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "bank.compatible-composition-acceptance/v1",
+  "date": "2026-11-06",
+  "status": "passed-compatible-scope",
+  "decision": "task108 user-selected compatible migration; preserve public API/carriers/PB/PID/financial behavior/frozen runtime, permit necessary handwritten wiring",
+  "baseline": {
+    "tool": "d1c1c8b5a83f85b1982a231f68316ced4d102de5",
+    "bank": "21dc6c60d75a5b87a576986539c283b4cdbc87c6",
+    "bcReadOnlyReference": "13c151b8e5e9a707b23a5e678229b5d8b9219e8c"
+  },
+  "author": { "yamlFiles": 157, "bytes": 594713, "physicalLines": 13921, "roundtrip": "passed" },
+  "products": {
+    "count": 14,
+    "unchangedProducts": 13,
+    "changedProduct": "artifact-contract",
+    "onlyAddedSlot": "bank-service.deployment.service.projectionStore",
+    "unchangedAfterExcludingExactlyAddedSlot": true,
+    "financialSemanticsPreserved": true
+  },
+  "implementation": {
+    "actualEntityAndEventFoldCore": true,
+    "actualApplicationBehaviorsAndBootstrap": true,
+    "actualLocalActorRepositoryConsumption": true,
+    "actualJdbcSchemaRepositoryProjectionConsumption": true,
+    "preservedPublicProtocolValuesProtobufAndSerializationBytes": true,
+    "authorizedHandwrittenChanges": [
+      "v1/handwritten/scala/example/bankwealth/integration/BankRuntime.scala",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+      "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala"
+    ],
+    "otherHandwrittenFilesUnchanged": 32,
+    "frozenBusinessTestsUnchanged": true,
+    "frozenRuntimeUnchanged": true
+  },
+  "actor": {
+    "candidate": "target/truthsrc-compatible-candidate-20261106-04",
+    "receipt": "target/truthsrc-compatible-actor-20261106-01/result.json",
+    "mainScalaSources": 534,
+    "testScalaSources": 14,
+    "tests": 64,
+    "businessTests": 41,
+    "generatedTests": 23,
+    "suites": 13,
+    "checksPassed": 15,
+    "sourceBound": true,
+    "status": "passed"
+  },
+  "readside": {
+    "candidate": "target/truthsrc-compatible-candidate-20261106-03",
+    "receipt": "target/truthsrc-compatible-readside-20261106-03/result.json",
+    "mainScalaSources": 534,
+    "testScalaSources": 11,
+    "tests": 47,
+    "frozenReadsideTests": 24,
+    "generatedTests": 23,
+    "suites": 10,
+    "checksPassed": 14,
+    "sourceBound": true,
+    "storage": "isolated in-memory H2 MySQL mode plus persistence testkit",
+    "status": "passed"
+  },
+  "nodeTests": {
+    "unification": { "passed": 400, "skipped": 1, "failed": 0 },
+    "finalSelectedMainline": { "passed": 139, "skipped": 0, "failed": 0 },
+    "buildAndReadsideVerifier": { "passed": 55, "skipped": 0, "failed": 0 },
+    "bankFullLoop": { "passed": 6, "skipped": 0, "failed": 0 },
+    "currentBankAdaptation": { "passed": 1, "skipped": 0, "failed": 0 },
+    "finalBankCurrent": { "passed": 8, "skipped": 1, "failed": 0 },
+    "note": "Suites overlap; counts must not be summed as unique coverage. Actor and readside runs share the same 23 generated tests."
+  },
+  "currentOutput": {
+    "path": "generated/current",
+    "plannedFiles": 233,
+    "sourceAndConfigFiles": 229,
+    "evidenceFiles": 4,
+    "updateWrites": 44,
+    "newFiles": 30,
+    "changedSourceFiles": 10,
+    "changedEvidenceFiles": 4,
+    "unchangedFiles": 189,
+    "repeatWrites": 0,
+    "retainedFiles": 0,
+    "synchronized": true,
+    "bytesEqualBothTestedCandidates": true,
+    "foldCode": "app/example/bankwealth/domain/entities/behaviors/CreditBalanceEventHandler.scala:14",
+    "reversePrecision": "span"
+  },
+  "installation": {
+    "package": "madpolaris-truthsrc-0.5.0.tgz",
+    "offlineLocalTarball": true,
+    "independentPrefixAndProject": true,
+    "initGenerateAndSynchronizedStatusPassed": true,
+    "newReadsideModulesAndSchemaIncluded": true,
+    "registryPublication": false
+  },
+  "compatibilityLimits": [
+    "local ActorRef repository, not cluster sharding",
+    "existing JVM carriers and PB manifests retained through compatible type/constructor entrypoints",
+    "journal state PB plus relational indexes, not inferred flat SQL from descriptive read-models",
+    "bank ownership, index selection, DTO assembly and cross-PID query joins remain explicit application ports",
+    "BC final-writer family comparison and verified compatibility, not byte-identical full BC bank generation"
+  ],
+  "remainingIndependentDebts": [
+    "runtime retry/backoff/deadline remains OPEN",
+    "information-density alternative/context pack/type dequoting remain deferred"
+  ],
+  "notPerformed": [
+    "runtime publication or rebuild",
+    "HTTP server, real database container, browser or cross-JVM reacceptance",
+    "1134 re-signing or old journal/data migration",
+    "BC source edits or shared generated app writes",
+    "Git commit/push",
+    "inline knowledge annotations or Agent hooks"
+  ],
+  "evidence": [
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/unification-final.log", "bytes": 91010, "sha256": "860d1c66fd091e9f50a8e982fb299dd7a33c15649e3abebefb39525060f7864c" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/bank-current-final.log", "bytes": 2549, "sha256": "66ae3692324aea6ad16b585022bc90907d7574959f7c4d8a9afeece17f788555" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/installed-status.json", "bytes": 6242, "sha256": "e7b277c3850d06f068fcc8a387f35aa59dc4a0d8a49c679090ab47b3dafbbda1" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/unification.log", "bytes": 91023, "sha256": "7d52b03e69ab75ec39a1086efee2083454dd1ca02b80ed6d441e12f0a2a9162a" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/mainline-final-tests.log", "bytes": 27628, "sha256": "54f4193086b7eb0b76930d8908ce57b88ab86bd182ecc06b8af70e2047206c88" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/verifier-multispan-tests.log", "bytes": 11197, "sha256": "456a26cf63a1a89cd99c62fe5e777770ecda0d17291b22d358a47f1a37b21b0a" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/bank-full-loop.log", "bytes": 1963, "sha256": "44507ead6b8ed8cafade6edaf3ec64f35f18da01741dc49898c8030d14d892a0" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/current-bank-adaptation.log", "bytes": 550, "sha256": "b4d0a70fc274e1605c400c7bb66ae5cb083329e93f5c7d99e38e4967cc7a55d4" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/compatible-source-check.json", "bytes": 90362, "sha256": "ee971254cd314cfd0f7dc0e34e4a4b61fda74b91661ab994072b4c23b3c3d747" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/current-final-status.json", "bytes": 82888, "sha256": "cdf54cf62305705713fe97d2075997b2a2a166d764c7d3ef8d9f4109fb3a7f96" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/current-final-queries.json", "bytes": 332917, "sha256": "940f61f1d6fb155faa1b7282d1c0f89133176235009a642adab426f8baf4dcce" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/current-update-result.json", "bytes": 200423, "sha256": "9800a476904b10ced6ed92f90df04d0298f89ad7de8bad2424d4d01b04a4ab03" },
+    { "file": "/private/tmp/truthsrc-mainline-compat.7zDtHQ/current-repeat-result.json", "bytes": 203007, "sha256": "61757b3e46b9c5a5e64105a9ff56fa63c0bcee7fced5ccff796d7ed49a4a7ffa" },
+    { "file": "target/truthsrc-compatible-readside-20261106-03/result.json", "bytes": 34148, "sha256": "52a3ecc192a29b5a39b361b2aa2d79f37a489735c01abc60fd8cb67f43d23ef7" },
+    { "file": "target/truthsrc-compatible-actor-20261106-01/result.json", "bytes": 38287, "sha256": "47a3d337a7008cd7f770298acd1702ef1d9db3d4ca8302f676b5e32568b166f5" }
+  ]
+}
