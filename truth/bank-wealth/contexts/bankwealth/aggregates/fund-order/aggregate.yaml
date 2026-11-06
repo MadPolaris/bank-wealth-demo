@@ -10,469 +10,99 @@ payload:
   {
     "name": "FundOrder",
     "entity": "FundOrderEntity",
-    "identifier": {
-      "name": "id",
-      "dataType": "FundOrderId",
-      "origin": "BUSINESS_INPUT"
-    },
+    "identifier": "id: FundOrderId @BUSINESS_INPUT",
     "stateFields": [
-      {
-        "name": "id",
-        "dataType": "FundOrderId",
-        "default": ""
-      },
-      {
-        "name": "status",
-        "dataType": "String",
-        "default": "new"
-      },
-      {
-        "name": "operationId",
-        "dataType": "OperationId",
-        "default": ""
-      },
-      {
-        "name": "investorAccountId",
-        "dataType": "AccountId",
-        "default": ""
-      },
-      {
-        "name": "fundCollectionAccountId",
-        "dataType": "AccountId",
-        "default": ""
-      },
-      {
-        "name": "fundCode",
-        "dataType": "String",
-        "default": ""
-      },
-      {
-        "name": "amount",
-        "dataType": "Money",
-        "default": {
-          "amount": "0.00",
-          "currency": "CNY"
-        }
-      },
-      {
-        "name": "reservedSubscriptions",
-        "dataType": "Map[TxId, Money]",
-        "default": []
-      },
-      {
-        "name": "committedSubscriptions",
-        "dataType": "Map[TxId, Money]",
-        "default": []
-      },
-      {
-        "name": "compensatedSubscriptions",
-        "dataType": "Map[TxId, Money]",
-        "default": []
-      },
-      {
-        "name": "selectedPaymentTxId",
-        "dataType": "TxId",
-        "default": ""
-      },
-      {
-        "name": "paymentOutcome",
-        "dataType": "String",
-        "default": ""
-      },
-      {
-        "name": "cashPaymentResults",
-        "dataType": "Map[TxId, String]",
-        "default": []
-      },
-      {
-        "name": "cashPaymentFinalResults",
-        "dataType": "Map[TxId, String]",
-        "default": []
-      },
-      {
-        "name": "taRequestId",
-        "dataType": "TaRequestId",
-        "default": ""
-      },
-      {
-        "name": "taReference",
-        "dataType": "String",
-        "default": ""
-      },
-      {
-        "name": "taStatus",
-        "dataType": "String",
-        "default": ""
-      },
-      {
-        "name": "taReceipts",
-        "dataType": "Map[String, String]",
-        "default": []
-      },
-      {
-        "name": "taReceiptOutcomes",
-        "dataType": "Map[String, String]",
-        "default": []
-      },
-      {
-        "name": "taConfirmedShares",
-        "dataType": "FundShare",
-        "default": {
-          "fundCode": "",
-          "shares": "",
-          "nav": ""
-        }
-      },
-      {
-        "name": "taRejectionReason",
-        "dataType": "String",
-        "default": ""
-      },
-      {
-        "name": "refundOperationId",
-        "dataType": "OperationId",
-        "default": ""
-      },
-      {
-        "name": "refundOutcome",
-        "dataType": "String",
-        "default": ""
-      },
-      {
-        "name": "refundResultReceipts",
-        "dataType": "Map[String, String]",
-        "default": []
-      },
-      {
-        "name": "refundFinalResults",
-        "dataType": "Map[TxId, String]",
-        "default": []
-      },
-      {
-        "name": "taObservedReceipts",
-        "dataType": "Map[String, String]",
-        "default": []
-      },
-      {
-        "name": "paymentObservedResults",
-        "dataType": "Map[TxId, String]",
-        "default": []
-      },
-      {
-        "name": "refundObservedResults",
-        "dataType": "Map[TxId, String]",
-        "default": []
-      },
-      {
-        "name": "cashRequestSource",
-        "dataType": "Option[BankCashOriginal]",
-        "default": {
-          "present": false,
-          "value": null
-        }
-      },
-      {
-        "name": "cashRequestOriginals",
-        "dataType": "Map[String, BankCashOriginal]",
-        "default": []
-      }
+      "id: FundOrderId = \"\"",
+      "status: String = \"new\"",
+      "operationId: OperationId = \"\"",
+      "investorAccountId: AccountId = \"\"",
+      "fundCollectionAccountId: AccountId = \"\"",
+      "fundCode: String = \"\"",
+      "amount: Money = {\"amount\":\"0.00\",\"currency\":\"CNY\"}",
+      "reservedSubscriptions: \"Map[TxId, Money]\" = []",
+      "committedSubscriptions: \"Map[TxId, Money]\" = []",
+      "compensatedSubscriptions: \"Map[TxId, Money]\" = []",
+      "selectedPaymentTxId: TxId = \"\"",
+      "paymentOutcome: String = \"\"",
+      "cashPaymentResults: \"Map[TxId, String]\" = []",
+      "cashPaymentFinalResults: \"Map[TxId, String]\" = []",
+      "taRequestId: TaRequestId = \"\"",
+      "taReference: String = \"\"",
+      "taStatus: String = \"\"",
+      "taReceipts: \"Map[String, String]\" = []",
+      "taReceiptOutcomes: \"Map[String, String]\" = []",
+      "taConfirmedShares: FundShare = {\"fundCode\":\"\",\"shares\":\"\",\"nav\":\"\"}",
+      "taRejectionReason: String = \"\"",
+      "refundOperationId: OperationId = \"\"",
+      "refundOutcome: String = \"\"",
+      "refundResultReceipts: \"Map[String, String]\" = []",
+      "refundFinalResults: \"Map[TxId, String]\" = []",
+      "taObservedReceipts: \"Map[String, String]\" = []",
+      "paymentObservedResults: \"Map[TxId, String]\" = []",
+      "refundObservedResults: \"Map[TxId, String]\" = []",
+      "cashRequestSource: \"Option[BankCashOriginal]\" = {\"present\":false,\"value\":null}",
+      "cashRequestOriginals: \"Map[String, BankCashOriginal]\" = []"
     ],
     "aggregateRuleRefs": [
-      {
-        "ruleId": "ORDER_RESOURCE",
-        "errCode": "ORDER_RESOURCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_REPLAY_CONFLICT",
-        "errCode": "ORDER_REPLAY_CONFLICT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_REQUEST_ONCE",
-        "errCode": "ORDER_REQUEST_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_ACCOUNTS",
-        "errCode": "ORDER_ACCOUNTS",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_AMOUNT",
-        "errCode": "ORDER_AMOUNT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_OPERATION",
-        "errCode": "ORDER_OPERATION",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_PHASE_RESOURCE",
-        "errCode": "ORDER_PHASE_RESOURCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_PHASE_POSITIVE",
-        "errCode": "ORDER_PHASE_POSITIVE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_COMMITTEDSUBSCRIPTIONS_MATCH",
-        "errCode": "ORDER_COMMITTEDSUBSCRIPTIONS_MATCH",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_COMPENSATEDSUBSCRIPTIONS_MATCH",
-        "errCode": "ORDER_COMPENSATEDSUBSCRIPTIONS_MATCH",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_RESERVEDSUBSCRIPTIONS_MATCH",
-        "errCode": "ORDER_RESERVEDSUBSCRIPTIONS_MATCH",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_PREPARE_COMMITTED",
-        "errCode": "ORDER_PREPARE_COMMITTED",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_PREPARE_COMPENSATED",
-        "errCode": "ORDER_PREPARE_COMPENSATED",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_PREPARE_ONCE",
-        "errCode": "ORDER_PREPARE_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_REQUEST_AMOUNT",
-        "errCode": "ORDER_REQUEST_AMOUNT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_COMMIT_ONCE",
-        "errCode": "ORDER_COMMIT_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_NOT_CANCELED",
-        "errCode": "ORDER_NOT_CANCELED",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_PREPARED",
-        "errCode": "ORDER_PREPARED",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_COMMIT_AMOUNT",
-        "errCode": "ORDER_COMMIT_AMOUNT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_CANCEL_ONCE",
-        "errCode": "ORDER_CANCEL_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "ORDER_CANCEL_NOT_COMMITTED",
-        "errCode": "ORDER_CANCEL_NOT_COMMITTED",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "PAYMENT_TERMINAL_CONFLICT",
-        "errCode": "PAYMENT_TERMINAL_CONFLICT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "PAYMENT_TERMINAL_ONCE",
-        "errCode": "PAYMENT_TERMINAL_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "PAYMENT_COMMIT_PROOF",
-        "errCode": "PAYMENT_COMMIT_PROOF",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "PAYMENT_LATE_PROGRESS",
-        "errCode": "PAYMENT_LATE_PROGRESS",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "PAYMENT_PROGRESS_ONCE",
-        "errCode": "PAYMENT_PROGRESS_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_SUBMIT_RESOURCE",
-        "errCode": "TA_SUBMIT_RESOURCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_PAID",
-        "errCode": "TA_PAID",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_SUBMIT_ONCE",
-        "errCode": "TA_SUBMIT_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_ORDER",
-        "errCode": "TA_ORDER",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_PAYMENT",
-        "errCode": "TA_PAYMENT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_REQUEST",
-        "errCode": "TA_REQUEST",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_REFERENCE",
-        "errCode": "TA_REFERENCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_FUND",
-        "errCode": "TA_FUND",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_RECEIPT_PRESENT",
-        "errCode": "TA_RECEIPT_PRESENT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_RECEIPT_CONFLICT",
-        "errCode": "TA_RECEIPT_CONFLICT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_RECEIPT_ONCE",
-        "errCode": "TA_RECEIPT_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_LATE_PROGRESS",
-        "errCode": "TA_LATE_PROGRESS",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_TERMINAL_CONFLICT",
-        "errCode": "TA_TERMINAL_CONFLICT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_SHARE_FUND",
-        "errCode": "TA_SHARE_FUND",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "TA_REJECTION_REASON",
-        "errCode": "TA_REJECTION_REASON",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "REFUND_RESOURCE",
-        "errCode": "REFUND_RESOURCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "REFUND_PAYMENT",
-        "errCode": "REFUND_PAYMENT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "REFUND_TA_REJECTED",
-        "errCode": "REFUND_TA_REJECTED",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "REFUND_INTENT_ONCE",
-        "errCode": "REFUND_INTENT_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "REFUND_RESULT_ASSOCIATION",
-        "errCode": "REFUND_RESULT_ASSOCIATION",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "REFUND_RECEIPT_CONFLICT",
-        "errCode": "REFUND_RECEIPT_CONFLICT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "REFUND_RECEIPT_ONCE",
-        "errCode": "REFUND_RECEIPT_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "REFUND_TERMINAL_CONFLICT",
-        "errCode": "REFUND_TERMINAL_CONFLICT",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "REFUND_TERMINAL_ONCE",
-        "errCode": "REFUND_TERMINAL_ONCE",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "REFUND_LATE_PROGRESS",
-        "errCode": "REFUND_LATE_PROGRESS",
-        "desc": "Explicit P23-derived V1 rule"
-      },
-      {
-        "ruleId": "CASH_SOURCE_OPTION",
-        "errCode": "CASH_SOURCE_OPTION",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "CASH_SOURCE_RESOURCE",
-        "errCode": "CASH_SOURCE_RESOURCE",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "CASH_SOURCE_BODY",
-        "errCode": "CASH_SOURCE_BODY",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "CASH_SOURCE_CONFLICT",
-        "errCode": "CASH_SOURCE_CONFLICT",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "CASH_SOURCE_PAYMENT",
-        "errCode": "CASH_SOURCE_PAYMENT",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "CASH_SOURCE_ONCE",
-        "errCode": "CASH_SOURCE_ONCE",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "CASH_SOURCE_BEFORE_SETTLEMENT",
-        "errCode": "CASH_SOURCE_BEFORE_SETTLEMENT",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "CASH_ADMITTED_PAYMENT_MATCH",
-        "errCode": "CASH_ADMITTED_PAYMENT_MATCH",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      }
+      "@rule(ORDER_RESOURCE/ORDER_RESOURCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_REPLAY_CONFLICT/ORDER_REPLAY_CONFLICT | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_REQUEST_ONCE/ORDER_REQUEST_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_ACCOUNTS/ORDER_ACCOUNTS | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_AMOUNT/ORDER_AMOUNT | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_OPERATION/ORDER_OPERATION | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_PHASE_RESOURCE/ORDER_PHASE_RESOURCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_PHASE_POSITIVE/ORDER_PHASE_POSITIVE | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_COMMITTEDSUBSCRIPTIONS_MATCH/ORDER_COMMITTEDSUBSCRIPTIONS_MATCH | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_COMPENSATEDSUBSCRIPTIONS_MATCH/ORDER_COMPENSATEDSUBSCRIPTIONS_MATCH | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_RESERVEDSUBSCRIPTIONS_MATCH/ORDER_RESERVEDSUBSCRIPTIONS_MATCH | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_PREPARE_COMMITTED/ORDER_PREPARE_COMMITTED | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_PREPARE_COMPENSATED/ORDER_PREPARE_COMPENSATED | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_PREPARE_ONCE/ORDER_PREPARE_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_REQUEST_AMOUNT/ORDER_REQUEST_AMOUNT | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_COMMIT_ONCE/ORDER_COMMIT_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_NOT_CANCELED/ORDER_NOT_CANCELED | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_PREPARED/ORDER_PREPARED | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_COMMIT_AMOUNT/ORDER_COMMIT_AMOUNT | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_CANCEL_ONCE/ORDER_CANCEL_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(ORDER_CANCEL_NOT_COMMITTED/ORDER_CANCEL_NOT_COMMITTED | \"Explicit P23-derived V1 rule\")",
+      "@rule(PAYMENT_TERMINAL_CONFLICT/PAYMENT_TERMINAL_CONFLICT | \"Explicit P23-derived V1 rule\")",
+      "@rule(PAYMENT_TERMINAL_ONCE/PAYMENT_TERMINAL_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(PAYMENT_COMMIT_PROOF/PAYMENT_COMMIT_PROOF | \"Explicit P23-derived V1 rule\")",
+      "@rule(PAYMENT_LATE_PROGRESS/PAYMENT_LATE_PROGRESS | \"Explicit P23-derived V1 rule\")",
+      "@rule(PAYMENT_PROGRESS_ONCE/PAYMENT_PROGRESS_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_SUBMIT_RESOURCE/TA_SUBMIT_RESOURCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_PAID/TA_PAID | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_SUBMIT_ONCE/TA_SUBMIT_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_ORDER/TA_ORDER | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_PAYMENT/TA_PAYMENT | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_REQUEST/TA_REQUEST | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_REFERENCE/TA_REFERENCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_FUND/TA_FUND | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_RECEIPT_PRESENT/TA_RECEIPT_PRESENT | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_RECEIPT_CONFLICT/TA_RECEIPT_CONFLICT | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_RECEIPT_ONCE/TA_RECEIPT_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_LATE_PROGRESS/TA_LATE_PROGRESS | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_TERMINAL_CONFLICT/TA_TERMINAL_CONFLICT | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_SHARE_FUND/TA_SHARE_FUND | \"Explicit P23-derived V1 rule\")",
+      "@rule(TA_REJECTION_REASON/TA_REJECTION_REASON | \"Explicit P23-derived V1 rule\")",
+      "@rule(REFUND_RESOURCE/REFUND_RESOURCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(REFUND_PAYMENT/REFUND_PAYMENT | \"Explicit P23-derived V1 rule\")",
+      "@rule(REFUND_TA_REJECTED/REFUND_TA_REJECTED | \"Explicit P23-derived V1 rule\")",
+      "@rule(REFUND_INTENT_ONCE/REFUND_INTENT_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(REFUND_RESULT_ASSOCIATION/REFUND_RESULT_ASSOCIATION | \"Explicit P23-derived V1 rule\")",
+      "@rule(REFUND_RECEIPT_CONFLICT/REFUND_RECEIPT_CONFLICT | \"Explicit P23-derived V1 rule\")",
+      "@rule(REFUND_RECEIPT_ONCE/REFUND_RECEIPT_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(REFUND_TERMINAL_CONFLICT/REFUND_TERMINAL_CONFLICT | \"Explicit P23-derived V1 rule\")",
+      "@rule(REFUND_TERMINAL_ONCE/REFUND_TERMINAL_ONCE | \"Explicit P23-derived V1 rule\")",
+      "@rule(REFUND_LATE_PROGRESS/REFUND_LATE_PROGRESS | \"Explicit P23-derived V1 rule\")",
+      "@rule(CASH_SOURCE_OPTION/CASH_SOURCE_OPTION | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(CASH_SOURCE_RESOURCE/CASH_SOURCE_RESOURCE | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(CASH_SOURCE_BODY/CASH_SOURCE_BODY | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(CASH_SOURCE_CONFLICT/CASH_SOURCE_CONFLICT | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(CASH_SOURCE_PAYMENT/CASH_SOURCE_PAYMENT | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(CASH_SOURCE_ONCE/CASH_SOURCE_ONCE | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(CASH_SOURCE_BEFORE_SETTLEMENT/CASH_SOURCE_BEFORE_SETTLEMENT | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(CASH_ADMITTED_PAYMENT_MATCH/CASH_ADMITTED_PAYMENT_MATCH | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")"
     ],
     "provenance": {
       "author": "agent-assisted-bank-v1",
@@ -494,290 +124,135 @@ extraEvents:
       "name": "FundTAReceiptObserved",
       "description": "Technical raw receipt observation only; trusted bridge validation and guarded business commands are required before any business outcome.",
       "payloads": [
-        {
-          "name": "fundOrderId",
-          "dataType": "FundOrderId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "paymentTxId",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "taRequestId",
-          "dataType": "TaRequestId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "investorAccountId",
-          "dataType": "AccountId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "fundCollectionAccountId",
-          "dataType": "AccountId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "fundCode",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "amount",
-          "dataType": "Money",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "principal",
-          "dataType": "AmountDecimal",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "receiptId",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "receiptBody",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "taReference",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "status",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "shares",
-          "dataType": "TaExactText",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "nav",
-          "dataType": "TaExactText",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "reason",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        }
+        "fundOrderId: FundOrderId @PROPAGATED",
+        "paymentTxId: TxId @PROPAGATED",
+        "taRequestId: TaRequestId @PROPAGATED",
+        "investorAccountId: AccountId @PROPAGATED",
+        "fundCollectionAccountId: AccountId @PROPAGATED",
+        "fundCode: String @PROPAGATED",
+        "amount: Money @PROPAGATED",
+        "principal: AmountDecimal @PROPAGATED",
+        "receiptId: String @PROPAGATED",
+        "receiptBody: String @PROPAGATED",
+        "taReference: String @PROPAGATED",
+        "status: String @PROPAGATED",
+        "shares: TaExactText @PROPAGATED",
+        "nav: TaExactText @PROPAGATED",
+        "reason: String @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "taObservedReceipts",
-          "op": "put",
-          "key": "event.receiptId",
-          "value": "event.receiptBody"
-        }
+        "taObservedReceipts := @fold[put](key=event.receiptId, value=event.receiptBody)"
       ]
     },
     {
       "name": "BankPaymentResultSucceeded",
       "description": "Technical Saga result observation; only trusted delivery to the guarded FundOrder command advances business payment outcome.",
       "payloads": [
-        {
-          "name": "txid",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        }
+        "txid: TxId @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "paymentObservedResults",
-          "op": "put",
-          "key": "event.txid",
-          "value": "literal:succeeded"
-        }
+        "paymentObservedResults := @fold[put](key=event.txid, value=\"literal:succeeded\")"
       ]
     },
     {
       "name": "BankPaymentResultRejectedBeforeEffects",
       "description": "Technical Saga result observation; only trusted delivery to the guarded FundOrder command advances business payment outcome.",
       "payloads": [
-        {
-          "name": "txid",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        }
+        "txid: TxId @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "paymentObservedResults",
-          "op": "put",
-          "key": "event.txid",
-          "value": "literal:rejected-before-effects"
-        }
+        "paymentObservedResults := @fold[put](key=event.txid, value=\"literal:rejected-before-effects\")"
       ]
     },
     {
       "name": "BankPaymentResultCompensated",
       "description": "Technical Saga result observation; only trusted delivery to the guarded FundOrder command advances business payment outcome.",
       "payloads": [
-        {
-          "name": "txid",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        }
+        "txid: TxId @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "paymentObservedResults",
-          "op": "put",
-          "key": "event.txid",
-          "value": "literal:compensated"
-        }
+        "paymentObservedResults := @fold[put](key=event.txid, value=\"literal:compensated\")"
       ]
     },
     {
       "name": "BankPaymentResultRecoveryRequired",
       "description": "Technical Saga result observation; only trusted delivery to the guarded FundOrder command advances business payment outcome.",
       "payloads": [
-        {
-          "name": "txid",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        }
+        "txid: TxId @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "paymentObservedResults",
-          "op": "put",
-          "key": "event.txid",
-          "value": "literal:recovery-required"
-        }
+        "paymentObservedResults := @fold[put](key=event.txid, value=\"literal:recovery-required\")"
       ]
     },
     {
       "name": "BankPaymentResultOutcomeUnknown",
       "description": "Technical Saga result observation; only trusted delivery to the guarded FundOrder command advances business payment outcome.",
       "payloads": [
-        {
-          "name": "txid",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        }
+        "txid: TxId @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "paymentObservedResults",
-          "op": "put",
-          "key": "event.txid",
-          "value": "literal:outcome-unknown"
-        }
+        "paymentObservedResults := @fold[put](key=event.txid, value=\"literal:outcome-unknown\")"
       ]
     },
     {
       "name": "BankRefundResultSucceeded",
       "description": "Technical independent refund result; trusted delivery separately records guarded business refund outcome.",
       "payloads": [
-        {
-          "name": "txid",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        }
+        "txid: TxId @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "refundObservedResults",
-          "op": "put",
-          "key": "event.txid",
-          "value": "literal:succeeded"
-        }
+        "refundObservedResults := @fold[put](key=event.txid, value=\"literal:succeeded\")"
       ]
     },
     {
       "name": "BankRefundResultRejectedBeforeEffects",
       "description": "Technical independent refund result; trusted delivery separately records guarded business refund outcome.",
       "payloads": [
-        {
-          "name": "txid",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        }
+        "txid: TxId @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "refundObservedResults",
-          "op": "put",
-          "key": "event.txid",
-          "value": "literal:rejected-before-effects"
-        }
+        "refundObservedResults := @fold[put](key=event.txid, value=\"literal:rejected-before-effects\")"
       ]
     },
     {
       "name": "BankRefundResultCompensated",
       "description": "Technical independent refund result; trusted delivery separately records guarded business refund outcome.",
       "payloads": [
-        {
-          "name": "txid",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        }
+        "txid: TxId @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "refundObservedResults",
-          "op": "put",
-          "key": "event.txid",
-          "value": "literal:compensated"
-        }
+        "refundObservedResults := @fold[put](key=event.txid, value=\"literal:compensated\")"
       ]
     },
     {
       "name": "BankRefundResultRecoveryRequired",
       "description": "Technical independent refund result; trusted delivery separately records guarded business refund outcome.",
       "payloads": [
-        {
-          "name": "txid",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        }
+        "txid: TxId @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "refundObservedResults",
-          "op": "put",
-          "key": "event.txid",
-          "value": "literal:recovery-required"
-        }
+        "refundObservedResults := @fold[put](key=event.txid, value=\"literal:recovery-required\")"
       ]
     },
     {
       "name": "BankRefundResultOutcomeUnknown",
       "description": "Technical independent refund result; trusted delivery separately records guarded business refund outcome.",
       "payloads": [
-        {
-          "name": "txid",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        }
+        "txid: TxId @PROPAGATED"
       ],
       "bindings": [],
       "foldAssignments": [
-        {
-          "slot": "refundObservedResults",
-          "op": "put",
-          "key": "event.txid",
-          "value": "literal:outcome-unknown"
-        }
+        "refundObservedResults := @fold[put](key=event.txid, value=\"literal:outcome-unknown\")"
       ]
     }
   ]

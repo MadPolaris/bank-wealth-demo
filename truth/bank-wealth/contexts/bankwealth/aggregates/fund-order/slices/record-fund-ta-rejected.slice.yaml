@@ -7,123 +7,27 @@ payload:
   {
     "name": "RecordFundTARejected",
     "parameters": [
-      {
-        "name": "fundOrderId",
-        "dataType": "FundOrderId",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "paymentTxId",
-        "dataType": "TxId",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "taRequestId",
-        "dataType": "TaRequestId",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "taReference",
-        "dataType": "String",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "receiptId",
-        "dataType": "String",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "receiptBody",
-        "dataType": "String",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "fundCode",
-        "dataType": "String",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "currency",
-        "dataType": "String",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "reason",
-        "dataType": "String",
-        "origin": "BUSINESS_INPUT"
-      }
+      "fundOrderId: FundOrderId @BUSINESS_INPUT",
+      "paymentTxId: TxId @BUSINESS_INPUT",
+      "taRequestId: TaRequestId @BUSINESS_INPUT",
+      "taReference: String @BUSINESS_INPUT",
+      "receiptId: String @BUSINESS_INPUT",
+      "receiptBody: String @BUSINESS_INPUT",
+      "fundCode: String @BUSINESS_INPUT",
+      "currency: String @BUSINESS_INPUT",
+      "reason: String @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "TA_ORDER",
-        "errCode": "TA_ORDER",
-        "cond": "param.fundOrderId == state.id",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_PAYMENT",
-        "errCode": "TA_PAYMENT",
-        "cond": "param.paymentTxId == state.selectedPaymentTxId && state.cashPaymentFinalResults.get(param.paymentTxId).contains(\"succeeded\")",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_REQUEST",
-        "errCode": "TA_REQUEST",
-        "cond": "param.taRequestId == state.taRequestId && param.taRequestId.value.nonEmpty",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_REFERENCE",
-        "errCode": "TA_REFERENCE",
-        "cond": "param.taReference.nonEmpty && (state.taReference.isEmpty || state.taReference == param.taReference)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_FUND",
-        "errCode": "TA_FUND",
-        "cond": "param.fundCode == state.fundCode && param.currency == state.amount.currency",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_RECEIPT_PRESENT",
-        "errCode": "TA_RECEIPT_PRESENT",
-        "cond": "param.receiptId.nonEmpty && param.receiptBody.nonEmpty",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_RECEIPT_CONFLICT",
-        "errCode": "TA_RECEIPT_CONFLICT",
-        "cond": "!state.taReceipts.contains(param.receiptId) || (state.taReceipts(param.receiptId) == param.receiptBody && state.taReceiptOutcomes.get(param.receiptId).contains(\"rejected\"))",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_RECEIPT_ONCE",
-        "errCode": "TA_RECEIPT_ONCE",
-        "cond": "!state.taReceipts.contains(param.receiptId)",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_TERMINAL_CONFLICT",
-        "errCode": "TA_TERMINAL_CONFLICT",
-        "cond": "state.taStatus != \"confirmed\" && state.taStatus != \"rejected\"",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_REJECTION_REASON",
-        "errCode": "TA_REJECTION_REASON",
-        "cond": "param.reason.nonEmpty",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject TA_ORDER/TA_ORDER: \"param.fundOrderId == state.id\")",
+      "@guard[invariantRef](reject TA_PAYMENT/TA_PAYMENT: \"param.paymentTxId == state.selectedPaymentTxId && state.cashPaymentFinalResults.get(param.paymentTxId).contains(\\\"succeeded\\\")\")",
+      "@guard[invariantRef](reject TA_REQUEST/TA_REQUEST: \"param.taRequestId == state.taRequestId && param.taRequestId.value.nonEmpty\")",
+      "@guard[invariantRef](reject TA_REFERENCE/TA_REFERENCE: \"param.taReference.nonEmpty && (state.taReference.isEmpty || state.taReference == param.taReference)\")",
+      "@guard[invariantRef](reject TA_FUND/TA_FUND: \"param.fundCode == state.fundCode && param.currency == state.amount.currency\")",
+      "@guard[invariantRef](reject TA_RECEIPT_PRESENT/TA_RECEIPT_PRESENT: \"param.receiptId.nonEmpty && param.receiptBody.nonEmpty\")",
+      "@guard[invariantRef](reject TA_RECEIPT_CONFLICT/TA_RECEIPT_CONFLICT: \"!state.taReceipts.contains(param.receiptId) || (state.taReceipts(param.receiptId) == param.receiptBody && state.taReceiptOutcomes.get(param.receiptId).contains(\\\"rejected\\\"))\")",
+      "@guard[invariantRef](succeed-empty TA_RECEIPT_ONCE/TA_RECEIPT_ONCE: \"!state.taReceipts.contains(param.receiptId)\")",
+      "@guard[invariantRef](reject TA_TERMINAL_CONFLICT/TA_TERMINAL_CONFLICT: \"state.taStatus != \\\"confirmed\\\" && state.taStatus != \\\"rejected\\\"\")",
+      "@guard[invariantRef](reject TA_REJECTION_REASON/TA_REJECTION_REASON: param.reason.nonEmpty)"
     ],
     "produces": [
       "FundTARejected"
@@ -140,124 +44,35 @@ events:
     "FundTARejected": {
       "name": "FundTARejected",
       "payloads": [
-        {
-          "name": "fundOrderId",
-          "dataType": "FundOrderId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "paymentTxId",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "taRequestId",
-          "dataType": "TaRequestId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "taReference",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "receiptId",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "receiptBody",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "fundCode",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "currency",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "reason",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "outcome",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        }
+        "fundOrderId: FundOrderId @PROPAGATED",
+        "paymentTxId: TxId @PROPAGATED",
+        "taRequestId: TaRequestId @PROPAGATED",
+        "taReference: String @PROPAGATED",
+        "receiptId: String @PROPAGATED",
+        "receiptBody: String @PROPAGATED",
+        "fundCode: String @PROPAGATED",
+        "currency: String @PROPAGATED",
+        "reason: String @PROPAGATED",
+        "outcome: String @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "fundOrderId",
-          "expr": "param.fundOrderId"
-        },
-        {
-          "slot": "paymentTxId",
-          "expr": "param.paymentTxId"
-        },
-        {
-          "slot": "taRequestId",
-          "expr": "param.taRequestId"
-        },
-        {
-          "slot": "taReference",
-          "expr": "param.taReference"
-        },
-        {
-          "slot": "receiptId",
-          "expr": "param.receiptId"
-        },
-        {
-          "slot": "receiptBody",
-          "expr": "param.receiptBody"
-        },
-        {
-          "slot": "fundCode",
-          "expr": "param.fundCode"
-        },
-        {
-          "slot": "currency",
-          "expr": "param.currency"
-        },
-        {
-          "slot": "reason",
-          "expr": "param.reason"
-        },
-        {
-          "slot": "outcome",
-          "expr": "literal:rejected"
-        }
+        "fundOrderId <- param.fundOrderId",
+        "paymentTxId <- param.paymentTxId",
+        "taRequestId <- param.taRequestId",
+        "taReference <- param.taReference",
+        "receiptId <- param.receiptId",
+        "receiptBody <- param.receiptBody",
+        "fundCode <- param.fundCode",
+        "currency <- param.currency",
+        "reason <- param.reason",
+        "outcome <- \"literal:rejected\""
       ],
       "foldAssignments": [
-        {
-          "slot": "taReceipts",
-          "op": "put",
-          "key": "event.receiptId",
-          "value": "event.receiptBody"
-        },
-        {
-          "slot": "taReceiptOutcomes",
-          "op": "put",
-          "key": "event.receiptId",
-          "value": "event.outcome"
-        },
-        {
-          "slot": "taReference",
-          "expr": "event.taReference"
-        },
-        {
-          "slot": "taStatus",
-          "expr": "event.outcome"
-        },
-        {
-          "slot": "taRejectionReason",
-          "expr": "event.reason"
-        }
+        "taReceipts := @fold[put](key=event.receiptId, value=event.receiptBody)",
+        "taReceiptOutcomes := @fold[put](key=event.receiptId, value=event.outcome)",
+        "taReference := event.taReference",
+        "taStatus := event.outcome",
+        "taRejectionReason := event.reason"
       ]
     }
   }

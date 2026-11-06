@@ -8,37 +8,10 @@ payload:
     "name": "SealSipSchedule",
     "parameters": [],
     "guards": [
-      {
-        "ruleId": "SIP_ADMITTED_SCHEDULE_COVERED",
-        "errCode": "SIP_ADMITTED_SCHEDULE_COVERED",
-        "onFail": "reject",
-        "when": {
-          "form": "collection-covered",
-          "map": "intentAppendedDueSlots",
-          "collection": "state.createIntentDueSlots"
-        }
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "cond": "state.initialized",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SEAL_ONCE",
-        "errCode": "SIP_SEAL_ONCE",
-        "cond": "!state.scheduleSealed",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_FINITE_SCHEDULE",
-        "errCode": "SIP_FINITE_SCHEDULE",
-        "cond": "state.scheduleCount > 0",
-        "onFail": "reject"
-      }
+      "@guard[when](reject SIP_ADMITTED_SCHEDULE_COVERED/SIP_ADMITTED_SCHEDULE_COVERED: collection-covered(map=intentAppendedDueSlots, collection=state.createIntentDueSlots))",
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](succeed-empty SIP_SEAL_ONCE/SIP_SEAL_ONCE: \"!state.scheduleSealed\")",
+      "@guard[invariantRef](reject SIP_FINITE_SCHEDULE/SIP_FINITE_SCHEDULE: \"state.scheduleCount > 0\")"
     ],
     "produces": [
       "SipScheduleSealed"
@@ -69,23 +42,13 @@ events:
     "SipScheduleSealed": {
       "name": "SipScheduleSealed",
       "payloads": [
-        {
-          "name": "sealed",
-          "dataType": "Boolean",
-          "origin": "PROPAGATED"
-        }
+        "sealed: Boolean @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "sealed",
-          "expr": "literal:true"
-        }
+        "sealed <- \"literal:true\""
       ],
       "foldAssignments": [
-        {
-          "slot": "scheduleSealed",
-          "expr": "event.sealed"
-        }
+        "scheduleSealed := event.sealed"
       ]
     }
   }

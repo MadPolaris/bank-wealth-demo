@@ -1,0 +1,157 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: structure
+schemaVersion: "truthsrc.structure/v1"
+id: order-payment
+description: "Shared exact protocol structures; row order and explicit business differences are preserved."
+payload:
+  {
+    "constants": {
+      "doc-payload-parameters": [
+        "txid: TxId @BUSINESS_INPUT",
+        "resource: FundOrderId @BUSINESS_INPUT",
+        "amount: Money @BUSINESS_INPUT"
+      ],
+      "doc-payload-provenance": {"author":"agent-assisted-bank-v1","workshopHeld":false,"sourceVersion":"bank-v1-p23-design-2","sourceFlow":"payment/ta/refund"},
+      "events-cash-fund-subscription-canceled-payloads": [
+        "txid: TxId @PROPAGATED",
+        "resource: FundOrderId @PROPAGATED",
+        "amount: Money @PROPAGATED"
+      ],
+      "events-cash-fund-subscription-canceled-bindings": ["txid <- param.txid","resource <- param.resource","amount <- param.amount"]
+    },
+    "templates": {
+      "cancel-cash-fund-subscription-payload-guards": {
+        "parameters": ["ref","cond","on-fail"],
+        "body": {"kind":"invariantRef","ref":{"$arg":"ref"},"errCode":{"$arg":"ref"},"cond":{"$arg":"cond"},"onFail":{"$arg":"on-fail"}}
+      },
+      "confirm-fund-subscription-payment-payload-guards": {
+        "parameters": ["ref","cond","on-fail"],
+        "body": {"kind":"invariantRef","ref":{"$arg":"ref"},"errCode":{"$arg":"ref"},"cond":{"$arg":"cond"},"onFail":{"$arg":"on-fail"}}
+      },
+      "reserve-fund-subscription-payload-guards": {
+        "parameters": ["ref","cond","on-fail"],
+        "body": {"kind":"invariantRef","ref":{"$arg":"ref"},"errCode":{"$arg":"ref"},"cond":{"$arg":"cond"},"onFail":{"$arg":"on-fail"}}
+      }
+    },
+    "atoms": [
+      {
+        "file": "contexts/bankwealth/aggregates/fund-order/slices/cancel-cash-fund-subscription.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "FundOrder",
+          "command": "CancelCashFundSubscription",
+          "payload": {
+            "name": "CancelCashFundSubscription",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": {
+              "$rows": {
+                "template": "cancel-cash-fund-subscription-payload-guards",
+                "rows": [
+                  ["ORDER_PHASE_RESOURCE","param.resource == state.id","reject"],
+                  ["ORDER_PHASE_POSITIVE","param.amount.currency == \"CNY\" && param.amount.amount > 0.00","reject"],
+                  ["ORDER_COMPENSATEDSUBSCRIPTIONS_MATCH","!state.compensatedSubscriptions.contains(param.txid) || state.compensatedSubscriptions(param.txid) == param.amount","reject"],
+                  ["ORDER_CANCEL_ONCE","!state.compensatedSubscriptions.contains(param.txid)","succeed-empty"],
+                  ["ORDER_CANCEL_NOT_COMMITTED","!state.committedSubscriptions.contains(param.txid)","reject"],
+                  ["ORDER_RESERVEDSUBSCRIPTIONS_MATCH","!state.reservedSubscriptions.contains(param.txid) || state.reservedSubscriptions(param.txid) == param.amount","reject"]
+                ]
+              }
+            },
+            "produces": ["CashFundSubscriptionCanceled"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "CashFundSubscriptionCanceled": {
+              "name": "CashFundSubscriptionCanceled",
+              "payloads": {"$value":"events-cash-fund-subscription-canceled-payloads"},
+              "bindings": {"$value":"events-cash-fund-subscription-canceled-bindings"},
+              "foldAssignments": [
+                "reservedSubscriptions := @fold[remove](key=event.txid)",
+                "compensatedSubscriptions := @fold[put](key=event.txid, value=event.amount)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/aggregates/fund-order/slices/confirm-fund-subscription-payment.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "FundOrder",
+          "command": "ConfirmFundSubscriptionPayment",
+          "payload": {
+            "name": "ConfirmFundSubscriptionPayment",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": {
+              "$rows": {
+                "template": "confirm-fund-subscription-payment-payload-guards",
+                "rows": [
+                  ["ORDER_PHASE_RESOURCE","param.resource == state.id","reject"],
+                  ["ORDER_PHASE_POSITIVE","param.amount.currency == \"CNY\" && param.amount.amount > 0.00","reject"],
+                  ["ORDER_COMMITTEDSUBSCRIPTIONS_MATCH","!state.committedSubscriptions.contains(param.txid) || state.committedSubscriptions(param.txid) == param.amount","reject"],
+                  ["ORDER_COMMIT_ONCE","!state.committedSubscriptions.contains(param.txid)","succeed-empty"],
+                  ["ORDER_NOT_CANCELED","!state.compensatedSubscriptions.contains(param.txid)","reject"],
+                  ["ORDER_PREPARED","state.reservedSubscriptions.contains(param.txid)","reject"],
+                  ["ORDER_RESERVEDSUBSCRIPTIONS_MATCH","!state.reservedSubscriptions.contains(param.txid) || state.reservedSubscriptions(param.txid) == param.amount","reject"],
+                  ["ORDER_COMMIT_AMOUNT","param.amount == state.amount","reject"]
+                ]
+              }
+            },
+            "produces": ["FundSubscriptionPaymentConfirmed"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "FundSubscriptionPaymentConfirmed": {
+              "name": "FundSubscriptionPaymentConfirmed",
+              "payloads": {"$value":"events-cash-fund-subscription-canceled-payloads"},
+              "bindings": {"$value":"events-cash-fund-subscription-canceled-bindings"},
+              "foldAssignments": [
+                "reservedSubscriptions := @fold[remove](key=event.txid)",
+                "committedSubscriptions := @fold[put](key=event.txid, value=event.amount)",
+                "selectedPaymentTxId := event.txid",
+                "status := \"literal:payment-committed\""
+              ]
+            }
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/aggregates/fund-order/slices/reserve-fund-subscription.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "FundOrder",
+          "command": "ReserveFundSubscription",
+          "payload": {
+            "name": "ReserveFundSubscription",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": {
+              "$rows": {
+                "template": "reserve-fund-subscription-payload-guards",
+                "rows": [
+                  ["ORDER_PHASE_RESOURCE","param.resource == state.id","reject"],
+                  ["ORDER_PHASE_POSITIVE","param.amount.currency == \"CNY\" && param.amount.amount > 0.00","reject"],
+                  ["ORDER_COMMITTEDSUBSCRIPTIONS_MATCH","!state.committedSubscriptions.contains(param.txid) || state.committedSubscriptions(param.txid) == param.amount","reject"],
+                  ["ORDER_COMPENSATEDSUBSCRIPTIONS_MATCH","!state.compensatedSubscriptions.contains(param.txid) || state.compensatedSubscriptions(param.txid) == param.amount","reject"],
+                  ["ORDER_RESERVEDSUBSCRIPTIONS_MATCH","!state.reservedSubscriptions.contains(param.txid) || state.reservedSubscriptions(param.txid) == param.amount","reject"],
+                  ["ORDER_PREPARE_COMMITTED","!state.committedSubscriptions.contains(param.txid)","succeed-empty"],
+                  ["ORDER_PREPARE_COMPENSATED","!state.compensatedSubscriptions.contains(param.txid)","succeed-empty"],
+                  ["ORDER_PREPARE_ONCE","!state.reservedSubscriptions.contains(param.txid)","succeed-empty"],
+                  ["ORDER_REQUEST_AMOUNT","state.status == \"payment-requested\" && param.amount == state.amount","reject"]
+                ]
+              }
+            },
+            "produces": ["ReserveFundSubscriptionConfirmed"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "ReserveFundSubscriptionConfirmed": {
+              "name": "ReserveFundSubscriptionConfirmed",
+              "payloads": {"$value":"events-cash-fund-subscription-canceled-payloads"},
+              "bindings": {"$value":"events-cash-fund-subscription-canceled-bindings"},
+              "foldAssignments": ["reservedSubscriptions := @fold[put](key=event.txid, value=event.amount)"]
+            }
+          }
+        }
+      }
+    ]
+  }

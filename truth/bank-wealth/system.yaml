@@ -16,3 +16,8 @@ contexts:
   [
     "bankwealth"
   ]
+authoring:
+  {
+    "structures": "truthsrc.structure/v1",
+    "micro": "truthsrc.micro/v1"
+  }

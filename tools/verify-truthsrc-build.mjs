@@ -382,7 +382,17 @@ export async function admitCandidate(output, options, { afterBuild = false } = {
   assert.deepEqual(captured.config.options.service.externalSourceRoots, [HANDWRITTEN]);
   assert.equal(captured.config.options.runtimeArtifact.repository, pathToFileURL(join(RUNTIME, 'maven')).href + '/');
   assert.ok(!overlap(output, HANDWRITTEN) && !overlap(output, TOOL) && !overlap(output, RUNTIME));
-  const plan = projectPlan(captured, output); // In-memory plan; NEVER applyEntries/projectCli(generate).
+  const inputs = parseStrictJson(readFileSync(join(output, '.truthsrc/inputs.json')));
+  let graphAst;
+  if (inputs.graph) {
+    const { SqliteKnowledgeGraphStore } = await import(pathToFileURL(join(TOOL, 'lib/knowledge-sqlite.mjs')));
+    const { exportKnowledgeAst } = await import(pathToFileURL(join(TOOL, 'lib/knowledge-graph.mjs')));
+    const { projectGraphFile } = await import(pathToFileURL(join(TOOL, 'lib/project/graph.mjs')));
+    const store = new SqliteKnowledgeGraphStore(projectGraphFile(PROJECT), { readonly: true });
+    try { graphAst = exportKnowledgeAst(store, { project: PROJECT, snapshot: inputs.graph.snapshot, expectedSources: captured.sources }); }
+    finally { store.close(); }
+  }
+  const plan = projectPlan(captured, output, graphAst); // Read-only graph export; no application writes.
   assert.equal(plan.generator.id, GENERATOR);
   assert.equal(plan.generator.version, '1');
   const before = inventory(output, { afterBuild });
@@ -395,9 +405,8 @@ export async function admitCandidate(output, options, { afterBuild = false } = {
   assert.equal(rows.size, plan.entries.length, 'retained/missing/foreign ledger entries forbidden');
   assert.deepEqual(Object.keys(before).sort(), [...plan.entries.map(entry => entry.path), 'truthsrc.ledger.json', 'anchors.json'].sort(),
     'candidate contains missing or unplanned files (including build scripts and old tests)');
-  const inputs = parseStrictJson(readFileSync(join(output, '.truthsrc/inputs.json')));
   const plannedInputs = JSON.parse(plan.entries.find(entry => entry.path === '.truthsrc/inputs.json').content);
-  for (const key of ['sources', 'sourceIndex', 'generatedFiles', 'canonicalId'])
+  for (const key of ['sources', 'sourceIndex', 'generatedFiles', 'canonicalId', ...(inputs.graph ? ['graph'] : [])])
     assert.deepEqual(inputs[key], plannedInputs[key], 'current generation input differs: ' + key);
   assert.equal(inputs.validation?.hard?.length, 0, 'generation validation evidence required');
   assert.equal(inputs.validation?.roundtrip?.ok, true, 'successful generation roundtrip evidence required');

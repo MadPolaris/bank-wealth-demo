@@ -9,18 +9,9 @@ payload:
     "context": "bankwealth",
     "version": "bank-v1-service-1",
     "fields": [
-      {
-        "name": "fundCode",
-        "dataType": "String"
-      },
-      {
-        "name": "shares",
-        "dataType": "TaExactText"
-      },
-      {
-        "name": "nav",
-        "dataType": "TaExactText"
-      }
+      "fundCode: String",
+      "shares: TaExactText",
+      "nav: TaExactText"
     ],
     "provenance": {
       "author": "agent-assisted-bank-v1-service-integration",

@@ -10,12 +10,7 @@ payload:
   {
     "id": "bank-ta-technical",
     "version": "bank-v1-1",
-    "artifact": {
-      "context": "bankwealth",
-      "kind": "artifact",
-      "owner": [],
-      "id": "BankTaTechnical"
-    },
+    "artifact": "@ref(bankwealth:artifact#BankTaTechnical)",
     "status": "selected",
     "provenance": [
       {
@@ -24,94 +19,28 @@ payload:
       }
     ],
     "references": [
-      {
-        "context": "bankwealth",
-        "kind": "pipeline",
-        "owner": [],
-        "id": "bank-ta-submission-v1"
-      }
+      "@ref(bankwealth:pipeline#bank-ta-submission-v1)"
     ],
     "ports": [
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankTaEffectExecute"
-        },
+        "ref": "@ref(bankwealth:port#BankTaEffectExecute)",
         "version": "bank-v1-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankTaEffectOperation"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankTaEffectObservation"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankTaEffectOperation)",
+        "outputType": "@type(nominal:bankwealth:type#BankTaEffectObservation)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankTaEffectQuery"
-        },
+        "ref": "@ref(bankwealth:port#BankTaEffectQuery)",
         "version": "bank-v1-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankTaEffectOperation"
-          }
-        },
-        "outputType": {
-          "form": "optional",
-          "element": {
-            "form": "nominal",
-            "ref": {
-              "context": "bankwealth",
-              "kind": "type",
-              "owner": [],
-              "id": "BankTaEffectObservation"
-            }
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankTaEffectOperation)",
+        "outputType": "@type(optional:nominal:bankwealth:type#BankTaEffectObservation)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankTaEffectReconcilePort"
-        },
+        "ref": "@ref(bankwealth:port#BankTaEffectReconcilePort)",
         "version": "bank-v1-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankTaEffectReconcile"
-          }
-        },
-        "outputType": {
-          "form": "primitive",
-          "name": "boolean"
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankTaEffectReconcile)",
+        "outputType": "@type(primitive:boolean)",
         "required": true
       }
     ],
@@ -122,32 +51,17 @@ payload:
     },
     "implementations": [
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankTaEffectExecute"
-        },
+        "port": "@ref(bankwealth:port#BankTaEffectExecute)",
         "id": "bankwealth.BankTaEffectExecute",
         "version": "bank-v1-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankTaEffectQuery"
-        },
+        "port": "@ref(bankwealth:port#BankTaEffectQuery)",
         "id": "bankwealth.BankTaEffectQuery",
         "version": "bank-v1-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankTaEffectReconcilePort"
-        },
+        "port": "@ref(bankwealth:port#BankTaEffectReconcilePort)",
         "id": "bankwealth.BankTaEffectReconcilePort",
         "version": "bank-v1-1"
       }

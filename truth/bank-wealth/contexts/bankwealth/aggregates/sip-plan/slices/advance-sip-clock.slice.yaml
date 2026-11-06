@@ -7,41 +7,13 @@ payload:
   {
     "name": "AdvanceSipClock",
     "parameters": [
-      {
-        "name": "tick",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      }
+      "tick: Long @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "cond": "state.initialized",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SCHEDULE_SEALED",
-        "errCode": "SIP_SCHEDULE_SEALED",
-        "cond": "state.scheduleSealed",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_CLOCK_MONOTONE",
-        "errCode": "SIP_CLOCK_MONOTONE",
-        "cond": "param.tick >= state.currentTick && param.tick >= 0",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_CLOCK_ONCE",
-        "errCode": "SIP_CLOCK_ONCE",
-        "cond": "param.tick != state.currentTick",
-        "onFail": "succeed-empty"
-      }
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_SCHEDULE_SEALED/SIP_SCHEDULE_SEALED: state.scheduleSealed)",
+      "@guard[invariantRef](reject SIP_CLOCK_MONOTONE/SIP_CLOCK_MONOTONE: \"param.tick >= state.currentTick && param.tick >= 0\")",
+      "@guard[invariantRef](succeed-empty SIP_CLOCK_ONCE/SIP_CLOCK_ONCE: \"param.tick != state.currentTick\")"
     ],
     "produces": [
       "SipClockAdvanced"
@@ -65,23 +37,13 @@ events:
     "SipClockAdvanced": {
       "name": "SipClockAdvanced",
       "payloads": [
-        {
-          "name": "tick",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        }
+        "tick: Long @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "tick",
-          "expr": "param.tick"
-        }
+        "tick <- param.tick"
       ],
       "foldAssignments": [
-        {
-          "slot": "currentTick",
-          "expr": "event.tick"
-        }
+        "currentTick := event.tick"
       ]
     }
   }

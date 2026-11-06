@@ -9,58 +9,19 @@ payload:
     "context": "bankwealth",
     "version": "bank-v1-service-1",
     "fields": [
-      {
-        "name": "planId",
-        "dataType": "PlanId"
-      },
-      {
-        "name": "original",
-        "dataType": "Option[BankSipCreateIntent]"
-      },
-      {
-        "name": "initialized",
-        "dataType": "Boolean"
-      },
-      {
-        "name": "scheduleSealed",
-        "dataType": "Boolean"
-      },
-      {
-        "name": "paused",
-        "dataType": "Boolean"
-      },
-      {
-        "name": "currentTick",
-        "dataType": "Long"
-      },
-      {
-        "name": "dueSlots",
-        "dataType": "Vector[Long]"
-      },
-      {
-        "name": "revisions",
-        "dataType": "Vector[BankSipRevisionView]"
-      },
-      {
-        "name": "scheduleCount",
-        "dataType": "Long"
-      },
-      {
-        "name": "observedCount",
-        "dataType": "Long"
-      },
-      {
-        "name": "startCount",
-        "dataType": "Long"
-      },
-      {
-        "name": "successTotal",
-        "dataType": "Long"
-      },
-      {
-        "name": "failureTotal",
-        "dataType": "Long"
-      }
+      "planId: PlanId",
+      "original: \"Option[BankSipCreateIntent]\"",
+      "initialized: Boolean",
+      "scheduleSealed: Boolean",
+      "paused: Boolean",
+      "currentTick: Long",
+      "dueSlots: \"Vector[Long]\"",
+      "revisions: \"Vector[BankSipRevisionView]\"",
+      "scheduleCount: Long",
+      "observedCount: Long",
+      "startCount: Long",
+      "successTotal: Long",
+      "failureTotal: Long"
     ],
     "provenance": {
       "author": "agent-assisted-bank-v1-service-integration",

@@ -8,72 +8,20 @@ version: bank-v1-1
 author: agent-assisted-bank-v1
 payload:
   {
-    "id": {
-      "context": "bankwealth",
-      "kind": "port",
-      "owner": [],
-      "id": "StableTaRequestId"
-    },
+    "id": "@ref(bankwealth:port#StableTaRequestId)",
     "version": "bank-v1-1",
-    "command": {
-      "context": "bankwealth",
-      "kind": "command",
-      "owner": [
-        "FundOrder"
-      ],
-      "id": "RegisterFundTASubmission"
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "TaRequestId"
-      }
-    },
+    "command": "@ref(bankwealth:command/FundOrder#RegisterFundTASubmission)",
+    "outputType": "@type(nominal:bankwealth:type#TaRequestId)",
     "inputDependencies": [
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RegisterFundTASubmission"
-        ],
-        "id": "fundOrderId"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RegisterFundTASubmission"
-        ],
-        "id": "paymentTxId"
-      }
+      "@ref(bankwealth:parameter/FundOrder/RegisterFundTASubmission#fundOrderId)",
+      "@ref(bankwealth:parameter/FundOrder/RegisterFundTASubmission#paymentTxId)"
     ],
     "stableIdentityContract": {
       "id": "StableTaRequestId-identity",
       "version": "1",
       "keys": [
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "FundOrder",
-            "RegisterFundTASubmission"
-          ],
-          "id": "fundOrderId"
-        },
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "FundOrder",
-            "RegisterFundTASubmission"
-          ],
-          "id": "paymentTxId"
-        }
+        "@ref(bankwealth:parameter/FundOrder/RegisterFundTASubmission#fundOrderId)",
+        "@ref(bankwealth:parameter/FundOrder/RegisterFundTASubmission#paymentTxId)"
       ]
     }
   }

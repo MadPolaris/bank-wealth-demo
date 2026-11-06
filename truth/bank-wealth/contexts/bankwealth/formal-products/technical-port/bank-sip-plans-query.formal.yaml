@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankSipPlansQuery",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankPlanPageKey"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipPlanPage"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankPlanPageKey)",
+    "outputType": "@type(nominal:bankwealth:type#BankSipPlanPage)"
   }

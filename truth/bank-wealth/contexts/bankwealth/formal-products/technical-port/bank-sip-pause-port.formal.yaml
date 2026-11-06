@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankSipPausePort",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankPlanKey"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipAcknowledgement"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankPlanKey)",
+    "outputType": "@type(nominal:bankwealth:type#BankSipAcknowledgement)"
   }

@@ -1,0 +1,120 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: structure
+schemaVersion: "truthsrc.structure/v1"
+id: payment-results
+description: "Shared exact protocol structures; row order and explicit business differences are preserved."
+payload:
+  {
+    "constants": {},
+    "templates": {
+      "slice-fund-order-record-fund-cash-payment-compensated": {
+        "parameters": ["file","doc-command","payload-guards","payload-produces","bindings-expr","definition-fold-assignments"],
+        "body": {
+          "file": {"$arg":"file"},
+          "doc": {
+            "kind": "slice",
+            "aggregate": "FundOrder",
+            "command": {"$arg":"doc-command"},
+            "payload": {
+              "name": {"$arg":"doc-command"},
+              "parameters": ["txid: TxId @BUSINESS_INPUT"],
+              "guards": {"$arg":"payload-guards"},
+              "produces": [{"$arg":"payload-produces"}],
+              "provenance": {"author":"agent-assisted-bank-v1","workshopHeld":false,"sourceVersion":"bank-v1-p23-design-2","sourceFlow":"payment/ta/refund"}
+            },
+            "events": {
+              "$object": [
+                [
+                  {"$arg":"payload-produces"},
+                  {
+                    "name": {"$arg":"payload-produces"},
+                    "payloads": ["txid: TxId @PROPAGATED","kind: String @PROPAGATED"],
+                    "bindings": ["txid <- param.txid",{"slot":"kind","expr":{"$arg":"bindings-expr"}}],
+                    "foldAssignments": {"$arg":"definition-fold-assignments"}
+                  }
+                ]
+              ]
+            }
+          }
+        }
+      }
+    },
+    "atoms": [
+      {
+        "$rows": {
+          "template": "slice-fund-order-record-fund-cash-payment-compensated",
+          "rows": [
+            [
+              "contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-compensated.slice.yaml",
+              "RecordFundCashPaymentCompensated",
+              [
+                "@guard[invariantRef](reject PAYMENT_TERMINAL_CONFLICT/PAYMENT_TERMINAL_CONFLICT: \"!state.cashPaymentFinalResults.contains(param.txid) || state.cashPaymentFinalResults(param.txid) == \\\"compensated\\\"\")",
+                "@guard[invariantRef](succeed-empty PAYMENT_TERMINAL_ONCE/PAYMENT_TERMINAL_ONCE: \"!state.cashPaymentFinalResults.contains(param.txid)\")"
+              ],
+              "FundCashPaymentCompensated",
+              "literal:compensated",
+              [
+                "cashPaymentResults := @fold[put](key=event.txid, value=event.kind)",
+                "paymentOutcome := event.kind",
+                "cashPaymentFinalResults := @fold[put](key=event.txid, value=event.kind)"
+              ]
+            ],
+            [
+              "contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-outcome-unknown.slice.yaml",
+              "RecordFundCashPaymentOutcomeUnknown",
+              [
+                "@guard[invariantRef](succeed-empty PAYMENT_LATE_PROGRESS/PAYMENT_LATE_PROGRESS: \"!state.cashPaymentFinalResults.contains(param.txid)\")",
+                "@guard[invariantRef](succeed-empty PAYMENT_PROGRESS_ONCE/PAYMENT_PROGRESS_ONCE: \"!state.cashPaymentResults.get(param.txid).contains(\\\"outcome-unknown\\\")\")"
+              ],
+              "FundCashPaymentOutcomeUnknown",
+              "literal:outcome-unknown",
+              ["cashPaymentResults := @fold[put](key=event.txid, value=event.kind)","paymentOutcome := event.kind"]
+            ],
+            [
+              "contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-recovery-required.slice.yaml",
+              "RecordFundCashPaymentRecoveryRequired",
+              [
+                "@guard[invariantRef](succeed-empty PAYMENT_LATE_PROGRESS/PAYMENT_LATE_PROGRESS: \"!state.cashPaymentFinalResults.contains(param.txid)\")",
+                "@guard[invariantRef](succeed-empty PAYMENT_PROGRESS_ONCE/PAYMENT_PROGRESS_ONCE: \"!state.cashPaymentResults.get(param.txid).contains(\\\"recovery-required\\\")\")"
+              ],
+              "FundCashPaymentRecoveryRequired",
+              "literal:recovery-required",
+              ["cashPaymentResults := @fold[put](key=event.txid, value=event.kind)","paymentOutcome := event.kind"]
+            ],
+            [
+              "contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-rejected-before-effects.slice.yaml",
+              "RecordFundCashPaymentRejectedBeforeEffects",
+              [
+                "@guard[invariantRef](reject PAYMENT_TERMINAL_CONFLICT/PAYMENT_TERMINAL_CONFLICT: \"!state.cashPaymentFinalResults.contains(param.txid) || state.cashPaymentFinalResults(param.txid) == \\\"rejected-before-effects\\\"\")",
+                "@guard[invariantRef](succeed-empty PAYMENT_TERMINAL_ONCE/PAYMENT_TERMINAL_ONCE: \"!state.cashPaymentFinalResults.contains(param.txid)\")"
+              ],
+              "FundCashPaymentRejectedBeforeEffects",
+              "literal:rejected-before-effects",
+              [
+                "cashPaymentResults := @fold[put](key=event.txid, value=event.kind)",
+                "paymentOutcome := event.kind",
+                "cashPaymentFinalResults := @fold[put](key=event.txid, value=event.kind)"
+              ]
+            ],
+            [
+              "contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
+              "RecordFundCashPaymentSucceeded",
+              [
+                "@guard[invariantRef](reject PAYMENT_TERMINAL_CONFLICT/PAYMENT_TERMINAL_CONFLICT: \"!state.cashPaymentFinalResults.contains(param.txid) || state.cashPaymentFinalResults(param.txid) == \\\"succeeded\\\"\")",
+                "@guard[invariantRef](succeed-empty PAYMENT_TERMINAL_ONCE/PAYMENT_TERMINAL_ONCE: \"!state.cashPaymentFinalResults.contains(param.txid)\")",
+                "@guard[invariantRef](reject PAYMENT_COMMIT_PROOF/PAYMENT_COMMIT_PROOF: \"state.committedSubscriptions.contains(param.txid) && param.txid == state.selectedPaymentTxId\")"
+              ],
+              "FundCashPaymentSucceeded",
+              "literal:succeeded",
+              [
+                "cashPaymentResults := @fold[put](key=event.txid, value=event.kind)",
+                "paymentOutcome := event.kind",
+                "cashPaymentFinalResults := @fold[put](key=event.txid, value=event.kind)"
+              ]
+            ]
+          ]
+        }
+      }
+    ]
+  }

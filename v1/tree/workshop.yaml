@@ -1,6 +1,0 @@
-# ═══ truthsrc workshop root — hand-editable; contract: SCHEMA.md ═══
-
-schemaVersion: truthsrc/v1
-name: bank-wealth-v1
-sessionOrder:
-  - refining

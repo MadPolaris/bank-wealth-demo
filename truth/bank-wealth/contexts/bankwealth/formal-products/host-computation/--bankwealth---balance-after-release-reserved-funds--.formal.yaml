@@ -8,89 +8,22 @@ version: bank-v1-1
 author: agent-assisted-bank-v1
 payload:
   {
-    "id": {
-      "context": "bankwealth",
-      "kind": "port",
-      "owner": [],
-      "id": "BalanceAfterReleaseReservedFunds"
-    },
+    "id": "@ref(bankwealth:port#BalanceAfterReleaseReservedFunds)",
     "version": "bank-v1-1",
-    "command": {
-      "context": "bankwealth",
-      "kind": "command",
-      "owner": [
-        "CreditBalance"
-      ],
-      "id": "ReleaseReservedFunds"
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "Money"
-      }
-    },
+    "command": "@ref(bankwealth:command/CreditBalance#ReleaseReservedFunds)",
+    "outputType": "@type(nominal:bankwealth:type#Money)",
     "inputDependencies": [
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "CreditBalance",
-          "ReleaseReservedFunds"
-        ],
-        "id": "txid"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "CreditBalance",
-          "ReleaseReservedFunds"
-        ],
-        "id": "resource"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "CreditBalance",
-          "ReleaseReservedFunds"
-        ],
-        "id": "amount"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "state-field",
-        "owner": [
-          "CreditBalance"
-        ],
-        "id": "accountBalance"
-      }
+      "@ref(bankwealth:parameter/CreditBalance/ReleaseReservedFunds#txid)",
+      "@ref(bankwealth:parameter/CreditBalance/ReleaseReservedFunds#resource)",
+      "@ref(bankwealth:parameter/CreditBalance/ReleaseReservedFunds#amount)",
+      "@ref(bankwealth:state-field/CreditBalance#accountBalance)"
     ],
     "stableIdentityContract": {
       "id": "BalanceAfterReleaseReservedFunds-identity",
       "version": "1",
       "keys": [
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "CreditBalance",
-            "ReleaseReservedFunds"
-          ],
-          "id": "txid"
-        },
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "CreditBalance",
-            "ReleaseReservedFunds"
-          ],
-          "id": "resource"
-        }
+        "@ref(bankwealth:parameter/CreditBalance/ReleaseReservedFunds#txid)",
+        "@ref(bankwealth:parameter/CreditBalance/ReleaseReservedFunds#resource)"
       ]
     }
   }

@@ -7,6 +7,7 @@ import {
   ROOT, TREE, TOOL_ROOT, filesUnder, sha256, loadSnapshot, assertSnapshotStable
 } from './truth-source.mjs';
 import { extractArtifacts } from './artifacts.mjs';
+import { historicalInventory } from './historical-source.mjs';
 
 export const TEMPLATE = join(ROOT, 'formal-inputs/existing-contracts/files.json');
 const publicEntries = ['bin/truthsrc.js', 'lib/products/cli.mjs', 'lib/products/compile.mjs'];
@@ -141,7 +142,8 @@ export function prepareFormalInputs(out) {
   writeFileSync(join(target, 'cli.stdout.log'), cli.stdout || '', { flag: 'wx' });
   writeFileSync(join(target, 'cli.stderr.log'), cli.stderr || '', { flag: 'wx' });
   const after = publicFingerprint();
-  const sourceFiles = filesUnder(TREE, name => name.endsWith('.yaml')).map(file => ({ file: relative(ROOT, file), sha256: sha256(readFileSync(file)) }));
+  const sourceFiles = captured.snapshot.historical ? historicalInventory('tree').map(({ file, sha256 }) => ({ file, sha256 }))
+    : filesUnder(TREE, name => name.endsWith('.yaml')).map(file => ({ file: relative(ROOT, file), sha256: sha256(readFileSync(file)) }));
   let drift = null;
   try {
     assertPublicStable(); assertSnapshotStable(captured.snapshot);

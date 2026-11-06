@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankAccountQuery",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankAccountKey"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankAccountResponse"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankAccountKey)",
+    "outputType": "@type(nominal:bankwealth:type#BankAccountResponse)"
   }

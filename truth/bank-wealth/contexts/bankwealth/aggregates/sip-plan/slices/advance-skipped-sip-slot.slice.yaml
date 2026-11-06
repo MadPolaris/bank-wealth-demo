@@ -7,67 +7,17 @@ payload:
   {
     "name": "AdvanceSkippedSipSlot",
     "parameters": [
-      {
-        "name": "position",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "dueSlot",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      }
+      "position: Long @BUSINESS_INPUT",
+      "dueSlot: Long @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "cond": "state.initialized",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SCHEDULE_SEALED",
-        "errCode": "SIP_SCHEDULE_SEALED",
-        "cond": "state.scheduleSealed",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_DECLARED",
-        "errCode": "SIP_SLOT_DECLARED",
-        "cond": "state.slots.contains(param.position)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_MATCH",
-        "errCode": "SIP_SLOT_MATCH",
-        "cond": "state.slots(param.position) == param.dueSlot",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SKIP_RECORDED",
-        "errCode": "SIP_SKIP_RECORDED",
-        "cond": "state.slotDisposition.get(param.dueSlot).contains(\"skipped\")",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SKIP_CURSOR_ONCE",
-        "errCode": "SIP_SKIP_CURSOR_ONCE",
-        "cond": "param.position >= state.startCount",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SKIP_CURSOR_ORDER",
-        "errCode": "SIP_SKIP_CURSOR_ORDER",
-        "cond": "param.position == state.startCount",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_SCHEDULE_SEALED/SIP_SCHEDULE_SEALED: state.scheduleSealed)",
+      "@guard[invariantRef](reject SIP_SLOT_DECLARED/SIP_SLOT_DECLARED: \"state.slots.contains(param.position)\")",
+      "@guard[invariantRef](reject SIP_SLOT_MATCH/SIP_SLOT_MATCH: \"state.slots(param.position) == param.dueSlot\")",
+      "@guard[invariantRef](reject SIP_SKIP_RECORDED/SIP_SKIP_RECORDED: \"state.slotDisposition.get(param.dueSlot).contains(\\\"skipped\\\")\")",
+      "@guard[invariantRef](succeed-empty SIP_SKIP_CURSOR_ONCE/SIP_SKIP_CURSOR_ONCE: \"param.position >= state.startCount\")",
+      "@guard[invariantRef](reject SIP_SKIP_CURSOR_ORDER/SIP_SKIP_CURSOR_ORDER: \"param.position == state.startCount\")"
     ],
     "produces": [
       "SipSkippedSlotAdvanced"
@@ -91,34 +41,15 @@ events:
     "SipSkippedSlotAdvanced": {
       "name": "SipSkippedSlotAdvanced",
       "payloads": [
-        {
-          "name": "position",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "dueSlot",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        }
+        "position: Long @PROPAGATED",
+        "dueSlot: Long @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "position",
-          "expr": "param.position"
-        },
-        {
-          "slot": "dueSlot",
-          "expr": "param.dueSlot"
-        }
+        "position <- param.position",
+        "dueSlot <- param.dueSlot"
       ],
       "foldAssignments": [
-        {
-          "slot": "startCount",
-          "op": "integer-apply",
-          "delta": "literal:1",
-          "sign": 1
-        }
+        "startCount := @fold[integer-apply](delta=\"literal:1\", sign=+1)"
       ]
     }
   }

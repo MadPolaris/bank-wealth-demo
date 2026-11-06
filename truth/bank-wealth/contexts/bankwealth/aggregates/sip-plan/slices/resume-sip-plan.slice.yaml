@@ -7,48 +7,14 @@ payload:
   {
     "name": "ResumeSipPlan",
     "parameters": [
-      {
-        "name": "tick",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      }
+      "tick: Long @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "cond": "state.initialized",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SCHEDULE_SEALED",
-        "errCode": "SIP_SCHEDULE_SEALED",
-        "cond": "state.scheduleSealed",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_RESUME_CLOCK",
-        "errCode": "SIP_RESUME_CLOCK",
-        "cond": "param.tick == state.currentTick",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_RESUME_ONCE",
-        "errCode": "SIP_RESUME_ONCE",
-        "cond": "state.paused",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_RESUME_CLASSIFIED",
-        "errCode": "SIP_RESUME_CLASSIFIED",
-        "cond": "state.observedCount == state.scheduleCount || (state.slots.contains(state.observedCount) && state.slots(state.observedCount) > state.currentTick)",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_SCHEDULE_SEALED/SIP_SCHEDULE_SEALED: state.scheduleSealed)",
+      "@guard[invariantRef](reject SIP_RESUME_CLOCK/SIP_RESUME_CLOCK: \"param.tick == state.currentTick\")",
+      "@guard[invariantRef](succeed-empty SIP_RESUME_ONCE/SIP_RESUME_ONCE: state.paused)",
+      "@guard[invariantRef](reject SIP_RESUME_CLASSIFIED/SIP_RESUME_CLASSIFIED: \"state.observedCount == state.scheduleCount || (state.slots.contains(state.observedCount) && state.slots(state.observedCount) > state.currentTick)\")"
     ],
     "produces": [
       "SipPlanResumed"
@@ -72,38 +38,16 @@ events:
     "SipPlanResumed": {
       "name": "SipPlanResumed",
       "payloads": [
-        {
-          "name": "tick",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "pauseTick",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        }
+        "tick: Long @PROPAGATED",
+        "pauseTick: Long @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "tick",
-          "expr": "param.tick"
-        },
-        {
-          "slot": "pauseTick",
-          "expr": "state.pauseTick"
-        }
+        "tick <- param.tick",
+        "pauseTick <- state.pauseTick"
       ],
       "foldAssignments": [
-        {
-          "slot": "paused",
-          "expr": "literal:false"
-        },
-        {
-          "slot": "pauseIntervals",
-          "op": "put",
-          "key": "event.pauseTick",
-          "value": "event.tick"
-        }
+        "paused := \"literal:false\"",
+        "pauseIntervals := @fold[put](key=event.pauseTick, value=event.tick)"
       ]
     }
   }

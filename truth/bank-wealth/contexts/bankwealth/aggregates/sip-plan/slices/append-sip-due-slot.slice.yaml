@@ -7,67 +7,17 @@ payload:
   {
     "name": "AppendSipDueSlot",
     "parameters": [
-      {
-        "name": "position",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "dueSlot",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      }
+      "position: Long @BUSINESS_INPUT",
+      "dueSlot: Long @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_ADMITTED_SLOT_MEMBER",
-        "errCode": "SIP_ADMITTED_SLOT_MEMBER",
-        "cond": "state.createIntent.isEmpty || state.createIntentDueSlots.contains(param.dueSlot)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "cond": "state.initialized",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_REPLAY_CONFLICT",
-        "errCode": "SIP_SLOT_REPLAY_CONFLICT",
-        "cond": "!state.slots.contains(param.position) || state.slots(param.position) == param.dueSlot",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_ONCE",
-        "errCode": "SIP_SLOT_ONCE",
-        "cond": "!state.slots.contains(param.position)",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SCHEDULE_OPEN",
-        "errCode": "SIP_SCHEDULE_OPEN",
-        "cond": "!state.scheduleSealed",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_POSITION",
-        "errCode": "SIP_SLOT_POSITION",
-        "cond": "param.position == state.scheduleCount && param.position < 9223372036854775807",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_ORDER",
-        "errCode": "SIP_SLOT_ORDER",
-        "cond": "param.dueSlot > state.lastDueSlot && param.dueSlot >= state.latestEffectiveSlot",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject SIP_ADMITTED_SLOT_MEMBER/SIP_ADMITTED_SLOT_MEMBER: \"state.createIntent.isEmpty || state.createIntentDueSlots.contains(param.dueSlot)\")",
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_SLOT_REPLAY_CONFLICT/SIP_SLOT_REPLAY_CONFLICT: \"!state.slots.contains(param.position) || state.slots(param.position) == param.dueSlot\")",
+      "@guard[invariantRef](succeed-empty SIP_SLOT_ONCE/SIP_SLOT_ONCE: \"!state.slots.contains(param.position)\")",
+      "@guard[invariantRef](reject SIP_SCHEDULE_OPEN/SIP_SCHEDULE_OPEN: \"!state.scheduleSealed\")",
+      "@guard[invariantRef](reject SIP_SLOT_POSITION/SIP_SLOT_POSITION: \"param.position == state.scheduleCount && param.position < 9223372036854775807\")",
+      "@guard[invariantRef](reject SIP_SLOT_ORDER/SIP_SLOT_ORDER: \"param.dueSlot > state.lastDueSlot && param.dueSlot >= state.latestEffectiveSlot\")"
     ],
     "produces": [
       "SipDueSlotAppended"
@@ -98,50 +48,18 @@ events:
     "SipDueSlotAppended": {
       "name": "SipDueSlotAppended",
       "payloads": [
-        {
-          "name": "position",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "dueSlot",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        }
+        "position: Long @PROPAGATED",
+        "dueSlot: Long @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "position",
-          "expr": "param.position"
-        },
-        {
-          "slot": "dueSlot",
-          "expr": "param.dueSlot"
-        }
+        "position <- param.position",
+        "dueSlot <- param.dueSlot"
       ],
       "foldAssignments": [
-        {
-          "slot": "slots",
-          "op": "put",
-          "key": "event.position",
-          "value": "event.dueSlot"
-        },
-        {
-          "slot": "scheduleCount",
-          "op": "integer-apply",
-          "delta": "literal:1",
-          "sign": 1
-        },
-        {
-          "slot": "lastDueSlot",
-          "expr": "event.dueSlot"
-        },
-        {
-          "slot": "intentAppendedDueSlots",
-          "op": "put",
-          "key": "event.dueSlot",
-          "value": "event.position"
-        }
+        "slots := @fold[put](key=event.position, value=event.dueSlot)",
+        "scheduleCount := @fold[integer-apply](delta=\"literal:1\", sign=+1)",
+        "lastDueSlot := event.dueSlot",
+        "intentAppendedDueSlots := @fold[put](key=event.dueSlot, value=event.position)"
       ]
     }
   }

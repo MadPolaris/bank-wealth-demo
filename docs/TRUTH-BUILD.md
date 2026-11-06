@@ -1,5 +1,14 @@
 # 当前真源服务的离线编译与生成单元测试
 
+## 2026-11-06 紧凑真源与图链候选
+
+本轮 `target/truthsrc-minimal-candidate-20261106-02` 由压缩后的当前作者树经
+知识图导出AST生成，保留旧公开签名并新增规则核心/参数分层。
+`target/truthsrc-minimal-actor-20261106-01/result.json` 为 **passed**：505份main
+Scala和14份测试源码编译完成，64测试/13Suite全部通过（41业务＋23生成），15项来源、
+冻结依赖、实际staging、隔离和进程检查均true。没有启动HTTP/数据库或重签1134。
+下文2026-11-05记录保留其原时点，不被本次结果覆盖。
+
 `tools/verify-truthsrc-build.mjs` 验证一个**当前 JS 真源项目生成的、尚未构建过的银行服务目录**，连同原始 `v1/handwritten/scala/` 编译。它不是旧发行复演脚本，也不导入 `v1-release-cold.mjs`。
 
 默认只运行服务 `compile`。`--compile-generated-tests` 只增加生成测试源码的 `Test / compile`；`--run-generated-tests` 隐含该编译步骤，并通过生成 build 的固定 `Test / test` 执行已准入的生成单元测试。另有独立`--run-actor-tests`模式，按固定清单增加八个冻结业务Suite，不是整目录历史测试；它仍用原fork/runner和OS禁网，详见[四流actor窗口](TRUTH-RUNTIME-ACCEPTANCE.md#四流actor窗口独立于服务数据库)。两个执行模式互斥，均无任意task、`testOnly`、`run`、`runMain`或HTTP入口。通过不表示完整1134重新签收，runtime retry/backoff/deadline设计仍为 **OPEN**。

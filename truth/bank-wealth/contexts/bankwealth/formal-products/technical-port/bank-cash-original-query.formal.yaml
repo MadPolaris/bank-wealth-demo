@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankCashOriginalQuery",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankCashRequestKey"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankCashRequestResponse"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankCashRequestKey)",
+    "outputType": "@type(nominal:bankwealth:type#BankCashRequestResponse)"
   }

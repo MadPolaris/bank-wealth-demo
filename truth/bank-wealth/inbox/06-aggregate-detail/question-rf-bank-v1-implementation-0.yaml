@@ -28,6 +28,7 @@ payload:
           "inheritedSources": [
             {
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/inheritedSources/0/value",
               "interpretation": "historical-frozen-reference",
               "originalFile": "tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml",
@@ -35,6 +36,7 @@ payload:
             },
             {
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/inheritedSources/1/value",
               "interpretation": "historical-frozen-reference",
               "originalFile": "tree/inbox/refining/question-rf-cash-purchase-v2-contract-0.yaml",
@@ -42,6 +44,7 @@ payload:
             },
             {
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/inheritedSources/2/value",
               "interpretation": "historical-frozen-reference",
               "originalFile": "tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml",
@@ -62,9 +65,10 @@ payload:
           "money": {
             "type": "Money",
             "binding": "truthsrc.project.json#/exactTypes",
-            "domainRules": "contexts/bankwealth/aggregates/credit-balance/slices/reserve-funds.slice.yaml",
+            "domainRules": "knowledge:bank-wealth/bankwealth/command/CreditBalance/ReserveFunds",
             "historicalDecision": {
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/money"
             }
           },
@@ -73,6 +77,7 @@ payload:
             "declaration": "contexts/bankwealth/value-objects/ta-exact-text.vo.yaml",
             "historicalDecision": {
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/taExactText"
             }
           },
@@ -80,18 +85,21 @@ payload:
             {
               "id": "decision.p23-bank-v1-handoff",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/inheritedSources/0/value",
               "interpretation": "historical-frozen-reference"
             },
             {
               "id": "contract.cash-purchase-v2",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/inheritedSources/1/value",
               "interpretation": "historical-frozen-reference"
             },
             {
               "id": "decision.cash-entry-prerequisites",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/inheritedSources/2/value",
               "interpretation": "historical-frozen-reference"
             }
@@ -101,6 +109,7 @@ payload:
               "id": "PAY-success",
               "flow": "payment",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/0",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "PurchaseFundWithCash"
@@ -109,6 +118,7 @@ payload:
               "id": "PAY-repeat",
               "flow": "payment",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/1",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "PurchaseFundWithCash"
@@ -117,6 +127,7 @@ payload:
               "id": "PAY-conflict",
               "flow": "payment",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/2",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "PurchaseFundWithCash"
@@ -125,6 +136,7 @@ payload:
               "id": "PAY-early-reject",
               "flow": "payment",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/3",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "PurchaseFundWithCash"
@@ -133,6 +145,7 @@ payload:
               "id": "PAY-unknown-recover",
               "flow": "payment",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/4",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "PurchaseFundWithCash"
@@ -141,6 +154,7 @@ payload:
               "id": "PAY-cancel-before-prepare",
               "flow": "payment",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/5",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "PurchaseFundWithCash"
@@ -149,6 +163,7 @@ payload:
               "id": "TA-confirm",
               "flow": "ta",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/6",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "SettlePaidFundOrderWithTa"
@@ -157,6 +172,7 @@ payload:
               "id": "TA-repeat",
               "flow": "ta",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/7",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "SettlePaidFundOrderWithTa"
@@ -165,6 +181,7 @@ payload:
               "id": "TA-conflicting-body",
               "flow": "ta",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/8",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "SettlePaidFundOrderWithTa"
@@ -173,6 +190,7 @@ payload:
               "id": "TA-unknown-confirm",
               "flow": "ta",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/9",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "SettlePaidFundOrderWithTa"
@@ -181,6 +199,7 @@ payload:
               "id": "TA-before-payment",
               "flow": "ta",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/10",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "SettlePaidFundOrderWithTa"
@@ -189,6 +208,7 @@ payload:
               "id": "TA-wrong-resource",
               "flow": "ta",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/11",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "SettlePaidFundOrderWithTa"
@@ -197,6 +217,7 @@ payload:
               "id": "TA-accepted-only",
               "flow": "ta",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/12",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "SettlePaidFundOrderWithTa"
@@ -205,6 +226,7 @@ payload:
               "id": "REFUND-success",
               "flow": "refund",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/13",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RefundTaRejectedPurchase"
@@ -213,6 +235,7 @@ payload:
               "id": "REFUND-repeat",
               "flow": "refund",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/14",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RefundTaRejectedPurchase"
@@ -221,6 +244,7 @@ payload:
               "id": "REFUND-substitute",
               "flow": "refund",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/15",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RefundTaRejectedPurchase"
@@ -229,6 +253,7 @@ payload:
               "id": "REFUND-unknown-recover",
               "flow": "refund",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/16",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RefundTaRejectedPurchase"
@@ -237,6 +262,7 @@ payload:
               "id": "REFUND-no-TA-reject",
               "flow": "refund",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/17",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RefundTaRejectedPurchase"
@@ -245,6 +271,7 @@ payload:
               "id": "REFUND-conflicting-terminal",
               "flow": "refund",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/18",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RefundTaRejectedPurchase"
@@ -253,6 +280,7 @@ payload:
               "id": "SIP-success",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/19",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -261,6 +289,7 @@ payload:
               "id": "SIP-repeat-slot",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/20",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -269,6 +298,7 @@ payload:
               "id": "SIP-conflict-config",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/21",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -277,6 +307,7 @@ payload:
               "id": "SIP-unknown-recover",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/22",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -285,6 +316,7 @@ payload:
               "id": "SIP-no-effects-failure",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/23",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -293,6 +325,7 @@ payload:
               "id": "SIP-pause-backlog",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/24",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -301,6 +334,7 @@ payload:
               "id": "SIP-inflight-pause",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/25",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -309,6 +343,7 @@ payload:
               "id": "SIP-revision-backlog",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/26",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -317,6 +352,7 @@ payload:
               "id": "SIP-late-terminal",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/27",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -325,6 +361,7 @@ payload:
               "id": "SIP-refund-count-boundary",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/28",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -333,6 +370,7 @@ payload:
               "id": "SIP-catch-up-order",
               "flow": "sip",
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/scenarios/29",
               "interpretation": "historical-acceptance-scenario",
               "currentUseCase": "RunFiniteSipPlan"
@@ -347,6 +385,7 @@ payload:
           "readiness": {
             "historicalDeclaration": {
               "file": "v1/tree/inbox/refining/question-rf-bank-v1-implementation-0.yaml",
+              "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/readiness"
             },
             "acceptedRelease": "v1/integration/RELEASE-SIGNOUT-1134.md",

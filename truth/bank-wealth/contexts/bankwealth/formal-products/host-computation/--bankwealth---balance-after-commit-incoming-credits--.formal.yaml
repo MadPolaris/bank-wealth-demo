@@ -8,89 +8,22 @@ version: bank-v1-1
 author: agent-assisted-bank-v1
 payload:
   {
-    "id": {
-      "context": "bankwealth",
-      "kind": "port",
-      "owner": [],
-      "id": "BalanceAfterCommitIncomingCredits"
-    },
+    "id": "@ref(bankwealth:port#BalanceAfterCommitIncomingCredits)",
     "version": "bank-v1-1",
-    "command": {
-      "context": "bankwealth",
-      "kind": "command",
-      "owner": [
-        "CreditBalance"
-      ],
-      "id": "CommitIncomingCredits"
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "Money"
-      }
-    },
+    "command": "@ref(bankwealth:command/CreditBalance#CommitIncomingCredits)",
+    "outputType": "@type(nominal:bankwealth:type#Money)",
     "inputDependencies": [
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "CreditBalance",
-          "CommitIncomingCredits"
-        ],
-        "id": "txid"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "CreditBalance",
-          "CommitIncomingCredits"
-        ],
-        "id": "resource"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "CreditBalance",
-          "CommitIncomingCredits"
-        ],
-        "id": "amount"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "state-field",
-        "owner": [
-          "CreditBalance"
-        ],
-        "id": "accountBalance"
-      }
+      "@ref(bankwealth:parameter/CreditBalance/CommitIncomingCredits#txid)",
+      "@ref(bankwealth:parameter/CreditBalance/CommitIncomingCredits#resource)",
+      "@ref(bankwealth:parameter/CreditBalance/CommitIncomingCredits#amount)",
+      "@ref(bankwealth:state-field/CreditBalance#accountBalance)"
     ],
     "stableIdentityContract": {
       "id": "BalanceAfterCommitIncomingCredits-identity",
       "version": "1",
       "keys": [
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "CreditBalance",
-            "CommitIncomingCredits"
-          ],
-          "id": "txid"
-        },
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "CreditBalance",
-            "CommitIncomingCredits"
-          ],
-          "id": "resource"
-        }
+        "@ref(bankwealth:parameter/CreditBalance/CommitIncomingCredits#txid)",
+        "@ref(bankwealth:parameter/CreditBalance/CommitIncomingCredits#resource)"
       ]
     }
   }

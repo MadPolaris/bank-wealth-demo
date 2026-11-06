@@ -1,0 +1,215 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: structure
+schemaVersion: "truthsrc.structure/v1"
+id: refund-results
+description: "Shared exact protocol structures; row order and explicit business differences are preserved."
+payload:
+  {
+    "constants": {
+      "doc-payload-parameters": [
+        "refundTxId: TxId @BUSINESS_INPUT",
+        "refundOperationId: OperationId @BUSINESS_INPUT",
+        "receiptId: String @BUSINESS_INPUT",
+        "receiptBody: String @BUSINESS_INPUT"
+      ],
+      "refund-result-association": "@guard[invariantRef](reject REFUND_RESULT_ASSOCIATION/REFUND_RESULT_ASSOCIATION: \"param.refundOperationId == state.refundOperationId && param.refundOperationId.value.nonEmpty\")",
+      "refund-receipt-present": "@guard[invariantRef](reject REFUND_RECEIPT_PRESENT/REFUND_RECEIPT_PRESENT: \"param.refundTxId.value.nonEmpty && param.receiptId.nonEmpty && param.receiptBody.nonEmpty\")",
+      "refund-receipt-conflict": "@guard[invariantRef](reject REFUND_RECEIPT_CONFLICT/REFUND_RECEIPT_CONFLICT: \"!state.refundResultReceipts.contains(param.receiptId) || state.refundResultReceipts(param.receiptId) == param.receiptBody\")",
+      "refund-receipt-once": "@guard[invariantRef](succeed-empty REFUND_RECEIPT_ONCE/REFUND_RECEIPT_ONCE: \"!state.refundResultReceipts.contains(param.receiptId)\")",
+      "refund-terminal-once": "@guard[invariantRef](succeed-empty REFUND_TERMINAL_ONCE/REFUND_TERMINAL_ONCE: \"!state.refundFinalResults.contains(param.refundTxId)\")",
+      "doc-payload-provenance": {"author":"agent-assisted-bank-v1","workshopHeld":false,"sourceVersion":"bank-v1-p23-design-2","sourceFlow":"payment/ta/refund"},
+      "events-fund-refund-compensated-payloads": [
+        "refundTxId: TxId @PROPAGATED",
+        "refundOperationId: OperationId @PROPAGATED",
+        "receiptId: String @PROPAGATED",
+        "receiptBody: String @PROPAGATED",
+        "kind: String @PROPAGATED"
+      ],
+      "events-fund-refund-compensated-fold-assignments": [
+        "refundResultReceipts := @fold[put](key=event.receiptId, value=event.receiptBody)",
+        "refundOutcome := event.kind",
+        "refundFinalResults := @fold[put](key=event.refundTxId, value=event.kind)"
+      ],
+      "doc-payload-guards": [
+        "@guard[invariantRef](reject REFUND_RESULT_ASSOCIATION/REFUND_RESULT_ASSOCIATION: \"param.refundOperationId == state.refundOperationId && param.refundOperationId.value.nonEmpty\")",
+        "@guard[invariantRef](reject REFUND_RECEIPT_PRESENT/REFUND_RECEIPT_PRESENT: \"param.refundTxId.value.nonEmpty && param.receiptId.nonEmpty && param.receiptBody.nonEmpty\")",
+        "@guard[invariantRef](reject REFUND_RECEIPT_CONFLICT/REFUND_RECEIPT_CONFLICT: \"!state.refundResultReceipts.contains(param.receiptId) || state.refundResultReceipts(param.receiptId) == param.receiptBody\")",
+        "@guard[invariantRef](succeed-empty REFUND_RECEIPT_ONCE/REFUND_RECEIPT_ONCE: \"!state.refundResultReceipts.contains(param.receiptId)\")",
+        "@guard[invariantRef](succeed-empty REFUND_LATE_PROGRESS/REFUND_LATE_PROGRESS: \"!state.refundFinalResults.contains(param.refundTxId)\")"
+      ],
+      "events-fund-refund-outcome-unknown-fold-assignments": [
+        "refundResultReceipts := @fold[put](key=event.receiptId, value=event.receiptBody)",
+        "refundOutcome := event.kind"
+      ]
+    },
+    "templates": {},
+    "atoms": [
+      {
+        "file": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-compensated.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "FundOrder",
+          "command": "RecordFundRefundCompensated",
+          "payload": {
+            "name": "RecordFundRefundCompensated",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": [
+              {"$value":"refund-result-association"},
+              {"$value":"refund-receipt-present"},
+              {"$value":"refund-receipt-conflict"},
+              "@guard[invariantRef](reject REFUND_TERMINAL_CONFLICT/REFUND_TERMINAL_CONFLICT: \"!state.refundFinalResults.contains(param.refundTxId) || state.refundFinalResults(param.refundTxId) == \\\"compensated\\\"\")",
+              {"$value":"refund-receipt-once"},
+              {"$value":"refund-terminal-once"}
+            ],
+            "produces": ["FundRefundCompensated"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "FundRefundCompensated": {
+              "name": "FundRefundCompensated",
+              "payloads": {"$value":"events-fund-refund-compensated-payloads"},
+              "bindings": [
+                "refundTxId <- param.refundTxId",
+                "refundOperationId <- param.refundOperationId",
+                "receiptId <- param.receiptId",
+                "receiptBody <- param.receiptBody",
+                "kind <- \"literal:compensated\""
+              ],
+              "foldAssignments": {"$value":"events-fund-refund-compensated-fold-assignments"}
+            }
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-outcome-unknown.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "FundOrder",
+          "command": "RecordFundRefundOutcomeUnknown",
+          "payload": {
+            "name": "RecordFundRefundOutcomeUnknown",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": {"$value":"doc-payload-guards"},
+            "produces": ["FundRefundOutcomeUnknown"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "FundRefundOutcomeUnknown": {
+              "name": "FundRefundOutcomeUnknown",
+              "payloads": {"$value":"events-fund-refund-compensated-payloads"},
+              "bindings": [
+                "refundTxId <- param.refundTxId",
+                "refundOperationId <- param.refundOperationId",
+                "receiptId <- param.receiptId",
+                "receiptBody <- param.receiptBody",
+                "kind <- \"literal:outcome-unknown\""
+              ],
+              "foldAssignments": {"$value":"events-fund-refund-outcome-unknown-fold-assignments"}
+            }
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-recovery-required.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "FundOrder",
+          "command": "RecordFundRefundRecoveryRequired",
+          "payload": {
+            "name": "RecordFundRefundRecoveryRequired",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": {"$value":"doc-payload-guards"},
+            "produces": ["FundRefundRecoveryRequired"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "FundRefundRecoveryRequired": {
+              "name": "FundRefundRecoveryRequired",
+              "payloads": {"$value":"events-fund-refund-compensated-payloads"},
+              "bindings": [
+                "refundTxId <- param.refundTxId",
+                "refundOperationId <- param.refundOperationId",
+                "receiptId <- param.receiptId",
+                "receiptBody <- param.receiptBody",
+                "kind <- \"literal:recovery-required\""
+              ],
+              "foldAssignments": {"$value":"events-fund-refund-outcome-unknown-fold-assignments"}
+            }
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-rejected-before-effects.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "FundOrder",
+          "command": "RecordFundRefundRejectedBeforeEffects",
+          "payload": {
+            "name": "RecordFundRefundRejectedBeforeEffects",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": [
+              {"$value":"refund-result-association"},
+              {"$value":"refund-receipt-present"},
+              {"$value":"refund-receipt-conflict"},
+              "@guard[invariantRef](reject REFUND_TERMINAL_CONFLICT/REFUND_TERMINAL_CONFLICT: \"!state.refundFinalResults.contains(param.refundTxId) || state.refundFinalResults(param.refundTxId) == \\\"rejected-before-effects\\\"\")",
+              {"$value":"refund-receipt-once"},
+              {"$value":"refund-terminal-once"}
+            ],
+            "produces": ["FundRefundRejectedBeforeEffects"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "FundRefundRejectedBeforeEffects": {
+              "name": "FundRefundRejectedBeforeEffects",
+              "payloads": {"$value":"events-fund-refund-compensated-payloads"},
+              "bindings": [
+                "refundTxId <- param.refundTxId",
+                "refundOperationId <- param.refundOperationId",
+                "receiptId <- param.receiptId",
+                "receiptBody <- param.receiptBody",
+                "kind <- \"literal:rejected-before-effects\""
+              ],
+              "foldAssignments": {"$value":"events-fund-refund-compensated-fold-assignments"}
+            }
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "FundOrder",
+          "command": "RecordFundRefundSucceeded",
+          "payload": {
+            "name": "RecordFundRefundSucceeded",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": [
+              {"$value":"refund-result-association"},
+              {"$value":"refund-receipt-present"},
+              {"$value":"refund-receipt-conflict"},
+              "@guard[invariantRef](reject REFUND_TERMINAL_CONFLICT/REFUND_TERMINAL_CONFLICT: \"!state.refundFinalResults.contains(param.refundTxId) || state.refundFinalResults(param.refundTxId) == \\\"succeeded\\\"\")",
+              {"$value":"refund-receipt-once"},
+              {"$value":"refund-terminal-once"}
+            ],
+            "produces": ["FundRefundSucceeded"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "FundRefundSucceeded": {
+              "name": "FundRefundSucceeded",
+              "payloads": {"$value":"events-fund-refund-compensated-payloads"},
+              "bindings": [
+                "refundTxId <- param.refundTxId",
+                "refundOperationId <- param.refundOperationId",
+                "receiptId <- param.receiptId",
+                "receiptBody <- param.receiptBody",
+                "kind <- \"literal:succeeded\""
+              ],
+              "foldAssignments": {"$value":"events-fund-refund-compensated-fold-assignments"}
+            }
+          }
+        }
+      }
+    ]
+  }

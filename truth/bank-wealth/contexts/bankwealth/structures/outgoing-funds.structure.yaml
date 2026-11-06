@@ -1,0 +1,162 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: structure
+schemaVersion: "truthsrc.structure/v1"
+id: outgoing-funds
+description: "Shared exact protocol structures; row order and explicit business differences are preserved."
+payload:
+  {
+    "constants": {
+      "doc-payload-parameters": [
+        "txid: TxId @BUSINESS_INPUT",
+        "resource: AccountId @BUSINESS_INPUT",
+        "amount: Money @BUSINESS_INPUT"
+      ],
+      "ledger-resource": "@guard[invariantRef](reject LEDGER_RESOURCE/LEDGER_RESOURCE: \"state.initialized && param.resource == state.id\")",
+      "ledger-cny": "@guard[invariantRef](reject LEDGER_CNY/LEDGER_CNY: \"param.amount.currency == \\\"CNY\\\"\")",
+      "ledger-positive": "@guard[invariantRef](reject LEDGER_POSITIVE/LEDGER_POSITIVE: \"param.amount.amount > 0.00\")",
+      "ledger-committedoutgoing-match": "@guard[invariantRef](reject LEDGER_COMMITTEDOUTGOING_MATCH/LEDGER_COMMITTEDOUTGOING_MATCH: \"!state.committedOutgoing.contains(param.txid) || state.committedOutgoing(param.txid) == param.amount\")",
+      "ledger-reservedamount-match": "@guard[invariantRef](reject LEDGER_RESERVEDAMOUNT_MATCH/LEDGER_RESERVEDAMOUNT_MATCH: \"!state.reservedAmount.contains(param.txid) || state.reservedAmount(param.txid) == param.amount\")",
+      "doc-payload-provenance": {
+        "author": "agent-assisted-bank-v1",
+        "workshopHeld": false,
+        "approvedBy": "user-approved-p24-p25-bank-joint",
+        "sourceVersion": "bank-v1-p23-design-2"
+      },
+      "ledger-compensatedoutgoing-match": "@guard[invariantRef](reject LEDGER_COMPENSATEDOUTGOING_MATCH/LEDGER_COMPENSATEDOUTGOING_MATCH: \"!state.compensatedOutgoing.contains(param.txid) || state.compensatedOutgoing(param.txid) == param.amount\")",
+      "events-release-reserved-funds-confirmed-payloads": [
+        "txid: TxId @PROPAGATED",
+        "resource: AccountId @PROPAGATED",
+        "amount: Money @PROPAGATED",
+        "currency: String @PROPAGATED",
+        "available: Money @PROPAGATED"
+      ],
+      "release-reserved-funds-confirmed-fold-assignments-2": "accountBalance := @fold[put](key=event.currency, value=event.available)"
+    },
+    "templates": {},
+    "atoms": [
+      {
+        "file": "contexts/bankwealth/aggregates/credit-balance/slices/deduct-funds.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "CreditBalance",
+          "command": "DeductFunds",
+          "payload": {
+            "name": "DeductFunds",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": [
+              {"$value":"ledger-resource"},
+              {"$value":"ledger-cny"},
+              {"$value":"ledger-positive"},
+              {"$value":"ledger-committedoutgoing-match"},
+              "@guard[when](succeed-empty LEDGER_COMMIT_ONCE/LEDGER_COMMIT_ONCE: map-absent(map=committedOutgoing, key=param.txid))",
+              "@guard[invariantRef](reject LEDGER_NOT_COMPENSATED/LEDGER_NOT_COMPENSATED: \"!state.compensatedOutgoing.contains(param.txid)\")",
+              "@guard[invariantRef](reject LEDGER_PREPARED/LEDGER_PREPARED: \"state.reservedAmount.contains(param.txid)\")",
+              {"$value":"ledger-reservedamount-match"}
+            ],
+            "produces": ["DeductFundsConfirmed"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "DeductFundsConfirmed": {
+              "name": "DeductFundsConfirmed",
+              "payloads": [
+                "txid: TxId @PROPAGATED",
+                "resource: AccountId @PROPAGATED",
+                "amount: Money @PROPAGATED"
+              ],
+              "bindings": ["txid <- param.txid","resource <- param.resource","amount <- param.amount"],
+              "foldAssignments": [
+                "reservedAmount := @fold[remove](key=event.txid)",
+                "committedOutgoing := @fold[put](key=event.txid, value=event.amount)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/aggregates/credit-balance/slices/release-reserved-funds.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "CreditBalance",
+          "command": "ReleaseReservedFunds",
+          "payload": {
+            "name": "ReleaseReservedFunds",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": [
+              {"$value":"ledger-resource"},
+              {"$value":"ledger-cny"},
+              {"$value":"ledger-positive"},
+              {"$value":"ledger-compensatedoutgoing-match"},
+              "@guard[when](succeed-empty LEDGER_COMPENSATE_ONCE/LEDGER_COMPENSATE_ONCE: map-absent(map=compensatedOutgoing, key=param.txid))",
+              "@guard[invariantRef](reject LEDGER_NOT_COMMITTED/LEDGER_NOT_COMMITTED: \"!state.committedOutgoing.contains(param.txid)\")",
+              {"$value":"ledger-reservedamount-match"}
+            ],
+            "produces": ["ReleaseReservedFundsConfirmed"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "ReleaseReservedFundsConfirmed": {
+              "name": "ReleaseReservedFundsConfirmed",
+              "payloads": {"$value":"events-release-reserved-funds-confirmed-payloads"},
+              "bindings": [
+                "txid <- param.txid",
+                "resource <- param.resource",
+                "amount <- param.amount",
+                "currency <- \"literal:CNY\"",
+                "available <- @host(bankwealth:port#BalanceAfterReleaseReservedFunds@bank-v1-1)"
+              ],
+              "foldAssignments": [
+                "reservedAmount := @fold[remove](key=event.txid)",
+                "compensatedOutgoing := @fold[put](key=event.txid, value=event.amount)",
+                {"$value":"release-reserved-funds-confirmed-fold-assignments-2"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/aggregates/credit-balance/slices/reserve-funds.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "CreditBalance",
+          "command": "ReserveFunds",
+          "payload": {
+            "name": "ReserveFunds",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": [
+              {"$value":"ledger-resource"},
+              {"$value":"ledger-cny"},
+              {"$value":"ledger-positive"},
+              {"$value":"ledger-committedoutgoing-match"},
+              {"$value":"ledger-compensatedoutgoing-match"},
+              {"$value":"ledger-reservedamount-match"},
+              "@guard[when](succeed-empty LEDGER_ALREADY_COMMITTED/LEDGER_ALREADY_COMMITTED: map-absent(map=committedOutgoing, key=param.txid))",
+              "@guard[when](succeed-empty LEDGER_ALREADY_COMPENSATED/LEDGER_ALREADY_COMPENSATED: map-absent(map=compensatedOutgoing, key=param.txid))",
+              "@guard[when](succeed-empty LEDGER_ALREADY_PREPARED/LEDGER_ALREADY_PREPARED: map-absent(map=reservedAmount, key=param.txid))",
+              "@guard[when](reject LEDGER_SUFFICIENT/LEDGER_SUFFICIENT: money-sufficient(amount=param.amount, in=accountBalance))"
+            ],
+            "produces": ["ReserveFundsConfirmed"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "ReserveFundsConfirmed": {
+              "name": "ReserveFundsConfirmed",
+              "payloads": {"$value":"events-release-reserved-funds-confirmed-payloads"},
+              "bindings": [
+                "txid <- param.txid",
+                "resource <- param.resource",
+                "amount <- param.amount",
+                "currency <- \"literal:CNY\"",
+                "available <- @host(bankwealth:port#BalanceAfterReserveFunds@bank-v1-1)"
+              ],
+              "foldAssignments": [
+                "reservedAmount := @fold[put](key=event.txid, value=event.amount)",
+                {"$value":"release-reserved-funds-confirmed-fold-assignments-2"}
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }

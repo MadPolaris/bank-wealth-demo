@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankCashSubmitPort",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankCashSubmit"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankCashAcknowledgement"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankCashSubmit)",
+    "outputType": "@type(nominal:bankwealth:type#BankCashAcknowledgement)"
   }

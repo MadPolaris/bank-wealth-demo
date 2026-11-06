@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankReconcileExistingPort",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankOperationKey"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankRecoveryAcknowledgement"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankOperationKey)",
+    "outputType": "@type(nominal:bankwealth:type#BankRecoveryAcknowledgement)"
   }

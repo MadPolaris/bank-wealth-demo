@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankSipOccurrencesQuery",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankOccurrencePageKey"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipOccurrencePage"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankOccurrencePageKey)",
+    "outputType": "@type(nominal:bankwealth:type#BankSipOccurrencePage)"
   }

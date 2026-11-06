@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankOrderQuery",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankOrderKey"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankOrderResponse"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankOrderKey)",
+    "outputType": "@type(nominal:bankwealth:type#BankOrderResponse)"
   }

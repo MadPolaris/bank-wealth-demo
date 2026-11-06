@@ -54,11 +54,7 @@ steps:
               "resultKind": "succeeded",
               "code": "Succeeded",
               "outputs": [
-                {
-                  "slot": "txid",
-                  "ref": "result:txid",
-                  "type": "TxId"
-                }
+                "txid <- \"result:txid\" : TxId"
               ]
             },
             {

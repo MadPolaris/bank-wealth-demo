@@ -7,58 +7,16 @@ payload:
   {
     "name": "InitializeAccount",
     "parameters": [
-      {
-        "name": "resource",
-        "dataType": "AccountId",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "currency",
-        "dataType": "String",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "amount",
-        "dataType": "Money",
-        "origin": "BUSINESS_INPUT"
-      }
+      "resource: AccountId @BUSINESS_INPUT",
+      "currency: String @BUSINESS_INPUT",
+      "amount: Money @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "ACCOUNT_ID",
-        "errCode": "ACCOUNT_ID",
-        "cond": "param.resource == state.id",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "ACCOUNT_CURRENCY",
-        "errCode": "ACCOUNT_CURRENCY",
-        "cond": "param.currency == \"CNY\" && param.amount.currency == param.currency",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "ACCOUNT_INIT_CONFLICT",
-        "errCode": "ACCOUNT_INIT_CONFLICT",
-        "cond": "!state.initialized || state.accountBalance.get(param.currency).contains(param.amount)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "ACCOUNT_INIT_ONCE",
-        "errCode": "ACCOUNT_INIT_ONCE",
-        "cond": "!state.initialized",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "ACCOUNT_SEED_NONNEGATIVE",
-        "errCode": "ACCOUNT_SEED_NONNEGATIVE",
-        "cond": "param.amount.amount >= 0.00",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject ACCOUNT_ID/ACCOUNT_ID: \"param.resource == state.id\")",
+      "@guard[invariantRef](reject ACCOUNT_CURRENCY/ACCOUNT_CURRENCY: \"param.currency == \\\"CNY\\\" && param.amount.currency == param.currency\")",
+      "@guard[invariantRef](reject ACCOUNT_INIT_CONFLICT/ACCOUNT_INIT_CONFLICT: \"!state.initialized || state.accountBalance.get(param.currency).contains(param.amount)\")",
+      "@guard[invariantRef](succeed-empty ACCOUNT_INIT_ONCE/ACCOUNT_INIT_ONCE: \"!state.initialized\")",
+      "@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE/ACCOUNT_SEED_NONNEGATIVE: \"param.amount.amount >= 0.00\")"
     ],
     "produces": [
       "AccountInitialized"
@@ -75,47 +33,18 @@ events:
     "AccountInitialized": {
       "name": "AccountInitialized",
       "payloads": [
-        {
-          "name": "resource",
-          "dataType": "AccountId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "currency",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "amount",
-          "dataType": "Money",
-          "origin": "PROPAGATED"
-        }
+        "resource: AccountId @PROPAGATED",
+        "currency: String @PROPAGATED",
+        "amount: Money @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "resource",
-          "expr": "param.resource"
-        },
-        {
-          "slot": "currency",
-          "expr": "param.currency"
-        },
-        {
-          "slot": "amount",
-          "expr": "param.amount"
-        }
+        "resource <- param.resource",
+        "currency <- param.currency",
+        "amount <- param.amount"
       ],
       "foldAssignments": [
-        {
-          "slot": "initialized",
-          "expr": "literal:true"
-        },
-        {
-          "slot": "accountBalance",
-          "op": "put",
-          "key": "event.currency",
-          "value": "event.amount"
-        }
+        "initialized := \"literal:true\"",
+        "accountBalance := @fold[put](key=event.currency, value=event.amount)"
       ]
     }
   }

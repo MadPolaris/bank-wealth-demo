@@ -6,6 +6,7 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ROOT, TOOL_ROOT } from './truth-source.mjs';
 import { bankApplicationRequest, V1_TREE } from './v1-inputs.mjs';
+import { historicalInventory } from './historical-source.mjs';
 
 const load = file => import(pathToFileURL(join(TOOL_ROOT, file)).href);
 const { readProductRequest } = await load('lib/products/cli.mjs');
@@ -18,6 +19,7 @@ const json = file => JSON.parse(readFileSync(file, 'utf8'));
 const inputDirectory = flow => join(ROOT, 'v1/formal-inputs', flow + '-376');
 
 export function fingerprints(root) {
+  if (root === V1_TREE) return Object.fromEntries(historicalInventory('v1/tree').map(({ file, sha256 }) => [file.slice('v1/tree/'.length), sha256]));
   const files = {};
   function walk(directory) {
     for (const item of readdirSync(directory, { withFileTypes: true })) {

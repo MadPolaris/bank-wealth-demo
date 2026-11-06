@@ -7,55 +7,15 @@ payload:
   {
     "name": "PauseSipPlan",
     "parameters": [
-      {
-        "name": "tick",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      }
+      "tick: Long @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "cond": "state.initialized",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SCHEDULE_SEALED",
-        "errCode": "SIP_SCHEDULE_SEALED",
-        "cond": "state.scheduleSealed",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_PAUSE_REPLAY_CONFLICT",
-        "errCode": "SIP_PAUSE_REPLAY_CONFLICT",
-        "cond": "!state.paused || param.tick == state.pauseTick",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_PAUSE_ONCE",
-        "errCode": "SIP_PAUSE_ONCE",
-        "cond": "!state.paused",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_PAUSE_CLOCK",
-        "errCode": "SIP_PAUSE_CLOCK",
-        "cond": "param.tick == state.currentTick && param.tick >= 0",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_PAUSE_INTERVAL_ONCE",
-        "errCode": "SIP_PAUSE_INTERVAL_ONCE",
-        "cond": "!state.pauseIntervals.contains(param.tick)",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_SCHEDULE_SEALED/SIP_SCHEDULE_SEALED: state.scheduleSealed)",
+      "@guard[invariantRef](reject SIP_PAUSE_REPLAY_CONFLICT/SIP_PAUSE_REPLAY_CONFLICT: \"!state.paused || param.tick == state.pauseTick\")",
+      "@guard[invariantRef](succeed-empty SIP_PAUSE_ONCE/SIP_PAUSE_ONCE: \"!state.paused\")",
+      "@guard[invariantRef](reject SIP_PAUSE_CLOCK/SIP_PAUSE_CLOCK: \"param.tick == state.currentTick && param.tick >= 0\")",
+      "@guard[invariantRef](reject SIP_PAUSE_INTERVAL_ONCE/SIP_PAUSE_INTERVAL_ONCE: \"!state.pauseIntervals.contains(param.tick)\")"
     ],
     "produces": [
       "SipPlanPaused"
@@ -79,27 +39,14 @@ events:
     "SipPlanPaused": {
       "name": "SipPlanPaused",
       "payloads": [
-        {
-          "name": "tick",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        }
+        "tick: Long @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "tick",
-          "expr": "param.tick"
-        }
+        "tick <- param.tick"
       ],
       "foldAssignments": [
-        {
-          "slot": "paused",
-          "expr": "literal:true"
-        },
-        {
-          "slot": "pauseTick",
-          "expr": "event.tick"
-        }
+        "paused := \"literal:true\"",
+        "pauseTick := event.tick"
       ]
     }
   }

@@ -1,0 +1,343 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: structure
+schemaVersion: "truthsrc.structure/v1"
+id: effect-protocols
+description: "Shared exact protocol structures; row order and explicit business differences are preserved."
+payload:
+  {
+    "constants": {},
+    "templates": {
+      "formal-effect-host-bank-sip-dispatch": {
+        "parameters": [
+          "file",
+          "doc-id",
+          "ref-id",
+          "payload-step-id",
+          "payload-port",
+          "ref-id-2",
+          "ref-id-3",
+          "ref-id-4",
+          "ref-id-5",
+          "ref-id-6",
+          "identity-input",
+          "ref-id-7",
+          "outcomes-code",
+          "ref-id-8",
+          "implementation-id",
+          "ref-id-9",
+          "ref-id-10",
+          "implementation-id-2",
+          "ref-id-11",
+          "implementation-id-3",
+          "provenance-pointer"
+        ],
+        "body": {
+          "file": {"$arg":"file"},
+          "doc": {
+            "kind": "formal-product",
+            "schemaVersion": "truthsrc.formal-product/v1",
+            "family": "effect-host",
+            "id": {"$arg":"doc-id"},
+            "version": "bank-v1-1",
+            "author": "agent-assisted-bank-v1",
+            "payload": {
+              "id": {"$arg":"doc-id"},
+              "version": "bank-v1-1",
+              "pipeline": {"ref":{"context":"bankwealth","kind":"pipeline","owner":[],"id":{"$arg":"ref-id"}},"version":"bank-v1-1"},
+              "stepId": {"$arg":"payload-step-id"},
+              "port": {"$arg":"payload-port"},
+              "requestType": {"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id-2"}}},
+              "resultType": {"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id-3"}}},
+              "operationType": {"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id-4"}}},
+              "observationType": {"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id-5"}}},
+              "reconcileType": {"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id-6"}}},
+              "identity": {
+                "input": {"$arg":"identity-input"},
+                "slot": {"$arg":"identity-input"},
+                "valueType": {"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id-7"}}},
+                "encoding": "length-prefixed-utf8"
+              },
+              "outcomes": [
+                {"status":"confirmed","code":{"$arg":"outcomes-code"},"kind":"success"},
+                {"status":"rejected","code":"Refused","kind":"business-rejection"},
+                {"status":"failed","code":"Unavailable","kind":"infrastructure-failure"},
+                {"status":"unknown","code":"Unknown","kind":"unknown-effect"}
+              ],
+              "technicalPorts": [
+                {
+                  "role": "execute",
+                  "port": {"ref":{"context":"bankwealth","kind":"port","owner":[],"id":{"$arg":"ref-id-8"}},"version":"bank-v1-1"},
+                  "implementation": {"id":{"$arg":"implementation-id"},"version":"bank-v1-1"},
+                  "owner": {"ref":{"context":"bankwealth","kind":"artifact","owner":[],"id":{"$arg":"ref-id-9"}},"version":"bank-v1-1"}
+                },
+                {
+                  "role": "query",
+                  "port": {"ref":{"context":"bankwealth","kind":"port","owner":[],"id":{"$arg":"ref-id-10"}},"version":"bank-v1-1"},
+                  "implementation": {"id":{"$arg":"implementation-id-2"},"version":"bank-v1-1"},
+                  "owner": {"ref":{"context":"bankwealth","kind":"artifact","owner":[],"id":{"$arg":"ref-id-9"}},"version":"bank-v1-1"}
+                },
+                {
+                  "role": "reconcile",
+                  "port": {"ref":{"context":"bankwealth","kind":"port","owner":[],"id":{"$arg":"ref-id-11"}},"version":"bank-v1-1"},
+                  "implementation": {"id":{"$arg":"implementation-id-3"},"version":"bank-v1-1"},
+                  "owner": {"ref":{"context":"bankwealth","kind":"artifact","owner":[],"id":{"$arg":"ref-id-9"}},"version":"bank-v1-1"}
+                }
+              ],
+              "provenance": [{"document":"bank-v1","pointer":{"$arg":"provenance-pointer"}}]
+            }
+          }
+        }
+      },
+      "formal-technical-port-bank-sip-dispatch-execute": {
+        "parameters": ["file","doc-id","ref-id","ref-id-2"],
+        "body": {
+          "file": {"$arg":"file"},
+          "doc": {
+            "kind": "formal-product",
+            "schemaVersion": "truthsrc.formal-product/v1",
+            "family": "technical-port",
+            "id": {"$arg":"doc-id"},
+            "version": "bank-v1-1",
+            "author": "agent-assisted-bank-v1",
+            "payload": {
+              "name": {"$arg":"doc-id"},
+              "version": "bank-v1-1",
+              "inputType": {"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id"}}},
+              "outputType": {"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id-2"}}}
+            }
+          }
+        }
+      },
+      "formal-technical-port-bank-sip-dispatch-query": {
+        "parameters": ["file","doc-id","ref-id","ref-id-2"],
+        "body": {
+          "file": {"$arg":"file"},
+          "doc": {
+            "kind": "formal-product",
+            "schemaVersion": "truthsrc.formal-product/v1",
+            "family": "technical-port",
+            "id": {"$arg":"doc-id"},
+            "version": "bank-v1-1",
+            "author": "agent-assisted-bank-v1",
+            "payload": {
+              "name": {"$arg":"doc-id"},
+              "version": "bank-v1-1",
+              "inputType": {"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id"}}},
+              "outputType": {"form":"optional","element":{"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id-2"}}}}
+            }
+          }
+        }
+      },
+      "formal-technical-port-bank-sip-dispatch-reconcile-port": {
+        "parameters": ["file","doc-id","ref-id"],
+        "body": {
+          "file": {"$arg":"file"},
+          "doc": {
+            "kind": "formal-product",
+            "schemaVersion": "truthsrc.formal-product/v1",
+            "family": "technical-port",
+            "id": {"$arg":"doc-id"},
+            "version": "bank-v1-1",
+            "author": "agent-assisted-bank-v1",
+            "payload": {
+              "name": {"$arg":"doc-id"},
+              "version": "bank-v1-1",
+              "inputType": {"form":"nominal","ref":{"context":"bankwealth","kind":"type","owner":[],"id":{"$arg":"ref-id"}}},
+              "outputType": "@type(primitive:boolean)"
+            }
+          }
+        }
+      },
+      "value-object-bank-sip-dispatch-observation": {
+        "parameters": ["file","doc-name","doc-seq","fields-data-type","fields-name","fields-data-type-2","fields-name-2","fields-data-type-3"],
+        "body": {
+          "file": {"$arg":"file"},
+          "doc": {
+            "kind": "value-object",
+            "name": {"$arg":"doc-name"},
+            "seq": {"$arg":"doc-seq"},
+            "payload": {
+              "name": {"$arg":"doc-name"},
+              "context": "bankwealth",
+              "version": "bank-v1-1",
+              "fields": [
+                "operation: String",
+                {"name":"request","dataType":{"$arg":"fields-data-type"}},
+                {"name":{"$arg":"fields-name"},"dataType":"String"},
+                {"name":"evidence","dataType":{"$arg":"fields-data-type-2"}},
+                {"name":{"$arg":"fields-name-2"},"dataType":{"$arg":"fields-data-type-3"}}
+              ]
+            }
+          }
+        }
+      }
+    },
+    "atoms": [
+      {
+        "$rows": {
+          "template": "formal-effect-host-bank-sip-dispatch",
+          "rows": [
+            [
+              "contexts/bankwealth/formal-products/effect-host/bank-sip-dispatch.formal.yaml",
+              "bank-sip-dispatch",
+              "bank-sip-dispatch-v1",
+              "dispatch-cash",
+              "DispatchSipCash",
+              "BankSipDispatchRequest",
+              "BankSipDispatchResult",
+              "BankSipDispatchOperation",
+              "BankSipDispatchObservation",
+              "BankSipDispatchReconcile",
+              "occurrenceId",
+              "OccurrenceId",
+              "Dispatched",
+              "BankSipDispatchExecute",
+              "bankwealth.BankSipDispatchExecute",
+              "BankSipTechnical",
+              "BankSipDispatchQuery",
+              "bankwealth.BankSipDispatchQuery",
+              "BankSipDispatchReconcilePort",
+              "bankwealth.BankSipDispatchReconcilePort",
+              "/pipelines/2"
+            ],
+            [
+              "contexts/bankwealth/formal-products/effect-host/bank-ta-effect.formal.yaml",
+              "bank-ta-effect",
+              "bank-ta-submission-v1",
+              "submit-ta",
+              "SubmitPaidTaRequest",
+              "BankTaEffectRequest",
+              "BankTaEffectResult",
+              "BankTaEffectOperation",
+              "BankTaEffectObservation",
+              "BankTaEffectReconcile",
+              "taRequestId",
+              "TaRequestId",
+              "Observed",
+              "BankTaEffectExecute",
+              "bankwealth.BankTaEffectExecute",
+              "BankTaTechnical",
+              "BankTaEffectQuery",
+              "bankwealth.BankTaEffectQuery",
+              "BankTaEffectReconcilePort",
+              "bankwealth.BankTaEffectReconcilePort",
+              "/pipelines/3"
+            ]
+          ]
+        }
+      },
+      {
+        "$rows": {
+          "template": "formal-technical-port-bank-sip-dispatch-execute",
+          "rows": [
+            ["contexts/bankwealth/formal-products/technical-port/bank-sip-dispatch-execute.formal.yaml","BankSipDispatchExecute","BankSipDispatchOperation","BankSipDispatchObservation"],
+            ["contexts/bankwealth/formal-products/technical-port/bank-ta-effect-execute.formal.yaml","BankTaEffectExecute","BankTaEffectOperation","BankTaEffectObservation"]
+          ]
+        }
+      },
+      {
+        "$rows": {
+          "template": "formal-technical-port-bank-sip-dispatch-query",
+          "rows": [
+            ["contexts/bankwealth/formal-products/technical-port/bank-sip-dispatch-query.formal.yaml","BankSipDispatchQuery","BankSipDispatchOperation","BankSipDispatchObservation"],
+            ["contexts/bankwealth/formal-products/technical-port/bank-ta-effect-query.formal.yaml","BankTaEffectQuery","BankTaEffectOperation","BankTaEffectObservation"]
+          ]
+        }
+      },
+      {
+        "$rows": {
+          "template": "formal-technical-port-bank-sip-dispatch-reconcile-port",
+          "rows": [
+            ["contexts/bankwealth/formal-products/technical-port/bank-sip-dispatch-reconcile-port.formal.yaml","BankSipDispatchReconcilePort","BankSipDispatchReconcile"],
+            ["contexts/bankwealth/formal-products/technical-port/bank-ta-effect-reconcile-port.formal.yaml","BankTaEffectReconcilePort","BankTaEffectReconcile"]
+          ]
+        }
+      },
+      {
+        "$rows": {
+          "template": "value-object-bank-sip-dispatch-observation",
+          "rows": [
+            ["contexts/bankwealth/value-objects/bank-sip-dispatch-observation.vo.yaml","BankSipDispatchObservation",78,"BankSipDispatchRequest","status","String","result","Option[BankSipDispatchResult]"],
+            ["contexts/bankwealth/value-objects/bank-sip-dispatch-reconcile.vo.yaml","BankSipDispatchReconcile",79,"BankSipDispatchRequest","decision","Option[BankSipDispatchObservation]","authorization","String"],
+            ["contexts/bankwealth/value-objects/bank-ta-effect-observation.vo.yaml","BankTaEffectObservation",73,"BankTaEffectRequest","status","String","result","Option[BankTaEffectResult]"],
+            ["contexts/bankwealth/value-objects/bank-ta-effect-reconcile.vo.yaml","BankTaEffectReconcile",74,"BankTaEffectRequest","decision","Option[BankTaEffectObservation]","authorization","String"]
+          ]
+        }
+      },
+      {
+        "file": "contexts/bankwealth/value-objects/bank-sip-dispatch-operation.vo.yaml",
+        "doc": {
+          "kind": "value-object",
+          "name": "BankSipDispatchOperation",
+          "seq": 77,
+          "payload": {
+            "name": "BankSipDispatchOperation",
+            "context": "bankwealth",
+            "version": "bank-v1-1",
+            "fields": ["operation: String","request: BankSipDispatchRequest"]
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/value-objects/bank-sip-dispatch-request.vo.yaml",
+        "doc": {
+          "kind": "value-object",
+          "name": "BankSipDispatchRequest",
+          "seq": 75,
+          "payload": {
+            "name": "BankSipDispatchRequest",
+            "context": "bankwealth",
+            "version": "bank-v1-1",
+            "fields": ["occurrenceId: OccurrenceId","occurrence: SipOccurrence"]
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/value-objects/bank-ta-effect-operation.vo.yaml",
+        "doc": {
+          "kind": "value-object",
+          "name": "BankTaEffectOperation",
+          "seq": 72,
+          "payload": {
+            "name": "BankTaEffectOperation",
+            "context": "bankwealth",
+            "version": "bank-v1-1",
+            "fields": ["operation: String","request: BankTaEffectRequest"]
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/value-objects/bank-sip-dispatch-result.vo.yaml",
+        "doc": {
+          "kind": "value-object",
+          "name": "BankSipDispatchResult",
+          "seq": 76,
+          "payload": {"name":"BankSipDispatchResult","context":"bankwealth","version":"bank-v1-1","fields":["operationId: OperationId"]}
+        }
+      },
+      {
+        "file": "contexts/bankwealth/value-objects/bank-ta-effect-result.vo.yaml",
+        "doc": {
+          "kind": "value-object",
+          "name": "BankTaEffectResult",
+          "seq": 71,
+          "payload": {"name":"BankTaEffectResult","context":"bankwealth","version":"bank-v1-1","fields":["taRequestId: TaRequestId"]}
+        }
+      },
+      {
+        "file": "contexts/bankwealth/value-objects/bank-ta-effect-request.vo.yaml",
+        "doc": {
+          "kind": "value-object",
+          "name": "BankTaEffectRequest",
+          "seq": 70,
+          "payload": {
+            "name": "BankTaEffectRequest",
+            "context": "bankwealth",
+            "version": "bank-v1-1",
+            "fields": ["taRequestId: TaRequestId","fundOrderId: FundOrderId","paymentTxId: TxId"]
+          }
+        }
+      }
+    ]
+  }

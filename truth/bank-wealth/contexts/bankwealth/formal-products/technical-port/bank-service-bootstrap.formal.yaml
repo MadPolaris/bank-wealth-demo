@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankServiceBootstrap",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankServiceBootstrapInput"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankServiceBootstrapAcknowledgement"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankServiceBootstrapInput)",
+    "outputType": "@type(nominal:bankwealth:type#BankServiceBootstrapAcknowledgement)"
   }

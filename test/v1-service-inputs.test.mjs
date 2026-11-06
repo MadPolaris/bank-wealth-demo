@@ -6,9 +6,10 @@ import {compileProductSet} from '../../metarch-truthsrc/lib/products/compile.mjs
 import {readProductRequest} from '../../metarch-truthsrc/lib/products/cli.mjs';
 import {bankServiceRequest} from '../tools/v1-service-inputs.mjs';
 import {bankApplicationRequest,V1_TREE} from '../tools/v1-inputs.mjs';
+import {historicalSnapshot} from '../tools/historical-source.mjs';
 
 test('service source and historical application inputs are explicit separate complete versions',()=>{
- const current=JSON.parse(compileTree(V1_TREE)),request=bankServiceRequest();
+ const current=historicalSnapshot('v1/tree').canonical,request=bankServiceRequest();
  assert.deepEqual(request.documents.find(d=>d.id==='bank-v1').value,current);
  const captured=readProductRequest(new URL('../v1/formal-inputs/release-pages-721/files.json',import.meta.url).pathname);
  assert.deepEqual(captured,request);

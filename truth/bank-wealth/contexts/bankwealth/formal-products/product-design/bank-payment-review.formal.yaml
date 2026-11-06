@@ -25,91 +25,16 @@ payload:
     ],
     "approvalSource": null,
     "references": [
-      {
-        "context": "bankwealth",
-        "kind": "aggregate",
-        "owner": [],
-        "id": "FundOrder"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "command",
-        "owner": [
-          "FundOrder"
-        ],
-        "id": "RequestFundPurchaseSettlement"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RequestFundPurchaseSettlement"
-        ],
-        "id": "operationId"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RequestFundPurchaseSettlement"
-        ],
-        "id": "fundOrderId"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RequestFundPurchaseSettlement"
-        ],
-        "id": "investorAccountId"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RequestFundPurchaseSettlement"
-        ],
-        "id": "fundCollectionAccountId"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RequestFundPurchaseSettlement"
-        ],
-        "id": "fundCode"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RequestFundPurchaseSettlement"
-        ],
-        "id": "amount"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "event",
-        "owner": [
-          "FundOrder"
-        ],
-        "id": "FundPurchaseSettlementRequested"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "event-slot",
-        "owner": [
-          "FundOrder",
-          "FundPurchaseSettlementRequested"
-        ],
-        "id": "operationId"
-      }
+      "@ref(bankwealth:aggregate#FundOrder)",
+      "@ref(bankwealth:command/FundOrder#RequestFundPurchaseSettlement)",
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#operationId)",
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#fundOrderId)",
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#investorAccountId)",
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#fundCollectionAccountId)",
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#fundCode)",
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#amount)",
+      "@ref(bankwealth:event/FundOrder#FundPurchaseSettlementRequested)",
+      "@ref(bankwealth:event-slot/FundOrder/FundPurchaseSettlementRequested#operationId)"
     ],
     "nodes": [
       {
@@ -136,12 +61,7 @@ payload:
         "kind": "target",
         "label": "FundOrder",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "aggregate",
-            "owner": [],
-            "id": "FundOrder"
-          }
+          "@ref(bankwealth:aggregate#FundOrder)"
         ],
         "action": null,
         "feedback": null
@@ -161,68 +81,13 @@ payload:
         "kind": "action",
         "label": "RequestFundPurchaseSettlement",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "command",
-            "owner": [
-              "FundOrder"
-            ],
-            "id": "RequestFundPurchaseSettlement"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "FundOrder",
-              "RequestFundPurchaseSettlement"
-            ],
-            "id": "operationId"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "FundOrder",
-              "RequestFundPurchaseSettlement"
-            ],
-            "id": "fundOrderId"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "FundOrder",
-              "RequestFundPurchaseSettlement"
-            ],
-            "id": "investorAccountId"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "FundOrder",
-              "RequestFundPurchaseSettlement"
-            ],
-            "id": "fundCollectionAccountId"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "FundOrder",
-              "RequestFundPurchaseSettlement"
-            ],
-            "id": "fundCode"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "FundOrder",
-              "RequestFundPurchaseSettlement"
-            ],
-            "id": "amount"
-          }
+          "@ref(bankwealth:command/FundOrder#RequestFundPurchaseSettlement)",
+          "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#operationId)",
+          "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#fundOrderId)",
+          "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#investorAccountId)",
+          "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#fundCollectionAccountId)",
+          "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#fundCode)",
+          "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseSettlement#amount)"
         ],
         "action": {
           "command": {
@@ -330,46 +195,16 @@ payload:
         "kind": "feedback",
         "label": "已持久受理，不承诺业务成功或投影新鲜度",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "event",
-            "owner": [
-              "FundOrder"
-            ],
-            "id": "FundPurchaseSettlementRequested"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "event-slot",
-            "owner": [
-              "FundOrder",
-              "FundPurchaseSettlementRequested"
-            ],
-            "id": "operationId"
-          }
+          "@ref(bankwealth:event/FundOrder#FundPurchaseSettlementRequested)",
+          "@ref(bankwealth:event-slot/FundOrder/FundPurchaseSettlementRequested#operationId)"
         ],
         "action": null,
         "feedback": {
-          "event": {
-            "context": "bankwealth",
-            "kind": "event",
-            "owner": [
-              "FundOrder"
-            ],
-            "id": "FundPurchaseSettlementRequested"
-          },
+          "event": "@ref(bankwealth:event/FundOrder#FundPurchaseSettlementRequested)",
           "state": "pending",
           "evidence": "provisional",
           "resourceKeys": [
-            {
-              "context": "bankwealth",
-              "kind": "event-slot",
-              "owner": [
-                "FundOrder",
-                "FundPurchaseSettlementRequested"
-              ],
-              "id": "operationId"
-            }
+            "@ref(bankwealth:event-slot/FundOrder/FundPurchaseSettlementRequested#operationId)"
           ],
           "watermark": null
         }

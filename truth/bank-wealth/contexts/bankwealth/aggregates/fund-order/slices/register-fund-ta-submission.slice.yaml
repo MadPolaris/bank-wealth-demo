@@ -7,39 +7,13 @@ payload:
   {
     "name": "RegisterFundTASubmission",
     "parameters": [
-      {
-        "name": "fundOrderId",
-        "dataType": "FundOrderId",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "paymentTxId",
-        "dataType": "TxId",
-        "origin": "BUSINESS_INPUT"
-      }
+      "fundOrderId: FundOrderId @BUSINESS_INPUT",
+      "paymentTxId: TxId @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "TA_SUBMIT_RESOURCE",
-        "errCode": "TA_SUBMIT_RESOURCE",
-        "cond": "param.fundOrderId == state.id",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_PAID",
-        "errCode": "TA_PAID",
-        "cond": "param.paymentTxId == state.selectedPaymentTxId && state.cashPaymentFinalResults.get(param.paymentTxId).contains(\"succeeded\")",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "TA_SUBMIT_ONCE",
-        "errCode": "TA_SUBMIT_ONCE",
-        "cond": "state.taRequestId.value.isEmpty",
-        "onFail": "succeed-empty"
-      }
+      "@guard[invariantRef](reject TA_SUBMIT_RESOURCE/TA_SUBMIT_RESOURCE: \"param.fundOrderId == state.id\")",
+      "@guard[invariantRef](reject TA_PAID/TA_PAID: \"param.paymentTxId == state.selectedPaymentTxId && state.cashPaymentFinalResults.get(param.paymentTxId).contains(\\\"succeeded\\\")\")",
+      "@guard[invariantRef](succeed-empty TA_SUBMIT_ONCE/TA_SUBMIT_ONCE: state.taRequestId.value.isEmpty)"
     ],
     "produces": [
       "FundTASubmissionRegistered"
@@ -56,54 +30,18 @@ events:
     "FundTASubmissionRegistered": {
       "name": "FundTASubmissionRegistered",
       "payloads": [
-        {
-          "name": "fundOrderId",
-          "dataType": "FundOrderId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "paymentTxId",
-          "dataType": "TxId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "taRequestId",
-          "dataType": "TaRequestId",
-          "origin": "PROPAGATED"
-        }
+        "fundOrderId: FundOrderId @PROPAGATED",
+        "paymentTxId: TxId @PROPAGATED",
+        "taRequestId: TaRequestId @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "fundOrderId",
-          "expr": "param.fundOrderId"
-        },
-        {
-          "slot": "paymentTxId",
-          "expr": "param.paymentTxId"
-        },
-        {
-          "slot": "taRequestId",
-          "expr": {
-            "form": "host",
-            "id": {
-              "context": "bankwealth",
-              "kind": "port",
-              "owner": [],
-              "id": "StableTaRequestId"
-            },
-            "version": "bank-v1-1"
-          }
-        }
+        "fundOrderId <- param.fundOrderId",
+        "paymentTxId <- param.paymentTxId",
+        "taRequestId <- @host(bankwealth:port#StableTaRequestId@bank-v1-1)"
       ],
       "foldAssignments": [
-        {
-          "slot": "taRequestId",
-          "expr": "event.taRequestId"
-        },
-        {
-          "slot": "taStatus",
-          "expr": "literal:submitted"
-        }
+        "taRequestId := event.taRequestId",
+        "taStatus := \"literal:submitted\""
       ]
     }
   }

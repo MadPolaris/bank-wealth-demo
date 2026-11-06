@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "bank.compact-graph-acceptance/v1",
+  "date": "2026-11-06",
+  "overall": "partial-template-boundary-open",
+  "scope": [
+    "author-structures",
+    "author-micro",
+    "single-author-tree",
+    "knowledge-store-ast",
+    "precise-code-mapping",
+    "four-flow-actor-regression"
+  ],
+  "author": {
+    "before": {
+      "yamlFiles": 303,
+      "bytes": 947254,
+      "lines": 33847
+    },
+    "after": {
+      "yamlFiles": 157,
+      "bytes": 590184,
+      "lines": 13847
+    }
+  },
+  "products": {
+    "count": 14,
+    "payloadsPreserved": true,
+    "independentBaseline": "docs/TRUTH-LEGACY-BASELINE.json"
+  },
+  "retiredAuthorFiles": 430,
+  "newTests": {
+    "passed": 122,
+    "failed": 0
+  },
+  "toolUnification": {
+    "passed": 400,
+    "skipped": 1,
+    "failed": 0
+  },
+  "generatorProfiles": {
+    "passed": 31,
+    "failed": 0
+  },
+  "bankUpdateLoop": {
+    "passed": 6,
+    "failed": 0
+  },
+  "bankAdaptation": {
+    "passed": 1,
+    "failed": 0
+  },
+  "actor": {
+    "mainScalaSources": 505,
+    "testScalaSources": 14,
+    "tests": 64,
+    "suites": 13,
+    "status": "passed",
+    "receipt": "target/truthsrc-minimal-actor-20261106-01/result.json"
+  },
+  "pending": [
+    "complete BC mixed-pipeline application composition and relational read-side generation parity"
+  ],
+  "notPerformed": [
+    "runtime publication",
+    "Git commit/push",
+    "HTTP/database/cross-JVM reacceptance",
+    "inline knowledge annotation rollout",
+    "agent hooks installation"
+  ],
+  "evidence": [
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/macro-acceptance.json",
+      "bytes": 5238,
+      "sha256": "5831a2f907ec43bab54d3b5105b50339716baa1a009739a9a3cb301f4047fbbb"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/micro-acceptance.json",
+      "bytes": 1811,
+      "sha256": "611862e82b3ed33c14319cbdf48856aabaa4b1462d44e91fe8e91a0da6138ec2"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/macro-apply.json",
+      "bytes": 19121,
+      "sha256": "bb9409c440e8fbac7a45fba172ca9a35bb898617f77f18b0101c3e32cfe5711b"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/micro-apply.json",
+      "bytes": 12947,
+      "sha256": "a8a7abf7fd3ba68f69d2638782b904833f79dceb4e7724046128b8ec3e353bd1"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/all-new-tests-final.log",
+      "bytes": 24750,
+      "sha256": "0f79991c693a20ed036e7a61f51d5aa2c263aa49735eab9fe58be8555b6c4579"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/final-unification.log",
+      "bytes": 91035,
+      "sha256": "8a4bf474c0a84957674d21d8b6a37a697f082b315bc3d8792e639efa1abe65c1"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/final-generation-regressions.log",
+      "bytes": 8068,
+      "sha256": "2e491a1f0efb2fab34726522e2432cd54fa38bf6ae5203a3cb45cc279a5a3561"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/bank-full-loop.log",
+      "bytes": 1961,
+      "sha256": "f7280a584a5fb637a3fcdfd8b8f41e605365b4fb6f9b6c94cbfe8f97e134a03d"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/current-bank-adaptation-02.log",
+      "bytes": 551,
+      "sha256": "186667eec1b375ddb3ed4d2402b2d64384924dbd1ada7817da778f8543b5e799"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/default-final-status.json",
+      "bytes": 61746,
+      "sha256": "5e7f11b176de119c6aef003b74b6db71fa1e4ace8789b9663bd15316dcf8a97c"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/bank-precise-query.json",
+      "bytes": 1392,
+      "sha256": "fe3c84282206a1ae42c4236ffc6de636f0b6d8c7103d2ef54735687ed1dd0eb4"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/final-boundary-tests.log",
+      "bytes": 3310,
+      "sha256": "d6e1151e806419f0c5fc8fe17f365d4f11d27d6f2e78b90b7c5a4d38ad48801b"
+    },
+    {
+      "file": "/private/tmp/truthsrc-minimal-delivery.mZW0i6/build-verifier-updated.log",
+      "bytes": 7452,
+      "sha256": "64bdde86c71b4c3e18ad37cfbb615f3c1b4b2fe9bf999f72030e09f1d27757ee"
+    },
+    {
+      "file": "/Users/zhongdj/Workspaces/mad-polaris/bank-wealth-demo/target/truthsrc-minimal-actor-20261106-01/result.json",
+      "bytes": 37961,
+      "sha256": "9fe0153e27d135bf14abf5074fbdc14bf8d7369fb3c2783bbe647f5cfeac9787"
+    }
+  ]
+}

@@ -7,81 +7,19 @@ payload:
   {
     "name": "CreateSipPlan",
     "parameters": [
-      {
-        "name": "planId",
-        "dataType": "PlanId",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "config",
-        "dataType": "SipRevisionConfig",
-        "origin": "BUSINESS_INPUT"
-      }
+      "planId: PlanId @BUSINESS_INPUT",
+      "config: SipRevisionConfig @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_ADMITTED_CREATE_MATCH",
-        "errCode": "SIP_ADMITTED_CREATE_MATCH",
-        "cond": "state.createIntent.isEmpty || (state.sipCreateIntents.contains(\"original\") && param.planId == state.sipCreateIntents(\"original\").planId && param.config == state.sipCreateIntents(\"original\").config)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_PLAN_ID",
-        "errCode": "SIP_PLAN_ID",
-        "cond": "param.planId.value.nonEmpty",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_CREATE_CONFLICT",
-        "errCode": "SIP_CREATE_CONFLICT",
-        "cond": "!state.initialized || (param.planId == state.id && state.revisions.contains(param.config.revision) && state.revisions(param.config.revision) == param.config)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_CREATE_ONCE",
-        "errCode": "SIP_CREATE_ONCE",
-        "cond": "!state.initialized",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_REVISION_ID",
-        "errCode": "SIP_REVISION_ID",
-        "cond": "param.config.revision.value.nonEmpty",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_EFFECTIVE_SLOT",
-        "errCode": "SIP_EFFECTIVE_SLOT",
-        "cond": "param.config.effectiveSlot >= 0",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_CONFIG_ACCOUNTS",
-        "errCode": "SIP_CONFIG_ACCOUNTS",
-        "cond": "param.config.investorAccountId.value.nonEmpty && param.config.fundCollectionAccountId.value.nonEmpty && param.config.investorAccountId != param.config.fundCollectionAccountId",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_CONFIG_FUND",
-        "errCode": "SIP_CONFIG_FUND",
-        "cond": "param.config.fundCode.nonEmpty",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_CONFIG_AMOUNT",
-        "errCode": "SIP_CONFIG_AMOUNT",
-        "cond": "param.config.amount.currency == \"CNY\" && param.config.amount.amount > 0.00",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject SIP_ADMITTED_CREATE_MATCH/SIP_ADMITTED_CREATE_MATCH: \"state.createIntent.isEmpty || (state.sipCreateIntents.contains(\\\"original\\\") && param.planId == state.sipCreateIntents(\\\"original\\\").planId && param.config == state.sipCreateIntents(\\\"original\\\").config)\")",
+      "@guard[invariantRef](reject SIP_PLAN_ID/SIP_PLAN_ID: param.planId.value.nonEmpty)",
+      "@guard[invariantRef](reject SIP_CREATE_CONFLICT/SIP_CREATE_CONFLICT: \"!state.initialized || (param.planId == state.id && state.revisions.contains(param.config.revision) && state.revisions(param.config.revision) == param.config)\")",
+      "@guard[invariantRef](succeed-empty SIP_CREATE_ONCE/SIP_CREATE_ONCE: \"!state.initialized\")",
+      "@guard[invariantRef](reject SIP_REVISION_ID/SIP_REVISION_ID: param.config.revision.value.nonEmpty)",
+      "@guard[invariantRef](reject SIP_EFFECTIVE_SLOT/SIP_EFFECTIVE_SLOT: \"param.config.effectiveSlot >= 0\")",
+      "@guard[invariantRef](reject SIP_CONFIG_ACCOUNTS/SIP_CONFIG_ACCOUNTS: \"param.config.investorAccountId.value.nonEmpty && param.config.fundCollectionAccountId.value.nonEmpty && param.config.investorAccountId != param.config.fundCollectionAccountId\")",
+      "@guard[invariantRef](reject SIP_CONFIG_FUND/SIP_CONFIG_FUND: param.config.fundCode.nonEmpty)",
+      "@guard[invariantRef](reject SIP_CONFIG_AMOUNT/SIP_CONFIG_AMOUNT: \"param.config.amount.currency == \\\"CNY\\\" && param.config.amount.amount > 0.00\")"
     ],
     "produces": [
       "SipPlanCreated"
@@ -112,50 +50,19 @@ events:
     "SipPlanCreated": {
       "name": "SipPlanCreated",
       "payloads": [
-        {
-          "name": "planId",
-          "dataType": "PlanId",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "config",
-          "dataType": "SipRevisionConfig",
-          "origin": "PROPAGATED"
-        }
+        "planId: PlanId @PROPAGATED",
+        "config: SipRevisionConfig @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "planId",
-          "expr": "param.planId"
-        },
-        {
-          "slot": "config",
-          "expr": "param.config"
-        }
+        "planId <- param.planId",
+        "config <- param.config"
       ],
       "foldAssignments": [
-        {
-          "slot": "id",
-          "expr": "event.planId"
-        },
-        {
-          "slot": "initialized",
-          "expr": "literal:true"
-        },
-        {
-          "slot": "revisions",
-          "op": "put",
-          "key": "event.config.revision",
-          "value": "event.config"
-        },
-        {
-          "slot": "latestRevision",
-          "expr": "event.config.revision"
-        },
-        {
-          "slot": "latestEffectiveSlot",
-          "expr": "event.config.effectiveSlot"
-        }
+        "id := event.planId",
+        "initialized := \"literal:true\"",
+        "revisions := @fold[put](key=event.config.revision, value=event.config)",
+        "latestRevision := event.config.revision",
+        "latestEffectiveSlot := event.config.effectiveSlot"
       ]
     }
   }

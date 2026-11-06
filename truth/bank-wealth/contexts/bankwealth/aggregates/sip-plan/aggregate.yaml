@@ -10,488 +10,105 @@ payload:
   {
     "name": "SipPlan",
     "entity": "SipPlanEntity",
-    "identifier": {
-      "name": "id",
-      "dataType": "PlanId",
-      "origin": "BUSINESS_INPUT"
-    },
+    "identifier": "id: PlanId @BUSINESS_INPUT",
     "description": "Explicit local-cash revision; finite authored slots and discrete manual clock. Only generated event application evolves business state. Original external SIP is not migrated.",
     "stateFields": [
-      {
-        "name": "id",
-        "dataType": "PlanId",
-        "default": ""
-      },
-      {
-        "name": "initialized",
-        "dataType": "Boolean",
-        "default": false
-      },
-      {
-        "name": "scheduleSealed",
-        "dataType": "Boolean",
-        "default": false
-      },
-      {
-        "name": "scheduleCount",
-        "dataType": "Long",
-        "default": "0"
-      },
-      {
-        "name": "lastDueSlot",
-        "dataType": "Long",
-        "default": "-1"
-      },
-      {
-        "name": "slots",
-        "dataType": "Map[Long, Long]",
-        "default": []
-      },
-      {
-        "name": "currentTick",
-        "dataType": "Long",
-        "default": "-1"
-      },
-      {
-        "name": "observedCount",
-        "dataType": "Long",
-        "default": "0"
-      },
-      {
-        "name": "startCount",
-        "dataType": "Long",
-        "default": "0"
-      },
-      {
-        "name": "paused",
-        "dataType": "Boolean",
-        "default": false
-      },
-      {
-        "name": "pauseTick",
-        "dataType": "Long",
-        "default": "-1"
-      },
-      {
-        "name": "pauseIntervals",
-        "dataType": "Map[Long, Long]",
-        "default": []
-      },
-      {
-        "name": "revisions",
-        "dataType": "Map[RevisionId, SipRevisionConfig]",
-        "default": []
-      },
-      {
-        "name": "revisionEnds",
-        "dataType": "Map[RevisionId, Long]",
-        "default": []
-      },
-      {
-        "name": "latestRevision",
-        "dataType": "RevisionId",
-        "default": ""
-      },
-      {
-        "name": "latestEffectiveSlot",
-        "dataType": "Long",
-        "default": "-1"
-      },
-      {
-        "name": "slotDisposition",
-        "dataType": "Map[Long, String]",
-        "default": []
-      },
-      {
-        "name": "occurrences",
-        "dataType": "Map[Long, SipOccurrence]",
-        "default": []
-      },
-      {
-        "name": "occurrenceProgress",
-        "dataType": "Map[OccurrenceId, String]",
-        "default": []
-      },
-      {
-        "name": "firstTerminals",
-        "dataType": "Map[OccurrenceId, String]",
-        "default": []
-      },
-      {
-        "name": "terminalReceiptBodies",
-        "dataType": "Map[String, String]",
-        "default": []
-      },
-      {
-        "name": "successTotal",
-        "dataType": "Long",
-        "default": "0"
-      },
-      {
-        "name": "failureTotal",
-        "dataType": "Long",
-        "default": "0"
-      },
-      {
-        "name": "createIntent",
-        "dataType": "Option[BankSipCreateIntent]",
-        "default": {
-          "present": false,
-          "value": null
-        }
-      },
-      {
-        "name": "sipCreateIntents",
-        "dataType": "Map[String, BankSipCreateIntent]",
-        "default": []
-      },
-      {
-        "name": "createIntentDueSlots",
-        "dataType": "Vector[Long]",
-        "default": []
-      },
-      {
-        "name": "intentAppendedDueSlots",
-        "dataType": "Map[Long, Long]",
-        "default": []
-      }
+      "id: PlanId = \"\"",
+      "initialized: Boolean = false",
+      "scheduleSealed: Boolean = false",
+      "scheduleCount: Long = \"0\"",
+      "lastDueSlot: Long = \"-1\"",
+      "slots: \"Map[Long, Long]\" = []",
+      "currentTick: Long = \"-1\"",
+      "observedCount: Long = \"0\"",
+      "startCount: Long = \"0\"",
+      "paused: Boolean = false",
+      "pauseTick: Long = \"-1\"",
+      "pauseIntervals: \"Map[Long, Long]\" = []",
+      "revisions: \"Map[RevisionId, SipRevisionConfig]\" = []",
+      "revisionEnds: \"Map[RevisionId, Long]\" = []",
+      "latestRevision: RevisionId = \"\"",
+      "latestEffectiveSlot: Long = \"-1\"",
+      "slotDisposition: \"Map[Long, String]\" = []",
+      "occurrences: \"Map[Long, SipOccurrence]\" = []",
+      "occurrenceProgress: \"Map[OccurrenceId, String]\" = []",
+      "firstTerminals: \"Map[OccurrenceId, String]\" = []",
+      "terminalReceiptBodies: \"Map[String, String]\" = []",
+      "successTotal: Long = \"0\"",
+      "failureTotal: Long = \"0\"",
+      "createIntent: \"Option[BankSipCreateIntent]\" = {\"present\":false,\"value\":null}",
+      "sipCreateIntents: \"Map[String, BankSipCreateIntent]\" = []",
+      "createIntentDueSlots: \"Vector[Long]\" = []",
+      "intentAppendedDueSlots: \"Map[Long, Long]\" = []"
     ],
     "aggregateRuleRefs": [
-      {
-        "ruleId": "SIP_PLAN_ID",
-        "errCode": "SIP_PLAN_ID",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_CREATE_CONFLICT",
-        "errCode": "SIP_CREATE_CONFLICT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_CREATE_ONCE",
-        "errCode": "SIP_CREATE_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_REVISION_ID",
-        "errCode": "SIP_REVISION_ID",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_EFFECTIVE_SLOT",
-        "errCode": "SIP_EFFECTIVE_SLOT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_CONFIG_ACCOUNTS",
-        "errCode": "SIP_CONFIG_ACCOUNTS",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_CONFIG_FUND",
-        "errCode": "SIP_CONFIG_FUND",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_CONFIG_AMOUNT",
-        "errCode": "SIP_CONFIG_AMOUNT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SLOT_REPLAY_CONFLICT",
-        "errCode": "SIP_SLOT_REPLAY_CONFLICT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SLOT_ONCE",
-        "errCode": "SIP_SLOT_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SCHEDULE_OPEN",
-        "errCode": "SIP_SCHEDULE_OPEN",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SLOT_POSITION",
-        "errCode": "SIP_SLOT_POSITION",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SLOT_ORDER",
-        "errCode": "SIP_SLOT_ORDER",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SEAL_ONCE",
-        "errCode": "SIP_SEAL_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_FINITE_SCHEDULE",
-        "errCode": "SIP_FINITE_SCHEDULE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_REVISION_REPLAY_CONFLICT",
-        "errCode": "SIP_REVISION_REPLAY_CONFLICT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_REVISION_ONCE",
-        "errCode": "SIP_REVISION_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_REVISION_FUTURE",
-        "errCode": "SIP_REVISION_FUTURE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SCHEDULE_SEALED",
-        "errCode": "SIP_SCHEDULE_SEALED",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_CLOCK_MONOTONE",
-        "errCode": "SIP_CLOCK_MONOTONE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_CLOCK_ONCE",
-        "errCode": "SIP_CLOCK_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_PAUSE_REPLAY_CONFLICT",
-        "errCode": "SIP_PAUSE_REPLAY_CONFLICT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_PAUSE_ONCE",
-        "errCode": "SIP_PAUSE_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_PAUSE_CLOCK",
-        "errCode": "SIP_PAUSE_CLOCK",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_PAUSE_INTERVAL_ONCE",
-        "errCode": "SIP_PAUSE_INTERVAL_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_RESUME_CLOCK",
-        "errCode": "SIP_RESUME_CLOCK",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_RESUME_ONCE",
-        "errCode": "SIP_RESUME_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_RESUME_CLASSIFIED",
-        "errCode": "SIP_RESUME_CLASSIFIED",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SLOT_DECLARED",
-        "errCode": "SIP_SLOT_DECLARED",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SLOT_MATCH",
-        "errCode": "SIP_SLOT_MATCH",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_OBSERVATION_CONFLICT",
-        "errCode": "SIP_OBSERVATION_CONFLICT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_OBSERVATION_ONCE",
-        "errCode": "SIP_OBSERVATION_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_OBSERVATION_ORDER",
-        "errCode": "SIP_OBSERVATION_ORDER",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SLOT_DUE",
-        "errCode": "SIP_SLOT_DUE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_PAUSE_CLASSIFICATION",
-        "errCode": "SIP_PAUSE_CLASSIFICATION",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SKIP_RECORDED",
-        "errCode": "SIP_SKIP_RECORDED",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SKIP_CURSOR_ONCE",
-        "errCode": "SIP_SKIP_CURSOR_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_SKIP_CURSOR_ORDER",
-        "errCode": "SIP_SKIP_CURSOR_ORDER",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_OCCURRENCE_REPLAY_CONFLICT",
-        "errCode": "SIP_OCCURRENCE_REPLAY_CONFLICT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_OCCURRENCE_ONCE",
-        "errCode": "SIP_OCCURRENCE_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_ACTIVE_START",
-        "errCode": "SIP_ACTIVE_START",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_START_ORDER",
-        "errCode": "SIP_START_ORDER",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_BACKLOG_REQUIRED",
-        "errCode": "SIP_BACKLOG_REQUIRED",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_REVISION_DECLARED",
-        "errCode": "SIP_REVISION_DECLARED",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_RETAINED_CONFIG",
-        "errCode": "SIP_RETAINED_CONFIG",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_REVISION_INTERVAL",
-        "errCode": "SIP_REVISION_INTERVAL",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_OCCURRENCE_KNOWN",
-        "errCode": "SIP_OCCURRENCE_KNOWN",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_ORIGINAL_ASSOCIATION",
-        "errCode": "SIP_ORIGINAL_ASSOCIATION",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_LATE_PROGRESS",
-        "errCode": "SIP_LATE_PROGRESS",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_PROGRESS_ONCE",
-        "errCode": "SIP_PROGRESS_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_TERMINAL_EVIDENCE",
-        "errCode": "SIP_TERMINAL_EVIDENCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_TERMINAL_RECEIPT",
-        "errCode": "SIP_TERMINAL_RECEIPT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_TERMINAL_RECEIPT_CONFLICT",
-        "errCode": "SIP_TERMINAL_RECEIPT_CONFLICT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_TERMINAL_CONFLICT",
-        "errCode": "SIP_TERMINAL_CONFLICT",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_TERMINAL_ONCE",
-        "errCode": "SIP_TERMINAL_ONCE",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_TOTAL_CAPACITY",
-        "errCode": "SIP_TOTAL_CAPACITY",
-        "desc": "Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding"
-      },
-      {
-        "ruleId": "SIP_INTENT_OPTION",
-        "errCode": "SIP_INTENT_OPTION",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "SIP_INTENT_RESOURCE",
-        "errCode": "SIP_INTENT_RESOURCE",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "SIP_INTENT_BODY",
-        "errCode": "SIP_INTENT_BODY",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "SIP_INTENT_CONFLICT",
-        "errCode": "SIP_INTENT_CONFLICT",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "SIP_INTENT_EXISTING_CONFIG",
-        "errCode": "SIP_INTENT_EXISTING_CONFIG",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "SIP_INTENT_ONCE",
-        "errCode": "SIP_INTENT_ONCE",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "SIP_INTENT_BEFORE_CREATE",
-        "errCode": "SIP_INTENT_BEFORE_CREATE",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "SIP_ADMITTED_CREATE_MATCH",
-        "errCode": "SIP_ADMITTED_CREATE_MATCH",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "SIP_ADMITTED_SLOT_MEMBER",
-        "errCode": "SIP_ADMITTED_SLOT_MEMBER",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      },
-      {
-        "ruleId": "SIP_ADMITTED_SCHEDULE_COVERED",
-        "errCode": "SIP_ADMITTED_SCHEDULE_COVERED",
-        "desc": "Approved bank-v1 service source integration; agent-assisted, no workshop"
-      }
+      "@rule(SIP_PLAN_ID/SIP_PLAN_ID | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_CREATE_CONFLICT/SIP_CREATE_CONFLICT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_CREATE_ONCE/SIP_CREATE_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_REVISION_ID/SIP_REVISION_ID | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_EFFECTIVE_SLOT/SIP_EFFECTIVE_SLOT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_CONFIG_ACCOUNTS/SIP_CONFIG_ACCOUNTS | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_CONFIG_FUND/SIP_CONFIG_FUND | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_CONFIG_AMOUNT/SIP_CONFIG_AMOUNT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_INITIALIZED/SIP_INITIALIZED | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SLOT_REPLAY_CONFLICT/SIP_SLOT_REPLAY_CONFLICT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SLOT_ONCE/SIP_SLOT_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SCHEDULE_OPEN/SIP_SCHEDULE_OPEN | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SLOT_POSITION/SIP_SLOT_POSITION | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SLOT_ORDER/SIP_SLOT_ORDER | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SEAL_ONCE/SIP_SEAL_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_FINITE_SCHEDULE/SIP_FINITE_SCHEDULE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_REVISION_REPLAY_CONFLICT/SIP_REVISION_REPLAY_CONFLICT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_REVISION_ONCE/SIP_REVISION_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_REVISION_FUTURE/SIP_REVISION_FUTURE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SCHEDULE_SEALED/SIP_SCHEDULE_SEALED | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_CLOCK_MONOTONE/SIP_CLOCK_MONOTONE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_CLOCK_ONCE/SIP_CLOCK_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_PAUSE_REPLAY_CONFLICT/SIP_PAUSE_REPLAY_CONFLICT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_PAUSE_ONCE/SIP_PAUSE_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_PAUSE_CLOCK/SIP_PAUSE_CLOCK | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_PAUSE_INTERVAL_ONCE/SIP_PAUSE_INTERVAL_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_RESUME_CLOCK/SIP_RESUME_CLOCK | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_RESUME_ONCE/SIP_RESUME_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_RESUME_CLASSIFIED/SIP_RESUME_CLASSIFIED | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SLOT_DECLARED/SIP_SLOT_DECLARED | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SLOT_MATCH/SIP_SLOT_MATCH | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_OBSERVATION_CONFLICT/SIP_OBSERVATION_CONFLICT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_OBSERVATION_ONCE/SIP_OBSERVATION_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_OBSERVATION_ORDER/SIP_OBSERVATION_ORDER | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SLOT_DUE/SIP_SLOT_DUE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_PAUSE_CLASSIFICATION/SIP_PAUSE_CLASSIFICATION | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SKIP_RECORDED/SIP_SKIP_RECORDED | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SKIP_CURSOR_ONCE/SIP_SKIP_CURSOR_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_SKIP_CURSOR_ORDER/SIP_SKIP_CURSOR_ORDER | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_OCCURRENCE_REPLAY_CONFLICT/SIP_OCCURRENCE_REPLAY_CONFLICT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_OCCURRENCE_ONCE/SIP_OCCURRENCE_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_ACTIVE_START/SIP_ACTIVE_START | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_START_ORDER/SIP_START_ORDER | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_BACKLOG_REQUIRED/SIP_BACKLOG_REQUIRED | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_REVISION_DECLARED/SIP_REVISION_DECLARED | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_RETAINED_CONFIG/SIP_RETAINED_CONFIG | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_REVISION_INTERVAL/SIP_REVISION_INTERVAL | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_OCCURRENCE_KNOWN/SIP_OCCURRENCE_KNOWN | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_ORIGINAL_ASSOCIATION/SIP_ORIGINAL_ASSOCIATION | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_LATE_PROGRESS/SIP_LATE_PROGRESS | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_PROGRESS_ONCE/SIP_PROGRESS_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_TERMINAL_EVIDENCE/SIP_TERMINAL_EVIDENCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_TERMINAL_RECEIPT/SIP_TERMINAL_RECEIPT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_TERMINAL_RECEIPT_CONFLICT/SIP_TERMINAL_RECEIPT_CONFLICT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_TERMINAL_CONFLICT/SIP_TERMINAL_CONFLICT | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_TERMINAL_ONCE/SIP_TERMINAL_ONCE | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_TOTAL_CAPACITY/SIP_TOTAL_CAPACITY | \"Explicit local-cash V1 SIP rule; trusted terminal authority is a required external binding\")",
+      "@rule(SIP_INTENT_OPTION/SIP_INTENT_OPTION | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(SIP_INTENT_RESOURCE/SIP_INTENT_RESOURCE | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(SIP_INTENT_BODY/SIP_INTENT_BODY | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(SIP_INTENT_CONFLICT/SIP_INTENT_CONFLICT | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(SIP_INTENT_EXISTING_CONFIG/SIP_INTENT_EXISTING_CONFIG | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(SIP_INTENT_ONCE/SIP_INTENT_ONCE | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(SIP_INTENT_BEFORE_CREATE/SIP_INTENT_BEFORE_CREATE | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(SIP_ADMITTED_CREATE_MATCH/SIP_ADMITTED_CREATE_MATCH | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(SIP_ADMITTED_SLOT_MEMBER/SIP_ADMITTED_SLOT_MEMBER | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")",
+      "@rule(SIP_ADMITTED_SCHEDULE_COVERED/SIP_ADMITTED_SCHEDULE_COVERED | \"Approved bank-v1 service source integration; agent-assisted, no workshop\")"
     ],
     "provenance": {
       "author": "agent-assisted-bank-v1",

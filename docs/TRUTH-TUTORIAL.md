@@ -1,10 +1,15 @@
 # 银行财富：从真源到代码到回锚
 
+2026-11-06实施验收摘要见 [TRUTH-COMPACT-GRAPH-ACCEPTANCE.json](TRUTH-COMPACT-GRAPH-ACCEPTANCE.json)。
+该记录明确区分已完成的紧凑真源/图回锚闭环与尚未完成的全量BC模板迁移。
+
 ## 当前项目与前置
 
 当前入口只有根 `truthsrc.project.json`。作者树为
-`truth/bank-wealth/`，上下文 `bankwealth`。旧 `tree/`、`v1/tree/`
-和 `*-376` 请求均只用于历史比较/复演，不再双写。
+`truth/bank-wealth/`，上下文 `bankwealth`。157个YAML使用显式结构共享与受控微语法；
+旧 `tree/`、`v1/tree/`已移除，历史读取使用固定Git revision，不再双写。
+`*-376` 请求仅属历史复演。完整BC读侧/装配模板尚未全部迁移，见
+[模板对照](../../metarch-truthsrc/TEMPLATE-PARITY.md)。
 
 本教程使用相邻 `metarch-truthsrc` 源码和 Node ≥22.5。完整服务生成额外
 需要本地冻结runtime供给；从已有干净1134归档准备，无下载或重发：
@@ -24,7 +29,10 @@ node tools/truthsrc-project.mjs generate --out "$PWD/generated/current"
 Saga副本，由公共assembly组装。配置中的runtime仓库和外部源路径相对
 项目解析。`prepare` 只提取六个已核SHA的JAR/POM，未编译/发布runtime。
 Scala构建/服务运行另需JDK、sbt及依赖/存储，不能把生成当作运行认证。
-本轮已在独立空缓存、仅本地供给和OS禁止网络的环境中通过499应用Scala源
+本轮新候选另外通过505份应用Scala和14份测试源码编译，64测试/13Suite全部成功，
+见 [构建记录](TRUTH-BUILD.md#2026-11-06-紧凑真源与图链候选)。下面关于499源码、runtime冷02、
+database11的段落是2026-11-05历史结果，不代表本轮又启动了这些窗口。
+本轮前已在独立空缓存、仅本地供给和OS禁止网络的环境中通过499应用Scala源
 及生成测试源码编译；生成-only窗口23项通过。后续固定actor窗口又实际通过
 41项业务＋23项生成测试，覆盖四流原业务断言，详见[运行验收边界](TRUTH-RUNTIME-ACCEPTANCE.md)。
 actor持久化使用内存testkit，TA使用显式有来源fixture及本轮新journal；
@@ -41,12 +49,13 @@ GET前后journal不变，21鉴权拒绝和5MySQL负例通过。它不是重新�
    申购意图，而不是直接调用内部聚合资金命令。
 2. 阅读 `use-cases.yaml` 的 `PurchaseFundWithCash`：可信入站先持久化原
    请求，现金pipeline安排阶段，三participant Saga管理付款事务。
-3. 阅读 `aggregates/credit-balance/slices/reserve-funds.slice.yaml`：
+3. 阅读 `structures/outgoing-funds.structure.yaml` 中 `ReserveFunds` 的声明：
    `ReserveFunds` 要求账户初始化/归属匹配、CNY正金额、同交易正文一致和
    可用金额充足，产生 `ReserveFundsConfirmed`。事件payload及fold才
    演进余额/预留，不在命令处理器直接改状态。
-4. 公共编译器派生 decision/dependencies/folds；生成器消费版本化产品，
-   核心apply写入规则、事件handler、源码ledger和真实文件anchors。
+4. 公共编译器派生decision/dependencies/folds，完整快照进入项目SQLite；
+   从图导出已验证AST，再由唯一apply写入代码、ledger及最终字节锚，锚回到同图。
+   服务生成把规则核心放在`domain/invariant/`，旧入口保留兼容，不改冻结wire。
 
 以上相对文件位于 `truth/bank-wealth/contexts/bankwealth/`。
 
@@ -61,12 +70,14 @@ node tools/truthsrc-project.mjs status --out "$PWD/generated/current"
 
 ```bash
 node tools/truthsrc-project.mjs query --out "$PWD/generated/current" \
-  --file app/example/bankwealth/domain/CreditBalanceRules.scala
+  --file app/example/bankwealth/domain/invariant/CreditBalanceRules.scala
 ```
 
-加 `--symbol next0` 或 `--line 10` 只得到文件级候选，不能用局部变量或
-当前数组位置伪造跨版本ID。原子位置、canonical pointer和快照摘要同时
-返回。源已变但代码未变、代码被手改、来源缺失/历史等分别报告。
+加 `--line <真实代码行>` 时，命中生成器记录且最终字节仍一致的区间会返回
+`precision: span`；相邻fold保持不同知识身份。`--symbol next0`仍只是候选，不能把局部
+变量或数组位置当永久ID。`origins`可指向同一宏声明/微语法字符串，不伪造字符串下
+的对象子路径。项目 `.truthsrc/knowledge.sqlite`保存展开知识和同图代码锚，外置
+`anchors.json`只作派生交换。缺图、过期、代码修改与历史来源分别报告。
 
 ## 真实知识变更、再生成与手写边界
 
@@ -79,10 +90,9 @@ node tools/truthsrc-project.mjs query --out "$PWD/generated/current" \
 BANK_TRUTHSRC_INTEGRATION=1 node --test --test-concurrency=1 test/unified-truth.test.mjs
 ```
 
-该测试已实跑5/5通过（含完整service生成的opt-in项，约290秒），创建并
-清理自己的临时项目，不启动旧runner或服务：先生成、双向
-查询，再改真源、观察输入过期、预览更新、受控再生、确认规则源码包含
-新错误码，最后同输入重生零写入。正式当前树与原V1树都不修改。
+该测试在2026-11-06对紧凑树与图/AST链实跑 **6/6通过**，创建并清理自己的临时项目，
+不启动旧runner或服务：先生成、双向查询，再改变一条错误码、观察过期、受控update，
+最后重复生成零源码写入。正式当前树与冻结手写实现保持不变。
 
 实际开发使用 `generate ... --update --plan` 后 `generate ... --update`。
 更新仅接收同owner/生成器/类别且匹配成功基线的现有文件；冲突拒绝，不
@@ -116,7 +126,7 @@ BANK_TRUTHSRC_INTEGRATION=1 node --test --test-concurrency=1 test/unified-truth.
 ## Agent、自定义生成器与历史复演
 
 MCP配置使用公共 `truthsrc mcp`，调用 `project_sources`/`project_status`
-并传根项目和自有输出路径；不要求服务器发号或先建图。
+并传根项目和自有输出路径；不要求服务器发号，读取生成时建立的本地知识图。
 普通自定义生成器的实跑命令见 [工具教程](../../metarch-truthsrc/TUTORIAL.md)。
 正式producer登记不等于普通插件：不得绕过产品准入或银行专写另一条链。
 

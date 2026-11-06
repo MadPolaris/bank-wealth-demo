@@ -4,23 +4,25 @@
 >
 > **本项目用银行账户、基金申购、退款和定投，演示一条可以追溯的研发链路：业务真源 → 编译 → 代码生成 → 手写边界集成 → 运行验证 → 代码回锚。** 它不是 Palantir 产品、插件或兼容实现，也不是可用于真实资金的生产银行系统。
 >
-> 阅读核对日期：2026-11-04。银行 V1 的冻结发行已有完整本地验收；通用工具链仍在演进。本文会区分“已经运行验证的发行”“当前源码”“历史材料”，不会把三者混为一谈。
+> 阅读核对日期：2026-11-06。当前开发入口已收敛为根 `truthsrc.project.json` 和 [`truth/bank-wealth/`](truth/bank-wealth/)，先宏压缩、再受控微语法降噪；旧两树已退役。代码通过本地 SQLite 知识图导出的 AST 生成，再回锚同图。原1134发行和下文旧运行位置仍是历史证据，不与当前源码混用。
+>
+> **当前操作从 [真源教程](docs/TRUTH-TUTORIAL.md) 开始。** 本地无 npm 依赖的工具可安装为 `truthsrc` CLI；银行完整生成还需要已冻结runtime供给。完整 BC 混合管线模板对齐的差距见工具仓 `MINIMAL-DELIVERY.md`，不以局部模板相等冒全量完成。
 
 ## 先用一分钟回答最常见的问题
 
 | 你想找什么 | 从这里开始 |
 |---|---|
-| 项目当前要展示的银行业务 | [`v1/tree/`](v1/tree/) |
-| `v1/` 是什么 | 当前银行示例的真源、明确绑定、手写实现、测试和集成材料；不是编译输出目录 |
+| 项目当前要展示的银行业务 | [`truth/bank-wealth/`](truth/bank-wealth/) 与根 `truthsrc.project.json` |
+| `v1/` 是什么 | 保留的手写实现、测试、历史绑定、集成材料和发行证据；旧 `v1/tree` 已退役 |
 | 真源编译后的 JSON | [`v1/formal-inputs/release-bridge-1069/bank-v1.json`](v1/formal-inputs/release-bridge-1069/bank-v1.json) 是发行输入快照；新编译输出应放到新目录 |
 | 给生成器的完整输入 | 同目录的 [`files.json`](v1/formal-inputs/release-bridge-1069/files.json)、[`request.json`](v1/formal-inputs/release-bridge-1069/request.json) 和 [`compiled.json`](v1/formal-inputs/release-bridge-1069/compiled.json) |
 | 生成后的 Scala 应用 | 在每次生成的目标目录中，不在 `v1/handwritten/`；本机已验位置见第 4 节 |
 | 必须手写的代码 | [`v1/handwritten/scala/example/bankwealth/`](v1/handwritten/scala/example/bankwealth/) |
-| 代码回锚 | 生成目标根部的 `anchors.json`、`truthsrc.ledger.json`；手写来源另见 [`HANDWRITTEN-SOURCE-MAP.json`](v1/integration/HANDWRITTEN-SOURCE-MAP.json) |
+| 代码回锚 | 项目 `.truthsrc/knowledge.sqlite` 与生成目标的派生 `anchors.json`、`truthsrc.ledger.json`；手写来源另见 [`HANDWRITTEN-SOURCE-MAP.json`](v1/integration/HANDWRITTEN-SOURCE-MAP.json) |
 | 前端 | 有。当前页面实现是 [`BankBrowserPages.scala`](v1/handwritten/scala/example/bankwealth/web/BankBrowserPages.scala)，应用内路径 `/bank/v1` |
 | 怎样演示 | 第 5 节是无数据库的小演示；第 9 节是完整银行发行复演 |
 | 什么已经验收 | [`RELEASE-SIGNOUT-1134.md`](v1/integration/RELEASE-SIGNOUT-1134.md) |
-| 为什么根目录还有另一套 `tree/` | 那是早期设计／预览材料，不能与当前 `v1/tree/` 混用 |
+| 旧两套作者树去了哪里 | 已经逐文件核对后移除；固定 Git revision 和 [`TRUTH-LEGACY-BASELINE.json`](docs/TRUTH-LEGACY-BASELINE.json) 保留历史来源 |
 
 **新手推荐顺序：**先读第 1–4 节，再做第 5 节的小演示。想看“知识怎样变成代码”，读第 6–8 节；准备运行银行，再读第 9 节。不需要先读所有编号报告。
 
@@ -130,7 +132,7 @@ TA 是基金登记／份额确认这一侧的简称。本例允许模拟基金�
 
 ```text
 作者输入                       派生产物                         运行与证据
-v1/tree/ ──公共编译器──> canonical / 语义产品 ──生成器──> 生成应用
+truth/bank-wealth/ ──公共编译器/图AST──> canonical / 语义产品 ──生成器──> 生成应用
     + 明确技术绑定、生成配置                                  + 手写边界
                                                              ↓
                                                         构建、运行、测试
@@ -140,23 +142,27 @@ v1/tree/ ──公共编译器──> canonical / 语义产品 ──生成器�
 
 “真源”是作者维护的权威描述；“派生产物”可以从指定输入重新得到；“运行证据”记录某次真实执行发生了什么。三者不能互相冒充。
 
-### 4.2 当前 `v1/` 目录
+### 4.2 当前作者输入与保留的 `v1/`
 
 ```text
+truth/bank-wealth/
+├── system.yaml
+├── contexts/bankwealth/
+│   ├── context.yaml
+│   ├── structures/         共享协议/结果/TCC结构，展开为标准虚拟原子
+│   ├── aggregates/         聚合与未合并的业务切片
+│   ├── value-objects/
+│   ├── sagas/、pipelines/
+│   └── formal-products/、stories/、read-models/、use-cases.yaml
+└── inbox/                  有实际来源的背景、角色与决策
+truthsrc.project.json       唯一项目配置
+bindings/implementation/    八份具名技术选择
 v1/
-├── tree/                  当前 V1 业务真源
-│   ├── workshop.yaml      真源树入口信息
-│   ├── aggregates/        聚合与命令切片，含事件定义和状态折叠
-│   ├── value-objects/     金额、身份、输入输出等值对象
-│   ├── sagas/             跨聚合事务定义
-│   ├── pipelines/         执行管线定义
-│   ├── formal-products/   技术端口、宿主、服务、体验等正式合同
-│   └── inbox/             设计问题、背景、决策与来源
-├── formal-inputs/         明确作者绑定及逐批冻结的完整输入快照
-├── handwritten/scala/    具体银行适配、读侧、页面、安全及运行装配
-├── test/scala/           银行行为、集成、恢复和页面测试源码
-├── integration/          合同、协作边界、来源映射、验收与发行签出
-└── third-party/          当前主要是 sbt-twirl 插件许可／来源材料
+├── formal-inputs/          历史冻结请求，不是当前作者面
+├── handwritten/scala/     银行适配、读侧、页面、安全及运行装配
+├── test/scala/            冻结业务/恢复验收源码
+├── integration/           历史合同、协作与发行证据
+└── third-party/           许可/来源材料
 ```
 
 `formal-inputs/` 中的 `payment-authored-*` 等目录含显式技术 binding，例如端口怎样连接实际实现。`payment-376`、`release-pages-721`、`release-bridge-1069` 等是历史批次标签，**不是需要依次运行的脚本编号**。不要通过批量编辑这些 JSON 来修改业务。
@@ -212,7 +218,7 @@ ScalaPB 等构建工具还会根据 `.proto` 产生 managed sources；它们属�
 
 | 目录／文件 | 正确读法 |
 |---|---|
-| `tree/`、六份根 binding JSON | 早期业务设计／导入与追加设计材料，历史保护面；不是当前 V1 输入的快捷替代品 |
+| 六份根 binding JSON | 早期设计配套历史保护面；两旧作者树已退役，不是当前输入的快捷替代品 |
 | `compiled/`、`isolation-zone/` | 旧 IR／Scala 说明样例，不是当前 V1 生成结果 |
 | `projections/` | 业务知识的上下文图、故事图、旅程图等；**不是**运行时 CQRS 数据库投影 |
 | `simulator/`、`tools/mock-ta.mjs` | 独立 MockTA 模拟器，不是银行前端，也不独自完成付款／退款 |
@@ -227,96 +233,49 @@ ScalaPB 等构建工具还会根据 `.proto` 产生 managed sources；它们属�
 
 ## 5. 不启动银行，也能做的第一个演示
 
-### 5.1 看懂并编译当前银行真源
+### 5.1 当前银行入口
 
-在本仓库根目录执行。下面假设 sibling `../metarch-truthsrc` 存在，并且使用支持这些接口的版本；推荐 Node ≥22.5。本轮实测 Node 22.23.4。无需启动数据库、Docker 或 BC 服务。
-
-```bash
-BANK="$PWD"
-TOOL="$(cd ../metarch-truthsrc && pwd -P)"
-DEMO="$(mktemp -d "${TMPDIR:-/tmp}/bank-readme.XXXXXX")"
-
-node "$TOOL/bin/truthsrc.js" validate --tree "$BANK/v1/tree"
-node "$TOOL/bin/truthsrc.js" roundtrip --tree "$BANK/v1/tree"
-node "$TOOL/bin/truthsrc.js" compile \
-  --tree "$BANK/v1/tree" --out "$DEMO/canonical.json"
-
-node tools/v1-service-inputs.mjs --check-service
-
-node "$TOOL/bin/truthsrc.js" compile-products \
-  --request "$BANK/v1/formal-inputs/release-bridge-1069/files.json" \
-  --out "$DEMO/compiled.json"
-```
-
-你会看到两条不同的编译动作：
-
-- `compile` 把**当前树**编成统一文档。
-- `compile-products` 把**选定的发行输入快照**编成语义产品。
-
-`--check-service` 则检查当前树经银行服务输入组装后的产品。对应薄层代码是 [`v1-inputs.mjs`](tools/v1-inputs.mjs) 和 [`v1-service-inputs.mjs`](tools/v1-service-inputs.mjs)，内部复用公共编译器，不是另写银行编译器。
-
-本轮结果：`validate` 为 **0 hard / 34 notice**，往返校验通过，287 个原子；canonical 有 3 个聚合、2 个 Saga、4 条管线；服务输入得到 14 项产品。本轮当前树与上述发行 canonical 的 JSON 内容一致，未来修改后不能继续假定相等。notice 不是执行失败，但也不应隐藏；结构通过不认证业务运行。
-
-这些命令只在新临时目录保存输出；`roundtrip` 使用并清理自己的系统临时目录，不改原树。不要把 `--out` 指向已冻结的 `compiled.json`；正式产品输出拒绝覆盖既有文件。
-
-### 5.2 预览会生成什么
-
-以下针对已经准备好本地锁定 runtime 和手写挂载的工作区：
+在本仓库根目录，使用 Node ≥22.5。只编译真源不需要数据库、Docker或BC服务：
 
 ```bash
-node "$TOOL/bin/truthsrc.js" generate-products \
-  --request "$BANK/v1/formal-inputs/release-bridge-1069/files.json" \
-  --generator "$TOOL/generators/scala-cqrs-play-service" \
-  --options-json "$BANK/v1/formal-inputs/release-bridge-1069/options.json" \
-  --out "$DEMO/js-app" --plan > "$DEMO/plan.json"
+node tools/truthsrc-project.mjs validate
+node tools/truthsrc-project.mjs compile
 ```
 
-本轮得到 **193 个计划文件、`applied:false`，目标目录未创建**。这里没有编译 Scala，也没有启动服务。
+当前有157个YAML，展开后保留3个聚合、2个Saga、4条pipeline和14个语义产品。
+结构共享与微语法只改变作者表示，不改变金融规则。`compile`的JSON输出是派生结果，不是新的编辑面。
 
-`options.json` 中保存了原作者机器上的绝对供给路径，所以**新 clone 不能保证原样执行这条 plan**。即使仅预览，正式入口也会检查本地 runtime 和挂载。跨机器应使用第 9 节的干净发行包及其路径适配流程，或准备自己显式拥有的选项与供给，不要删除校验来“跑通”。实际生成沿用同一公共入口去掉 `--plan`，但只应写新建且独占的目标，不能写回历史复演目录。
-
-### 5.3 想从空目录理解工具，而不是先处理完整银行？
-
-**版本说明：**本轮核对时，工具链工作区已新增 `init / compile-project / generate-project`，相关文件尚有未提交改动。它们不属于 1134 归档中的冻结工具。使用前先确认你的工具帮助中有这些命令；完整合同见 sibling [`metarch-truthsrc/PROJECT.md`](../metarch-truthsrc/PROJECT.md)。不能仅凭旧 HEAD 或旧包版本推定有这些能力。
-
-以下微型例子已在本轮独立临时目录实跑，不会创建第二套银行实现：
+完整银行生成还需要本地冻结runtime供给。只有已有干净1134归档时才执行准备：
 
 ```bash
-# 仍在 bank-wealth-demo 根目录；沿用上面的 TOOL。
-WORK="$(mktemp -d "${TMPDIR:-/tmp}/truthsrc-intro.XXXXXX")"
-WORK="$(cd "$WORK" && pwd -P)"
-
-# hello 不能预先存在，连空目录也不行。
-node "$TOOL/bin/truthsrc.js" init "$WORK/hello"
-node "$TOOL/bin/truthsrc.js" validate --tree "$WORK/hello/tree"
-node "$TOOL/bin/truthsrc.js" roundtrip --tree "$WORK/hello/tree"
-node "$TOOL/bin/truthsrc.js" compile-project \
-  --project "$WORK/hello/truthsrc.project.json" > "$WORK/compile-result.json"
-node "$TOOL/bin/truthsrc.js" generate-project \
-  --project "$WORK/hello/truthsrc.project.json" \
-  --out "$WORK/source" --plan > "$WORK/plan.json"
-node "$TOOL/bin/truthsrc.js" generate-project \
-  --project "$WORK/hello/truthsrc.project.json" \
-  --out "$WORK/source" > "$WORK/generation-result.json"
+node tools/prepare-truthsrc-runtime.mjs --archive dist/bank-wealth-v1-darwin-x64-1134.tar.gz
+node tools/truthsrc-project.mjs generate --out "$PWD/generated/current" --plan
+node tools/truthsrc-project.mjs generate --out "$PWD/generated/current"
 ```
 
-其中作者维护 `hello/tree/` 和明确的 `truthsrc.project.json` 技术配置。实际生成后：
+已有输出需要先 `status`，检查变更后显式 `--update --plan` / `--update`，不覆盖陌生文件。
+项目知识图在 `.truthsrc/knowledge.sqlite`；生成器实际消费图导出的AST，再将代码锚写回同图。
+当前service生成199份源码/配置及4份派生证据，账本和锚交换文件另计。
 
-```text
-source/.truthsrc/canonical.json   本次树编译结果
-source/.truthsrc/request.json     自动派生的完整请求
-source/.truthsrc/compiled.json    语义产品
-source/.truthsrc/inputs.json      输入来源与指纹
-source/anchors.json              实际文件锚
-source/truthsrc.ledger.json      写入账本
-source/…                        生成代码
+### 5.2 从空目录体验工具
+
+安装方式见 [工具README](../metarch-truthsrc/README.md#install-the-local-cli)。安装后：
+
+```bash
+truthsrc init ./my-workshop
+truthsrc validate --tree ./my-workshop/truth/example
+truthsrc roundtrip --tree ./my-workshop/truth/example
+truthsrc generate-project --project ./my-workshop/truthsrc.project.json --out ./my-workshop/generated
+truthsrc query-project --project ./my-workshop/truthsrc.project.json --out ./my-workshop/generated --knowledge SetCount
 ```
 
-这是一个最小领域脚手架，不是完整银行服务。第一批项目入口有明确支持范围，例如单一显式 context；遇到未知能力会拒绝，不会把任意业务自然语言自动变成程序。
+`my-workshop` 必须不存在。这是独立Counter教学模型，不是第二套银行真源。
+本轮已从本地tarball在独立前缀离线安装CLI并实测建树和生成；没有发布到npm。
+详细变更/再生、微语法、精确回锚和手写边界见 [当前教程](docs/TRUTH-TUTORIAL.md)。
 
 ## 6. 跟一条真实知识：初始化账户怎样变成代码？
 
-打开 [`initialize-account.slice.yaml`](v1/tree/aggregates/credit-balance/slices/initialize-account.slice.yaml)。`slice` 可以理解为“围绕一个命令组织的一小块业务定义”。其内容包括：
+打开 [`initialize-account.slice.yaml`](truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/slices/initialize-account.slice.yaml)。`slice` 可以理解为“围绕一个命令组织的一小块业务定义”。其内容包括：
 
 - 命令 `InitializeAccount`，参数为账户身份、币种和金额。
 - 守卫：账户身份匹配、币种为 CNY、金额非负、重复初始化不能篡改原值等。
@@ -358,7 +317,7 @@ Command → 守卫与决策 → Event → 持久化 → event application 更新
 ### 7.1 先区分四种“类型”
 
 1. **知识原子类型：**`note`、`aggregate`、`slice`、`saga`、`formal-product` 等。定义入口是 [`lib/shared.mjs`](../metarch-truthsrc/lib/shared.mjs) 与 [`SCHEMA.md`](../metarch-truthsrc/SCHEMA.md)。
-2. **作者侧正式合同 family：**如 `technical-port`、`saga-host`、`effect-host`、`artifact-contract`。定义在 [`lib/formal-products-pure.mjs`](../metarch-truthsrc/lib/formal-products-pure.mjs)，银行实例在 `v1/tree/formal-products/`。
+2. **作者侧正式合同 family：**如 `technical-port`、`saga-host`、`effect-host`、`artifact-contract`。定义在 [`lib/formal-products-pure.mjs`](../metarch-truthsrc/lib/formal-products-pure.mjs)，银行实例在 `truth/bank-wealth/contexts/bankwealth/formal-products/` 或对应的 `structures/` 宏声明中。
 3. **编译产品类型：**供代码生成器消费的检查后模型。注册、版本和依赖在 [`lib/products/registry.mjs`](../metarch-truthsrc/lib/products/registry.mjs)，分派在 [`lib/products/compile.mjs`](../metarch-truthsrc/lib/products/compile.mjs)，JSON 结构在 [`schema/`](../metarch-truthsrc/schema/)。
 4. **生成文件的 artifact kind：**`state`、`protocol`、`converter`、`service-runtime` 等。具体由生成器 [`generator.json`](../metarch-truthsrc/generators/scala-cqrs-play-service/generator.json) 的 `producers` 和 `artifactKinds` 声明，写入账本的 `entry.kind` 必须属于声明范围。
 
@@ -394,7 +353,7 @@ JS 服务生成入口是 [`scala-cqrs-play-service/generate.mjs`](../metarch-tru
 | 银行 JDBC 投影与表结构 | **手写** [`BankReadside.scala`](v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala)、[`BankReadsideSchema.scala`](v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala) |
 | 银行 endpoint 实现、页面、业务装配 | **手写** [`BankServiceEndpoints.scala`](v1/handwritten/scala/example/bankwealth/integration/BankServiceEndpoints.scala)、[`BankBrowserPages.scala`](v1/handwritten/scala/example/bankwealth/web/BankBrowserPages.scala)、[`BankServiceFactory.scala`](v1/handwritten/scala/example/bankwealth/integration/BankServiceFactory.scala) |
 
-HTTP 方法、路径、类型、端口、页面挂载等合同在 [`bank-service.formal.yaml`](v1/tree/formal-products/artifact-contract/bank-service.formal.yaml)。生成端产出类型化接口、Loader 和 `Router.from` 路由，不是必须生成传统 `conf/routes` 文本。具体页面 renderer 和银行 endpoint 实现仍为手写边界，不能宣传成“所有前端／读模型自动生成”。
+HTTP 方法、路径、类型、端口、页面挂载等合同在 [`bank-service.formal.yaml`](truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml)。生成端产出类型化接口、Loader 和 `Router.from` 路由，不是必须生成传统 `conf/routes` 文本。具体页面 renderer 和银行 endpoint 实现仍为手写边界，不能宣传成“所有前端／读模型自动生成”。
 
 ### 7.3 BC 中的定义在哪里？
 
@@ -432,7 +391,7 @@ Golden example 通常指“预先认定的输入与期望输出”，用来检�
 - **`truthsrc.ledger.json`：**每个生成文件的 `kind`、依赖、产品版本及 `knowledgeIds`，便于从文件反查来源和判断生成范围。
 - **[`HANDWRITTEN-SOURCE-MAP.json`](v1/integration/HANDWRITTEN-SOURCE-MAP.json)：**手写实现对知识的 `implements / supports / legacy-adapter` 显式声明，不是假装工具自动理解了手写代码。
 
-本例回锚是**文件级**。`symbol:null`、`span:null` 不是漏写行号，而是没有宣称符号／源码区间验证。“回写”也不是把 hash 塞回业务树；派生索引在树外，避免工具产物污染真源。
+本例现在同时有文件级和精确区间锚。命令、guard、事件分支和fold由渲染器同源记录，最终字节核验后存入项目知识图；无解析证据的`symbol`仍不认证。`anchors.json`是派生交换文件，不是另一真源，也不把hash塞回业务树。
 
 ### 8.2 查询知识之间的关系
 
@@ -497,7 +456,7 @@ JS
 
 当前前端由 Play 应用提供 HTML 和原生 JavaScript，界面文案主要是英文；它是用于验证业务操作的朴素界面，不是手机银行成品 UI。
 
-实际 renderer 为 [`BankBrowserPages.scala`](v1/handwritten/scala/example/bankwealth/web/BankBrowserPages.scala)，挂载合同在 [`bank-service.formal.yaml`](v1/tree/formal-products/artifact-contract/bank-service.formal.yaml)。正确装配并启动后，入口为：
+实际 renderer 为 [`BankBrowserPages.scala`](v1/handwritten/scala/example/bankwealth/web/BankBrowserPages.scala)，挂载合同在 [`bank-service.formal.yaml`](truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml)。正确装配并启动后，入口为：
 
 ```text
 http://127.0.0.1:<本次分配的HTTP端口>/bank/v1
@@ -655,7 +614,7 @@ MANUAL 块可以保留允许的手写片段，但它不是协作锁。两个 age
 
 - **想读业务：**[`v1/tree/`](v1/tree/)，再对照 [`v1/test/scala/`](v1/test/scala/) 的实际预期。
 - **想读银行运行装配：**[`BankServiceFactory.scala`](v1/handwritten/scala/example/bankwealth/integration/BankServiceFactory.scala)、[`integration/CONTRACT.md`](v1/integration/CONTRACT.md)。
-- **想读服务／页面合同：**[`bank-service.formal.yaml`](v1/tree/formal-products/artifact-contract/bank-service.formal.yaml)、[`PAGES-CONTRACT.md`](v1/integration/PAGES-CONTRACT.md)。
+- **想读服务／页面合同：**[`bank-service.formal.yaml`](truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml)、[`PAGES-CONTRACT.md`](v1/integration/PAGES-CONTRACT.md)。
 - **想读工具：**sibling [`metarch-truthsrc/SCHEMA.md`](../metarch-truthsrc/SCHEMA.md)、[`PROJECT.md`](../metarch-truthsrc/PROJECT.md)、[`bin/truthsrc.js`](../metarch-truthsrc/bin/truthsrc.js)。这些跨仓链接在完整工作区有效，单独 clone 银行不会自动带来工具仓。
 - **想读当前正式生成：**[`generate-cli.mjs`](../metarch-truthsrc/lib/products/generate-cli.mjs)、[`product-plan.mjs`](../metarch-truthsrc/src/core/product-plan.mjs)、[`generate.mjs`](../metarch-truthsrc/src/core/generate.mjs)。
 - **想看发行做到哪一步：**[`RELEASE-SIGNOUT-1134.md`](v1/integration/RELEASE-SIGNOUT-1134.md)。

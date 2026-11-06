@@ -9,14 +9,8 @@ payload:
     "context": "bankwealth",
     "version": "bank-v1-service-1",
     "fields": [
-      {
-        "name": "config",
-        "dataType": "SipRevisionConfig"
-      },
-      {
-        "name": "endSlot",
-        "dataType": "Option[Long]"
-      }
+      "config: SipRevisionConfig",
+      "endSlot: \"Option[Long]\""
     ],
     "provenance": {
       "author": "agent-assisted-bank-v1-service-integration",

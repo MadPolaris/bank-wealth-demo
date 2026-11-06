@@ -10,12 +10,7 @@ payload:
   {
     "id": "bank-service",
     "version": "bank-v1-service-1",
-    "artifact": {
-      "context": "bankwealth",
-      "kind": "artifact",
-      "owner": [],
-      "id": "BankService"
-    },
+    "artifact": "@ref(bankwealth:artifact#BankService)",
     "status": "selected",
     "provenance": [
       {
@@ -28,666 +23,151 @@ payload:
       }
     ],
     "references": [
-      {
-        "context": "bankwealth",
-        "kind": "aggregate",
-        "owner": [],
-        "id": "FundOrder"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "aggregate",
-        "owner": [],
-        "id": "SipPlan"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankCashSubmit"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankCashOriginal"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankCashAcknowledgement"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipCreate"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipCreateIntent"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipAcknowledgement"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipRevise"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipRevisionInput"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankTick"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankTickAcknowledgement"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankAccountKey"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankCashRequestKey"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankOrderKey"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankPlanKey"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankPlanPageKey"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankOccurrencePageKey"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankPendingPageKey"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankOperationKey"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankProjectionWatermark"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankReadMetadata"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankAccountView"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankCashRequestView"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankTaSharesView"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankOrderView"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipRevisionView"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipPlanView"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipOccurrenceView"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankPendingOperationView"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankAccountResponse"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankCashRequestResponse"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankOrderResponse"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipPlanResponse"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipPlanPage"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankSipOccurrencePage"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankPendingResponse"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankRecoveryAcknowledgement"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankServiceBootstrapInput"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankServiceBootstrapAcknowledgement"
-      }
+      "@ref(bankwealth:aggregate#FundOrder)",
+      "@ref(bankwealth:aggregate#SipPlan)",
+      "@ref(bankwealth:type#BankCashSubmit)",
+      "@ref(bankwealth:type#BankCashOriginal)",
+      "@ref(bankwealth:type#BankCashAcknowledgement)",
+      "@ref(bankwealth:type#BankSipCreate)",
+      "@ref(bankwealth:type#BankSipCreateIntent)",
+      "@ref(bankwealth:type#BankSipAcknowledgement)",
+      "@ref(bankwealth:type#BankSipRevise)",
+      "@ref(bankwealth:type#BankSipRevisionInput)",
+      "@ref(bankwealth:type#BankTick)",
+      "@ref(bankwealth:type#BankTickAcknowledgement)",
+      "@ref(bankwealth:type#BankAccountKey)",
+      "@ref(bankwealth:type#BankCashRequestKey)",
+      "@ref(bankwealth:type#BankOrderKey)",
+      "@ref(bankwealth:type#BankPlanKey)",
+      "@ref(bankwealth:type#BankPlanPageKey)",
+      "@ref(bankwealth:type#BankOccurrencePageKey)",
+      "@ref(bankwealth:type#BankPendingPageKey)",
+      "@ref(bankwealth:type#BankOperationKey)",
+      "@ref(bankwealth:type#BankProjectionWatermark)",
+      "@ref(bankwealth:type#BankReadMetadata)",
+      "@ref(bankwealth:type#BankAccountView)",
+      "@ref(bankwealth:type#BankCashRequestView)",
+      "@ref(bankwealth:type#BankTaSharesView)",
+      "@ref(bankwealth:type#BankOrderView)",
+      "@ref(bankwealth:type#BankSipRevisionView)",
+      "@ref(bankwealth:type#BankSipPlanView)",
+      "@ref(bankwealth:type#BankSipOccurrenceView)",
+      "@ref(bankwealth:type#BankPendingOperationView)",
+      "@ref(bankwealth:type#BankAccountResponse)",
+      "@ref(bankwealth:type#BankCashRequestResponse)",
+      "@ref(bankwealth:type#BankOrderResponse)",
+      "@ref(bankwealth:type#BankSipPlanResponse)",
+      "@ref(bankwealth:type#BankSipPlanPage)",
+      "@ref(bankwealth:type#BankSipOccurrencePage)",
+      "@ref(bankwealth:type#BankPendingResponse)",
+      "@ref(bankwealth:type#BankRecoveryAcknowledgement)",
+      "@ref(bankwealth:type#BankServiceBootstrapInput)",
+      "@ref(bankwealth:type#BankServiceBootstrapAcknowledgement)"
     ],
     "ports": [
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankServiceBootstrap"
-        },
+        "ref": "@ref(bankwealth:port#BankServiceBootstrap)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankServiceBootstrapInput"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankServiceBootstrapAcknowledgement"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankServiceBootstrapInput)",
+        "outputType": "@type(nominal:bankwealth:type#BankServiceBootstrapAcknowledgement)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankAccountQuery"
-        },
+        "ref": "@ref(bankwealth:port#BankAccountQuery)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankAccountKey"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankAccountResponse"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankAccountKey)",
+        "outputType": "@type(nominal:bankwealth:type#BankAccountResponse)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankCashSubmitPort"
-        },
+        "ref": "@ref(bankwealth:port#BankCashSubmitPort)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankCashSubmit"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankCashAcknowledgement"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankCashSubmit)",
+        "outputType": "@type(nominal:bankwealth:type#BankCashAcknowledgement)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankCashOriginalQuery"
-        },
+        "ref": "@ref(bankwealth:port#BankCashOriginalQuery)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankCashRequestKey"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankCashRequestResponse"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankCashRequestKey)",
+        "outputType": "@type(nominal:bankwealth:type#BankCashRequestResponse)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankOrderQuery"
-        },
+        "ref": "@ref(bankwealth:port#BankOrderQuery)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankOrderKey"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankOrderResponse"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankOrderKey)",
+        "outputType": "@type(nominal:bankwealth:type#BankOrderResponse)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipCreatePort"
-        },
+        "ref": "@ref(bankwealth:port#BankSipCreatePort)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipCreate"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipAcknowledgement"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankSipCreate)",
+        "outputType": "@type(nominal:bankwealth:type#BankSipAcknowledgement)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipPlansQuery"
-        },
+        "ref": "@ref(bankwealth:port#BankSipPlansQuery)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankPlanPageKey"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipPlanPage"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankPlanPageKey)",
+        "outputType": "@type(nominal:bankwealth:type#BankSipPlanPage)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipPlanQuery"
-        },
+        "ref": "@ref(bankwealth:port#BankSipPlanQuery)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankPlanKey"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipPlanResponse"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankPlanKey)",
+        "outputType": "@type(nominal:bankwealth:type#BankSipPlanResponse)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipRevisePort"
-        },
+        "ref": "@ref(bankwealth:port#BankSipRevisePort)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipRevisionInput"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipAcknowledgement"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankSipRevisionInput)",
+        "outputType": "@type(nominal:bankwealth:type#BankSipAcknowledgement)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipPausePort"
-        },
+        "ref": "@ref(bankwealth:port#BankSipPausePort)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankPlanKey"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipAcknowledgement"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankPlanKey)",
+        "outputType": "@type(nominal:bankwealth:type#BankSipAcknowledgement)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipResumePort"
-        },
+        "ref": "@ref(bankwealth:port#BankSipResumePort)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankPlanKey"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipAcknowledgement"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankPlanKey)",
+        "outputType": "@type(nominal:bankwealth:type#BankSipAcknowledgement)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipOccurrencesQuery"
-        },
+        "ref": "@ref(bankwealth:port#BankSipOccurrencesQuery)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankOccurrencePageKey"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipOccurrencePage"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankOccurrencePageKey)",
+        "outputType": "@type(nominal:bankwealth:type#BankSipOccurrencePage)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankPendingOperationsQuery"
-        },
+        "ref": "@ref(bankwealth:port#BankPendingOperationsQuery)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankPendingPageKey"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankPendingResponse"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankPendingPageKey)",
+        "outputType": "@type(nominal:bankwealth:type#BankPendingResponse)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankReconcileExistingPort"
-        },
+        "ref": "@ref(bankwealth:port#BankReconcileExistingPort)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankOperationKey"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankRecoveryAcknowledgement"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankOperationKey)",
+        "outputType": "@type(nominal:bankwealth:type#BankRecoveryAcknowledgement)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankBusinessTickPort"
-        },
+        "ref": "@ref(bankwealth:port#BankBusinessTickPort)",
         "version": "bank-v1-service-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankTick"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankTickAcknowledgement"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankTick)",
+        "outputType": "@type(nominal:bankwealth:type#BankTickAcknowledgement)",
         "required": true
       }
     ],
@@ -707,15 +187,7 @@ payload:
       "service": {
         "schemaVersion": "truthsrc.play-service/v1",
         "profile": "scala-cqrs-play-service@1",
-        "bootstrap": {
-          "ref": {
-            "context": "bankwealth",
-            "kind": "port",
-            "owner": [],
-            "id": "BankServiceBootstrap"
-          },
-          "version": "bank-v1-service-1"
-        },
+        "bootstrap": "@pin(bankwealth:port#BankServiceBootstrap@bank-v1-service-1)",
         "namespaceConfig": "bank.namespace",
         "journal": {
           "provider": "mongodb-rxmongo",
@@ -735,33 +207,9 @@ payload:
             "path": "/api/v1/accounts/me",
             "audience": "customer",
             "operation": "query",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankAccountQuery"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankAccountKey"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankAccountResponse"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankAccountQuery@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankAccountKey)",
+            "outputType": "@type(nominal:bankwealth:type#BankAccountResponse)",
             "csrf": false
           },
           {
@@ -770,33 +218,9 @@ payload:
             "path": "/api/v1/cash-requests",
             "audience": "customer",
             "operation": "command",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankCashSubmitPort"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankCashSubmit"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankCashAcknowledgement"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankCashSubmitPort@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankCashSubmit)",
+            "outputType": "@type(nominal:bankwealth:type#BankCashAcknowledgement)",
             "csrf": true
           },
           {
@@ -805,33 +229,9 @@ payload:
             "path": "/api/v1/cash-requests/:clientRequestId",
             "audience": "customer",
             "operation": "query",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankCashOriginalQuery"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankCashRequestKey"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankCashRequestResponse"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankCashOriginalQuery@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankCashRequestKey)",
+            "outputType": "@type(nominal:bankwealth:type#BankCashRequestResponse)",
             "csrf": false
           },
           {
@@ -840,33 +240,9 @@ payload:
             "path": "/api/v1/orders/:orderId",
             "audience": "customer",
             "operation": "query",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankOrderQuery"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankOrderKey"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankOrderResponse"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankOrderQuery@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankOrderKey)",
+            "outputType": "@type(nominal:bankwealth:type#BankOrderResponse)",
             "csrf": false
           },
           {
@@ -875,33 +251,9 @@ payload:
             "path": "/api/v1/sip-plans",
             "audience": "customer",
             "operation": "command",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankSipCreatePort"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankSipCreate"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankSipAcknowledgement"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankSipCreatePort@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankSipCreate)",
+            "outputType": "@type(nominal:bankwealth:type#BankSipAcknowledgement)",
             "csrf": true
           },
           {
@@ -910,33 +262,9 @@ payload:
             "path": "/api/v1/sip-plans",
             "audience": "customer",
             "operation": "query",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankSipPlansQuery"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankPlanPageKey"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankSipPlanPage"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankSipPlansQuery@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankPlanPageKey)",
+            "outputType": "@type(nominal:bankwealth:type#BankSipPlanPage)",
             "csrf": false
           },
           {
@@ -945,33 +273,9 @@ payload:
             "path": "/api/v1/sip-plans/:planId",
             "audience": "customer",
             "operation": "query",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankSipPlanQuery"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankPlanKey"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankSipPlanResponse"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankSipPlanQuery@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankPlanKey)",
+            "outputType": "@type(nominal:bankwealth:type#BankSipPlanResponse)",
             "csrf": false
           },
           {
@@ -980,33 +284,9 @@ payload:
             "path": "/api/v1/sip-plans/:planId/revisions",
             "audience": "customer",
             "operation": "command",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankSipRevisePort"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankSipRevisionInput"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankSipAcknowledgement"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankSipRevisePort@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankSipRevisionInput)",
+            "outputType": "@type(nominal:bankwealth:type#BankSipAcknowledgement)",
             "csrf": true
           },
           {
@@ -1015,33 +295,9 @@ payload:
             "path": "/api/v1/sip-plans/:planId/pause",
             "audience": "customer",
             "operation": "command",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankSipPausePort"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankPlanKey"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankSipAcknowledgement"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankSipPausePort@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankPlanKey)",
+            "outputType": "@type(nominal:bankwealth:type#BankSipAcknowledgement)",
             "csrf": true
           },
           {
@@ -1050,33 +306,9 @@ payload:
             "path": "/api/v1/sip-plans/:planId/resume",
             "audience": "customer",
             "operation": "command",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankSipResumePort"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankPlanKey"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankSipAcknowledgement"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankSipResumePort@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankPlanKey)",
+            "outputType": "@type(nominal:bankwealth:type#BankSipAcknowledgement)",
             "csrf": true
           },
           {
@@ -1085,33 +317,9 @@ payload:
             "path": "/api/v1/sip-plans/:planId/occurrences",
             "audience": "customer",
             "operation": "query",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankSipOccurrencesQuery"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankOccurrencePageKey"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankSipOccurrencePage"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankSipOccurrencesQuery@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankOccurrencePageKey)",
+            "outputType": "@type(nominal:bankwealth:type#BankSipOccurrencePage)",
             "csrf": false
           },
           {
@@ -1120,33 +328,9 @@ payload:
             "path": "/api/v1/operations/pending",
             "audience": "operator",
             "operation": "query",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankPendingOperationsQuery"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankPendingPageKey"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankPendingResponse"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankPendingOperationsQuery@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankPendingPageKey)",
+            "outputType": "@type(nominal:bankwealth:type#BankPendingResponse)",
             "csrf": false
           },
           {
@@ -1155,33 +339,9 @@ payload:
             "path": "/api/v1/operations/:operationId/reconcile",
             "audience": "operator",
             "operation": "reconcile",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankReconcileExistingPort"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankOperationKey"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankRecoveryAcknowledgement"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankReconcileExistingPort@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankOperationKey)",
+            "outputType": "@type(nominal:bankwealth:type#BankRecoveryAcknowledgement)",
             "csrf": true
           },
           {
@@ -1190,33 +350,9 @@ payload:
             "path": "/api/v1/business-clock/tick",
             "audience": "operator",
             "operation": "tick",
-            "port": {
-              "ref": {
-                "context": "bankwealth",
-                "kind": "port",
-                "owner": [],
-                "id": "BankBusinessTickPort"
-              },
-              "version": "bank-v1-service-1"
-            },
-            "inputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankTick"
-              }
-            },
-            "outputType": {
-              "form": "nominal",
-              "ref": {
-                "context": "bankwealth",
-                "kind": "type",
-                "owner": [],
-                "id": "BankTickAcknowledgement"
-              }
-            },
+            "port": "@pin(bankwealth:port#BankBusinessTickPort@bank-v1-service-1)",
+            "inputType": "@type(nominal:bankwealth:type#BankTick)",
+            "outputType": "@type(nominal:bankwealth:type#BankTickAcknowledgement)",
             "csrf": true
           }
         ],
@@ -1292,152 +428,77 @@ payload:
     },
     "implementations": [
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankServiceBootstrap"
-        },
+        "port": "@ref(bankwealth:port#BankServiceBootstrap)",
         "id": "example.bankwealth.integration.BankServiceFactory",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankAccountQuery"
-        },
+        "port": "@ref(bankwealth:port#BankAccountQuery)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankAccountQuery",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankCashSubmitPort"
-        },
+        "port": "@ref(bankwealth:port#BankCashSubmitPort)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankCashSubmitPort",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankCashOriginalQuery"
-        },
+        "port": "@ref(bankwealth:port#BankCashOriginalQuery)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankCashOriginalQuery",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankOrderQuery"
-        },
+        "port": "@ref(bankwealth:port#BankOrderQuery)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankOrderQuery",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipCreatePort"
-        },
+        "port": "@ref(bankwealth:port#BankSipCreatePort)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankSipCreatePort",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipPlansQuery"
-        },
+        "port": "@ref(bankwealth:port#BankSipPlansQuery)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankSipPlansQuery",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipPlanQuery"
-        },
+        "port": "@ref(bankwealth:port#BankSipPlanQuery)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankSipPlanQuery",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipRevisePort"
-        },
+        "port": "@ref(bankwealth:port#BankSipRevisePort)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankSipRevisePort",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipPausePort"
-        },
+        "port": "@ref(bankwealth:port#BankSipPausePort)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankSipPausePort",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipResumePort"
-        },
+        "port": "@ref(bankwealth:port#BankSipResumePort)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankSipResumePort",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipOccurrencesQuery"
-        },
+        "port": "@ref(bankwealth:port#BankSipOccurrencesQuery)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankSipOccurrencesQuery",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankPendingOperationsQuery"
-        },
+        "port": "@ref(bankwealth:port#BankPendingOperationsQuery)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankPendingOperationsQuery",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankReconcileExistingPort"
-        },
+        "port": "@ref(bankwealth:port#BankReconcileExistingPort)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankReconcileExistingPort",
         "version": "bank-v1-service-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankBusinessTickPort"
-        },
+        "port": "@ref(bankwealth:port#BankBusinessTickPort)",
         "id": "example.bankwealth.integration.BankServiceEndpoints.BankBusinessTickPort",
         "version": "bank-v1-service-1"
       }

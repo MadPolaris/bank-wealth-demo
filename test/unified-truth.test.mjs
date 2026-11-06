@@ -14,28 +14,29 @@ import { queryProject, statusProject } from '../../metarch-truthsrc/lib/project/
 import { deriveProjectRequest } from '../../metarch-truthsrc/lib/project/derive.mjs';
 import { compileProductSet } from '../../metarch-truthsrc/lib/products/compile.mjs';
 import { tmpdir } from 'node:os';
+import { readHistoricalFile } from '../tools/historical-source.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const tree = join(ROOT, 'truth/bank-wealth'), project = join(ROOT, 'truthsrc.project.json');
 const json = file => JSON.parse(readFileSync(file, 'utf8'));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
-const original = JSON.parse(compileTree(join(ROOT, 'v1/tree')));
+const baseline = json(join(ROOT, 'docs/TRUTH-LEGACY-BASELINE.json'));
 const current = JSON.parse(compileTree(tree));
 
 test('one root entry names current bank source; four execution flows retain all original semantics', () => {
   assert.equal(json(project).tree, 'truth/bank-wealth');
   assert.equal(current.authoring.system.id, 'bank-wealth');
   assert.equal(current.authoring.context.id, 'bankwealth');
-  for (const family of ['aggregates', 'valueObjects', 'sagas', 'pipelines', 'ports', 'hostComputations', 'externalEventProducers', 'sagaHosts', 'effectHosts', 'artifactContracts', 'productDesigns'])
-    assert.deepEqual(current[family], original[family], family + ' execution declaration changed');
+  for (const { family, sha256 } of baseline.executionFamilies)
+    assert.equal(hash(JSON.stringify(current[family])), sha256, family + ' execution declaration changed');
   assert.deepEqual(current.pipelines.map(p => p.id), ['bank-cash-payment-v1', 'bank-independent-refund-v1', 'bank-sip-dispatch-v1', 'bank-ta-submission-v1']);
   assert.equal(validateTree(tree).hard.length, 0);
-  assert.deepEqual(roundtrip(tree), { ok: true, atoms: 303 });
+  assert.deepEqual(roundtrip(tree), { ok: true, atoms: 157 });
 });
 
 test('all migrated V1 source bytes remain frozen; narratives replace missing author coverage', () => {
   const evidence = json(join(ROOT, 'docs/TRUTH-MIGRATION-EVIDENCE.json'));
-  for (const source of evidence.sourceFiles) assert.equal(hash(readFileSync(join(ROOT, source.file))), source.sha256, source.file);
+  for (const source of evidence.sourceFiles) assert.equal(hash(readHistoricalFile(source.file)), source.sha256, source.file);
   assert.equal(current.stories.length, 4); assert.equal(current.readModels.length, 6);
   assert.equal(current.useCases.useCases.length, 4);
   assert.equal(current.sessions.flatMap(s => s.scopes.flatMap(b => b.notes)).filter(n => n.type === 'role').length, 3);
@@ -51,15 +52,11 @@ test('current complete request uses only current tree and named technical choice
   const { copyImmutableData } = await import('../../metarch-truthsrc/lib/immutable-data.mjs');
   assert.doesNotThrow(() => copyImmutableData(captured.sourceIndex));
   assert.equal(captured.compilation.result.products.length, 14);
-  assert.ok(captured.sources.filter(s => s.file).every(s => !s.file.includes('/formal-inputs/') && !s.file.endsWith('/request.json')));
+  assert.ok(captured.sources.filter(s => s.file).every(s => !s.file.includes('/formal-inputs/') && !s.file.endsWith('/request.json') && !s.file.startsWith(join(ROOT, 'tree') + '/') && !s.file.startsWith(join(ROOT, 'v1/tree') + '/')));
   const config = captured.config;
   for (const doc of config.documents) assert.ok(doc.file.startsWith('bindings/implementation/'));
-  const documents = config.documents.map(d => { const value = json(join(ROOT, d.file)); return { id: d.id, schemaVersion: value.schemaVersion, value }; });
-  const previous = compileProductSet(deriveProjectRequest(original, config, documents));
-  assert.deepEqual(previous.diagnostics, []);
-  for (const product of captured.compilation.result.products) {
-    assert.deepEqual(product.payload, previous.result.products.find(p => p.id === product.id).payload, product.id + ' semantic payload changed');
-  }
+  assert.deepEqual(captured.compilation.result.products.map(p => ({ id: p.id, version: p.version,
+    payloadSchemaVersion: p.payloadSchemaVersion, requires: p.requires, sha256: hash(JSON.stringify(p.payload)) })), baseline.products);
 });
 
 test('current narrative references resolve to declared technical ports and real execution sources', () => {
@@ -93,19 +90,18 @@ test('full current service generates, queries, updates a teaching-only copy and 
   const out = join(parent, 'generated'), input = { project: configFile, out }, flags = ['--project', configFile, '--out', out];
   const planned = await projectCli('generate-project', [...flags, '--plan']);
   assert.equal(existsSync(out), false);
-  assert.equal(planned.plan.entries.filter(e => e.kind !== 'project-evidence').length, 193);
+  assert.equal(planned.plan.entries.filter(e => e.kind !== 'project-evidence').length, 199);
   const applied = await projectCli('generate-project', flags);
-  assert.equal(applied.result.written, 197); assert.equal(statusProject(input).synchronized, true);
+  assert.equal(applied.result.written, 203); assert.equal(statusProject(input).synchronized, true);
   const first = queryProject({ ...input, knowledge: 'ReserveFunds' });
-  assert.ok(first.result.some(r => r.origins.some(o => o.file.endsWith('reserve-funds.slice.yaml'))));
-  const rules = first.result.flatMap(r => r.locations).find(l => l.file.endsWith('CreditBalanceRules.scala'));
+  assert.ok(first.result.some(r => r.origins.some(o => o.file.endsWith('outgoing-funds.structure.yaml'))));
+  const rules = first.result.flatMap(r => r.locations).find(l => l.file.endsWith('domain/invariant/CreditBalanceRules.scala'));
   const reverse = queryProject({ ...input, file: rules.file, symbol: 'next0' });
   assert.equal(reverse.state, 'candidates-only');
-  const atom = join(source, 'contexts/bankwealth/aggregates/credit-balance/slices/reserve-funds.slice.yaml');
+  const atom = join(source, 'contexts/bankwealth/structures/outgoing-funds.structure.yaml');
   const bytes = readFileSync(atom, 'utf8');
-  // Teaching-only error-code change exercises generated output without changing financial predicates.
-  assert.ok(bytes.includes('"errCode": "LEDGER_POSITIVE"'));
-  writeFileSync(atom, bytes.replace('"errCode": "LEDGER_POSITIVE"', '"errCode": "LEDGER_POSITIVE_TEACHING"'));
+  assert.ok(bytes.includes('LEDGER_POSITIVE/LEDGER_POSITIVE:'));
+  writeFileSync(atom, bytes.replace('LEDGER_POSITIVE/LEDGER_POSITIVE:', 'LEDGER_POSITIVE/LEDGER_POSITIVE_TEACHING:'));
   assert.equal(statusProject(input).inputs.state, 'changed');
   const update = await projectCli('generate-project', [...flags, '--update', '--plan']);
   assert.ok(update.preview.actions.some(a => a.path === rules.file && a.changed));
@@ -113,6 +109,6 @@ test('full current service generates, queries, updates a teaching-only copy and 
   assert.equal(statusProject(input).synchronized, true);
   assert.ok(readFileSync(join(out, rules.file), 'utf8').includes('LEDGER_POSITIVE_TEACHING'));
   assert.equal((await projectCli('generate-project', [...flags, '--update'])).result.written, 0);
-  assert.equal(readFileSync(join(tree, 'contexts/bankwealth/aggregates/credit-balance/slices/reserve-funds.slice.yaml'), 'utf8'), bytes);
-  t.diagnostic(JSON.stringify({ products: 14, sourceFiles: 193, noHistoricalCompleteRequest: true, runtimeVerified: false, originalSourceUnchanged: true }));
+  assert.equal(readFileSync(join(tree, 'contexts/bankwealth/structures/outgoing-funds.structure.yaml'), 'utf8'), bytes);
+  t.diagnostic(JSON.stringify({ products: 14, sourceFiles: 199, noHistoricalCompleteRequest: true, runtimeVerified: false, originalSourceUnchanged: true }));
 });

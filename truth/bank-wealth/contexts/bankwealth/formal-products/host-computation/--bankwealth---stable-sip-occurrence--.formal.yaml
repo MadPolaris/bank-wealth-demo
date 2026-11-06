@@ -8,97 +8,23 @@ version: bank-v1-1
 author: agent-assisted-bank-v1
 payload:
   {
-    "id": {
-      "context": "bankwealth",
-      "kind": "port",
-      "owner": [],
-      "id": "StableSipOccurrence"
-    },
+    "id": "@ref(bankwealth:port#StableSipOccurrence)",
     "version": "bank-v1-1",
-    "command": {
-      "context": "bankwealth",
-      "kind": "command",
-      "owner": [
-        "SipPlan"
-      ],
-      "id": "TriggerSipInstallment"
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "SipOccurrence"
-      }
-    },
+    "command": "@ref(bankwealth:command/SipPlan#TriggerSipInstallment)",
+    "outputType": "@type(nominal:bankwealth:type#SipOccurrence)",
     "inputDependencies": [
-      {
-        "context": "bankwealth",
-        "kind": "state-field",
-        "owner": [
-          "SipPlan"
-        ],
-        "id": "id"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "SipPlan",
-          "TriggerSipInstallment"
-        ],
-        "id": "revision"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "SipPlan",
-          "TriggerSipInstallment"
-        ],
-        "id": "dueSlot"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "SipPlan",
-          "TriggerSipInstallment"
-        ],
-        "id": "config"
-      }
+      "@ref(bankwealth:state-field/SipPlan#id)",
+      "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#revision)",
+      "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#dueSlot)",
+      "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#config)"
     ],
     "stableIdentityContract": {
       "id": "sip-plan-revision-slot",
       "version": "1",
       "keys": [
-        {
-          "context": "bankwealth",
-          "kind": "state-field",
-          "owner": [
-            "SipPlan"
-          ],
-          "id": "id"
-        },
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "SipPlan",
-            "TriggerSipInstallment"
-          ],
-          "id": "revision"
-        },
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "SipPlan",
-            "TriggerSipInstallment"
-          ],
-          "id": "dueSlot"
-        }
+        "@ref(bankwealth:state-field/SipPlan#id)",
+        "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#revision)",
+        "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#dueSlot)"
       ]
     }
   }

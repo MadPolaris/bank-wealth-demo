@@ -7,76 +7,18 @@ payload:
   {
     "name": "ReviseSipPlan",
     "parameters": [
-      {
-        "name": "config",
-        "dataType": "SipRevisionConfig",
-        "origin": "BUSINESS_INPUT"
-      }
+      "config: SipRevisionConfig @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "cond": "state.initialized",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_REVISION_REPLAY_CONFLICT",
-        "errCode": "SIP_REVISION_REPLAY_CONFLICT",
-        "cond": "!state.revisions.contains(param.config.revision) || state.revisions(param.config.revision) == param.config",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_REVISION_ONCE",
-        "errCode": "SIP_REVISION_ONCE",
-        "cond": "!state.revisions.contains(param.config.revision)",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_REVISION_ID",
-        "errCode": "SIP_REVISION_ID",
-        "cond": "param.config.revision.value.nonEmpty",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_EFFECTIVE_SLOT",
-        "errCode": "SIP_EFFECTIVE_SLOT",
-        "cond": "param.config.effectiveSlot >= 0",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_CONFIG_ACCOUNTS",
-        "errCode": "SIP_CONFIG_ACCOUNTS",
-        "cond": "param.config.investorAccountId.value.nonEmpty && param.config.fundCollectionAccountId.value.nonEmpty && param.config.investorAccountId != param.config.fundCollectionAccountId",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_CONFIG_FUND",
-        "errCode": "SIP_CONFIG_FUND",
-        "cond": "param.config.fundCode.nonEmpty",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_CONFIG_AMOUNT",
-        "errCode": "SIP_CONFIG_AMOUNT",
-        "cond": "param.config.amount.currency == \"CNY\" && param.config.amount.amount > 0.00",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_REVISION_FUTURE",
-        "errCode": "SIP_REVISION_FUTURE",
-        "cond": "param.config.effectiveSlot > state.currentTick && param.config.effectiveSlot > state.latestEffectiveSlot",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_REVISION_REPLAY_CONFLICT/SIP_REVISION_REPLAY_CONFLICT: \"!state.revisions.contains(param.config.revision) || state.revisions(param.config.revision) == param.config\")",
+      "@guard[invariantRef](succeed-empty SIP_REVISION_ONCE/SIP_REVISION_ONCE: \"!state.revisions.contains(param.config.revision)\")",
+      "@guard[invariantRef](reject SIP_REVISION_ID/SIP_REVISION_ID: param.config.revision.value.nonEmpty)",
+      "@guard[invariantRef](reject SIP_EFFECTIVE_SLOT/SIP_EFFECTIVE_SLOT: \"param.config.effectiveSlot >= 0\")",
+      "@guard[invariantRef](reject SIP_CONFIG_ACCOUNTS/SIP_CONFIG_ACCOUNTS: \"param.config.investorAccountId.value.nonEmpty && param.config.fundCollectionAccountId.value.nonEmpty && param.config.investorAccountId != param.config.fundCollectionAccountId\")",
+      "@guard[invariantRef](reject SIP_CONFIG_FUND/SIP_CONFIG_FUND: param.config.fundCode.nonEmpty)",
+      "@guard[invariantRef](reject SIP_CONFIG_AMOUNT/SIP_CONFIG_AMOUNT: \"param.config.amount.currency == \\\"CNY\\\" && param.config.amount.amount > 0.00\")",
+      "@guard[invariantRef](reject SIP_REVISION_FUTURE/SIP_REVISION_FUTURE: \"param.config.effectiveSlot > state.currentTick && param.config.effectiveSlot > state.latestEffectiveSlot\")"
     ],
     "produces": [
       "SipPlanRevised"
@@ -100,48 +42,18 @@ events:
     "SipPlanRevised": {
       "name": "SipPlanRevised",
       "payloads": [
-        {
-          "name": "config",
-          "dataType": "SipRevisionConfig",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "previousRevision",
-          "dataType": "RevisionId",
-          "origin": "PROPAGATED"
-        }
+        "config: SipRevisionConfig @PROPAGATED",
+        "previousRevision: RevisionId @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "config",
-          "expr": "param.config"
-        },
-        {
-          "slot": "previousRevision",
-          "expr": "state.latestRevision"
-        }
+        "config <- param.config",
+        "previousRevision <- state.latestRevision"
       ],
       "foldAssignments": [
-        {
-          "slot": "revisions",
-          "op": "put",
-          "key": "event.config.revision",
-          "value": "event.config"
-        },
-        {
-          "slot": "revisionEnds",
-          "op": "put",
-          "key": "event.previousRevision",
-          "value": "event.config.effectiveSlot"
-        },
-        {
-          "slot": "latestRevision",
-          "expr": "event.config.revision"
-        },
-        {
-          "slot": "latestEffectiveSlot",
-          "expr": "event.config.effectiveSlot"
-        }
+        "revisions := @fold[put](key=event.config.revision, value=event.config)",
+        "revisionEnds := @fold[put](key=event.previousRevision, value=event.config.effectiveSlot)",
+        "latestRevision := event.config.revision",
+        "latestEffectiveSlot := event.config.effectiveSlot"
       ]
     }
   }

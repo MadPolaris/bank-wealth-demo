@@ -1,0 +1,152 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: structure
+schemaVersion: "truthsrc.structure/v1"
+id: incoming-funds
+description: "Shared exact protocol structures; row order and explicit business differences are preserved."
+payload:
+  {
+    "constants": {
+      "doc-payload-parameters": [
+        "txid: TxId @BUSINESS_INPUT",
+        "resource: AccountId @BUSINESS_INPUT",
+        "amount: Money @BUSINESS_INPUT"
+      ],
+      "ledger-resource": "@guard[invariantRef](reject LEDGER_RESOURCE/LEDGER_RESOURCE: \"state.initialized && param.resource == state.id\")",
+      "ledger-cny": "@guard[invariantRef](reject LEDGER_CNY/LEDGER_CNY: \"param.amount.currency == \\\"CNY\\\"\")",
+      "ledger-positive": "@guard[invariantRef](reject LEDGER_POSITIVE/LEDGER_POSITIVE: \"param.amount.amount > 0.00\")",
+      "ledger-compensatedincoming-match": "@guard[invariantRef](reject LEDGER_COMPENSATEDINCOMING_MATCH/LEDGER_COMPENSATEDINCOMING_MATCH: \"!state.compensatedIncoming.contains(param.txid) || state.compensatedIncoming(param.txid) == param.amount\")",
+      "ledger-incomingcredits-match": "@guard[invariantRef](reject LEDGER_INCOMINGCREDITS_MATCH/LEDGER_INCOMINGCREDITS_MATCH: \"!state.incomingCredits.contains(param.txid) || state.incomingCredits(param.txid) == param.amount\")",
+      "doc-payload-provenance": {
+        "author": "agent-assisted-bank-v1",
+        "workshopHeld": false,
+        "approvedBy": "user-approved-p24-p25-bank-joint",
+        "sourceVersion": "bank-v1-p23-design-2"
+      },
+      "events-cancel-incoming-credit-confirmed-payloads": [
+        "txid: TxId @PROPAGATED",
+        "resource: AccountId @PROPAGATED",
+        "amount: Money @PROPAGATED"
+      ],
+      "events-cancel-incoming-credit-confirmed-bindings": ["txid <- param.txid","resource <- param.resource","amount <- param.amount"],
+      "ledger-committedincoming-match": "@guard[invariantRef](reject LEDGER_COMMITTEDINCOMING_MATCH/LEDGER_COMMITTEDINCOMING_MATCH: \"!state.committedIncoming.contains(param.txid) || state.committedIncoming(param.txid) == param.amount\")"
+    },
+    "templates": {},
+    "atoms": [
+      {
+        "file": "contexts/bankwealth/aggregates/credit-balance/slices/cancel-incoming-credit.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "CreditBalance",
+          "command": "CancelIncomingCredit",
+          "payload": {
+            "name": "CancelIncomingCredit",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": [
+              {"$value":"ledger-resource"},
+              {"$value":"ledger-cny"},
+              {"$value":"ledger-positive"},
+              {"$value":"ledger-compensatedincoming-match"},
+              "@guard[when](succeed-empty LEDGER_COMPENSATE_ONCE/LEDGER_COMPENSATE_ONCE: map-absent(map=compensatedIncoming, key=param.txid))",
+              "@guard[invariantRef](reject LEDGER_NOT_COMMITTED/LEDGER_NOT_COMMITTED: \"!state.committedIncoming.contains(param.txid)\")",
+              {"$value":"ledger-incomingcredits-match"}
+            ],
+            "produces": ["CancelIncomingCreditConfirmed"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "CancelIncomingCreditConfirmed": {
+              "name": "CancelIncomingCreditConfirmed",
+              "payloads": {"$value":"events-cancel-incoming-credit-confirmed-payloads"},
+              "bindings": {"$value":"events-cancel-incoming-credit-confirmed-bindings"},
+              "foldAssignments": [
+                "incomingCredits := @fold[remove](key=event.txid)",
+                "compensatedIncoming := @fold[put](key=event.txid, value=event.amount)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/aggregates/credit-balance/slices/commit-incoming-credits.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "CreditBalance",
+          "command": "CommitIncomingCredits",
+          "payload": {
+            "name": "CommitIncomingCredits",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": [
+              {"$value":"ledger-resource"},
+              {"$value":"ledger-cny"},
+              {"$value":"ledger-positive"},
+              {"$value":"ledger-committedincoming-match"},
+              "@guard[when](succeed-empty LEDGER_COMMIT_ONCE/LEDGER_COMMIT_ONCE: map-absent(map=committedIncoming, key=param.txid))",
+              "@guard[invariantRef](reject LEDGER_NOT_COMPENSATED/LEDGER_NOT_COMPENSATED: \"!state.compensatedIncoming.contains(param.txid)\")",
+              "@guard[invariantRef](reject LEDGER_PREPARED/LEDGER_PREPARED: \"state.incomingCredits.contains(param.txid)\")",
+              {"$value":"ledger-incomingcredits-match"}
+            ],
+            "produces": ["CommitIncomingCreditsConfirmed"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "CommitIncomingCreditsConfirmed": {
+              "name": "CommitIncomingCreditsConfirmed",
+              "payloads": [
+                "txid: TxId @PROPAGATED",
+                "resource: AccountId @PROPAGATED",
+                "amount: Money @PROPAGATED",
+                "currency: String @PROPAGATED",
+                "available: Money @PROPAGATED"
+              ],
+              "bindings": [
+                "txid <- param.txid",
+                "resource <- param.resource",
+                "amount <- param.amount",
+                "currency <- \"literal:CNY\"",
+                "available <- @host(bankwealth:port#BalanceAfterCommitIncomingCredits@bank-v1-1)"
+              ],
+              "foldAssignments": [
+                "incomingCredits := @fold[remove](key=event.txid)",
+                "committedIncoming := @fold[put](key=event.txid, value=event.amount)",
+                "accountBalance := @fold[put](key=event.currency, value=event.available)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "file": "contexts/bankwealth/aggregates/credit-balance/slices/record-incoming-credits.slice.yaml",
+        "doc": {
+          "kind": "slice",
+          "aggregate": "CreditBalance",
+          "command": "RecordIncomingCredits",
+          "payload": {
+            "name": "RecordIncomingCredits",
+            "parameters": {"$value":"doc-payload-parameters"},
+            "guards": [
+              {"$value":"ledger-resource"},
+              {"$value":"ledger-cny"},
+              {"$value":"ledger-positive"},
+              {"$value":"ledger-committedincoming-match"},
+              {"$value":"ledger-compensatedincoming-match"},
+              {"$value":"ledger-incomingcredits-match"},
+              "@guard[when](succeed-empty LEDGER_ALREADY_COMMITTED/LEDGER_ALREADY_COMMITTED: map-absent(map=committedIncoming, key=param.txid))",
+              "@guard[when](succeed-empty LEDGER_ALREADY_COMPENSATED/LEDGER_ALREADY_COMPENSATED: map-absent(map=compensatedIncoming, key=param.txid))",
+              "@guard[when](succeed-empty LEDGER_ALREADY_PREPARED/LEDGER_ALREADY_PREPARED: map-absent(map=incomingCredits, key=param.txid))"
+            ],
+            "produces": ["RecordIncomingCreditsConfirmed"],
+            "provenance": {"$value":"doc-payload-provenance"}
+          },
+          "events": {
+            "RecordIncomingCreditsConfirmed": {
+              "name": "RecordIncomingCreditsConfirmed",
+              "payloads": {"$value":"events-cancel-incoming-credit-confirmed-payloads"},
+              "bindings": {"$value":"events-cancel-incoming-credit-confirmed-bindings"},
+              "foldAssignments": ["incomingCredits := @fold[put](key=event.txid, value=event.amount)"]
+            }
+          }
+        }
+      }
+    ]
+  }

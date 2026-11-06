@@ -8,89 +8,22 @@ version: bank-v1-1
 author: agent-assisted-bank-v1
 payload:
   {
-    "id": {
-      "context": "bankwealth",
-      "kind": "port",
-      "owner": [],
-      "id": "BalanceAfterReserveFunds"
-    },
+    "id": "@ref(bankwealth:port#BalanceAfterReserveFunds)",
     "version": "bank-v1-1",
-    "command": {
-      "context": "bankwealth",
-      "kind": "command",
-      "owner": [
-        "CreditBalance"
-      ],
-      "id": "ReserveFunds"
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "Money"
-      }
-    },
+    "command": "@ref(bankwealth:command/CreditBalance#ReserveFunds)",
+    "outputType": "@type(nominal:bankwealth:type#Money)",
     "inputDependencies": [
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "CreditBalance",
-          "ReserveFunds"
-        ],
-        "id": "txid"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "CreditBalance",
-          "ReserveFunds"
-        ],
-        "id": "resource"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "CreditBalance",
-          "ReserveFunds"
-        ],
-        "id": "amount"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "state-field",
-        "owner": [
-          "CreditBalance"
-        ],
-        "id": "accountBalance"
-      }
+      "@ref(bankwealth:parameter/CreditBalance/ReserveFunds#txid)",
+      "@ref(bankwealth:parameter/CreditBalance/ReserveFunds#resource)",
+      "@ref(bankwealth:parameter/CreditBalance/ReserveFunds#amount)",
+      "@ref(bankwealth:state-field/CreditBalance#accountBalance)"
     ],
     "stableIdentityContract": {
       "id": "BalanceAfterReserveFunds-identity",
       "version": "1",
       "keys": [
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "CreditBalance",
-            "ReserveFunds"
-          ],
-          "id": "txid"
-        },
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "CreditBalance",
-            "ReserveFunds"
-          ],
-          "id": "resource"
-        }
+        "@ref(bankwealth:parameter/CreditBalance/ReserveFunds#txid)",
+        "@ref(bankwealth:parameter/CreditBalance/ReserveFunds#resource)"
       ]
     }
   }

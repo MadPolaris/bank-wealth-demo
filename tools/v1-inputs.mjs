@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ROOT, TOOL_ROOT, filesUnder, sha256 } from './truth-source.mjs';
+import { historicalSnapshot, historicalInventory } from './historical-source.mjs';
 
 const load = file => import(pathToFileURL(join(TOOL_ROOT, file)).href);
 const { compileTree } = await load('lib/compile.mjs');
@@ -90,7 +91,7 @@ export function bankExactTypes(canonical) {
 }
 
 export function deriveBankDomainInputs() {
-  const text = compileTree(V1_TREE), value = JSON.parse(text);
+  const { text, canonical: value } = historicalSnapshot('v1/tree');
   const canonical = { id: 'bank-v1', schemaVersion: 'truthsrc/v1', value };
   const layout = bankLayout(value);
   const references = { id: 'references', schemaVersion: 'truthsrc.reference-binding/v1', value: { schemaVersion: 'truthsrc.reference-binding/v1', layout } };
@@ -141,7 +142,7 @@ export function bankDomainRequest() {
 
 export function writeBankDomainInputs(target) {
   assert.ok(!existsSync(target), 'domain input output must be a fresh owned directory');
-  const before = filesUnder(V1_TREE).map(file => [file, sha256(readFileSync(file))]);
+  const before = historicalInventory('v1/tree').map(({ file, sha256 }) => [join(ROOT, file), sha256]);
   const request = bankDomainRequest(), compilation = compileProductSet(request);
   assert.deepEqual(compilation.diagnostics, []);
   assert.ok(compilation.result);
@@ -158,7 +159,7 @@ export function writeBankDomainInputs(target) {
   write('request.json', captured);
   write('compiled.json', compilation.result);
   write('options.json', { packages: [{ context, package: 'example.bankwealth' }], verificationCases: [] });
-  const after = filesUnder(V1_TREE).map(file => [file, sha256(readFileSync(file))]);
+  const after = historicalInventory('v1/tree').map(({ file, sha256 }) => [join(ROOT, file), sha256]);
   assert.deepEqual(after, before);
   return { status: 'complete-domain-prerequisite-not-application-joint', target, products: compilation.result.products.length,
     requestBytes: Buffer.byteLength(JSON.stringify(request)), applicationRequests: 0, runtimeVerified: false };
@@ -207,7 +208,7 @@ export function bankApplicationRequest({ domainRequest, historical = false } = {
 
 export function writeBankApplicationInputs(target, scope, options) {
   assert.ok(!existsSync(target), 'application request needs a fresh owned directory');
-  const before = filesUnder(V1_TREE).map(file => [file, sha256(readFileSync(file))]);
+  const before = historicalInventory('v1/tree').map(({ file, sha256 }) => [join(ROOT, file), sha256]);
   const request = bankApplicationRequest({ historical: true }), compiled = compileProductSet(request);
   assert.deepEqual(compiled.diagnostics, []);
   const text = JSON.stringify(compiled.result) + '\n';
@@ -219,7 +220,7 @@ export function writeBankApplicationInputs(target, scope, options) {
     assemblies: request.assemblies, requirements: request.requirements, options: request.options });
   assert.deepEqual(readProductRequest(join(target, 'files.json')), request);
   write('request.json', request); write('compiled.json', compiled.result); write('options.json', options); write('scope.json', scope);
-  assert.deepEqual(filesUnder(V1_TREE).map(file => [file, sha256(readFileSync(file))]), before);
+  assert.deepEqual(historicalInventory('v1/tree').map(({ file, sha256 }) => [join(ROOT, file), sha256]), before);
   return { target, products: compiled.result.products.length, canonicalSHA: sha256(JSON.stringify(request.documents[0].value)), runtimeVerified: false };
 }
 

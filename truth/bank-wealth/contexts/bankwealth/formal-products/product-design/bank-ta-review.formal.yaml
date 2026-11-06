@@ -25,55 +25,12 @@ payload:
     ],
     "approvalSource": null,
     "references": [
-      {
-        "context": "bankwealth",
-        "kind": "aggregate",
-        "owner": [],
-        "id": "FundOrder"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "command",
-        "owner": [
-          "FundOrder"
-        ],
-        "id": "RegisterFundTASubmission"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RegisterFundTASubmission"
-        ],
-        "id": "fundOrderId"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RegisterFundTASubmission"
-        ],
-        "id": "paymentTxId"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "event",
-        "owner": [
-          "FundOrder"
-        ],
-        "id": "FundTASubmissionRegistered"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "event-slot",
-        "owner": [
-          "FundOrder",
-          "FundTASubmissionRegistered"
-        ],
-        "id": "fundOrderId"
-      }
+      "@ref(bankwealth:aggregate#FundOrder)",
+      "@ref(bankwealth:command/FundOrder#RegisterFundTASubmission)",
+      "@ref(bankwealth:parameter/FundOrder/RegisterFundTASubmission#fundOrderId)",
+      "@ref(bankwealth:parameter/FundOrder/RegisterFundTASubmission#paymentTxId)",
+      "@ref(bankwealth:event/FundOrder#FundTASubmissionRegistered)",
+      "@ref(bankwealth:event-slot/FundOrder/FundTASubmissionRegistered#fundOrderId)"
     ],
     "nodes": [
       {
@@ -100,12 +57,7 @@ payload:
         "kind": "target",
         "label": "FundOrder",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "aggregate",
-            "owner": [],
-            "id": "FundOrder"
-          }
+          "@ref(bankwealth:aggregate#FundOrder)"
         ],
         "action": null,
         "feedback": null
@@ -125,32 +77,9 @@ payload:
         "kind": "action",
         "label": "RegisterFundTASubmission",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "command",
-            "owner": [
-              "FundOrder"
-            ],
-            "id": "RegisterFundTASubmission"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "FundOrder",
-              "RegisterFundTASubmission"
-            ],
-            "id": "fundOrderId"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "FundOrder",
-              "RegisterFundTASubmission"
-            ],
-            "id": "paymentTxId"
-          }
+          "@ref(bankwealth:command/FundOrder#RegisterFundTASubmission)",
+          "@ref(bankwealth:parameter/FundOrder/RegisterFundTASubmission#fundOrderId)",
+          "@ref(bankwealth:parameter/FundOrder/RegisterFundTASubmission#paymentTxId)"
         ],
         "action": {
           "command": {
@@ -202,46 +131,16 @@ payload:
         "kind": "feedback",
         "label": "已持久受理，不承诺业务成功或投影新鲜度",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "event",
-            "owner": [
-              "FundOrder"
-            ],
-            "id": "FundTASubmissionRegistered"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "event-slot",
-            "owner": [
-              "FundOrder",
-              "FundTASubmissionRegistered"
-            ],
-            "id": "fundOrderId"
-          }
+          "@ref(bankwealth:event/FundOrder#FundTASubmissionRegistered)",
+          "@ref(bankwealth:event-slot/FundOrder/FundTASubmissionRegistered#fundOrderId)"
         ],
         "action": null,
         "feedback": {
-          "event": {
-            "context": "bankwealth",
-            "kind": "event",
-            "owner": [
-              "FundOrder"
-            ],
-            "id": "FundTASubmissionRegistered"
-          },
+          "event": "@ref(bankwealth:event/FundOrder#FundTASubmissionRegistered)",
           "state": "pending",
           "evidence": "provisional",
           "resourceKeys": [
-            {
-              "context": "bankwealth",
-              "kind": "event-slot",
-              "owner": [
-                "FundOrder",
-                "FundTASubmissionRegistered"
-              ],
-              "id": "fundOrderId"
-            }
+            "@ref(bankwealth:event-slot/FundOrder/FundTASubmissionRegistered#fundOrderId)"
           ],
           "watermark": null
         }

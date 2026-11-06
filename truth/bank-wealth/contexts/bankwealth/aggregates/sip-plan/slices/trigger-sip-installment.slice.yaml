@@ -7,112 +7,24 @@ payload:
   {
     "name": "TriggerSipInstallment",
     "parameters": [
-      {
-        "name": "position",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "dueSlot",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "revision",
-        "dataType": "RevisionId",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "config",
-        "dataType": "SipRevisionConfig",
-        "origin": "BUSINESS_INPUT"
-      }
+      "position: Long @BUSINESS_INPUT",
+      "dueSlot: Long @BUSINESS_INPUT",
+      "revision: RevisionId @BUSINESS_INPUT",
+      "config: SipRevisionConfig @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "cond": "state.initialized",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SCHEDULE_SEALED",
-        "errCode": "SIP_SCHEDULE_SEALED",
-        "cond": "state.scheduleSealed",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_DECLARED",
-        "errCode": "SIP_SLOT_DECLARED",
-        "cond": "state.slots.contains(param.position)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_MATCH",
-        "errCode": "SIP_SLOT_MATCH",
-        "cond": "state.slots(param.position) == param.dueSlot",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_OCCURRENCE_REPLAY_CONFLICT",
-        "errCode": "SIP_OCCURRENCE_REPLAY_CONFLICT",
-        "cond": "!state.occurrences.contains(param.dueSlot) || (state.occurrences(param.dueSlot).revision == param.revision && state.occurrences(param.dueSlot).config == param.config)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_OCCURRENCE_ONCE",
-        "errCode": "SIP_OCCURRENCE_ONCE",
-        "cond": "!state.occurrences.contains(param.dueSlot)",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_ACTIVE_START",
-        "errCode": "SIP_ACTIVE_START",
-        "cond": "!state.paused",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_START_ORDER",
-        "errCode": "SIP_START_ORDER",
-        "cond": "param.position == state.startCount",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_BACKLOG_REQUIRED",
-        "errCode": "SIP_BACKLOG_REQUIRED",
-        "cond": "state.slotDisposition.get(param.dueSlot).contains(\"backlog\")",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_REVISION_DECLARED",
-        "errCode": "SIP_REVISION_DECLARED",
-        "cond": "state.revisions.contains(param.revision)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_RETAINED_CONFIG",
-        "errCode": "SIP_RETAINED_CONFIG",
-        "cond": "state.revisions(param.revision) == param.config && param.config.revision == param.revision",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_REVISION_INTERVAL",
-        "errCode": "SIP_REVISION_INTERVAL",
-        "cond": "param.dueSlot >= param.config.effectiveSlot && (!state.revisionEnds.contains(param.revision) || param.dueSlot < state.revisionEnds(param.revision))",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_SCHEDULE_SEALED/SIP_SCHEDULE_SEALED: state.scheduleSealed)",
+      "@guard[invariantRef](reject SIP_SLOT_DECLARED/SIP_SLOT_DECLARED: \"state.slots.contains(param.position)\")",
+      "@guard[invariantRef](reject SIP_SLOT_MATCH/SIP_SLOT_MATCH: \"state.slots(param.position) == param.dueSlot\")",
+      "@guard[invariantRef](reject SIP_OCCURRENCE_REPLAY_CONFLICT/SIP_OCCURRENCE_REPLAY_CONFLICT: \"!state.occurrences.contains(param.dueSlot) || (state.occurrences(param.dueSlot).revision == param.revision && state.occurrences(param.dueSlot).config == param.config)\")",
+      "@guard[invariantRef](succeed-empty SIP_OCCURRENCE_ONCE/SIP_OCCURRENCE_ONCE: \"!state.occurrences.contains(param.dueSlot)\")",
+      "@guard[invariantRef](reject SIP_ACTIVE_START/SIP_ACTIVE_START: \"!state.paused\")",
+      "@guard[invariantRef](reject SIP_START_ORDER/SIP_START_ORDER: \"param.position == state.startCount\")",
+      "@guard[invariantRef](reject SIP_BACKLOG_REQUIRED/SIP_BACKLOG_REQUIRED: \"state.slotDisposition.get(param.dueSlot).contains(\\\"backlog\\\")\")",
+      "@guard[invariantRef](reject SIP_REVISION_DECLARED/SIP_REVISION_DECLARED: \"state.revisions.contains(param.revision)\")",
+      "@guard[invariantRef](reject SIP_RETAINED_CONFIG/SIP_RETAINED_CONFIG: \"state.revisions(param.revision) == param.config && param.config.revision == param.revision\")",
+      "@guard[invariantRef](reject SIP_REVISION_INTERVAL/SIP_REVISION_INTERVAL: \"param.dueSlot >= param.config.effectiveSlot && (!state.revisionEnds.contains(param.revision) || param.dueSlot < state.revisionEnds(param.revision))\")"
     ],
     "produces": [
       "SipInstallmentTriggered"
@@ -136,55 +48,17 @@ events:
     "SipInstallmentTriggered": {
       "name": "SipInstallmentTriggered",
       "payloads": [
-        {
-          "name": "position",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "occurrence",
-          "dataType": "SipOccurrence",
-          "origin": "PROPAGATED"
-        }
+        "position: Long @PROPAGATED",
+        "occurrence: SipOccurrence @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "position",
-          "expr": "param.position"
-        },
-        {
-          "slot": "occurrence",
-          "expr": {
-            "form": "host",
-            "id": {
-              "context": "bankwealth",
-              "kind": "port",
-              "owner": [],
-              "id": "StableSipOccurrence"
-            },
-            "version": "bank-v1-1"
-          }
-        }
+        "position <- param.position",
+        "occurrence <- @host(bankwealth:port#StableSipOccurrence@bank-v1-1)"
       ],
       "foldAssignments": [
-        {
-          "slot": "occurrences",
-          "op": "put",
-          "key": "event.occurrence.dueSlot",
-          "value": "event.occurrence"
-        },
-        {
-          "slot": "occurrenceProgress",
-          "op": "put",
-          "key": "event.occurrence.occurrenceId",
-          "value": "literal:pending"
-        },
-        {
-          "slot": "startCount",
-          "op": "integer-apply",
-          "delta": "literal:1",
-          "sign": 1
-        }
+        "occurrences := @fold[put](key=event.occurrence.dueSlot, value=event.occurrence)",
+        "occurrenceProgress := @fold[put](key=event.occurrence.occurrenceId, value=\"literal:pending\")",
+        "startCount := @fold[integer-apply](delta=\"literal:1\", sign=+1)"
       ]
     }
   }

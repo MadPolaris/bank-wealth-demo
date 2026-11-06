@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankPendingOperationsQuery",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankPendingPageKey"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankPendingResponse"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankPendingPageKey)",
+    "outputType": "@type(nominal:bankwealth:type#BankPendingResponse)"
   }

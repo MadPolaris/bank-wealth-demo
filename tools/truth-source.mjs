@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { historicalSnapshot, historicalInventory, readHistoricalFile } from './historical-source.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const TREE = join(ROOT, 'tree');
@@ -61,12 +62,14 @@ export function assertToolStable() {
 }
 
 export function sourceFingerprint(tree = TREE, root = ROOT) {
-  const files = filesUnder(tree, (name) => name.endsWith('.yaml'));
+  const pinned = root === ROOT && [TREE, join(ROOT, 'v1/tree')].includes(tree);
+  const historical = pinned ? historicalInventory(relative(ROOT, tree)).map(f => [f.file, f.sha256]) : [];
+  const files = pinned ? [] : filesUnder(tree, (name) => name.endsWith('.yaml'));
   for (const binding of ['bindings.json', 'execution-bindings.json', 'runtime-binding.json',
     'wealth-bindings.json', 'wealth-execution-bindings.json', 'wealth-runtime-binding.json']) {
     if (existsSync(join(root, binding))) files.push(join(root, binding));
   }
-  return sha256(JSON.stringify(files.sort().map((file) => [relative(root, file), sha256(readFileSync(file))])));
+  return sha256(JSON.stringify([...historical, ...files.sort().map((file) => [relative(root, file), sha256(readFileSync(file))])]));
 }
 
 export function assertSnapshotStable(snapshot, root = ROOT) {
@@ -79,12 +82,14 @@ export function assertSnapshotStable(snapshot, root = ROOT) {
 export function loadSnapshot(tree = TREE, root = ROOT) {
   assertToolStable();
   const fingerprint = sourceFingerprint(tree, root);
-  const text = compiler.compileTree(tree);
+  const pinned = root === ROOT && [TREE, join(ROOT, 'v1/tree')].includes(tree) ? historicalSnapshot(relative(ROOT, tree)) : null;
+  const text = pinned ? pinned.text : compiler.compileTree(tree);
   const canonical = JSON.parse(text);
-  const atoms = filesUnder(tree, (name) => name.endsWith('.yaml')).map((file) => ({
+  const atoms = pinned ? pinned.atoms : filesUnder(tree, (name) => name.endsWith('.yaml')).map((file) => ({
     file: relative(tree, file), doc: parseDoc(readFileSync(file, 'utf8'), file),
   }));
-  const snapshot = { canonical, text, canonicalSha256: sha256(text), atoms, tree, tool: loadedFingerprint, sourceFingerprint: fingerprint };
+  const snapshot = { canonical, text, canonicalSha256: sha256(text), atoms, tree, tool: loadedFingerprint, sourceFingerprint: fingerprint,
+    ...(pinned ? { historical: true, revision: pinned.revision, parsed: pinned.parsed, originalEntries: pinned.entries } : {}) };
   assertSnapshotStable(snapshot, root);
   return snapshot;
 }
@@ -117,7 +122,7 @@ export function loadBindings(root = ROOT) {
 
 export function sourceGates(snapshot, root = ROOT) {
   assertSnapshotStable(snapshot, root);
-  const structure = validator.validateTree(snapshot.tree);
+  const structure = snapshot.historical ? validator.validateSnapshot(snapshot.parsed) : validator.validateTree(snapshot.tree);
   const bindings = loadBindings(root);
   const saga = sagaCompiler.compileSagas(snapshot.canonical, bindings.saga);
   const execution = executionCompiler.compileExecution(snapshot.canonical, bindings.execution);
@@ -137,25 +142,29 @@ export function roundtripLocal(snapshot) {
     if (compiler.compileTree(temp) !== snapshot.text) return { ok: false, stage: 'canonical', message: 'Canonical bytes differ after decomposition.' };
     const originals = filesUnder(snapshot.tree, (name) => name.endsWith('.yaml'));
     const regenerated = filesUnder(temp, (name) => name.endsWith('.yaml'));
-    const oldPaths = originals.map((file) => relative(snapshot.tree, file));
-    const newPaths = regenerated.map((file) => relative(temp, file));
+    const oldPaths = snapshot.historical ? snapshot.originalEntries.filter(e => e.file.endsWith('.yaml')).map(e => e.file).sort()
+      : originals.map((file) => relative(snapshot.tree, file)).sort();
+    const newPaths = regenerated.map((file) => relative(temp, file)).sort();
     if (JSON.stringify(oldPaths) !== JSON.stringify(newPaths)) return {
       ok: false, stage: 'paths', missing: oldPaths.filter((file) => !newPaths.includes(file)), added: newPaths.filter((file) => !oldPaths.includes(file)),
     };
-    const differences = oldPaths.filter((file) => !readFileSync(join(snapshot.tree, file)).equals(readFileSync(join(temp, file))));
+    const differences = oldPaths.filter((file) => !(snapshot.historical
+      ? Buffer.from(snapshot.originalEntries.find(e => e.file === file).content)
+      : readFileSync(join(snapshot.tree, file))).equals(readFileSync(join(temp, file))));
     assertSnapshotStable(snapshot);
     return differences.length ? { ok: false, stage: 'bytes', differences } : { ok: true, atoms: oldPaths.length };
   } finally { rmSync(temp, { recursive: true, force: true }); }
 }
 
 export function protectedFiles(root = ROOT, inventory) {
-  const directories = ['tree/sagas', 'tree/pipelines', 'compiled'];
+  const directories = root === ROOT ? ['compiled'] : ['tree/sagas', 'tree/pipelines', 'compiled'];
   const files = inventory ? inventory.map((entry) => join(root, entry.file))
     : directories.flatMap((directory) => filesUnder(join(root, directory)));
+  if (!inventory && root === ROOT) files.push(...historicalInventory('tree').filter(e => e.file.startsWith('tree/sagas/') || e.file.startsWith('tree/pipelines/')).map(e => join(root, e.file)));
   for (const file of inventory ? [] : ['bindings.json', 'execution-bindings.json', 'runtime-binding.json',
     'isolation-zone/generated-scaffold/FundOrderGeneratedContract.scala',
     'isolation-zone/handwritten-adapter/FundOrderIsolationAdapter.scala']) files.push(join(root, file));
-  return files.sort().map((file) => ({ file: relative(root, file), sha256: sha256(readFileSync(file)) }));
+  return files.sort().map((file) => ({ file: relative(root, file), sha256: sha256(root === ROOT && file.startsWith(TREE + '/') ? readHistoricalFile(relative(ROOT, file)) : readFileSync(file)) }));
 }
 
 export function protectionReport(root = ROOT) {

@@ -9,34 +9,13 @@ payload:
     "context": "bankwealth",
     "version": "bank-v1-service-1",
     "fields": [
-      {
-        "name": "occurrence",
-        "dataType": "SipOccurrence"
-      },
-      {
-        "name": "slotDisposition",
-        "dataType": "String"
-      },
-      {
-        "name": "progress",
-        "dataType": "String"
-      },
-      {
-        "name": "paymentStatus",
-        "dataType": "String"
-      },
-      {
-        "name": "taStatus",
-        "dataType": "String"
-      },
-      {
-        "name": "refundStatus",
-        "dataType": "String"
-      },
-      {
-        "name": "firstTerminal",
-        "dataType": "Option[String]"
-      }
+      "occurrence: SipOccurrence",
+      "slotDisposition: String",
+      "progress: String",
+      "paymentStatus: String",
+      "taStatus: String",
+      "refundStatus: String",
+      "firstTerminal: \"Option[String]\""
     ],
     "provenance": {
       "author": "agent-assisted-bank-v1-service-integration",

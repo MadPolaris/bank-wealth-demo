@@ -10,12 +10,7 @@ payload:
   {
     "id": "bank-sip-technical",
     "version": "bank-v1-1",
-    "artifact": {
-      "context": "bankwealth",
-      "kind": "artifact",
-      "owner": [],
-      "id": "BankSipTechnical"
-    },
+    "artifact": "@ref(bankwealth:artifact#BankSipTechnical)",
     "status": "selected",
     "provenance": [
       {
@@ -24,94 +19,28 @@ payload:
       }
     ],
     "references": [
-      {
-        "context": "bankwealth",
-        "kind": "pipeline",
-        "owner": [],
-        "id": "bank-sip-dispatch-v1"
-      }
+      "@ref(bankwealth:pipeline#bank-sip-dispatch-v1)"
     ],
     "ports": [
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipDispatchExecute"
-        },
+        "ref": "@ref(bankwealth:port#BankSipDispatchExecute)",
         "version": "bank-v1-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipDispatchOperation"
-          }
-        },
-        "outputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipDispatchObservation"
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankSipDispatchOperation)",
+        "outputType": "@type(nominal:bankwealth:type#BankSipDispatchObservation)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipDispatchQuery"
-        },
+        "ref": "@ref(bankwealth:port#BankSipDispatchQuery)",
         "version": "bank-v1-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipDispatchOperation"
-          }
-        },
-        "outputType": {
-          "form": "optional",
-          "element": {
-            "form": "nominal",
-            "ref": {
-              "context": "bankwealth",
-              "kind": "type",
-              "owner": [],
-              "id": "BankSipDispatchObservation"
-            }
-          }
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankSipDispatchOperation)",
+        "outputType": "@type(optional:nominal:bankwealth:type#BankSipDispatchObservation)",
         "required": true
       },
       {
-        "ref": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipDispatchReconcilePort"
-        },
+        "ref": "@ref(bankwealth:port#BankSipDispatchReconcilePort)",
         "version": "bank-v1-1",
-        "inputType": {
-          "form": "nominal",
-          "ref": {
-            "context": "bankwealth",
-            "kind": "type",
-            "owner": [],
-            "id": "BankSipDispatchReconcile"
-          }
-        },
-        "outputType": {
-          "form": "primitive",
-          "name": "boolean"
-        },
+        "inputType": "@type(nominal:bankwealth:type#BankSipDispatchReconcile)",
+        "outputType": "@type(primitive:boolean)",
         "required": true
       }
     ],
@@ -122,32 +51,17 @@ payload:
     },
     "implementations": [
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipDispatchExecute"
-        },
+        "port": "@ref(bankwealth:port#BankSipDispatchExecute)",
         "id": "bankwealth.BankSipDispatchExecute",
         "version": "bank-v1-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipDispatchQuery"
-        },
+        "port": "@ref(bankwealth:port#BankSipDispatchQuery)",
         "id": "bankwealth.BankSipDispatchQuery",
         "version": "bank-v1-1"
       },
       {
-        "port": {
-          "context": "bankwealth",
-          "kind": "port",
-          "owner": [],
-          "id": "BankSipDispatchReconcilePort"
-        },
+        "port": "@ref(bankwealth:port#BankSipDispatchReconcilePort)",
         "id": "bankwealth.BankSipDispatchReconcilePort",
         "version": "bank-v1-1"
       }

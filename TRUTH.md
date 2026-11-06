@@ -1,8 +1,10 @@
 # 银行财富：唯一当前真源入口
 
 当前作者入口为根 `truthsrc.project.json`，唯一当前树为
-`truth/bank-wealth/contexts/bankwealth/`。旧根 `tree/` 和 `v1/tree/`
-是历史/冻结输入，保留原字节，**不再作为新开发的另一份编辑面**。
+`truth/bank-wealth/contexts/bankwealth/`。当前使用版本化结构共享与受控微语法，
+157个YAML展开为完整语义；不要编辑虚拟展开原子。旧 `tree/`、`v1/tree/`
+已退役，历史字节由固定Git revision和 `docs/TRUTH-LEGACY-BASELINE.json`定位，
+**不再保留第二份作者树**。
 
 - 建模/演进：编辑 `truth/bank-wealth/`。
 - 显式技术选择：`truthsrc.project.json` 与 `bindings/implementation/`。

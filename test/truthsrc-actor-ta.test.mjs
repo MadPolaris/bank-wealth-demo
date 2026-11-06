@@ -11,6 +11,7 @@ import { parseDoc } from '../../metarch-truthsrc/lib/shared.mjs';
 import { ConflictError, PersistentMockTACore } from '../simulator/mock-ta-core.mjs';
 import { canonicalJson, clone, digest, validateMockConfiguration } from '../simulator/contract.mjs';
 import { readPinnedJson } from '../tools/truthsrc-actor-ta-worker.mjs';
+import { readHistoricalFile } from '../tools/historical-source.mjs';
 
 const bank = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const worker = path.join(bank, 'tools', 'truthsrc-actor-ta-worker.mjs');
@@ -98,7 +99,7 @@ test('fixture is the complete mechanical seven-scenario extraction with full-fil
   assert.equal(fixture.interpretation, 'historical-frozen-test-fixture');
   assert.equal(fixture.source.file, 'tree/inbox/refining/question-rf-cash-purchase-v2-contract-0.yaml');
   assert.equal(fixture.source.pointer, '/payload/info/artifact/body/mockConfiguration');
-  const bytes = fs.readFileSync(path.join(bank, fixture.source.file));
+  const bytes = readHistoricalFile(fixture.source.file);
   assert.equal(fixture.source.sha256, digest(bytes));
   const original = fixture.source.pointer.slice(1).split('/').reduce((value, key) => value[key], parseDoc(bytes.toString('utf8')));
   assert.deepEqual(configuration, original);

@@ -10,22 +10,6 @@ payload:
   {
     "name": "BankBusinessTickPort",
     "version": "bank-v1-service-1",
-    "inputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankTick"
-      }
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "BankTickAcknowledgement"
-      }
-    }
+    "inputType": "@type(nominal:bankwealth:type#BankTick)",
+    "outputType": "@type(nominal:bankwealth:type#BankTickAcknowledgement)"
   }

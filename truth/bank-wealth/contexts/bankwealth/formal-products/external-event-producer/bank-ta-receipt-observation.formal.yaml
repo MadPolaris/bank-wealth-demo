@@ -11,336 +11,77 @@ payload:
     "id": "bank-ta-receipt-observation",
     "version": "bank-v1-1",
     "kind": "authority-event",
-    "event": {
-      "context": "bankwealth",
-      "kind": "event",
-      "owner": [
-        "FundOrder"
-      ],
-      "id": "FundTAReceiptObserved"
-    },
-    "port": {
-      "context": "bankwealth",
-      "kind": "port",
-      "owner": [],
-      "id": "BankTaReceiptIngress"
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "TaReceipt"
-      }
-    },
+    "event": "@ref(bankwealth:event/FundOrder#FundTAReceiptObserved)",
+    "port": "@ref(bankwealth:port#BankTaReceiptIngress)",
+    "outputType": "@type(nominal:bankwealth:type#TaReceipt)",
     "slotMappings": [
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "fundOrderId"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "fundOrderId"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#fundOrderId)",
+        "member": "@ref(bankwealth:member/TaReceipt#fundOrderId)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "paymentTxId"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "paymentTxId"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#paymentTxId)",
+        "member": "@ref(bankwealth:member/TaReceipt#paymentTxId)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "taRequestId"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "taRequestId"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#taRequestId)",
+        "member": "@ref(bankwealth:member/TaReceipt#taRequestId)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "investorAccountId"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "investorAccountId"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#investorAccountId)",
+        "member": "@ref(bankwealth:member/TaReceipt#investorAccountId)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "fundCollectionAccountId"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "fundCollectionAccountId"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#fundCollectionAccountId)",
+        "member": "@ref(bankwealth:member/TaReceipt#fundCollectionAccountId)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "fundCode"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "fundCode"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#fundCode)",
+        "member": "@ref(bankwealth:member/TaReceipt#fundCode)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "amount"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "amount"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#amount)",
+        "member": "@ref(bankwealth:member/TaReceipt#amount)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "principal"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "principal"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#principal)",
+        "member": "@ref(bankwealth:member/TaReceipt#principal)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "receiptId"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "receiptId"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#receiptId)",
+        "member": "@ref(bankwealth:member/TaReceipt#receiptId)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "receiptBody"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "receiptBody"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#receiptBody)",
+        "member": "@ref(bankwealth:member/TaReceipt#receiptBody)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "taReference"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "taReference"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#taReference)",
+        "member": "@ref(bankwealth:member/TaReceipt#taReference)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "status"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "status"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#status)",
+        "member": "@ref(bankwealth:member/TaReceipt#status)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "shares"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "shares"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#shares)",
+        "member": "@ref(bankwealth:member/TaReceipt#shares)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "nav"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "nav"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#nav)",
+        "member": "@ref(bankwealth:member/TaReceipt#nav)"
       },
       {
-        "slot": {
-          "context": "bankwealth",
-          "kind": "event-slot",
-          "owner": [
-            "FundOrder",
-            "FundTAReceiptObserved"
-          ],
-          "id": "reason"
-        },
-        "member": {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "reason"
-        }
+        "slot": "@ref(bankwealth:event-slot/FundOrder/FundTAReceiptObserved#reason)",
+        "member": "@ref(bankwealth:member/TaReceipt#reason)"
       }
     ],
     "stableIdentityContract": {
       "id": "bank-ta-receipt-identity",
       "version": "1",
       "keys": [
-        {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "taRequestId"
-        },
-        {
-          "context": "bankwealth",
-          "kind": "member",
-          "owner": [
-            "TaReceipt"
-          ],
-          "id": "receiptId"
-        }
+        "@ref(bankwealth:member/TaReceipt#taRequestId)",
+        "@ref(bankwealth:member/TaReceipt#receiptId)"
       ]
     }
   }

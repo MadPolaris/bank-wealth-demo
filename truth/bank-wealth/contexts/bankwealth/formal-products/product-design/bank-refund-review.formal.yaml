@@ -25,55 +25,12 @@ payload:
     ],
     "approvalSource": null,
     "references": [
-      {
-        "context": "bankwealth",
-        "kind": "aggregate",
-        "owner": [],
-        "id": "FundOrder"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "command",
-        "owner": [
-          "FundOrder"
-        ],
-        "id": "RequestFundPurchaseRefund"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RequestFundPurchaseRefund"
-        ],
-        "id": "fundOrderId"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RequestFundPurchaseRefund"
-        ],
-        "id": "paymentTxId"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "event",
-        "owner": [
-          "FundOrder"
-        ],
-        "id": "FundPurchaseRefundRequested"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "event-slot",
-        "owner": [
-          "FundOrder",
-          "FundPurchaseRefundRequested"
-        ],
-        "id": "fundOrderId"
-      }
+      "@ref(bankwealth:aggregate#FundOrder)",
+      "@ref(bankwealth:command/FundOrder#RequestFundPurchaseRefund)",
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#fundOrderId)",
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#paymentTxId)",
+      "@ref(bankwealth:event/FundOrder#FundPurchaseRefundRequested)",
+      "@ref(bankwealth:event-slot/FundOrder/FundPurchaseRefundRequested#fundOrderId)"
     ],
     "nodes": [
       {
@@ -100,12 +57,7 @@ payload:
         "kind": "target",
         "label": "FundOrder",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "aggregate",
-            "owner": [],
-            "id": "FundOrder"
-          }
+          "@ref(bankwealth:aggregate#FundOrder)"
         ],
         "action": null,
         "feedback": null
@@ -125,32 +77,9 @@ payload:
         "kind": "action",
         "label": "RequestFundPurchaseRefund",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "command",
-            "owner": [
-              "FundOrder"
-            ],
-            "id": "RequestFundPurchaseRefund"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "FundOrder",
-              "RequestFundPurchaseRefund"
-            ],
-            "id": "fundOrderId"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "FundOrder",
-              "RequestFundPurchaseRefund"
-            ],
-            "id": "paymentTxId"
-          }
+          "@ref(bankwealth:command/FundOrder#RequestFundPurchaseRefund)",
+          "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#fundOrderId)",
+          "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#paymentTxId)"
         ],
         "action": {
           "command": {
@@ -202,46 +131,16 @@ payload:
         "kind": "feedback",
         "label": "已持久受理，不承诺业务成功或投影新鲜度",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "event",
-            "owner": [
-              "FundOrder"
-            ],
-            "id": "FundPurchaseRefundRequested"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "event-slot",
-            "owner": [
-              "FundOrder",
-              "FundPurchaseRefundRequested"
-            ],
-            "id": "fundOrderId"
-          }
+          "@ref(bankwealth:event/FundOrder#FundPurchaseRefundRequested)",
+          "@ref(bankwealth:event-slot/FundOrder/FundPurchaseRefundRequested#fundOrderId)"
         ],
         "action": null,
         "feedback": {
-          "event": {
-            "context": "bankwealth",
-            "kind": "event",
-            "owner": [
-              "FundOrder"
-            ],
-            "id": "FundPurchaseRefundRequested"
-          },
+          "event": "@ref(bankwealth:event/FundOrder#FundPurchaseRefundRequested)",
           "state": "pending",
           "evidence": "provisional",
           "resourceKeys": [
-            {
-              "context": "bankwealth",
-              "kind": "event-slot",
-              "owner": [
-                "FundOrder",
-                "FundPurchaseRefundRequested"
-              ],
-              "id": "fundOrderId"
-            }
+            "@ref(bankwealth:event-slot/FundOrder/FundPurchaseRefundRequested#fundOrderId)"
           ],
           "watermark": null
         }

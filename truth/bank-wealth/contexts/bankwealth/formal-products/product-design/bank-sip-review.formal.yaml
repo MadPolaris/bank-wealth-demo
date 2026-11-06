@@ -25,73 +25,14 @@ payload:
     ],
     "approvalSource": null,
     "references": [
-      {
-        "context": "bankwealth",
-        "kind": "aggregate",
-        "owner": [],
-        "id": "SipPlan"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "command",
-        "owner": [
-          "SipPlan"
-        ],
-        "id": "TriggerSipInstallment"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "SipPlan",
-          "TriggerSipInstallment"
-        ],
-        "id": "position"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "SipPlan",
-          "TriggerSipInstallment"
-        ],
-        "id": "dueSlot"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "SipPlan",
-          "TriggerSipInstallment"
-        ],
-        "id": "revision"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "SipPlan",
-          "TriggerSipInstallment"
-        ],
-        "id": "config"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "event",
-        "owner": [
-          "SipPlan"
-        ],
-        "id": "SipInstallmentTriggered"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "event-slot",
-        "owner": [
-          "SipPlan",
-          "SipInstallmentTriggered"
-        ],
-        "id": "position"
-      }
+      "@ref(bankwealth:aggregate#SipPlan)",
+      "@ref(bankwealth:command/SipPlan#TriggerSipInstallment)",
+      "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#position)",
+      "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#dueSlot)",
+      "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#revision)",
+      "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#config)",
+      "@ref(bankwealth:event/SipPlan#SipInstallmentTriggered)",
+      "@ref(bankwealth:event-slot/SipPlan/SipInstallmentTriggered#position)"
     ],
     "nodes": [
       {
@@ -118,12 +59,7 @@ payload:
         "kind": "target",
         "label": "SipPlan",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "aggregate",
-            "owner": [],
-            "id": "SipPlan"
-          }
+          "@ref(bankwealth:aggregate#SipPlan)"
         ],
         "action": null,
         "feedback": null
@@ -143,50 +79,11 @@ payload:
         "kind": "action",
         "label": "TriggerSipInstallment",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "command",
-            "owner": [
-              "SipPlan"
-            ],
-            "id": "TriggerSipInstallment"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "SipPlan",
-              "TriggerSipInstallment"
-            ],
-            "id": "position"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "SipPlan",
-              "TriggerSipInstallment"
-            ],
-            "id": "dueSlot"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "SipPlan",
-              "TriggerSipInstallment"
-            ],
-            "id": "revision"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "parameter",
-            "owner": [
-              "SipPlan",
-              "TriggerSipInstallment"
-            ],
-            "id": "config"
-          }
+          "@ref(bankwealth:command/SipPlan#TriggerSipInstallment)",
+          "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#position)",
+          "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#dueSlot)",
+          "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#revision)",
+          "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#config)"
         ],
         "action": {
           "command": {
@@ -266,46 +163,16 @@ payload:
         "kind": "feedback",
         "label": "已持久受理，不承诺业务成功或投影新鲜度",
         "references": [
-          {
-            "context": "bankwealth",
-            "kind": "event",
-            "owner": [
-              "SipPlan"
-            ],
-            "id": "SipInstallmentTriggered"
-          },
-          {
-            "context": "bankwealth",
-            "kind": "event-slot",
-            "owner": [
-              "SipPlan",
-              "SipInstallmentTriggered"
-            ],
-            "id": "position"
-          }
+          "@ref(bankwealth:event/SipPlan#SipInstallmentTriggered)",
+          "@ref(bankwealth:event-slot/SipPlan/SipInstallmentTriggered#position)"
         ],
         "action": null,
         "feedback": {
-          "event": {
-            "context": "bankwealth",
-            "kind": "event",
-            "owner": [
-              "SipPlan"
-            ],
-            "id": "SipInstallmentTriggered"
-          },
+          "event": "@ref(bankwealth:event/SipPlan#SipInstallmentTriggered)",
           "state": "pending",
           "evidence": "provisional",
           "resourceKeys": [
-            {
-              "context": "bankwealth",
-              "kind": "event-slot",
-              "owner": [
-                "SipPlan",
-                "SipInstallmentTriggered"
-              ],
-              "id": "position"
-            }
+            "@ref(bankwealth:event-slot/SipPlan/SipInstallmentTriggered#position)"
           ],
           "watermark": null
         }

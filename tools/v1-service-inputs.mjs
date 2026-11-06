@@ -6,6 +6,7 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ROOT, TOOL_ROOT, filesUnder, sha256 } from './truth-source.mjs';
 import { V1_TREE, bankApplicationRequest, bankDomainRequest } from './v1-inputs.mjs';
+import { historicalInventory } from './historical-source.mjs';
 
 const load = file => import(pathToFileURL(join(TOOL_ROOT, file)).href);
 const { profileFor } = await load('lib/products/registry.mjs');
@@ -14,7 +15,7 @@ const { readProductRequest } = await load('lib/products/cli.mjs');
 export const BANK_SERVICE_ARTIFACT = 'bank-service';
 export const BANK_SERVICE_PROFILE = 'scala-cqrs-play-service@1';
 const serviceVersions = new Map([['artifact-contract', '3'], ['saga-host-contract', '2'], ['effect-host-contract', '2']]);
-const treeInventory = () => filesUnder(V1_TREE).map(file => [file, sha256(readFileSync(file))]);
+const treeInventory = () => historicalInventory('v1/tree').map(({ file, sha256 }) => [join(ROOT, file), sha256]);
 
 export function bankServiceRequest() {
   // Explicit fresh-domain injection is intentional. MAIN-owned v1-inputs.mjs must
@@ -87,8 +88,8 @@ export function bankServiceOptions(options, externalSourceRoots) {
 }
 
 function protectedInputs() {
-  const rows = [];
-  for (const dir of ['tree', 'compiled', 'isolation-zone', 'qualification', 'v1/formal-inputs'])
+  const rows = historicalInventory('tree').map(({ file, sha256 }) => [join(ROOT, file), sha256]);
+  for (const dir of ['compiled', 'isolation-zone', 'qualification', 'v1/formal-inputs'])
     for (const file of filesUnder(join(ROOT, dir))) rows.push([file, sha256(readFileSync(file))]);
   for (const name of ['bindings.json', 'execution-bindings.json', 'runtime-binding.json', 'wealth-bindings.json', 'wealth-execution-bindings.json', 'wealth-runtime-binding.json', 'tools/v1-inputs.mjs']) {
     const file = join(ROOT, name);

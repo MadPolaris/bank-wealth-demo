@@ -15,18 +15,9 @@ payload:
     ],
     "transactionIdType": "TxId",
     "args": [
-      {
-        "slot": "fundCollectionAccountId",
-        "type": "AccountId"
-      },
-      {
-        "slot": "investorAccountId",
-        "type": "AccountId"
-      },
-      {
-        "slot": "amount",
-        "type": "Money"
-      }
+      "fundCollectionAccountId: AccountId",
+      "investorAccountId: AccountId",
+      "amount: Money"
     ],
     "participants": [
       {
@@ -71,43 +62,16 @@ payload:
               "name": "ReserveFunds"
             },
             "bindings": [
-              {
-                "slot": "txid",
-                "ref": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "ref": "args:fundCollectionAccountId",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "ref": "args:amount",
-                "type": "Money"
-              }
+              "txid <- txid : TxId",
+              "resource <- \"args:fundCollectionAccountId\" : AccountId",
+              "amount <- \"args:amount\" : Money"
             ],
             "outputs": [
-              {
-                "slot": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "type": "Money"
-              },
-              {
-                "slot": "currency",
-                "type": "Text"
-              },
-              {
-                "slot": "available",
-                "type": "Money"
-              }
+              "txid: TxId",
+              "resource: AccountId",
+              "amount: Money",
+              "currency: Text",
+              "available: Money"
             ]
           },
           "commit": {
@@ -117,35 +81,14 @@ payload:
               "name": "DeductFunds"
             },
             "bindings": [
-              {
-                "slot": "txid",
-                "ref": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "ref": "args:fundCollectionAccountId",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "ref": "args:amount",
-                "type": "Money"
-              }
+              "txid <- txid : TxId",
+              "resource <- \"args:fundCollectionAccountId\" : AccountId",
+              "amount <- \"args:amount\" : Money"
             ],
             "outputs": [
-              {
-                "slot": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "type": "Money"
-              }
+              "txid: TxId",
+              "resource: AccountId",
+              "amount: Money"
             ]
           },
           "compensate": {
@@ -155,43 +98,16 @@ payload:
               "name": "ReleaseReservedFunds"
             },
             "bindings": [
-              {
-                "slot": "txid",
-                "ref": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "ref": "args:fundCollectionAccountId",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "ref": "args:amount",
-                "type": "Money"
-              }
+              "txid <- txid : TxId",
+              "resource <- \"args:fundCollectionAccountId\" : AccountId",
+              "amount <- \"args:amount\" : Money"
             ],
             "outputs": [
-              {
-                "slot": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "type": "Money"
-              },
-              {
-                "slot": "currency",
-                "type": "Text"
-              },
-              {
-                "slot": "available",
-                "type": "Money"
-              }
+              "txid: TxId",
+              "resource: AccountId",
+              "amount: Money",
+              "currency: Text",
+              "available: Money"
             ]
           }
         }
@@ -208,35 +124,14 @@ payload:
               "name": "RecordIncomingCredits"
             },
             "bindings": [
-              {
-                "slot": "txid",
-                "ref": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "ref": "args:investorAccountId",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "ref": "args:amount",
-                "type": "Money"
-              }
+              "txid <- txid : TxId",
+              "resource <- \"args:investorAccountId\" : AccountId",
+              "amount <- \"args:amount\" : Money"
             ],
             "outputs": [
-              {
-                "slot": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "type": "Money"
-              }
+              "txid: TxId",
+              "resource: AccountId",
+              "amount: Money"
             ]
           },
           "commit": {
@@ -246,43 +141,16 @@ payload:
               "name": "CommitIncomingCredits"
             },
             "bindings": [
-              {
-                "slot": "txid",
-                "ref": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "ref": "args:investorAccountId",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "ref": "args:amount",
-                "type": "Money"
-              }
+              "txid <- txid : TxId",
+              "resource <- \"args:investorAccountId\" : AccountId",
+              "amount <- \"args:amount\" : Money"
             ],
             "outputs": [
-              {
-                "slot": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "type": "Money"
-              },
-              {
-                "slot": "currency",
-                "type": "Text"
-              },
-              {
-                "slot": "available",
-                "type": "Money"
-              }
+              "txid: TxId",
+              "resource: AccountId",
+              "amount: Money",
+              "currency: Text",
+              "available: Money"
             ]
           },
           "compensate": {
@@ -292,35 +160,14 @@ payload:
               "name": "CancelIncomingCredit"
             },
             "bindings": [
-              {
-                "slot": "txid",
-                "ref": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "ref": "args:investorAccountId",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "ref": "args:amount",
-                "type": "Money"
-              }
+              "txid <- txid : TxId",
+              "resource <- \"args:investorAccountId\" : AccountId",
+              "amount <- \"args:amount\" : Money"
             ],
             "outputs": [
-              {
-                "slot": "txid",
-                "type": "TxId"
-              },
-              {
-                "slot": "resource",
-                "type": "AccountId"
-              },
-              {
-                "slot": "amount",
-                "type": "Money"
-              }
+              "txid: TxId",
+              "resource: AccountId",
+              "amount: Money"
             ]
           }
         }
@@ -400,11 +247,7 @@ payload:
           "name": "BankRefundResultSucceeded"
         },
         "bindings": [
-          {
-            "slot": "txid",
-            "ref": "txid",
-            "type": "TxId"
-          }
+          "txid <- txid : TxId"
         ]
       },
       {
@@ -414,11 +257,7 @@ payload:
           "name": "BankRefundResultRejectedBeforeEffects"
         },
         "bindings": [
-          {
-            "slot": "txid",
-            "ref": "txid",
-            "type": "TxId"
-          }
+          "txid <- txid : TxId"
         ]
       },
       {
@@ -428,11 +267,7 @@ payload:
           "name": "BankRefundResultCompensated"
         },
         "bindings": [
-          {
-            "slot": "txid",
-            "ref": "txid",
-            "type": "TxId"
-          }
+          "txid <- txid : TxId"
         ]
       },
       {
@@ -442,11 +277,7 @@ payload:
           "name": "BankRefundResultRecoveryRequired"
         },
         "bindings": [
-          {
-            "slot": "txid",
-            "ref": "txid",
-            "type": "TxId"
-          }
+          "txid <- txid : TxId"
         ]
       },
       {
@@ -456,11 +287,7 @@ payload:
           "name": "BankRefundResultOutcomeUnknown"
         },
         "bindings": [
-          {
-            "slot": "txid",
-            "ref": "txid",
-            "type": "TxId"
-          }
+          "txid <- txid : TxId"
         ]
       }
     ]

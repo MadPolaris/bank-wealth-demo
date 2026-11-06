@@ -86,10 +86,12 @@ groups; retain data and failed evidence. See `docs/TRUTH-RUNTIME-WINDOW-20261105
 - Roles/read-model narratives cite actual existing behavior. They are not a new
   executable authorization/SQL projection engine; five-layer design proposals keep
   their approval status. Do not invent workshop history or approvals.
-- `tree/`, `v1/tree/`, six root bindings, old formal inputs and frozen1134/P23
-  artifacts remain historical byte-preserved inputs. Old commands require explicit
-  `--historical`, and frozen complete-request API requires `historical:true`.
-  Do not resume editing both old and new author models.
+- `tree/` and `v1/tree/` were retired after exact 430-file and full-product checks.
+  Historical source reads use revision `675a9366cf270995ef714e505e42c19652f0e4f0`
+  through `tools/historical-source.mjs`; see `docs/TRUTH-LEGACY-BASELINE.json`.
+  Six root bindings, old formal inputs and frozen1134/P23 artifacts remain
+  byte-preserved. Old commands require `--historical`; frozen complete requests
+  require `historical:true`. Never reconstruct a second current author tree.
 - Do not run `tools/qualify-domain.mjs`, `test/domain-runner.test.mjs`, or clean
   qualification/isolation/compiled/history to make a gate green. No global test
   discovery in this bank repository.

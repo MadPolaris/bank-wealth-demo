@@ -7,91 +7,21 @@ payload:
   {
     "name": "RecordSipInstallmentSucceeded",
     "parameters": [
-      {
-        "name": "occurrence",
-        "dataType": "SipOccurrence",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "evidence",
-        "dataType": "String",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "receiptId",
-        "dataType": "String",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "receiptBody",
-        "dataType": "String",
-        "origin": "BUSINESS_INPUT"
-      }
+      "occurrence: SipOccurrence @BUSINESS_INPUT",
+      "evidence: String @BUSINESS_INPUT",
+      "receiptId: String @BUSINESS_INPUT",
+      "receiptBody: String @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "cond": "state.initialized",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_OCCURRENCE_KNOWN",
-        "errCode": "SIP_OCCURRENCE_KNOWN",
-        "cond": "state.occurrences.contains(param.occurrence.dueSlot)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_ORIGINAL_ASSOCIATION",
-        "errCode": "SIP_ORIGINAL_ASSOCIATION",
-        "cond": "state.occurrences(param.occurrence.dueSlot) == param.occurrence && param.occurrence.planId == state.id",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_TERMINAL_EVIDENCE",
-        "errCode": "SIP_TERMINAL_EVIDENCE",
-        "cond": "param.evidence == \"ta-confirmed\"",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_TERMINAL_RECEIPT",
-        "errCode": "SIP_TERMINAL_RECEIPT",
-        "cond": "param.receiptId.nonEmpty && param.receiptBody.nonEmpty",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_TERMINAL_RECEIPT_CONFLICT",
-        "errCode": "SIP_TERMINAL_RECEIPT_CONFLICT",
-        "cond": "!state.terminalReceiptBodies.contains(param.receiptId) || state.terminalReceiptBodies(param.receiptId) == param.receiptBody",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_TERMINAL_CONFLICT",
-        "errCode": "SIP_TERMINAL_CONFLICT",
-        "cond": "!state.firstTerminals.contains(param.occurrence.occurrenceId) || state.firstTerminals(param.occurrence.occurrenceId) == \"succeeded\"",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_TERMINAL_ONCE",
-        "errCode": "SIP_TERMINAL_ONCE",
-        "cond": "!state.firstTerminals.contains(param.occurrence.occurrenceId)",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_TOTAL_CAPACITY",
-        "errCode": "SIP_TOTAL_CAPACITY",
-        "cond": "state.successTotal < 9223372036854775807",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_OCCURRENCE_KNOWN/SIP_OCCURRENCE_KNOWN: \"state.occurrences.contains(param.occurrence.dueSlot)\")",
+      "@guard[invariantRef](reject SIP_ORIGINAL_ASSOCIATION/SIP_ORIGINAL_ASSOCIATION: \"state.occurrences(param.occurrence.dueSlot) == param.occurrence && param.occurrence.planId == state.id\")",
+      "@guard[invariantRef](reject SIP_TERMINAL_EVIDENCE/SIP_TERMINAL_EVIDENCE: \"param.evidence == \\\"ta-confirmed\\\"\")",
+      "@guard[invariantRef](reject SIP_TERMINAL_RECEIPT/SIP_TERMINAL_RECEIPT: \"param.receiptId.nonEmpty && param.receiptBody.nonEmpty\")",
+      "@guard[invariantRef](reject SIP_TERMINAL_RECEIPT_CONFLICT/SIP_TERMINAL_RECEIPT_CONFLICT: \"!state.terminalReceiptBodies.contains(param.receiptId) || state.terminalReceiptBodies(param.receiptId) == param.receiptBody\")",
+      "@guard[invariantRef](reject SIP_TERMINAL_CONFLICT/SIP_TERMINAL_CONFLICT: \"!state.firstTerminals.contains(param.occurrence.occurrenceId) || state.firstTerminals(param.occurrence.occurrenceId) == \\\"succeeded\\\"\")",
+      "@guard[invariantRef](succeed-empty SIP_TERMINAL_ONCE/SIP_TERMINAL_ONCE: \"!state.firstTerminals.contains(param.occurrence.occurrenceId)\")",
+      "@guard[invariantRef](reject SIP_TOTAL_CAPACITY/SIP_TOTAL_CAPACITY: \"state.successTotal < 9223372036854775807\")"
     ],
     "produces": [
       "SipInstallmentSucceeded"
@@ -115,79 +45,24 @@ events:
     "SipInstallmentSucceeded": {
       "name": "SipInstallmentSucceeded",
       "payloads": [
-        {
-          "name": "occurrence",
-          "dataType": "SipOccurrence",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "evidence",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "receiptId",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "receiptBody",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "outcome",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        }
+        "occurrence: SipOccurrence @PROPAGATED",
+        "evidence: String @PROPAGATED",
+        "receiptId: String @PROPAGATED",
+        "receiptBody: String @PROPAGATED",
+        "outcome: String @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "occurrence",
-          "expr": "param.occurrence"
-        },
-        {
-          "slot": "evidence",
-          "expr": "param.evidence"
-        },
-        {
-          "slot": "receiptId",
-          "expr": "param.receiptId"
-        },
-        {
-          "slot": "receiptBody",
-          "expr": "param.receiptBody"
-        },
-        {
-          "slot": "outcome",
-          "expr": "literal:succeeded"
-        }
+        "occurrence <- param.occurrence",
+        "evidence <- param.evidence",
+        "receiptId <- param.receiptId",
+        "receiptBody <- param.receiptBody",
+        "outcome <- \"literal:succeeded\""
       ],
       "foldAssignments": [
-        {
-          "slot": "firstTerminals",
-          "op": "put",
-          "key": "event.occurrence.occurrenceId",
-          "value": "event.outcome"
-        },
-        {
-          "slot": "occurrenceProgress",
-          "op": "put",
-          "key": "event.occurrence.occurrenceId",
-          "value": "event.outcome"
-        },
-        {
-          "slot": "terminalReceiptBodies",
-          "op": "put",
-          "key": "event.receiptId",
-          "value": "event.receiptBody"
-        },
-        {
-          "slot": "successTotal",
-          "op": "integer-apply",
-          "delta": "literal:1",
-          "sign": 1
-        }
+        "firstTerminals := @fold[put](key=event.occurrence.occurrenceId, value=event.outcome)",
+        "occurrenceProgress := @fold[put](key=event.occurrence.occurrenceId, value=event.outcome)",
+        "terminalReceiptBodies := @fold[put](key=event.receiptId, value=event.receiptBody)",
+        "successTotal := @fold[integer-apply](delta=\"literal:1\", sign=+1)"
       ]
     }
   }

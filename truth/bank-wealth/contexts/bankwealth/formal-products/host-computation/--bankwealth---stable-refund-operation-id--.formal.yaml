@@ -8,72 +8,20 @@ version: bank-v1-1
 author: agent-assisted-bank-v1
 payload:
   {
-    "id": {
-      "context": "bankwealth",
-      "kind": "port",
-      "owner": [],
-      "id": "StableRefundOperationId"
-    },
+    "id": "@ref(bankwealth:port#StableRefundOperationId)",
     "version": "bank-v1-1",
-    "command": {
-      "context": "bankwealth",
-      "kind": "command",
-      "owner": [
-        "FundOrder"
-      ],
-      "id": "RequestFundPurchaseRefund"
-    },
-    "outputType": {
-      "form": "nominal",
-      "ref": {
-        "context": "bankwealth",
-        "kind": "type",
-        "owner": [],
-        "id": "OperationId"
-      }
-    },
+    "command": "@ref(bankwealth:command/FundOrder#RequestFundPurchaseRefund)",
+    "outputType": "@type(nominal:bankwealth:type#OperationId)",
     "inputDependencies": [
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RequestFundPurchaseRefund"
-        ],
-        "id": "fundOrderId"
-      },
-      {
-        "context": "bankwealth",
-        "kind": "parameter",
-        "owner": [
-          "FundOrder",
-          "RequestFundPurchaseRefund"
-        ],
-        "id": "paymentTxId"
-      }
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#fundOrderId)",
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#paymentTxId)"
     ],
     "stableIdentityContract": {
       "id": "StableRefundOperationId-identity",
       "version": "1",
       "keys": [
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "FundOrder",
-            "RequestFundPurchaseRefund"
-          ],
-          "id": "fundOrderId"
-        },
-        {
-          "context": "bankwealth",
-          "kind": "parameter",
-          "owner": [
-            "FundOrder",
-            "RequestFundPurchaseRefund"
-          ],
-          "id": "paymentTxId"
-        }
+        "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#fundOrderId)",
+        "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#paymentTxId)"
       ]
     }
   }

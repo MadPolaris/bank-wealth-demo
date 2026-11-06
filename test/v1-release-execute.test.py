@@ -49,6 +49,18 @@ class ReleaseExecutionTest(unittest.TestCase):
         (self.root/'project/build.properties').write_text('sbt.version=1.4.9')
         self.assertEqual(set(mod.inventory(self.root, ['project/target'])), {'project/build.properties'})
 
+    def test_retired_tree_refuses_before_candidate_creation(self):
+        if (ROOT / 'v1/tree/workshop.yaml').exists():
+            self.skipTest('historical checkout still contains its author tree')
+        target = self.root / 'retired-candidate'
+        config = {'schemaVersion': 'bank-v1-execution/v2', 'bundle': str(target),
+                  'workId': 'retired-source-test', 'javaHome': '/unused', 'python': '/unused',
+                  'sources': {key: '/unused' for key in
+                              ['jsCapture', 'bcCapture', 'bcRuntime', 'support', 'options', 'license', 'admissionFixture']}}
+        with self.assertRaisesRegex(ValueError, 'historical release source tree is retired'):
+            mod.capture(config)
+        self.assertFalse(target.exists())
+
     def test_invalid_config_cannot_create_candidate(self):
         target = self.root/'candidate'
         with self.assertRaises(ValueError):

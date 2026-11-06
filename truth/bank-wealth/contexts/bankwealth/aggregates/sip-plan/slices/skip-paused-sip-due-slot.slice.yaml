@@ -7,81 +7,19 @@ payload:
   {
     "name": "SkipPausedSipDueSlot",
     "parameters": [
-      {
-        "name": "position",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      },
-      {
-        "name": "dueSlot",
-        "dataType": "Long",
-        "origin": "BUSINESS_INPUT"
-      }
+      "position: Long @BUSINESS_INPUT",
+      "dueSlot: Long @BUSINESS_INPUT"
     ],
     "guards": [
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_INITIALIZED",
-        "errCode": "SIP_INITIALIZED",
-        "cond": "state.initialized",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SCHEDULE_SEALED",
-        "errCode": "SIP_SCHEDULE_SEALED",
-        "cond": "state.scheduleSealed",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_DECLARED",
-        "errCode": "SIP_SLOT_DECLARED",
-        "cond": "state.slots.contains(param.position)",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_MATCH",
-        "errCode": "SIP_SLOT_MATCH",
-        "cond": "state.slots(param.position) == param.dueSlot",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_OBSERVATION_CONFLICT",
-        "errCode": "SIP_OBSERVATION_CONFLICT",
-        "cond": "!state.slotDisposition.contains(param.dueSlot) || state.slotDisposition(param.dueSlot) == \"skipped\"",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_OBSERVATION_ONCE",
-        "errCode": "SIP_OBSERVATION_ONCE",
-        "cond": "!state.slotDisposition.contains(param.dueSlot)",
-        "onFail": "succeed-empty"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_OBSERVATION_ORDER",
-        "errCode": "SIP_OBSERVATION_ORDER",
-        "cond": "param.position == state.observedCount",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_SLOT_DUE",
-        "errCode": "SIP_SLOT_DUE",
-        "cond": "param.dueSlot <= state.currentTick",
-        "onFail": "reject"
-      },
-      {
-        "kind": "invariantRef",
-        "ref": "SIP_PAUSE_CLASSIFICATION",
-        "errCode": "SIP_PAUSE_CLASSIFICATION",
-        "cond": "state.paused && param.dueSlot >= state.pauseTick",
-        "onFail": "reject"
-      }
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_SCHEDULE_SEALED/SIP_SCHEDULE_SEALED: state.scheduleSealed)",
+      "@guard[invariantRef](reject SIP_SLOT_DECLARED/SIP_SLOT_DECLARED: \"state.slots.contains(param.position)\")",
+      "@guard[invariantRef](reject SIP_SLOT_MATCH/SIP_SLOT_MATCH: \"state.slots(param.position) == param.dueSlot\")",
+      "@guard[invariantRef](reject SIP_OBSERVATION_CONFLICT/SIP_OBSERVATION_CONFLICT: \"!state.slotDisposition.contains(param.dueSlot) || state.slotDisposition(param.dueSlot) == \\\"skipped\\\"\")",
+      "@guard[invariantRef](succeed-empty SIP_OBSERVATION_ONCE/SIP_OBSERVATION_ONCE: \"!state.slotDisposition.contains(param.dueSlot)\")",
+      "@guard[invariantRef](reject SIP_OBSERVATION_ORDER/SIP_OBSERVATION_ORDER: \"param.position == state.observedCount\")",
+      "@guard[invariantRef](reject SIP_SLOT_DUE/SIP_SLOT_DUE: \"param.dueSlot <= state.currentTick\")",
+      "@guard[invariantRef](reject SIP_PAUSE_CLASSIFICATION/SIP_PAUSE_CLASSIFICATION: \"state.paused && param.dueSlot >= state.pauseTick\")"
     ],
     "produces": [
       "SipPausedDueSlotSkipped"
@@ -105,49 +43,18 @@ events:
     "SipPausedDueSlotSkipped": {
       "name": "SipPausedDueSlotSkipped",
       "payloads": [
-        {
-          "name": "position",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "dueSlot",
-          "dataType": "Long",
-          "origin": "PROPAGATED"
-        },
-        {
-          "name": "disposition",
-          "dataType": "String",
-          "origin": "PROPAGATED"
-        }
+        "position: Long @PROPAGATED",
+        "dueSlot: Long @PROPAGATED",
+        "disposition: String @PROPAGATED"
       ],
       "bindings": [
-        {
-          "slot": "position",
-          "expr": "param.position"
-        },
-        {
-          "slot": "dueSlot",
-          "expr": "param.dueSlot"
-        },
-        {
-          "slot": "disposition",
-          "expr": "literal:skipped"
-        }
+        "position <- param.position",
+        "dueSlot <- param.dueSlot",
+        "disposition <- \"literal:skipped\""
       ],
       "foldAssignments": [
-        {
-          "slot": "slotDisposition",
-          "op": "put",
-          "key": "event.dueSlot",
-          "value": "event.disposition"
-        },
-        {
-          "slot": "observedCount",
-          "op": "integer-apply",
-          "delta": "literal:1",
-          "sign": 1
-        }
+        "slotDisposition := @fold[put](key=event.dueSlot, value=event.disposition)",
+        "observedCount := @fold[integer-apply](delta=\"literal:1\", sign=+1)"
       ]
     }
   }

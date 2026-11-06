@@ -9,22 +9,10 @@ payload:
     "context": "bankwealth",
     "version": "bank-v1-service-1",
     "fields": [
-      {
-        "name": "original",
-        "dataType": "BankCashOriginal"
-      },
-      {
-        "name": "paymentStatus",
-        "dataType": "String"
-      },
-      {
-        "name": "taStatus",
-        "dataType": "String"
-      },
-      {
-        "name": "refundStatus",
-        "dataType": "String"
-      }
+      "original: BankCashOriginal",
+      "paymentStatus: String",
+      "taStatus: String",
+      "refundStatus: String"
     ],
     "provenance": {
       "author": "agent-assisted-bank-v1-service-integration",

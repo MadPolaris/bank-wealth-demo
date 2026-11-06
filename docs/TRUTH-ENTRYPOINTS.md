@@ -1,6 +1,13 @@
 # 银行真源入口：作者目标、当前消费者与历史复演
 
-日期：2026-11-04。状态：**新根配置与当前命令已实施；以下历史入口盘点保留，用于解释冻结输入。**
+日期：2026-11-06。状态：**现役作者树已完成宏/微语法压缩；两旧树已退役。**
+
+`tree/`和`v1/tree/`的430文件已逐字节核对后移除。历史适配器只读固定revision
+`675a9366cf270995ef714e505e42c19652f0e4f0`，完整清单和14产品基线见
+[TRUTH-LEGACY-BASELINE.json](TRUTH-LEGACY-BASELINE.json)。需要Git对象可用，
+不会联网取回或以当前作者模型替代旧版本。旧发行执行器在当前checkout缺旧树时
+于创建候选前拒绝；整包复演使用冻结归档/历史checkout。下文旧路径均为该时点定位，
+不是当前磁盘入口；原运行回执不改写。
 
 ## 当前操作入口（实施后）
 
@@ -35,8 +42,8 @@
 - **根配置已建立并通过作者树与14产品准入。** 新开发使用本节入口；最终生成、再生和应用构建结果另以执行账为准。
 - 不推荐`current/tree`、`v2/tree`，也不把`v1/tree`过渡位置写成新教程最终布局。`bankwealth`是沿用的显式业务context，不自动改成`bank-wealth`或BC的`main`。
 - 新作者修改新源及明确的技术选择；canonical、完整request、编译产品、ledger、anchors是派生物，不手工维护第二套业务输入。宿主FQN、外置实现/测试路径、runtime pin及编码选择仍须显式说明，不靠工具猜。
-- **本次旧根`tree/`与`v1/tree/`均冻结原路径/字节。** 新目标不意味着允许挪走、改写或删除它们；另行授权前只以它们作比较/历史输入。
-- 旧工具通过显式历史选项仍可读取`v1/tree`作复演；这不是第二个当前编辑入口。缺新源/缺绑定会阻塞，不回退旧树。
+- **旧根`tree/`与`v1/tree/`已按新增授权退役。** 历史适配器从上述固定revision读取，不在磁盘重建可编辑副本。
+- 新输入缺失或绑定缺失会阻塞，不回退旧树；历史模式与当前项目编译分离。
 
 ## 2. 数据位置及实际用途
 
@@ -44,8 +51,8 @@
 
 | 位置 | 当前实际用途 | 迁移后应归属 / 待处理事项 |
 |---|---|---|
-| [根tree](../tree/) | 旧导入/设计/合同。根validate、project、existing-contracts工具仍默认读它。 | 历史/兼容输入，不能混入新默认查询。字节不动；旧消费者明确标历史或拒绝当前模式。 |
-| [v1/tree](../v1/tree/) | `V1_TREE`硬编码位置；domain派生和显式fresh service请求从这里读。 | 现行V1语义比较基线，之后作为冻结历史；新源承接通过前不宣称替代完成。 |
+| [根tree](https://github.com/MadPolaris/bank-wealth-demo/tree/675a9366cf270995ef714e505e42c19652f0e4f0/tree/) | 旧导入/设计/合同。根validate、project、existing-contracts工具仍默认读它。 | 历史/兼容输入，不能混入新默认查询。字节不动；旧消费者明确标历史或拒绝当前模式。 |
+| [v1/tree](https://github.com/MadPolaris/bank-wealth-demo/tree/675a9366cf270995ef714e505e42c19652f0e4f0/v1/tree/) | `V1_TREE`硬编码位置；domain派生和显式fresh service请求从这里读。 | 现行V1语义比较基线，之后作为冻结历史；新源承接通过前不宣称替代完成。 |
 | 根六绑定 | `bindings.json`、`execution-bindings.json`、`runtime-binding.json`及对应三个`wealth-*`文件。旧工具合并读取，execution中的旧Saga副本还被核等。 | 根历史合同的配套输入，全部保护。不是新service从根树自动推导出的绑定。 |
 | [v1/formal-inputs中的*-authored-*](../v1/formal-inputs/) | 原V1 adapter历史复演仍读取这些冻结文件；当前根项目不读它们。 | 当前必要技术选择已迁到 `bindings/implementation/` 并经14产品payload对账；重复embedded Saga删除，public union派生。旧文件不删改。 |
 | `v1/formal-inputs/{payment,refund,ta,sip}-376/` | 四个冻结完整应用输入；`checkInputs()`要求四者request相同，scope标四个消费场景。默认`bankApplicationRequest()`直接读payment-376。 | 历史joint复演，不是每次从当前树重建的四份fresh请求。 |
