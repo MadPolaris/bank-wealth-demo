@@ -2,7 +2,7 @@
 
 **目标：从一个业务问题，找到真实声明、生成代码和可验证的来源。** 本教程不启动银行服务；代码构建与真实HTTP/数据库验收见[完整工作坊](BANK-WORKSHOP.md)。
 
-所有命令都在 **`bank-wealth-demo` 仓库根目录**执行。需要相邻的配套 `metarch-truthsrc`、Node ≥22.13.0，推荐22.23.4。尚未取得两仓时，先按[获取与安装说明](https://github.com/zhongdj/metarch-truthsrc/blob/execution-compiler-v1/README.md#install-the-local-cli)准备；不要用main或旧发行分支代替配套版本。
+所有命令都在 **`bank-wealth-demo` 仓库根目录**执行。需要相邻的配套 `metarch-truthsrc`、Node ≥22.13.0，推荐22.23.4。尚未取得两仓时，先按[获取与安装说明](../../metarch-truthsrc/README.md#install-the-local-cli)准备；不要用main或旧发行分支代替配套版本。
 
 ## 1. 先回答业务问题
 
@@ -24,20 +24,20 @@
 ### 只看真源，不需要归档或Java
 
 ```bash
+node tools/bank-workshop.mjs doctor --through source --format human
 node tools/truthsrc-project.mjs validate
-node ../metarch-truthsrc/bin/truthsrc.js compile-project \
-  --project truthsrc.project.json --format human
+node tools/truthsrc-project.mjs compile
 ```
 
-成功信号：没有hard错误、roundtrip为true、严格产品编译成功。**这不是Scala编译或业务运行认证。**
+成功信号：doctor的source前置满足，validate没有hard错误、roundtrip为true，compile严格产品编译成功。无需先创建生成目录或准备归档；roundtrip会创建/清理自己的系统临时目录。**这不是Scala编译或业务运行认证。**
 
 ### 完整银行生成需要冻结供给
 
-需要已取得的干净 `bank-wealth-v1-darwin-x64-1134.tar.gz`；材料取得方式见[工作坊向导](BANK-WORKSHOP.md)。没有归档可以先完成上节或工具Counter，不要从旧运行目录拼凑依赖。
+需要实际取得的干净`bank-wealth-v1-darwin-x64-1134.tar.gz`；冻结供给的公开材料渠道尚未落实，不能假定新clone自带归档。范围和SHA见[工作坊向导](BANK-WORKSHOP.md)。没有归档可以先完成上节或工具Counter，不从旧运行目录拼凑依赖。
 
 ```bash
 node tools/prepare-truthsrc-runtime.mjs \
-  --archive dist/bank-wealth-v1-darwin-x64-1134.tar.gz
+  --archive /absolute/path/to/bank-wealth-v1-darwin-x64-1134.tar.gz
 ```
 
 prepare校验归档及六份JAR/POM，写入 `.local/truthsrc-runtime`。不下载、不编译或重发runtime，也不启动JVM。校验失败不会以另一份包代替。
@@ -107,7 +107,7 @@ node ../metarch-truthsrc/bin/truthsrc.js query-project \
 
 ## 5. 修改一次，安全地更新
 
-第一次修改练习建议在[Counter教程](https://github.com/zhongdj/metarch-truthsrc/blob/execution-compiler-v1/TUTORIAL.md)的独立项目完成，不为了学习改变银行金额、身份、guard或冻结业务预期。
+第一次修改练习建议在[Counter教程](../../metarch-truthsrc/TUTORIAL.md)的独立项目完成，不为了学习改变银行金额、身份、guard或冻结业务预期。
 
 真实银行开发的更新顺序：
 
@@ -123,7 +123,7 @@ node ../metarch-truthsrc/bin/truthsrc.js verify-project \
   --project truthsrc.project.json --out "$OUT" --format human
 ```
 
-成功信号：先显示输入过期，更新后恢复同步，重复update零源码写入。若生成区有手改，工具拒绝覆盖；先保存差异，再决定转成合法作者/手写修改，不删除证据消红。
+成功信号：先显示输入过期，更新后恢复同步，重复update零源码写入（不等于ledger/anchors等证据零写入）。若生成区有手改，工具拒绝覆盖；先保存差异，再决定转成合法作者/手写修改，不删除证据消红。实际apply还会写项目知识图，不承诺失败整体回滚；共享图与输出的写入需由主集成协调。
 
 仓内已有显式隔离变更测试：
 
@@ -139,11 +139,14 @@ BANK_TRUTHSRC_INTEGRATION=1 node --test --test-concurrency=1 test/unified-truth.
 
 生成的Entity、Behaviors、Bootstrap和本地Repository已被消费；本地Repository不是cluster sharding。JDBC Schema/Repository/Projection来自 `bank-service.formal.yaml` 的技术 `projectionStore`，业务owner/查询DTO仍是显式手写端口，六份说明性read-model不会自动变成全部SQL。
 
+现役手写路径为`handwritten/scala/`，固定预期在`test/scala/`，许可在`third-party/`。生成/手写职责与`docs/architecture/HANDWRITTEN-SOURCE-MAP.json`的解释见[架构入口](architecture/README.md)。目录和来源映射已逐项对账；迁移后的新候选各层结果见[本批验收](V1-RETIREMENT.md)，不靠改路径继承旧通过。
+
 历史验收按时点保留：
 
 - [2026-11-06兼容迁移](TRUTH-COMPATIBLE-COMPOSITION.md)：534main，actor64/readside47，两组共享23生成测试；H2/testkit与直接页面测试，不是该次真实HTTP/浏览器认证。
 - [2026-11-05运行窗口](TRUTH-RUNTIME-WINDOW-20261105.md)：当时候选的固定24恢复窗与数据库/浏览器结果，不能继承给后续源码。
-- [冻结1134发行](../v1/integration/RELEASE-SIGNOUT-1134.md)：原交付范围不变，不重签、重发或读取旧凭据。
+- [冻结1134发行与25项矩阵](HISTORY.md#release-1134)：按完整revision和原路径定位，原交付范围不变，不重签、重发或读取旧凭据。
+- [11月6日新人原回执](ONBOARDING-ACCEPTANCE.md)：图、代码和固定恢复已有实测；旧环境描述保持原时点，完整service/人工会话仍未执行。当前资源更新见[工作坊第4节](BANK-WORKSHOP.md#4-完整服务第三份同源构建与新的-owner)，不能把Docker/镜像可见当作服务通过。
 
 ## 遇到问题
 
@@ -156,4 +159,4 @@ BANK_TRUTHSRC_INTEGRATION=1 node --test --test-concurrency=1 test/unified-truth.
 | 图没有某个节点的代码 | 看身份、明确引用与诊断；说明性知识可能不是直接生成输入。 |
 | 服务前置不足或失败 | 按完整工作坊的本轮owner资源记录处理，保留失败回执，不停止未知进程。 |
 
-工具语法、精度与所有权见 [AUTHORING](https://github.com/zhongdj/metarch-truthsrc/blob/execution-compiler-v1/AUTHORING.md) 和 [PROJECT](https://github.com/zhongdj/metarch-truthsrc/blob/execution-compiler-v1/PROJECT.md)。agent遵循仓内 `AGENTS.md`，不启动暂停的qualification/domain-runner，不用全目录测试发现。**retry/backoff/deadline仍OPEN。**
+工具语法、精度与所有权见 [AUTHORING](../../metarch-truthsrc/AUTHORING.md) 和 [PROJECT](../../metarch-truthsrc/PROJECT.md)。普通外部generator模板、正式产品注册/schema、公共writer、只读MCP与BC金样入口集中在[首页扩展导航](../README.md#继续读架构与扩展工具)，两类生成扩展不可混同。agent遵循仓内`AGENTS.md`，不启动暂停的qualification/domain-runner，不用全目录测试发现。**retry/backoff/deadline仍OPEN。**

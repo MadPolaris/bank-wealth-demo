@@ -40,6 +40,7 @@ const SUPPORT = [fileURLToPath(import.meta.url), SOURCE, WORKER, FIXTURE,
     'truthsrc-runtime-tests', 'truthsrc-actor-ta-worker', 'truthsrc-runtime-crash', 'v1-crash-recovery',
     'v1-release-build-evidence', 'truthsrc-runtime-jars', 'verify-truthsrc-build'].map(name => join(ROOT, 'tools', name + '.mjs')),
   join(ROOT, '../metarch-truthsrc/lib/strict-json.mjs'),
+  join(ROOT, 'tools/historical-assets.mjs'), join(ROOT, 'docs/V1-RETIREMENT-MANIFEST.json'),
   ...['contract', 'journal', 'mock-ta-core'].map(name => join(ROOT, 'simulator', name + '.mjs'))];
 const loadedSupport = snapshots(SUPPORT);
 const now = () => new Date().toISOString();

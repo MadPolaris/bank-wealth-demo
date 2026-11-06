@@ -24,7 +24,7 @@
 ## 1. 唯一当前输入
 
 - 仓库：`bank-wealth-demo`，branch `feature/bank-wealth-truth-preview`，基于 `dda2f24` 的已有工作树；本轮未提交。**当前输入身份以新回执逐文件SHA为准，不以HEAD冒充包含本轮未提交文件。**
-- 源：[P23BankV1HandoffContract](../tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)。
+- 源：[P23BankV1HandoffContract](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)。
 - Artifact：`decision.p23-bank-v1-handoff`；业务设计版本：`bank-v1-p23-design-1`。
 - 外层仍是 `demo-proposal`，已选部分在body标 `selected-demo-design`；原政策/原子/六份bindings未被重写。新overlay通过明确来源和supersession生效，不使旧记录的历史open自动变成错误。
 - 共同公共设计：[P24/P25 DESIGN.md](../../metarch-truthsrc/.rounds/p24-p25-v1-design-q5bnn0o8/DESIGN.md)及配套矩阵，原样沿用。公共接口、BC/JS实施写面与兼容接续由工具链会话准备；本交接不重复设计、不解冻公共源码。

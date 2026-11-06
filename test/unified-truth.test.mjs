@@ -95,7 +95,7 @@ test('full current service generates, queries, updates a teaching-only copy and 
   const config = json(project);
   config.documents = config.documents.map(d => ({ ...d, file: join(ROOT, d.file) }));
   config.options.runtimeArtifact.repository = new URL('../.local/truthsrc-runtime/maven/', import.meta.url).href;
-  config.options.service.externalSourceRoots = [join(ROOT, 'v1/handwritten/scala')];
+  config.options.service.externalSourceRoots = [join(ROOT, 'handwritten/scala')];
   const configFile = join(candidate, 'truthsrc.project.json'); writeFileSync(configFile, JSON.stringify(config, null, 2) + '\n');
   const out = join(parent, 'generated'), input = { project: configFile, out }, flags = ['--project', configFile, '--out', out];
   const planned = await projectCli('generate-project', [...flags, '--plan']);

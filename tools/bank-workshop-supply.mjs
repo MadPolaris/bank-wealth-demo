@@ -92,10 +92,12 @@ export async function captureCurrent({ root = ROOT, tool = TOOL } = {}) {
   const inputs = [project, ...(config.documents ?? []).map(row => localPath(root, row.file))];
   const support = sourceFiles(join(root, 'tools'), file => /\.(mjs|py|scala)$/.test(file))
     .concat(sourceFiles(join(root, 'simulator'), file => /\.mjs$/.test(file)),
-      sourceFiles(join(root, 'v1/test/scala')), sourceFiles(join(root, 'test/fixtures')));
+      sourceFiles(join(root, 'test/scala')), sourceFiles(join(root, 'test/fixtures')),
+      join(root, 'docs/V1-RETIREMENT-MANIFEST.json'), join(root, 'docs/V1-REFERENCE-RELOCATIONS.json'),
+      join(root, 'docs/architecture/HANDWRITTEN-SOURCE-MAP.json'));
   const references = async files => Promise.all(files.sort().map(fileReference));
   return { project, tree, inputs: await references(inputs), author: treeEvidence(tree), tool: toolEvidence(),
-    handwritten: await references(sourceFiles(join(root, 'v1/handwritten/scala'))), support: await references(support) };
+    handwritten: await references(sourceFiles(join(root, 'handwritten/scala'))), support: await references(support) };
 }
 
 export async function captureSupply(archive, root = ROOT) {

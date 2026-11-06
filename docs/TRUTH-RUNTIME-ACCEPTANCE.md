@@ -21,12 +21,12 @@
 
 下列仅作为后续实现的源码定位，旧测试和驱动保持原字节；没有将它们挂到生成单元验证器：
 
-- F1：[BankSinglePaymentOracleSpec](../v1/test/scala/BankSinglePaymentOracleSpec.scala)、[BankPaymentDeliveryAcceptanceSpec](../v1/test/scala/BankPaymentDeliveryAcceptanceSpec.scala)。真实actor/testkit，非跨JVM。
-- F2/F3：[BankTaApplicationSpec](../v1/test/scala/BankTaApplicationSpec.scala)、[BankRefundApplicationSpec](../v1/test/scala/BankRefundApplicationSpec.scala)。需要TA Node子进程及自有JSONL journal，不只是银行testkit。
-- F4：[BankSipApplicationSpec](../v1/test/scala/BankSipApplicationSpec.scala)、[BankSipRecoverySpec](../v1/test/scala/BankSipRecoverySpec.scala)。可复用有限日程、修订/暂停、派发/恢复断言，但须明确新候选测试输入集合。
-- HTTP：[BankHttpAcceptanceMain](../v1/test/scala/BankHttpAcceptanceMain.scala)／[v1-http-acceptance](../tools/v1-http-acceptance.mjs)。历史窗口使用LevelDB、H2、真实loopback和手工Composition，排除TA；它不是生产Factory完整四流。
-- 恢复：[BankCrashRecoveryMain](../v1/test/scala/BankCrashRecoveryMain.scala)、[BankSipCrashRecoveryMain](../v1/test/scala/BankSipCrashRecoveryMain.scala)及[v1-crash-recovery](../tools/v1-crash-recovery.mjs)。24个旧窗口可作断言依据，旧控制器路径/环境/回执不直接沿用。
-- 生产存储：[BankProductionHttpMain](../v1/test/scala/BankProductionHttpMain.scala)、[BankMysqlNegativeMain](../v1/test/scala/BankMysqlNegativeMain.scala)。需要新资源窗口及显式测试源码闭包；不能将旧发行build回执改字段冒充当前编译。
+- F1：[BankSinglePaymentOracleSpec](../test/scala/BankSinglePaymentOracleSpec.scala)、[BankPaymentDeliveryAcceptanceSpec](../test/scala/BankPaymentDeliveryAcceptanceSpec.scala)。真实actor/testkit，非跨JVM。
+- F2/F3：[BankTaApplicationSpec](../test/scala/BankTaApplicationSpec.scala)、[BankRefundApplicationSpec](../test/scala/BankRefundApplicationSpec.scala)。需要TA Node子进程及自有JSONL journal，不只是银行testkit。
+- F4：[BankSipApplicationSpec](../test/scala/BankSipApplicationSpec.scala)、[BankSipRecoverySpec](../test/scala/BankSipRecoverySpec.scala)。可复用有限日程、修订/暂停、派发/恢复断言，但须明确新候选测试输入集合。
+- HTTP：[BankHttpAcceptanceMain](../test/scala/BankHttpAcceptanceMain.scala)／[v1-http-acceptance](../tools/v1-http-acceptance.mjs)。历史窗口使用LevelDB、H2、真实loopback和手工Composition，排除TA；它不是生产Factory完整四流。
+- 恢复：[BankCrashRecoveryMain](../test/scala/BankCrashRecoveryMain.scala)、[BankSipCrashRecoveryMain](../test/scala/BankSipCrashRecoveryMain.scala)及[v1-crash-recovery](../tools/v1-crash-recovery.mjs)。24个旧窗口可作断言依据，旧控制器路径/环境/回执不直接沿用。
+- 生产存储：[BankProductionHttpMain](../test/scala/BankProductionHttpMain.scala)、[BankMysqlNegativeMain](../test/scala/BankMysqlNegativeMain.scala)。需要新资源窗口及显式测试源码闭包；不能将旧发行build回执改字段冒充当前编译。
 - 浏览器：[v1-browser-funds](../tools/v1-browser-funds.mjs)。它可消费指定baseURL，但自身不证明运行应用来自当前作者候选，需要上层来源准入与独占控制器。
 
 ### 旧TA消费路径与本轮显式fixture

@@ -1,0 +1,1114 @@
+{
+  "schemaVersion": "bank.current-handwritten-source-map/v1",
+  "project": "truthsrc.project.json",
+  "root": "handwritten/scala",
+  "scope": "Explicit bank file-level implementation/support relations for the captured current request. Neither inferred semantic certification nor generated symbol/span anchors.",
+  "historicalMap": {
+    "revision": "4515b6b97d91714116b451b4e930dc81e112e528",
+    "file": "v1/integration/HANDWRITTEN-SOURCE-MAP.json",
+    "request": "v1/formal-inputs/release-bridge-1069/request.json"
+  },
+  "snapshot": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+  "document": {
+    "id": "bank-v1",
+    "sha256": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+  },
+  "files": {
+    "example/bankwealth/bindings/BankBalanceComputations.scala": "sha256:ceb8afd93202ceb3da389e3e4edc7f612a5512894a9b2af7c55e622874732b3e",
+    "example/bankwealth/bindings/BankPaymentBindings.scala": "sha256:28f1ab3b56ebab6504a78e248b50db7f25d0dc2e90a76eec8b2c394cc72b2b37",
+    "example/bankwealth/bindings/BankRefundBindings.scala": "sha256:db413dbdaa669ff9b99eb58af23a07c517a7374ada76dbfd4f2389d2a0c253eb",
+    "example/bankwealth/bindings/BankSipDispatchBindings.scala": "sha256:2fe8fbb47c8eb45d2019bd0301c9b15ad87c5ac2543ca5f6044a9f40fac954e6",
+    "example/bankwealth/bindings/BankSipTerminalBridge.scala": "sha256:a1cdd34f40425aaa93cf95f86ad2fbaade5893e9d3cbae5263de188576865a6d",
+    "example/bankwealth/bindings/BankTaBridge.scala": "sha256:bf8efecf3f15aca841a6a6ef870de8b1bf7c12269a95c1ce66f2a7e9de1ac7de",
+    "example/bankwealth/bindings/BankTaEffectBindings.scala": "sha256:8e5fe053f57524b8ceda63248d5fafa708eb7ca00e010293f1173a5940959b2c",
+    "example/bankwealth/bindings/MockTAClient.scala": "sha256:f9156b301bc7ab83fb0b9556024acc434e51c816ea8c17490c8e325348df549d",
+    "example/bankwealth/bindings/StableOrderIdentity.scala": "sha256:ec667552d797dacc85eb8890747b8ae9f08ba9ef3eb0738e815318ce04b5018c",
+    "example/bankwealth/bindings/StableSipIdentity.scala": "sha256:4a7f9b3a0360879b7ffa7734cb2612b51cfbc85a9a1dcf64441b78f3085a1f67",
+    "example/bankwealth/integration/BankApplicationPorts.scala": "sha256:42e4e0dec4be011379718b6942276b61a9cbb7e026b630071869ee045a3fe632",
+    "example/bankwealth/integration/BankBusinessClock.scala": "sha256:be7f6a3e628cd0b8e247f721ba637c4ded92121508cf669538bc560c8381e27e",
+    "example/bankwealth/integration/BankCashRequests.scala": "sha256:21cf50e66468caec589e83a20f5fa92806eb2c52913cfc7016df68f460e0b1d9",
+    "example/bankwealth/integration/BankJdbcDataSource.scala": "sha256:f5ef43d6307f5e75a86b6771ce09a20d48f173833db80068569a9074aa8bc1da",
+    "example/bankwealth/integration/BankJournal.scala": "sha256:7b2f07ee9885561f8385311d978dad770d4983059b9c7022422d58c5456ab467",
+    "example/bankwealth/integration/BankPersistenceJournal.scala": "sha256:c708cf2c4ead8ed6703d21a187d3a98ee3935171fc849af3f0aab293a37f1f0f",
+    "example/bankwealth/integration/BankRecovery.scala": "sha256:b9eecf80581d0a2d3877ff7426c23d37253e63bc46459f4308b91091b4402b2f",
+    "example/bankwealth/integration/BankRecoveryLoop.scala": "sha256:006f4a72315b370f28ec3aa1db05552c50847f4ea3c407dd1f030e330806b15f",
+    "example/bankwealth/integration/BankRequestIdentity.scala": "sha256:41857ea44ad3ddd24b75f9d7199f5f5ae152b90e48840918c9b09130dec84c23",
+    "example/bankwealth/integration/BankResourceCleanup.scala": "sha256:1f4b3d842c9631e3667dbc622ac50d57cefe34bf48dd76f80d1c92d5551518cf",
+    "example/bankwealth/integration/BankRuntime.scala": "sha256:f293f168980ea0c90ded77b75e48b1fb0a381dc6872cbd2225d86b388cf28488",
+    "example/bankwealth/integration/BankRuntimeDirectory.scala": "sha256:f164caeafff7e9d6fde2f4c4b050d2f7a94deaf2bac4aae7ac26a1e171278658",
+    "example/bankwealth/integration/BankSeedAuthority.scala": "sha256:65997c2a4e59ee7fc96633b6515a6fe262b6fe24fb72bf91181fdb9e787ac097",
+    "example/bankwealth/integration/BankServiceEndpoints.scala": "sha256:872d814864d587fdf1d487296bb4e160b74e34236fee62a3b2a410eecf1ee5e2",
+    "example/bankwealth/integration/BankServiceFactory.scala": "sha256:9e9eccfc1bdbf6a9efa7b0caa764b00bd4a68782ec420fb93fe697c31ff29342",
+    "example/bankwealth/integration/BankServiceJson.scala": "sha256:1c6963ad4264eca19c6e0041f7d107ddcefce921ddb5fe7d7c1485254fbf39c7",
+    "example/bankwealth/integration/BankTrustedAdmission.scala": "sha256:6a861c4f8e6b3920a32136a324506a3b17b0a91a917eefdc48bd332550a4abef",
+    "example/bankwealth/readside/BankReadside.scala": "sha256:2a51cfa366a21190b0b4d27ac9cc088199ea2804f0769cd4987cebbf9e378f27",
+    "example/bankwealth/readside/BankReadsideSchema.scala": "sha256:40b0662c0d5a88b5afd1db3b3ea2cbb5dcb4a680d1e3bca4fc09fb6f28e51e1f",
+    "example/bankwealth/security/BankDemoAuthority.scala": "sha256:4e6f14207abc0bc081e1c3d34d7be5485019b72c20322f7e5ee2a520fd6b7b9f",
+    "example/bankwealth/sip/BankSipApplication.scala": "sha256:fafc993a2854fc00da26b3ddf6171e1c60c256e03e552b9ca7463a20d488dbcf",
+    "example/bankwealth/ta/BankTaRefundApplication.scala": "sha256:579a2d43451f9c7be63ffd6dbcc156813803664e903ef1b0c03c913648b3719f",
+    "example/bankwealth/web/BankBrowserPages.scala": "sha256:fac999de7cce279679612da8d29def2078c6d90f3bfb936c0738f3586aca7ab0",
+    "example/bankwealth/web/BankPagesController.scala": "sha256:0d622b0ff4fc1b4e7e6e67543f72afb49a9b4bf67ee61fe7ef223c2856c20732",
+    "example/bankwealth/web/BankQueryController.scala": "sha256:262ecf70cfd8609882c22a2dc181e449915d4c43ed7810a777e4df9247dc8db0"
+  },
+  "entries": [
+    {
+      "file": "example/bankwealth/bindings/BankBalanceComputations.scala",
+      "relation": "implements",
+      "rationale": "Exact CreditBalance computation port implementations.",
+      "sources": [
+        "source:bank-v1#/hostComputations/2",
+        "source:bank-v1#/hostComputations/0",
+        "source:bank-v1#/hostComputations/1"
+      ]
+    },
+    {
+      "file": "example/bankwealth/bindings/BankPaymentBindings.scala",
+      "relation": "implements",
+      "rationale": "Concrete phase authority, query and original-target result delivery of the payment host.",
+      "sources": [
+        "source:bank-v1#/sagaHosts/0",
+        "source:bank-v1#/artifactContracts/0"
+      ]
+    },
+    {
+      "file": "example/bankwealth/bindings/BankRefundBindings.scala",
+      "relation": "implements",
+      "rationale": "Concrete reverse-principal phase authority and result delivery of the independent refund host.",
+      "sources": [
+        "source:bank-v1#/sagaHosts/1",
+        "source:bank-v1#/artifactContracts/1"
+      ]
+    },
+    {
+      "file": "example/bankwealth/bindings/BankSipDispatchBindings.scala",
+      "relation": "implements",
+      "rationale": "Original durable occurrence to cash-request dispatch effect bindings.",
+      "sources": [
+        "source:bank-v1#/effectHosts/0",
+        "source:bank-v1#/artifactContracts/3"
+      ]
+    },
+    {
+      "file": "example/bankwealth/bindings/BankSipTerminalBridge.scala",
+      "relation": "supports",
+      "rationale": "Correlated first terminal result propagation from FundOrder to SipPlan.",
+      "sources": [
+        "source:bank-v1#/aggregates/1",
+        "source:bank-v1#/aggregates/2"
+      ]
+    },
+    {
+      "file": "example/bankwealth/bindings/BankTaBridge.scala",
+      "relation": "supports",
+      "rationale": "Original-order TA registration, receipt ingestion and trusted rejection-to-refund bridge.",
+      "sources": [
+        "source:bank-v1#/aggregates/1",
+        "source:bank-v1#/effectHosts/1",
+        "source:bank-v1#/externalEventProducers/10"
+      ]
+    },
+    {
+      "file": "example/bankwealth/bindings/BankTaEffectBindings.scala",
+      "relation": "implements",
+      "rationale": "TA execute/query/reconcile effect bindings, including trusted absence authorization.",
+      "sources": [
+        "source:bank-v1#/effectHosts/1",
+        "source:bank-v1#/artifactContracts/4"
+      ]
+    },
+    {
+      "file": "example/bankwealth/bindings/MockTAClient.scala",
+      "relation": "supports",
+      "rationale": "Explicit worker transport to the simulated external TA required by the TA effect.",
+      "sources": [
+        "source:bank-v1#/effectHosts/1"
+      ]
+    },
+    {
+      "file": "example/bankwealth/bindings/StableOrderIdentity.scala",
+      "relation": "implements",
+      "rationale": "Stable TA and independent refund identity computation ports.",
+      "sources": [
+        "source:bank-v1#/hostComputations/5",
+        "source:bank-v1#/hostComputations/3"
+      ]
+    },
+    {
+      "file": "example/bankwealth/bindings/StableSipIdentity.scala",
+      "relation": "implements",
+      "rationale": "Stable occurrence computation port.",
+      "sources": [
+        "source:bank-v1#/hostComputations/4"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankApplicationPorts.scala",
+      "relation": "supports",
+      "rationale": "Internal application facades supporting the declared service endpoints; not additional source-defined ports.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankBusinessClock.scala",
+      "relation": "supports",
+      "rationale": "Operator tick adapter across SIP and simulated TA clock.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/13"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankCashRequests.scala",
+      "relation": "supports",
+      "rationale": "Durable original request admission and original cash graph dispatch.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/1",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/2",
+        "source:bank-v1#/aggregates/1",
+        "source:bank-v1#/sagaHosts/0"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankJdbcDataSource.scala",
+      "relation": "supports",
+      "rationale": "DriverManager adapter for declared MySQL read-side connection.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/readSide"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankJournal.scala",
+      "relation": "supports",
+      "rationale": "Namespace-scoped application journal abstraction for declared journal provider.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/journal",
+        "source:bank-v1#/artifactContracts/2/deployment/service/namespaceConfig"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankPersistenceJournal.scala",
+      "relation": "supports",
+      "rationale": "Akka persistence query adapter for declared journal and namespace.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/journal",
+        "source:bank-v1#/artifactContracts/2/deployment/service/namespaceConfig"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankRecovery.scala",
+      "relation": "supports",
+      "rationale": "Authorized recovery of existing payment/refund identities.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/12",
+        "source:bank-v1#/sagaHosts/0",
+        "source:bank-v1#/sagaHosts/1"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankRecoveryLoop.scala",
+      "relation": "supports",
+      "rationale": "Bootstrap-owned journal discovery and existing cash/TA/SIP recovery; no new financial authority.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/bootstrap",
+        "source:bank-v1#/artifactContracts/2/deployment/service/journal",
+        "source:bank-v1#/sagaHosts/0",
+        "source:bank-v1#/sagaHosts/1",
+        "source:bank-v1#/effectHosts/1",
+        "source:bank-v1#/effectHosts/0"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankRequestIdentity.scala",
+      "relation": "supports",
+      "rationale": "Principal/request identity encoding and namespace-local persistence IDs.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/1",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/4",
+        "source:bank-v1#/artifactContracts/2/deployment/service/namespaceConfig"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankResourceCleanup.scala",
+      "relation": "supports",
+      "rationale": "Bootstrap-owned resource lifecycle cleanup.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/bootstrap"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankRuntime.scala",
+      "relation": "supports",
+      "rationale": "Bank-owned single-process assembly consuming the generated local actor repositories and the declared execution hosts; not cluster-sharding certification.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/bootstrap",
+        "source:bank-v1#/sagaHosts/0",
+        "source:bank-v1#/sagaHosts/1",
+        "source:bank-v1#/effectHosts/1",
+        "source:bank-v1#/effectHosts/0"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankRuntimeDirectory.scala",
+      "relation": "supports",
+      "rationale": "Actor handle and graph factory interfaces used by bootstrap assembly.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/bootstrap",
+        "source:bank-v1#/sagaHosts/0",
+        "source:bank-v1#/sagaHosts/1",
+        "source:bank-v1#/effectHosts/1",
+        "source:bank-v1#/effectHosts/0"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankSeedAuthority.scala",
+      "relation": "supports",
+      "rationale": "Bootstrap initialization adapter checking original account initialization events.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/bootstrap",
+        "source:bank-v1#/aggregates/0"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankServiceEndpoints.scala",
+      "relation": "implements",
+      "rationale": "Source-declared service endpoint implementation facade.",
+      "sources": [
+        "source:bank-v1#/ports/3",
+        "source:bank-v1#/ports/6",
+        "source:bank-v1#/ports/5",
+        "source:bank-v1#/ports/7",
+        "source:bank-v1#/ports/65",
+        "source:bank-v1#/ports/72",
+        "source:bank-v1#/ports/71",
+        "source:bank-v1#/ports/74",
+        "source:bank-v1#/ports/70",
+        "source:bank-v1#/ports/73",
+        "source:bank-v1#/ports/69",
+        "source:bank-v1#/ports/38",
+        "source:bank-v1#/ports/39",
+        "source:bank-v1#/ports/4"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankServiceFactory.scala",
+      "relation": "implements",
+      "rationale": "Explicit BankServiceBootstrap implementation pin.",
+      "sources": [
+        "source:bank-v1#/ports/64",
+        "source:bank-v1#/artifactContracts/2/implementations/0"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankServiceJson.scala",
+      "relation": "supports",
+      "rationale": "Strict bank DTO encoding and decoding for declared endpoint input/output types.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints"
+      ]
+    },
+    {
+      "file": "example/bankwealth/integration/BankTrustedAdmission.scala",
+      "relation": "supports",
+      "rationale": "Trusted source of principal/account/fund mappings for cash and SIP admission.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/1",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/4"
+      ]
+    },
+    {
+      "file": "example/bankwealth/readside/BankReadside.scala",
+      "relation": "supports",
+      "rationale": "Bank-owned authorization, DTO and business projection selection consuming the explicitly generated JDBC journal readside store.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/readSide",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/0",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/2",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/3",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/5",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/6",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/10",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/11",
+        "source:bank-v1#/aggregates/0",
+        "source:bank-v1#/aggregates/1",
+        "source:bank-v1#/aggregates/2"
+      ]
+    },
+    {
+      "file": "example/bankwealth/readside/BankReadsideSchema.scala",
+      "relation": "supports",
+      "rationale": "Bank schema facade delegating to the generated JDBC readside schema selected by the explicit projectionStore contract.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/readSide"
+      ]
+    },
+    {
+      "file": "example/bankwealth/security/BankDemoAuthority.scala",
+      "relation": "supports",
+      "rationale": "Demo principal authentication and Origin/CSRF enforcement for declared audiences; not production identity certification.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints"
+      ]
+    },
+    {
+      "file": "example/bankwealth/sip/BankSipApplication.scala",
+      "relation": "supports",
+      "rationale": "Service implementation of durable SIP creation/revision/tick and occurrence dispatch.",
+      "sources": [
+        "source:bank-v1#/aggregates/2",
+        "source:bank-v1#/effectHosts/0",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/4",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/5",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/6",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/7",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/8",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/9",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/10",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/13"
+      ]
+    },
+    {
+      "file": "example/bankwealth/ta/BankTaRefundApplication.scala",
+      "relation": "supports",
+      "rationale": "Bootstrap discovery of original TA effects and independent refunds.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/bootstrap",
+        "source:bank-v1#/effectHosts/1",
+        "source:bank-v1#/sagaHosts/1"
+      ]
+    },
+    {
+      "file": "example/bankwealth/web/BankBrowserPages.scala",
+      "relation": "implements",
+      "rationale": "Explicit source-pinned page renderer used by generated page transport.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/pages/renderer"
+      ]
+    },
+    {
+      "file": "example/bankwealth/web/BankPagesController.scala",
+      "relation": "legacy-adapter",
+      "rationale": "Retained controller-based page adapter, tested separately; not the source-pinned generated page transport renderer.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints"
+      ]
+    },
+    {
+      "file": "example/bankwealth/web/BankQueryController.scala",
+      "relation": "legacy-adapter",
+      "rationale": "Retained controller adapter over the same typed query facades; not the generated router.",
+      "sources": [
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/0",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/2",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/3",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/5",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/6",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/10",
+        "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/11"
+      ]
+    }
+  ],
+  "references": [
+    {
+      "knowledgeKey": "source:bank-v1#/aggregates/0",
+      "document": "bank-v1",
+      "pointer": "/aggregates/0",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:52f64effa1d44f098a512d468ae9a440fdfffa61af3bb70a50125ad009c4289c",
+      "definitionVersion": null,
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/aggregates/1",
+      "document": "bank-v1",
+      "pointer": "/aggregates/1",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:40c3e057ab07728e957b695d8d2a1875407735276aa9ee89278dc1f9d3180aa0",
+      "definitionVersion": null,
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/aggregates/2",
+      "document": "bank-v1",
+      "pointer": "/aggregates/2",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:a4e80caea2b95d734ea659c5b063cdd4c3a7f22d7bc52c3b3ed6146007f42f50",
+      "definitionVersion": null,
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/0",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/0",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:f005bd9ccd6f56b3b9c2fac3552b80d3f6eb24d8364dc281d9f17e2c3d5eeaf0",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/1",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/1",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:874dbbed03ef2d9b2f521df3443b364137b120dda427635789db26b653f470cb",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/bootstrap",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/bootstrap",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:16a1efae5194694f32d8487b0c377ffabc93357d21f07646f372dc3dbb1c4110",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:2e5bd8c926837c4508d64798839862c697cfbb71dae48ea041f01d000ca14e9c",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/0",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/0",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:dd1a0d00350b03e954d6a1475f8c77e3df351e6bf3c46fd7459cf1404ebd88df",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/1",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/1",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:5656f505e5ca02d5a5be59fd18109d3a36fbf6d429858b25a96e5311df820bdc",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/10",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/10",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:c2eeff40a650b709be19526965711f499bc1d56b1727934d8488330f952ba1bf",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/11",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/11",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:136f9145093aee9dbfdc5f88343a2a21f474028b9f66d3df83d0b99f1fb979e9",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/12",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/12",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:21e639c32432203fc9d761258e4f4857cc0d0b86e5da0a14b47238f2fac1e087",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/13",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/13",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:3f1a151fd661dab8627cf704eff70cfab11608095648be150980095268534e63",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/2",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/2",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:37788cb239615858c70882aa568f5e5526326f18ba20372be8a43c38b33f41a4",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/3",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/3",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:82ecfbdd42fa1bb4e06aa3f538e50bb24ba790573f001179ee7a8c4ebff6d6a4",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/4",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/4",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:119a8f82042dde477e3ee7b3f5c8b1201743c5333c1cd25a9ba6c3d4932cc5e4",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/5",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/5",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:d2bd7ab0075cc8176043f2d36fc66b6ae7203c5fcbb2edbe259c44bb5e97db0c",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/6",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/6",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:246f9b9da9d069e1b98d87eb3cefe6f263a598d40af1925a6c12735d9bc5b277",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/7",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/7",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:e6515dde7d35647a0241e69d1f2d12bb871a2b481de64f08aa972aa8781142ef",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/8",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/8",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:9c416b69fa49e232c5e09e3645e29cb6de2b50f6ab43ecd1562ab18583d6de85",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/endpoints/9",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/endpoints/9",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:d83feec76419a36f5d9dd50e3bb24b4aba6445296e9d3acc0c677866427fd162",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/journal",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/journal",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:e9f80212c7a4e08c352fdbe55eb592cf7f8e04055cd37aa4b18165dfd089f469",
+      "definitionVersion": "3.0.8",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/namespaceConfig",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/namespaceConfig",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:983f715080eedba9366e01fb7016e6e85aa2347029a6411a85538dd94ea1db02",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/pages/renderer",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/pages/renderer",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:5483fc5e70ffc0bab7565c5acb546eaca3c2d0ec603edb2099366d3863e04f5b",
+      "definitionVersion": "1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/deployment/service/readSide",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/deployment/service/readSide",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:6e6203411c55e9bc587795d3e0c53b6d681409cdfb8f9bb77b6b54467301657d",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/2/implementations/0",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/2/implementations/0",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:d6d319b4195ef01eae3c51bd5ae6d79c38ae7f06c688cb99b938045001b387e1",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/3",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/3",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:d4b004a50946d1da15d0a41ab6c313e90d615a11396c42ef8b945ded713356cf",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/artifactContracts/4",
+      "document": "bank-v1",
+      "pointer": "/artifactContracts/4",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:850aa5706fa44c6e7651c494270ec59503adaef25c045568a34a2e33ff96679d",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/effectHosts/0",
+      "document": "bank-v1",
+      "pointer": "/effectHosts/0",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:c0062b6bf8bd59bc27c2e393895e39870ea61c0193fdaf88bfeec2dfefc86a39",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/effectHosts/1",
+      "document": "bank-v1",
+      "pointer": "/effectHosts/1",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:0d4911b63251ac7442434bec71bfaef5b6df3f5ae80d6c958e9a0bda878e6586",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/externalEventProducers/10",
+      "document": "bank-v1",
+      "pointer": "/externalEventProducers/10",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:28bbfa14168b71a00166800ebc195f47ec74108b25083a5ed04dd0d422aecf5d",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/hostComputations/0",
+      "document": "bank-v1",
+      "pointer": "/hostComputations/0",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:7f79ee5cb1a458e8aaaea4eac46630fe7ea37884a180e33345c6b7eabcc449b8",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/hostComputations/1",
+      "document": "bank-v1",
+      "pointer": "/hostComputations/1",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:0a535d847d1875762d4f502e14444ed2d70a166a0ade01d7433b370e11320294",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/hostComputations/2",
+      "document": "bank-v1",
+      "pointer": "/hostComputations/2",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:586e1ff840e27ddc6d56c6fe5092ae339c79cf7ccef757b4b287249a45ecb163",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/hostComputations/3",
+      "document": "bank-v1",
+      "pointer": "/hostComputations/3",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:719d7903b4436c01d5b67501cf90fb313b4c155a4d1fcd5fa323ace14b7adde3",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/hostComputations/4",
+      "document": "bank-v1",
+      "pointer": "/hostComputations/4",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:20cc43e4072b09b1e91364bd1e0413b99e7282edb5b3894b5ad114ced56054c2",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/hostComputations/5",
+      "document": "bank-v1",
+      "pointer": "/hostComputations/5",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:09846d646fc943593364e338dbb9a9595f13692cc7e8674511c70c489f1a4f2d",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/3",
+      "document": "bank-v1",
+      "pointer": "/ports/3",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:4e30192b7be556afdbfb04017ad67048e5f7d257c9b9795d69a6e2476e63fc02",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/38",
+      "document": "bank-v1",
+      "pointer": "/ports/38",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:ae19ee991170960e2ad07821872cc71d11fcad6b4b8af5d47df4112400c03254",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/39",
+      "document": "bank-v1",
+      "pointer": "/ports/39",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:4f50f87252378ae333c986168b9ef73f9acbd09b85f7836311ca2dcb24c654b0",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/4",
+      "document": "bank-v1",
+      "pointer": "/ports/4",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:9ccc379389ccd2b64ccdeaafdd26dedd65b0bd45597b251f8ce848a87a5e7a34",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/5",
+      "document": "bank-v1",
+      "pointer": "/ports/5",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:202551687bc30de1a0edd7a50fae9c5523ce7fed858805c14eb09417aa3a205c",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/6",
+      "document": "bank-v1",
+      "pointer": "/ports/6",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:25f85c8b44cb9baeb96e281a32cee198fd145fab7a5edb765329c04b2504b133",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/64",
+      "document": "bank-v1",
+      "pointer": "/ports/64",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:9b8672afcbb5ae2ce68b27d730e9aa2377e8c92930ad8e83bad7a3ac5486e3ec",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/65",
+      "document": "bank-v1",
+      "pointer": "/ports/65",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:dd7a76b9fa7e10917f2e7d8c19b1a2b07db36d8b19d7538a5971c7997bbe9945",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/69",
+      "document": "bank-v1",
+      "pointer": "/ports/69",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:97648e2577a78570cc2236a0c9666cb96a635fb08bf69e3f1ef2d7814ca913c9",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/7",
+      "document": "bank-v1",
+      "pointer": "/ports/7",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:4ae46aa648870146f484864ba8cdc34e2f1fc96a5d8ecfa90b21744a50d22006",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/70",
+      "document": "bank-v1",
+      "pointer": "/ports/70",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:15ec22d57f0c2311b9b5d8beb84eb48fe708590b187d4f59fed033e7e2d68f42",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/71",
+      "document": "bank-v1",
+      "pointer": "/ports/71",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:d7b16a88f0eb0b6207442e1a9b8b7cfa510bf9883f705184898c075db9cfc5e2",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/72",
+      "document": "bank-v1",
+      "pointer": "/ports/72",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:366673346551cf06740d0824e81323fd0a3775bc0eb997421dff2e96731d1c67",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/73",
+      "document": "bank-v1",
+      "pointer": "/ports/73",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:2721974d0746e44c30ef58012518697348a5c7184766c4726f382c80637f9d0d",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/ports/74",
+      "document": "bank-v1",
+      "pointer": "/ports/74",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:4ce99098dbfd60e2f6f4072a49097edac339abc33c75d0572a9321b94ac62fb8",
+      "definitionVersion": "bank-v1-service-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/sagaHosts/0",
+      "document": "bank-v1",
+      "pointer": "/sagaHosts/0",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:36c1c7e094b0f72a8578334cfffe95d78e866a2b1ff2b8202d3c5fe415186b1e",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    },
+    {
+      "knowledgeKey": "source:bank-v1#/sagaHosts/1",
+      "document": "bank-v1",
+      "pointer": "/sagaHosts/1",
+      "schemaVersion": "truthsrc/v1",
+      "documentSha": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89",
+      "valueSha": "sha256:8e4ca6b3d6ae4f148ead1fbbbcda5c6c11bd97ac0c1fdda541917f4dd477d2b2",
+      "definitionVersion": "bank-v1-1",
+      "sourceVersion": {
+        "kind": "document-content-sha256",
+        "value": "sha256:ebcce0008390d6009d7acb33195c66ef4b71db0df90af24a56bd71174e6d3e89"
+      }
+    }
+  ]
+}

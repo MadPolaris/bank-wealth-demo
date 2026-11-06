@@ -2,19 +2,19 @@
 
 ## 当前 P23 追加覆盖层
 
-最后更新: 2026-10-27。当前V1选择与业务交接位于 [P23BankV1HandoffContract](../tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)，artifact `decision.p23-bank-v1-handoff`、设计版本 `bank-v1-p23-design-1`。入口指针均相对原子：`/payload/info/artifact/body/resolutions`（已选政策正式引用）、`coverageRows`（23行及子范围）、`milestones`／`acceptancePackages`（既定P23–P32十里程碑/40包）、`flows`／`scenarios`（四类业务和30个未运行oracle）。
+最后更新: 2026-10-27。当前V1选择与业务交接位于 [P23BankV1HandoffContract](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)，artifact `decision.p23-bank-v1-handoff`、设计版本 `bank-v1-p23-design-1`。入口指针均相对原子：`/payload/info/artifact/body/resolutions`（已选政策正式引用）、`coverageRows`（23行及子范围）、`milestones`／`acceptancePackages`（既定P23–P32十里程碑/40包）、`flows`／`scenarios`（四类业务和30个未运行oracle）。
 
 本页以下“唯一设计权威”、R0–R8、八项open与未选栈描述保留为上一版历史；新overlay通过显式来源与supersession承接已选内容，不倒写旧note。当前状态和源码消费归还见 [P23交接](P23-BUSINESS-HANDOFF.md)；源/设计门通过不等于runtime制品、完整P23或V1运行通过。
 
 ## 唯一设计权威
 
-`decision.full-target-gap-roadmap` — [FullTargetGapRoadmapProposal](../tree/inbox/refining/question-rf-full-target-gap-roadmap-proposal-0.yaml)，board `wealth-roadmap-v1`、refining seq0。以下只提供 pointer／边界导航，不维护第二份业务、政策或阶段规格。
+`decision.full-target-gap-roadmap` — [FullTargetGapRoadmapProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-full-target-gap-roadmap-proposal-0.yaml)，board `wealth-roadmap-v1`、refining seq0。以下只提供 pointer／边界导航，不维护第二份业务、政策或阶段规格。
 
 - 全部 23 项及业务／产品／技术原来源：`/payload/info/artifact/body/coverageRows`。
 - bounded 完成目标和条件／延期／排除范围：`/payload/info/artifact/body/boundedCompletion`。
 - R0–R8 依赖、owner、产物和未来退出证据：`/payload/info/artifact/body/phases`。
 - X01–X10 依赖和已有规格入口：`/payload/info/artifact/body/publicExtensions`。
-- 仅原三项 selected-demo-design：`/payload/info/artifact/body/selectedDesignDecisions`。权威选择仍是 [CashPrerequisiteDecisionOverlay](../tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml)，不倒写 I0。
+- 仅原三项 selected-demo-design：`/payload/info/artifact/body/selectedDesignDecisions`。权威选择仍是 [CashPrerequisiteDecisionOverlay](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml)，不倒写 I0。
 - 八项 open 的裁决时点、S10 未选候选评审、退款／SIP 补充决定：`/payload/info/artifact/body/openDecisionSchedule`、`/payload/info/artifact/body/consumerStackReview`、`/payload/info/artifact/body/supplementalDecisions`。
 - 五要素、12 needs、15 obligations 完整映射：`/payload/info/artifact/body/productPlaneCoverage`、`/payload/info/artifact/body/technicalNeedCoverage`、`/payload/info/artifact/body/cashAcceptanceCoverage`。
 - seed 防重、MockTA unknown 进展、cancel 读侧、SIP 终态的未验收门：`/payload/info/artifact/body/criticalGates`。
@@ -22,8 +22,8 @@
 
 ## 公共交接，不是实现授权
 
-- `decision.public-x03-work-packages` — [PublicX03WorkPackagesProposal](../tree/inbox/refining/question-rf-public-x03-work-packages-proposal-1.yaml)，`/payload/info/artifact/body/packages`、`/payload/info/artifact/body/upstreamSpecification`。
-- `decision.public-x04-work-packages` — [PublicX04WorkPackagesProposal](../tree/inbox/refining/question-rf-public-x04-work-packages-proposal-2.yaml)，`/payload/info/artifact/body/packages`、`/payload/info/artifact/body/upstreamSpecification`。
+- `decision.public-x03-work-packages` — [PublicX03WorkPackagesProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-public-x03-work-packages-proposal-1.yaml)，`/payload/info/artifact/body/packages`、`/payload/info/artifact/body/upstreamSpecification`。
+- `decision.public-x04-work-packages` — [PublicX04WorkPackagesProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-public-x04-work-packages-proposal-2.yaml)，`/payload/info/artifact/body/packages`、`/payload/info/artifact/body/upstreamSpecification`。
 
 每份四个未来子包。精确 API／产品、目标端口、existing/proposed 文件分配、两域测试／fixture、P19 重叠、迁移／兼容与分层门在真源中；最终名字仍须公共 owner 审批。X01／X02 旧八包及历史真源原字节保留，详见 [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md)。公共现有 apply／anchors 和局部 Fab 恢复成果只作为限定复用依据，不认证银行；P19已观察到限定Money Prepare／actor ACK-loss回执，不能升级为X03完整值转换或银行资格。
 

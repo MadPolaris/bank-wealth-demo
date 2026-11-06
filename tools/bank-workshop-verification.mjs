@@ -110,7 +110,7 @@ export async function inspectBuild({ mode, output, evidence, source }) {
   same(b.inventory(actual.root, { afterBuild: true }), before.output, 'actual staged source changed');
   assert.equal(actual.files, Object.keys(before.output).length);
   for (const name of ['output', 'handwritten', 'localRuntime']) same(before[name], after[name]);
-  same(b.inventory(join(ROOT, 'v1/handwritten/scala')), before.handwritten);
+  same(b.inventory(join(ROOT, 'handwritten/scala')), before.handwritten);
   same(b.inventory(join(ROOT, '.local/truthsrc-runtime')), before.localRuntime);
   same(b.inventory(join(evidence, 'supply')), after.supply);
   for (const key of ['runtimeRebuilt', 'runtimePublished', 'release1134Resigned', 'servicesStarted']) assert.equal(result[key], false);
@@ -242,7 +242,24 @@ export async function inspectService({ evidence, buildEvidence, lease, round }) 
     }
     return receipt;
   };
-  await processEvidence(join(evidence, 'crash-boundary/probe'));
+  const { RUNTIME_NETWORK_SCOPE, RUNTIME_NETWORK_LIMITATION } = await import('./truthsrc-runtime-sandbox.mjs');
+  const boundaryEvidence = async (directory, networkScope, required = []) => {
+    const boundary = await rawJson(join(directory, 'boundary.json'));
+    same(Object.keys(boundary).sort(), ['before', 'limitation', 'networkScope', 'passed', 'syscallProbe']);
+    requirePassed(boundary.passed); assert.equal(boundary.networkScope, networkScope);
+    assert.equal(boundary.limitation, networkScope === 'deny-all' ? null : RUNTIME_NETWORK_LIMITATION);
+    const process = await processEvidence(join(directory, 'probe'), boundary.syscallProbe);
+    assert.equal(process.sandboxProfile, join(directory, 'runtime-sandbox.sb'));
+    const requiredFiles = [process.sandboxProfile, join(directory, 'runtime-probe.py'), configFile, ...required];
+    for (const file of requiredFiles) assert.ok(Object.hasOwn(boundary.before, file), 'required boundary input is not sealed');
+    const canaries = Object.keys(boundary.before).filter(file => !requiredFiles.includes(file));
+    assert.equal(canaries.length, 1, 'exact outside canary required');
+    for (const [file, expected] of Object.entries(boundary.before)) {
+      safePath(file, 'file'); const ref = await reference(file);
+      same({ bytes: ref.bytes, sha256: ref.sha256 }, expected, 'boundary input changed');
+    }
+  };
+  await boundaryEvidence(join(evidence, 'crash-boundary'), 'deny-all');
   const { CRASH_CASES } = await import('./truthsrc-runtime-crash.mjs');
   const { validateChildReport, compareRecoveryEvidence } = await import('./v1-crash-recovery.mjs');
   requirePassed(result.crash?.passed); assert.equal(result.crash.count, CRASH_CASES.length);
@@ -277,11 +294,15 @@ export async function inspectService({ evidence, buildEvidence, lease, round }) 
   same(await rawJson(join(evidence, 'database/result.json')), database);
   requirePassed(database?.passed); requirePassed(database.browserVerified); requirePassed(database.productionFactory);
   requirePassed(database.cleanup?.stopped); same(database.errors, []);
+  same(await rawJson(join(evidence, 'database/database-stop.json')), database.cleanup, 'database close receipt differs');
+  assert.equal(database.cleanup.schemaVersion, 'bank.truthsrc-runtime-databases/v1');
+  assert.equal(database.cleanup.owner, spec.owner);
   same(database.runs.map(row => row.mode), ['initial', 'restart', 'refund', 'replay']);
   for (const row of database.runs) {
     const run = join(evidence, 'database', row.mode), serviceRoot = join(round, 'service'), invocation = join(serviceRoot, 'runs', row.mode);
     same(await rawJson(join(run, 'result.json')), row);
-    await processEvidence(join(run, 'probe')); await processEvidence(join(run, 'server'), row.process);
+    await boundaryEvidence(run, RUNTIME_NETWORK_SCOPE, ['integration.conf', 'logback.xml', 'browser.json'].map(name => join(invocation, name)));
+    await processEvidence(join(run, 'server'), row.process);
     const server = await rawJson(join(invocation, 'server.json'));
     same([server.pid, server.origin], [row.process.pid, 'http://127.0.0.1:' + spec.ports.http]);
     same(await rawJson(join(invocation, 'closed.json')), { closed: true });

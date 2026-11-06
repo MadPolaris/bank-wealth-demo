@@ -78,6 +78,7 @@ test('rejects invalid, privileged, duplicate and overlapping network ports', () 
 test('rejects nonplain paths, broad roots, history, source and compiler write roots', () => {
   for (const evidence of [undefined, null, {}, 'relative', '/', '/private/tmp', '/private/var', '/Users', BANK,
     join(BANK, 'target'), join(BANK, 'v1'), join(BANK, 'tools'), join(BANK, 'tree/round'), join(BANK, 'v1/tree/round'),
+    join(BANK, 'handwritten/scala'), join(BANK, 'handwritten/scala/round'), join(BANK, 'test/scala'), join(BANK, 'test/scala/round'),
     join(BANK, '.scratch/round'), join(BANK, 'dist/v1/round'), join(TEMP, 'round/compile'), join(TEMP, 'round/classpath'),
     join(TEMP, 'round/classes'), join(TEMP, 'round/../round'), join(TEMP, 'round//child'), join(TEMP, 'bad name'),
     join(TEMP, 'bad"name'), join(TEMP, 'bad\nname'), join(TEMP, 'bad\\name'), join(TEMP, 'round') + '/']) {

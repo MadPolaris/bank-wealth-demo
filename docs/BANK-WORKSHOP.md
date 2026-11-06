@@ -1,7 +1,7 @@
 # 银行工作坊：一个新 run，一条可复核的证据链
 
 `tools/bank-workshop.mjs` 是**编排与报告入口**，不是另一套银行编译器。
-本轮实际已验项目、下载/运行环境限制及本地可打开的交付入口见[验收记录](ONBOARDING-ACCEPTANCE.md)。
+既有独立执行与交付范围见[2026-11-06原验收记录](ONBOARDING-ACCEPTANCE.md)；其中的环境状态属于捕获时点，不是本次迁移验收。
 唯一作者入口仍为根 `truthsrc.project.json`；编译、生成及回锚验收使用相邻
 `metarch-truthsrc` 的公共接口。付款成功不等于投资成功，独立退款不是撤销
 已 Commit 的付款；有限定投沿用原固定测试，不增加新金融规则。
@@ -10,7 +10,7 @@
 
 | `--through` | 必需材料 | 真正证明的范围 |
 |---|---|---|
-| `source` | 当前银行源码、完整相邻工具源码、Node ≥22.13（本环境22.23.4） | validate、原文 roundtrip、严格产品编译；不是 Scala 执行 |
+| `source` | 当前银行源码、完整相邻配套工具源码、Node ≥22.13.0（已验22.13.0、22.23.4） | validate、原文 roundtrip、严格产品编译；不是 Scala 执行 |
 | `anchors` | 再加实际 clean1134 归档 | 现有 prepare 验六个固定 JAR/POM；公共生成和只读图/回锚验收 |
 | `code` | 再加原生 Darwin x64、已安装 x64 JDK11、sandbox-exec/Python | 两个独立 fresh 输出，固定 actor 与 readside 测试及实际 staging 来源核验 |
 | `service` | 再加显式新租约、可用 Docker/socket、固定 Mongo/MySQL 镜像、显式 Playwright module 与 `chrome-headless-shell` | 第三个 fresh runtime 构建，全部恢复/数据库/HTTP窗口、浏览器和资源退出 |
@@ -18,18 +18,20 @@
 归档必须是实际取得的文件，SHA256 为
 `95daa7b9d1d394aa647175fd1b6418fd9ddac943026302a4174697bffba2cade`。
 不寻找旧运行目录、不借用户缓存、不下载、不递归打包 `dist/v1`，也不重建/发布
-runtime。材料的真实公开获取渠道尚未核实，因此入口始终单列
+runtime。材料的真实公开获取渠道尚未落实，因此入口始终单列
 `deliveryReady:false`，不以“请找维护者”冒称完成交付。
 
 首版银行构建目标是原生 Darwin x64/JDK11。工具已在Node22.13.0和22.23.4实测安装与Counter/回锚/图闭环；其它平台及真人上手仍单独验收。下面命令不构成抢占共享服务或绕过资源预约的授权。
 
 ## 2. 第一次运行：只验真源
 
-工作目录为自己的银行 checkout，且相邻工具 checkout 已配套取得。不要复制含
-`.local`、数据库、凭据及旧回执的整个工作目录来做练习。
+工作目录必须是**自己的银行checkout根目录**，且相邻工具checkout已配套取得。
+先确认`target/`是正常目录而非symlink；下面的`mkdir -p`只安全准备父目录，
+不会删除或清空已有目录。不要复制含`.local`、数据库、凭据及旧回执的整个工作目录来练习。
 
 ```bash
 BANK="$PWD"
+mkdir -p "$BANK/target"
 node "$BANK/tools/bank-workshop.mjs" doctor --through source --format human
 node "$BANK/tools/bank-workshop.mjs" verify --through source \
   --run "$BANK/target/workshop-source-01" --format human
@@ -39,7 +41,9 @@ node "$BANK/tools/bank-workshop.mjs" report \
 
 `--run` 必须是本银行 `target/` 下**尚不存在的直接子目录**。路径必须是规范绝对
 路径，无空格、symlink、大小写别名、`.`/`..` 或 `.scratch`。父 `target/` 必须存在。
-上例名字用过就选新名字，不删目录再复用。
+上例名字用过就选新名字，不删目录再复用。未带`--run`的doctor不检查父target，
+因此doctor通过不能代替run路径准备。若只需首次doctor/validate/compile、不留run，
+使用[首页三条source命令](../README.md#第一次成功只验真源)即可，无需父target。
 
 成功字段是 `requestedScopePassed:true`。此时 `fullPipelinePassed:false` 是正确
 结果：源码通过不是银行服务通过。`source` 不要求、不读取归档，不创建银行生成候选，
@@ -78,6 +82,10 @@ node "$BANK/tools/bank-workshop.mjs" verify --through code \
 受限执行详情见 [TRUTH-BUILD](TRUTH-BUILD.md)。
 
 ## 4. 完整服务：第三份同源构建与新的 owner
+
+当前资源只读更新（2026-11-06）：已见Docker daemon 20.10.21、两个固定数据库镜像，
+共享`metarch-mongo`运行中且不操作。**完整service窗口和人工会话仍未执行**；资源
+可见不是独占租约或服务通过，旧验收中的环境状态不回写。
 
 先按当前协调约定预约独占端口，选未使用的 owner。租约 JSON 在数据根之外，只有
 以下字段；将路径和端口替换成自己的实际值。
@@ -202,20 +210,23 @@ node "$BANK/tools/bank-workshop.mjs" stop --session "$BANK/target/truthsrc-runti
 
 它单独编译新Workshop launcher，不修改已封存应用或240秒冻结验收main。新launcher
 有独立来源、类路径、就绪/失败/退出证据；未实测的启动不能继承旧服务通过。当前真实
-数据库/人工会话能否执行，以[本轮资源状态](ONBOARDING-RUNTIME-WINDOW.md)及本机doctor为准。
+数据库/人工会话须另行核本机doctor与当前资源授权；[原运行窗口回执](ONBOARDING-RUNTIME-WINDOW.md)
+保留其捕获时点，不能当作今日资源探针。
 
-## 7. 本批验证范围
+## 7. 历史实现时点与独立验收
 
-仅运行定向 Node 合同测试及小规模真实 source 检查：
+工作坊编排首批实现时，只执行了定向Node合同测试和小规模真实source检查。
+其中runner、供给、公共生成/回锚及构建/服务替身证明的是**编排合同**，不是银行
+真实执行；替身标`executionKind:test-double`，模拟阶段全通过也不签
+`fullPipelinePassed:true`。这段历史范围不能再概括后续所有验收。
 
-```bash
-node --test --test-concurrency=1 test/bank-workshop.test.mjs
-node tools/bank-workshop.mjs doctor --through source --format json
-node tools/bank-workshop.mjs verify --through source \
-  --run "$PWD/target/workshop-source-<new-id>" --format json
-```
+| 独立证据 | 应怎样阅读 |
+|---|---|
+| [兼容迁移](TRUTH-COMPATIBLE-COMPOSITION.md) | 原候选actor64/readside47实测，共享23生成测试；不是该候选HTTP/数据库/浏览器签收 |
+| [11月6日新人验收](ONBOARDING-ACCEPTANCE.md) | 安装、图、代码和固定24恢复窗有独立实测；原回执不改，完整service和真人可用性仍未完成 |
+| [11月5日运行窗口](TRUTH-RUNTIME-WINDOW-20261105.md) | 当时选定候选的指定运行结果，不继承给今天源码或迁移后的输出 |
+| [1134历史发行](HISTORY.md#release-1134) | 原25项有界合同，不是本次工作坊service通过 |
 
-测试中的 runner、供给、公共生成/回锚和构建/服务操作替身证明的是**编排合同**，不是
-真实银行执行。替身记录显式 `executionKind:test-double`，即使所有模拟阶段通过也
-绝不签出 `fullPipelinePassed:true`。本批不运行 JVM、Docker、浏览器或银行全局测试，
-不下载、不提交/推送，不借历史 actor/readside/service 成功记录冒本次实跑。
+35手写、31固定测试、14许可已保字节迁移，497历史材料经固定Git对象保存后退出工作树；归属见
+[V1-RETIREMENT-MANIFEST](V1-RETIREMENT-MANIFEST.json)。目录、来源和迁移后新候选的实际
+结果统一见[本批验收](V1-RETIREMENT.md)。原文档时点不替今天的运行门，新结果也不重签旧证据。

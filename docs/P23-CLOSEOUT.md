@@ -17,7 +17,7 @@
 
 ## 固定的接续输入
 
-- [唯一银行真源](../tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)：artifact `decision.p23-bank-v1-handoff`，`bank-v1-p23-design-2`。
+- [唯一银行真源](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)：artifact `decision.p23-bank-v1-handoff`，`bank-v1-p23-design-2`。
 - [design-2 回执](P23-DESIGN-2-VERIFICATION.json)：P23 **109/109**、V1合同 **489/489**、默认 **285/285**，141原子往返、9投影通过。这里只重新核对原回执与当前源字节，没有重跑或把旧结果冒称新测试。
 - [运行库锁定清单](P23-RUNTIME-LOCK.json)：三库 `0.2.1-p23.20261027.1`，明确 file Maven resolver、commit、JAR/POM SHA。
 - [银行 P23-3 回执](P23-3-RUNTIME-ACCEPTANCE.json)及[制品核收说明](P23-3-RUNTIME-HANDOFF.md)：已核收，不再 blocked。

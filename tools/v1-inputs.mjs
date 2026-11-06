@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { ROOT, TOOL_ROOT, filesUnder, sha256 } from './truth-source.mjs';
+import { ROOT, TOOL_ROOT, sha256 } from './truth-source.mjs';
 import { historicalSnapshot, historicalInventory } from './historical-source.mjs';
+import { readHistoricalJson, readHistoricalProductRequest, assertHistoricalCheckout } from './historical-assets.mjs';
 
 const load = file => import(pathToFileURL(join(TOOL_ROOT, file)).href);
-const { compileTree } = await load('lib/compile.mjs');
 const { canonicalType } = await load('lib/domain-products/values.mjs');
 const { compileReferences } = await load('lib/domain-products/references.mjs');
 const { deriveDecisions } = await load('lib/domain-products/decision.mjs');
@@ -141,6 +141,7 @@ export function bankDomainRequest() {
 }
 
 export function writeBankDomainInputs(target) {
+  assertHistoricalCheckout();
   assert.ok(!existsSync(target), 'domain input output must be a fresh owned directory');
   const before = historicalInventory('v1/tree').map(({ file, sha256 }) => [join(ROOT, file), sha256]);
   const request = bankDomainRequest(), compilation = compileProductSet(request);
@@ -168,14 +169,14 @@ export function writeBankDomainInputs(target) {
 export function bankApplicationRequest({ domainRequest, historical = false } = {}) {
   if (!domainRequest) {
     assert.equal(historical, true, 'Frozen request requires explicit historical:true; current input comes from root truthsrc.project.json');
-    return JSON.parse(readFileSync(join(ROOT, 'v1/formal-inputs/payment-376/request.json'), 'utf8'));
+    return readHistoricalProductRequest('v1/formal-inputs/payment-376/files.json');
   }
   const request = structuredClone(domainRequest), canonical = request.documents[0];
   const sources = [['payment', 'payment-authored-165', ['sagas', 'runtime', 'execution']],
     ['refund', 'refund-authored-282', ['sagas', 'runtime', 'execution']],
     ['sip', 'sip-authored-307', ['execution']], ['ta', 'ta-authored-297', ['execution']]];
   for (const [flow, directory, names] of sources) for (const name of names) {
-    const value = JSON.parse(readFileSync(join(ROOT, 'v1/formal-inputs', directory, name + '.json'), 'utf8'));
+    const value = readHistoricalJson('v1/formal-inputs/' + directory + '/' + name + '.json');
     request.documents.push({ id: flow + '-' + name, schemaVersion: value.schemaVersion, value });
   }
   request.assemblies = [
@@ -207,6 +208,7 @@ export function bankApplicationRequest({ domainRequest, historical = false } = {
 }
 
 export function writeBankApplicationInputs(target, scope, options) {
+  assertHistoricalCheckout();
   assert.ok(!existsSync(target), 'application request needs a fresh owned directory');
   const before = historicalInventory('v1/tree').map(({ file, sha256 }) => [join(ROOT, file), sha256]);
   const request = bankApplicationRequest({ historical: true }), compiled = compileProductSet(request);

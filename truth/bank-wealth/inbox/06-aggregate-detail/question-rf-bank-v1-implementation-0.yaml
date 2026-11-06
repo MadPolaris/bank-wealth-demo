@@ -388,7 +388,7 @@ payload:
               "revision": "675a9366cf270995ef714e505e42c19652f0e4f0",
               "pointer": "/payload/info/artifact/body/readiness"
             },
-            "acceptedRelease": "v1/integration/RELEASE-SIGNOUT-1134.md",
+            "acceptedRelease": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md",
             "currentGeneration": "Run the root truthsrc.project.json; status is derived, not authored."
           }
         }

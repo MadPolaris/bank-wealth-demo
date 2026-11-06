@@ -47,7 +47,7 @@ function fixture({ staged = true, sourceCount = 235, ownedRoot = null } = {}) {
   const after = { ...structuredClone(before), supply: Object.fromEntries(Array.from({ length: 1065 }, (_, i) => ['supply-' + i, { ...stamp }])) };
   const actual = { passed: true, files: sourceCount, root: actualRoot, staged, admittedOutput: output, stdoutSha256: hash(stdout), sources: structuredClone(before.output) };
   const archiveSha256 = '95daa7b9d1d394aa647175fd1b6418fd9ddac943026302a4174697bffba2cade';
-  const input = { output, evidence, archive, javaHome, project: join(ROOT, 'truthsrc.project.json'), handwrittenRoot: join(ROOT, 'v1/handwritten/scala'),
+  const input = { output, evidence, archive, javaHome, project: join(ROOT, 'truthsrc.project.json'), handwrittenRoot: join(ROOT, 'handwritten/scala'),
     toolRoot: fileURLToPath(new URL('../../metarch-truthsrc', import.meta.url)), generator: { id: 'scala-cqrs-play-service', version: '1' },
     compileRuntimeTests: true, compileTests: true, runTests: false, runActors: false, compilerBridgePrefill: false, inheritedEnvironment: false,
     actor: null, testManifest: null, testFiles: generated, runtimeManifest: manifest, archiveSha256,

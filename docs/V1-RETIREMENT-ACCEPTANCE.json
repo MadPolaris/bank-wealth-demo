@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "bank.v1-retirement-acceptance/v1",
+  "date": "2026-11-06",
+  "directoryRetired": true,
+  "relocatedByteIdenticalFiles": 80,
+  "historicalFilesRetainedInGit": 497,
+  "authorLocatorFilesChanged": 16,
+  "authorLocatorsChanged": 177,
+  "actorTestsPassed": 64,
+  "readsideTestsPassed": 47,
+  "runtimeCompilationPassed": true,
+  "crashCasesPassed": 24,
+  "crashJvmInvocations": 72,
+  "databaseStagesPassed": [
+    "initial",
+    "restart",
+    "refund"
+  ],
+  "browserStagesPassed": [
+    "initial",
+    "refund"
+  ],
+  "fullPipelinePassed": false,
+  "serviceBlocker": "replay new readside did not reach caught-up within 90 seconds",
+  "manualSessionVerified": false,
+  "monarchR2Consumed": false,
+  "runtimeVersion": "0.2.1-p23.20261027.1",
+  "gitCommitted": false,
+  "gitPushed": false,
+  "refs": [
+    {
+      "file": "target/v1-retirement-service-20261106-02/report.json",
+      "bytes": 1841,
+      "sha256": "a5ba2026ff60147c9d5d4cd9df27554075fb2dba0129d278eb5706b378320f37"
+    },
+    {
+      "file": "target/v1-retirement-service-20261106-02-execution.json",
+      "bytes": 3029,
+      "sha256": "3b8624bb9686135936db8396604f5480f45525d6ceec53d12cc441e9d3c420cb"
+    },
+    {
+      "file": "target/v1-retirement-service-20261106-02-runtime-build/runtime-build.json",
+      "bytes": 661115,
+      "sha256": "b07268b8d2b8b9eb2c5143234aca1f84f9d48f0d9b19fdf8ee3c5523e53a8b06"
+    },
+    {
+      "file": "target/v1-retirement-baseline-20261106-01/current-verify.json",
+      "bytes": 46728,
+      "sha256": "fc5a1e11884805757447e269b7963851b50076a1b0233c70b3a82f12831be378"
+    },
+    {
+      "file": "target/v1-retirement-view-browser-20261106-01.json",
+      "bytes": 584,
+      "sha256": "52a3c7d547167457b6980e2d974025ab4c4f020ed21859f437537d364430b3f8"
+    },
+    {
+      "file": "target/disk-cleanup-20261106-01/result.json",
+      "bytes": 1119,
+      "sha256": "3ce279a4baa1ad07dcb4f557c237522c4aa7c6c3b33c10b7cd5fd11435ab1dae"
+    }
+  ]
+}

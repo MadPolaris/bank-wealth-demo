@@ -1,9 +1,0 @@
-{
-  "packages": [
-    {
-      "context": "bankwealth",
-      "package": "example.bankwealth"
-    }
-  ],
-  "verificationCases": []
-}

@@ -1,32 +1,36 @@
-# 银行财富：唯一当前真源入口
+# 银行财富：作者权威合同
 
-当前作者入口为根 `truthsrc.project.json`，唯一当前树为
-`truth/bank-wealth/contexts/bankwealth/`。当前使用版本化结构共享与受控微语法，
-157个YAML展开为完整语义；不要编辑虚拟展开原子。旧 `tree/`、`v1/tree/`
-已退役，历史字节由固定Git revision和 `docs/TRUTH-LEGACY-BASELINE.json`定位，
-**不再保留第二份作者树**。
+## 唯一当前输入
 
-- 建模/演进：编辑 `truth/bank-wealth/`。
-- 显式技术选择：`truthsrc.project.json` 与 `bindings/implementation/`。
-- 当前教学生成物：公共工具写入 `generated/current/`，不要手改派生请求。旧`generated/`根和`target/`候选属于本次历史验证输出，保留证据，不作为当前输出入口。
-- 现有手写实现：`v1/handwritten/scala/`，与生成目录隔离。
-- [操作教程](docs/TRUTH-TUTORIAL.md)、[验证记录](docs/TRUTH-VALIDATION.md)、[知识承接表](docs/TRUTH-MIGRATION.md)、
-  [当前/历史消费者](docs/TRUTH-ENTRYPOINTS.md)、[逐文件迁移证据](docs/TRUTH-MIGRATION-EVIDENCE.json)、
-  [新候选运行验收边界](docs/TRUTH-RUNTIME-ACCEPTANCE.md)。
+根 [`truthsrc.project.json`](truthsrc.project.json) 是唯一当前项目入口：
 
-旧 README 的工作内容已被其他会话修改，本次未覆盖它。本文件和根项目
-配置明确新的开发入口；旧演示、1134归档和旧发行复演文档均保持历史含义。
+- [`truth/bank-wealth/`](truth/bank-wealth/)：系统声明、`contexts/bankwealth/`内的领域与协作知识，以及`inbox/`内有来源的背景/决策。
+- [`bindings/implementation/`](bindings/implementation/)与根配置：具名技术选择、编码、宿主、runtime pin与外置源码路径。它们不构成另一份人工维护的完整业务request。
+- 结构共享与受控微语法按公共工具规则展开；虚拟原子路径是展开坐标，不能沿它创建第二份作者文件。身份与seq不得为整理目录而重排。
 
-```bash
-node tools/truthsrc-project.mjs validate
-node tools/truthsrc-project.mjs compile
-node tools/prepare-truthsrc-runtime.mjs --archive dist/bank-wealth-v1-darwin-x64-1134.tar.gz
-node tools/truthsrc-project.mjs generate --out "$PWD/generated/current" --plan
-node tools/truthsrc-project.mjs generate --out "$PWD/generated/current"
-node tools/truthsrc-project.mjs query --out "$PWD/generated/current" --knowledge ReserveFunds
-node tools/truthsrc-project.mjs status --out "$PWD/generated/current"
-```
+只修改被授权的作者输入。业务规则由显式声明定义，不由旧快照、生成器猜测或页面文案补足；未支持或缺失的能力必须明确拒绝，不能回退到旧树或虚构成功。
 
-`prepare` 只校验干净1134归档并提取六个固定JAR/POM到本机独占缓存；
-不联网、不运行服务、不修改或重发runtime。完整应用运行仍有独立JDK/sbt/
-存储前置，生成通过不是重新签收应用。retry/backoff/deadline **继续OPEN**。
+## 输入、实现与证据分离
+
+| 类型 | 合同 |
+|---|---|
+| 作者输入 | 当前树、根配置与具名技术选择，通过公共校验、roundtrip与严格编译 |
+| 派生产物 | canonical、完整request、编译产品、`.truthsrc/`知识图、生成源码、ledger与anchors由公共工具产生，不手工修补 |
+| 手写实现 | `handwritten/scala/`独立挂载，不复制到生成区；业务owner、DTO和适配职责见[架构入口](docs/architecture/README.md) |
+| 独立预期与回执 | `test/scala/`固定预期不随生成结果改写；每次候选的代码/运行证据独立签收，不继承历史通过 |
+
+手写来源声明位于`docs/architecture/HANDWRITTEN-SOURCE-MAP.json`，是显式实现关系，不是从手写代码自动推导真源。文件指纹或精确区间证明来源关联，不能单独证明业务正确。
+
+## 不随目录调整改变的语义
+
+- 付款成功不是投资成功；TA受理不是最终份额确认；结果未知需按原身份核实。
+- 独立退款不是补偿已经Commit的付款；有限定投复用现金入口，不引入三败自动暂停。
+- Saga事务与pipeline编排不互换；状态只在事件应用中演进，保持Onion依赖方向。
+- `/api/v1`、`/bank/v1`、`bank-v1`身份、PB/PID、codec及冻结runtime版本不因容器目录退役而改名。
+- retry/backoff/deadline债务未关闭，也不是已接受的语义豁免；实施和验收需独立授权。
+
+## 历史边界与操作入口
+
+旧`tree/`、`v1/tree/`和本次移除的`v1/`材料仅按[固定历史对象](docs/HISTORY.md)解释，不恢复成可编辑作者副本。原1134签收、1128暂停裁定及旧回执保持各自范围；当前路径迁移不等于重新验收。
+
+实际命令与读写边界见[ENTRYPOINTS](docs/TRUTH-ENTRYPOINTS.md)，学习见[教程](docs/TRUTH-TUTORIAL.md)，分层执行见[工作坊](docs/BANK-WORKSHOP.md)。本文件只定义权威合同，不充当运行回执。

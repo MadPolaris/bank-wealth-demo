@@ -53,7 +53,9 @@ async function startApiRelay({ containerId, hostPort, containerPort }) {
 export async function startDatabaseRelay({ docker, containerId, hostPort, containerPort, env, spawnImpl = spawn }) {
   assert.ok(/^[/][A-Za-z0-9/_.-]+$/.test(docker));
   assert.match(containerId, /^[0-9a-f]{64}$/);
-  assert.ok([[18762, 3306], [18763, 27017]].some(([host, inner]) => hostPort === host && containerPort === inner));
+  assert.ok(Number.isSafeInteger(hostPort) && hostPort > 1024 && hostPort <= 65535 && ![9000, 2551, 3306, 27017].includes(hostPort),
+    'explicit unprivileged nonshared host port required');
+  assert.ok([3306, 27017].includes(containerPort), 'fixed database container port required');
   if (spawnImpl === spawn) return startApiRelay({ containerId, hostPort, containerPort });
   const active = new Map(), clients = new Set(), sessions = [];
   let stopped = false, sequence = 0, failed = false;

@@ -2,7 +2,7 @@
 
 ## 当前 P23 追加合同（源/设计，不是运行实现）
 
-最后更新: 2026-10-27。新真源 [P23BankV1HandoffContract](../tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)（`decision.p23-bank-v1-handoff`、`bank-v1-p23-design-1`）承接已选V1政策与四类业务描述；30个scenario均为 `execution:not-run`。新合同测试只验证声明/引用/版本/oracle完整性，不生成应用、不运行资金或恢复。
+最后更新: 2026-10-27。新真源 [P23BankV1HandoffContract](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)（`decision.p23-bank-v1-handoff`、`bank-v1-p23-design-1`）承接已选V1政策与四类业务描述；30个scenario均为 `execution:not-run`。新合同测试只验证声明/引用/版本/oracle完整性，不生成应用、不运行资金或恢复。
 
 - 付款/退款指向现有准确版本bindings；TA桥和V1本地现金SIP明确列为设计要求/公共合同待补，旧外部SIP原子与六份bindings保持原字节。
 - 当前交付与测试证据见 [P23-BUSINESS-HANDOFF.md](P23-BUSINESS-HANDOFF.md)；分别记录源合同、消费窗口和整体制品门，不能合并一个绿色完成标志。
@@ -10,7 +10,7 @@
 
 ## 当前路线图源／设计增量
 
-- 全目标 `decision.full-target-gap-roadmap`，[FullTargetGapRoadmapProposal](../tree/inbox/refining/question-rf-full-target-gap-roadmap-proposal-0.yaml)，`/payload/info/artifact/body/coverageRows`、`/payload/info/artifact/body/phases`、`/payload/info/artifact/body/openDecisionSchedule`，入口 [FULL-TARGET-ROADMAP.md](FULL-TARGET-ROADMAP.md)。完整23行与required SIP保留，八项及退款／SIP补充决定仍open；没有新增运行目标／栈选择。
+- 全目标 `decision.full-target-gap-roadmap`，[FullTargetGapRoadmapProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-full-target-gap-roadmap-proposal-0.yaml)，`/payload/info/artifact/body/coverageRows`、`/payload/info/artifact/body/phases`、`/payload/info/artifact/body/openDecisionSchedule`，入口 [FULL-TARGET-ROADMAP.md](FULL-TARGET-ROADMAP.md)。完整23行与required SIP保留，八项及退款／SIP补充决定仍open；没有新增运行目标／栈选择。
 - X03／X04新增八个未来公共工作包，沿 [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md) 看唯一真源规格；没有公共 EP／实现／测试执行。当前公共与peer源码仅只读观察；限定复用证据不升级为银行资格。
 - 新 [ROADMAP-DESIGN-VERIFICATION.json](ROADMAP-DESIGN-VERIFICATION.json)记录本轮实测；原 [CASH-NEXT-DESIGN-VERIFICATION.json](CASH-NEXT-DESIGN-VERIFICATION.json)、I0／第二批回执和旧notes/tests原字节保留。默认 `npm test` 六文件不变；新增 `test:roadmap` 与七显式文件的 `test:current`，不执行paused suite。
 - 本轮只银行source/design/navigation/test/projections/新receipt，没有公共写入／应用生成／Scala构建／服务／资金运行／提交推送；bootstrap、authority、runtime绑定／恢复和完整设计仍未认证。
@@ -21,7 +21,7 @@
 
 ## 当前下一轮：选择／规格／证据分别读取
 
-- `decision.cash-entry-prerequisites` — [CashPrerequisiteDecisionOverlay](../tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml)，`/payload/info/artifact/body/resolvedDecisions` 与 `/payload/info/artifact/body/remainingOpenDecisions`；入口 [CASH-ENTRY-DECISIONS.md](CASH-ENTRY-DECISIONS.md)。三项 selected-demo-design，其余八项 open；bootstrap/fence/authority/start/recovery 未实现。
+- `decision.cash-entry-prerequisites` — [CashPrerequisiteDecisionOverlay](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml)，`/payload/info/artifact/body/resolvedDecisions` 与 `/payload/info/artifact/body/remainingOpenDecisions`；入口 [CASH-ENTRY-DECISIONS.md](CASH-ENTRY-DECISIONS.md)。三项 selected-demo-design，其余八项 open；bootstrap/fence/authority/start/recovery 未实现。
 - `decision.public-x01-work-packages` 与 `decision.public-x02-work-packages` — [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md)，8个子包的唯一规格在新 note，不是公共 EP／跨仓授权。公共仓已有并行 dirty 修改，只读观察，不清理、不覆盖。
 - 本轮验收在 [CASH-NEXT-DESIGN-VERIFICATION.json](CASH-NEXT-DESIGN-VERIFICATION.json) 发布实际选定结果与输入指纹；不从源码规格或命令登记推断测试通过。`test:next-design` 新增显式第六文件，原两个分组范围不改，paused suite 仍 excluded。
 - 原三份 I0 note、原 I0 test、所有历史 receipts、13原+4新增保护、domain/bindings及 paused 草稿保持原字节。没有公共代码修改、生成应用、sbt/服务/资金运行、提交/推送；没有独立审计。
@@ -32,9 +32,9 @@
 
 按 board `wealth-i0-design-v1`、refining seq 0 → 1 → 2 阅读：
 
-1. [I0 基线](I0-BASELINE.md) → `decision.i0-baseline-coverage`，源 [I0BaselineCoverageDesignProposal](../tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml)：`/payload/info/artifact/body/coverageRows`、`/payload/info/artifact/body/scopeDecisions`。
-2. [公共扩展](PUBLIC-EXTENSIONS.md) → `decision.i0-boundary-ownership`，源 [I0BoundaryOwnershipDesignProposal](../tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml)：`/payload/info/artifact/body/ownershipRows`、`/payload/info/artifact/body/toolDisposition`、`/payload/info/artifact/body/publicExtensions`。
-3. [现金纵切](CASH-FIRST-SLICE.md) → `decision.cash-first-slice-design`，源 [CashFirstSliceDesignProposal](../tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml)：`/payload/info/artifact/body/productPlanes`、`/payload/info/artifact/body/technicalNeeds`、`/payload/info/artifact/body/acceptanceObligations`。
+1. [I0 基线](I0-BASELINE.md) → `decision.i0-baseline-coverage`，源 [I0BaselineCoverageDesignProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml)：`/payload/info/artifact/body/coverageRows`、`/payload/info/artifact/body/scopeDecisions`。
+2. [公共扩展](PUBLIC-EXTENSIONS.md) → `decision.i0-boundary-ownership`，源 [I0BoundaryOwnershipDesignProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml)：`/payload/info/artifact/body/ownershipRows`、`/payload/info/artifact/body/toolDisposition`、`/payload/info/artifact/body/publicExtensions`。
+3. [现金纵切](CASH-FIRST-SLICE.md) → `decision.cash-first-slice-design`，源 [CashFirstSliceDesignProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml)：`/payload/info/artifact/body/productPlanes`、`/payload/info/artifact/body/technicalNeeds`、`/payload/info/artifact/body/acceptanceObligations`。
 
 三份 note 是唯一设计权威，均保持 `demo-proposal`、`workshopHeld: false`；新增政策仍为 open。导航文档不双写覆盖矩阵、业务政策、扩展规格或验收表。设计落盘不表示账户 setup/归属/募集、持仓、SIP 日历/计数或 batch scope 已裁决，也不证明 machine authority 已执法。
 

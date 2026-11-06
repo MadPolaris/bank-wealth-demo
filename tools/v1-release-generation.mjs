@@ -3,6 +3,7 @@ import { existsSync, lstatSync, readFileSync, realpathSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { ROOT, TOOL_ROOT } from './truth-source.mjs';
+import { assertHistoricalCheckout } from './historical-assets.mjs';
 
 const load = file => import(pathToFileURL(join(TOOL_ROOT, file)).href);
 const { readProductRequest } = await load('lib/products/cli.mjs');
@@ -34,6 +35,7 @@ export function releaseTarget(target) {
 }
 
 export function checkReleaseInputs(inputs) {
+  assertHistoricalCheckout();
   plainPath(inputs);
   assert.equal(dirname(inputs), join(ROOT, 'v1/formal-inputs'));
   assert.match(inputs.slice(dirname(inputs).length + 1), /^release-[A-Za-z0-9][A-Za-z0-9_.-]*$/u);

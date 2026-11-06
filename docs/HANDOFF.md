@@ -2,13 +2,13 @@
 
 ## 当前 P23 银行业务交接
 
-最后更新: 2026-10-27。先读 [P23-BUSINESS-HANDOFF.md](P23-BUSINESS-HANDOFF.md)，再按其指针消费唯一追加真源 [P23BankV1HandoffContract](../tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)（`decision.p23-bank-v1-handoff`）。包含四类当前业务描述、分离的schema/definition/plan/codec/runtime版本、已有binding与待公共合同支持的要求、正负场景及oracle；已选政策只补正式引用，没有重新决策。
+最后更新: 2026-10-27。先读 [P23-BUSINESS-HANDOFF.md](P23-BUSINESS-HANDOFF.md)，再按其指针消费唯一追加真源 [P23BankV1HandoffContract](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)（`decision.p23-bank-v1-handoff`）。包含四类当前业务描述、分离的schema/definition/plan/codec/runtime版本、已有binding与待公共合同支持的要求、正负场景及oracle；已选政策只补正式引用，没有重新决策。
 
 共同工具链设计沿用 `metarch-truthsrc/.rounds/p24-p25-v1-design-q5bnn0o8/DESIGN.md` 及配套矩阵，不在银行复制实现规格或修改公共源码。新交接分别报告银行源/设计验收、**本会话源码消费窗口是否结束/归还**、**P23整体runtime制品门是否通过**。以下旧移交中open/未选栈/旧测试选择均为历史，不覆盖新overlay，也不因窗口归还自动批准公共实施。
 
 ## 当前移交：全目标路线与 X03／X04 未来规格
 
-先读 [FULL-TARGET-ROADMAP.md](FULL-TARGET-ROADMAP.md)：`decision.full-target-gap-roadmap`，[FullTargetGapRoadmapProposal](../tree/inbox/refining/question-rf-full-target-gap-roadmap-proposal-0.yaml)，`/payload/info/artifact/body/coverageRows`、`/payload/info/artifact/body/phases`、`/payload/info/artifact/body/openDecisionSchedule`。完整目标保留SIP；R0–R8是未来退出里程碑，不是已实现／已授权行为，八项政策仍open。
+先读 [FULL-TARGET-ROADMAP.md](FULL-TARGET-ROADMAP.md)：`decision.full-target-gap-roadmap`，[FullTargetGapRoadmapProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-full-target-gap-roadmap-proposal-0.yaml)，`/payload/info/artifact/body/coverageRows`、`/payload/info/artifact/body/phases`、`/payload/info/artifact/body/openDecisionSchedule`。完整目标保留SIP；R0–R8是未来退出里程碑，不是已实现／已授权行为，八项政策仍open。
 
 公共移交沿 [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md) 的新X03／X04四＋四包及既有X01／X02规格。现有apply／anchors／限定Fab恢复复用；P19窄锁与最新证据须owner开工再核。退款发起authority／唯一启动与旧SIP资金路径另需决定，不能由付款S09继承；没有银行兼容shim。
 
@@ -16,7 +16,7 @@
 
 ## 此前移交：三项 demo 选择＋X01／X02 实施规格
 
-先读 [CASH-ENTRY-DECISIONS.md](CASH-ENTRY-DECISIONS.md)：`decision.cash-entry-prerequisites`，[CashPrerequisiteDecisionOverlay](../tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml)，`/payload/info/artifact/body/resolvedDecisions` 与 `/payload/info/artifact/body/remainingOpenDecisions`。只有账户 setup／可信归属募集映射／付款 pipeline 唯一启动三个设计 selected；原 I0 和其余八项不自动升级。
+先读 [CASH-ENTRY-DECISIONS.md](CASH-ENTRY-DECISIONS.md)：`decision.cash-entry-prerequisites`，[CashPrerequisiteDecisionOverlay](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml)，`/payload/info/artifact/body/resolvedDecisions` 与 `/payload/info/artifact/body/remainingOpenDecisions`。只有账户 setup／可信归属募集映射／付款 pipeline 唯一启动三个设计 selected；原 I0 和其余八项不自动升级。
 
 再按 [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md) 的 `decision.public-x01-work-packages`、`decision.public-x02-work-packages` 移交。独立公共 owner 授权、read/write-set、两域实际行为与兼容门都在真源；不在银行仓实现公共代码/EP或 generation/host shim。未来运行前仍须证明 seed delayed-duplicate fence、authority、creation-only pending 恢复和 source/stage/txid 关联。
 
@@ -27,9 +27,9 @@
 
 ## 先读 I0，再拆公共工作包
 
-1. [I0 基线](I0-BASELINE.md)：`decision.i0-baseline-coverage`，源 [I0BaselineCoverageDesignProposal](../tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml)，`/payload/info/artifact/body/coverageRows` 与 `/payload/info/artifact/body/scopeDecisions`。
-2. [边界与公共扩展](PUBLIC-EXTENSIONS.md)：`decision.i0-boundary-ownership`，源 [I0BoundaryOwnershipDesignProposal](../tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml)，`/payload/info/artifact/body/ownershipRows`、`/payload/info/artifact/body/toolDisposition` 与 `/payload/info/artifact/body/publicExtensions`。先拆 X01–X04；其余项不因此获得实现授权。
-3. [现金纵切](CASH-FIRST-SLICE.md)：`decision.cash-first-slice-design`，源 [CashFirstSliceDesignProposal](../tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml)，`/payload/info/artifact/body/productPlanes`、`/payload/info/artifact/body/technicalNeeds` 与 `/payload/info/artifact/body/acceptanceObligations`。
+1. [I0 基线](I0-BASELINE.md)：`decision.i0-baseline-coverage`，源 [I0BaselineCoverageDesignProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml)，`/payload/info/artifact/body/coverageRows` 与 `/payload/info/artifact/body/scopeDecisions`。
+2. [边界与公共扩展](PUBLIC-EXTENSIONS.md)：`decision.i0-boundary-ownership`，源 [I0BoundaryOwnershipDesignProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml)，`/payload/info/artifact/body/ownershipRows`、`/payload/info/artifact/body/toolDisposition` 与 `/payload/info/artifact/body/publicExtensions`。先拆 X01–X04；其余项不因此获得实现授权。
+3. [现金纵切](CASH-FIRST-SLICE.md)：`decision.cash-first-slice-design`，源 [CashFirstSliceDesignProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml)，`/payload/info/artifact/body/productPlanes`、`/payload/info/artifact/body/technicalNeeds` 与 `/payload/info/artifact/body/acceptanceObligations`。
 
 这些是 `demo-proposal`，不是完整业务设计、产品政策裁决或运行认证。文档只导航；业务契约、owner、公共扩展规格及验收义务在真源中维护。跨仓 public kernel/product/plugin/core 变更需独立 owner 授权和工作包；本次没有公共 EP 或公共实现，不以本仓银行专用生成器/宿主/资格兼容 shim 绕过公共能力缺口。
 
@@ -45,11 +45,11 @@
 
 ## 优先运行阻碍：从真源移交
 
-不在本页维护另一张资金/身份/桥接规格表。未来实现方先读 `decision.cash-first-slice-design` 的 `/payload/info/artifact/body/technicalNeeds` 与 `/payload/info/artifact/body/acceptanceObligations`；具体付款/TA/退款契约沿 [CashPurchaseV2Contract](../tree/inbox/refining/question-rf-cash-purchase-v2-contract-0.yaml)（`contract.cash-purchase-v2`）的 `/payload/info/artifact/body` 及 `/payload/info/artifact/references` 追溯。
+不在本页维护另一张资金/身份/桥接规格表。未来实现方先读 `decision.cash-first-slice-design` 的 `/payload/info/artifact/body/technicalNeeds` 与 `/payload/info/artifact/body/acceptanceObligations`；具体付款/TA/退款契约沿 [CashPurchaseV2Contract](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-purchase-v2-contract-0.yaml)（`contract.cash-purchase-v2`）的 `/payload/info/artifact/body` 及 `/payload/info/artifact/references` 追溯。
 
 生成守卫/默认状态/marker 的缺口、唯一 start owner、可信持久结果桥接、exact value/wire 与读模型证据需要联合验收；它们是待实现义务，不是 metadata 或 strict lowering 的执法结果。新的 endpoint/codec/component 名称属于提议，不表示已存在公共 binding 格式或 runtime consumer。schema 不认证发送者，局部声明解释测试不替代 actor 回放、崩溃恢复或真实资金验证。
 
-`ux.cash-v2` 的 [体验真源](../tree/inbox/storyMapping/relation-sm-cash-purchase-v2-experience-proposal-0.yaml) 与 `flow.cash-v2` 的 [业务图真源](../tree/inbox/eventStorming/relation-es-cash-purchase-v2-lifecycle-proposal-0.yaml) 同样在 `/payload/info/artifact/body` 维护；本页只保留未来协作顺序。
+`ux.cash-v2` 的 [体验真源](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/storyMapping/relation-sm-cash-purchase-v2-experience-proposal-0.yaml) 与 `flow.cash-v2` 的 [业务图真源](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/eventStorming/relation-es-cash-purchase-v2-lifecycle-proposal-0.yaml) 同样在 `/payload/info/artifact/body` 维护；本页只保留未来协作顺序。
 
 ## MockTA已实现的独立能力
 

@@ -293,7 +293,7 @@
     "service": {
       "artifact": "bank-service",
       "externalSourceRoots": [
-        "./v1/handwritten/scala"
+        "./handwritten/scala"
       ]
     }
   }

@@ -9,7 +9,7 @@ import { RUNTIME_MANIFEST_FILE, RUNTIME_MAINS, completeRuntimeCompilation, inspe
 import { jarManifestProbeSource, validateJarReferences, assertJarReferencesUnchanged } from './truthsrc-runtime-jars.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..'), TOOL = resolve(ROOT, '../metarch-truthsrc');
-const PROJECT = join(ROOT, 'truthsrc.project.json'), HAND = join(ROOT, 'v1/handwritten/scala'), LOCAL = join(ROOT, '.local/truthsrc-runtime');
+const PROJECT = join(ROOT, 'truthsrc.project.json'), HAND = join(ROOT, 'handwritten/scala'), LOCAL = join(ROOT, '.local/truthsrc-runtime');
 const VERIFIER = join(ROOT, 'tools/verify-truthsrc-build.mjs'), ARCHIVE_SHA = '95daa7b9d1d394aa647175fd1b6418fd9ddac943026302a4174697bffba2cade';
 const CACHES = ['home', 'cache', 'ivy', 'coursier', 'boot', 'global', 'tmp'];
 const CHECKS = ['osSandboxEnforced', 'outputUnchanged', 'handwrittenUnchanged', 'localRuntimeUnchanged', 'supplyUnchanged',

@@ -32,7 +32,7 @@ export function actorSuiteNames() { return ACTOR_SUITES.map(([name]) => name).so
 
 export function actorTestManifest(read = file => readFileSync(file, 'utf8')) {
   const suites = ACTOR_SUITES.map(([name, count, flow]) => {
-    const short = name.split('.').at(-1), file = join(ROOT, 'v1/test/scala', short + '.scala');
+    const short = name.split('.').at(-1), file = join(ROOT, 'test/scala', short + '.scala');
     const content = read(file);
     const classes = [...content.matchAll(/^final class ([A-Za-z][A-Za-z0-9]*) extends AnyFunSuite \{/gm)].map(m => m[1]);
     assert.deepEqual(classes, [short], 'unexpected actor suite class: ' + file);

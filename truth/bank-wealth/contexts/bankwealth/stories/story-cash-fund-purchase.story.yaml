@@ -32,17 +32,17 @@ payload:
       }
     ],
     "evidence": [
-      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
-      "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)",
-      "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
-      "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+      "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)",
+      "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+      "handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
       "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-cash-request-source.slice.yaml",
       "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-settlement.slice.yaml",
       "truth/bank-wealth/contexts/bankwealth/pipelines/bank-cash-payment-v1.pipeline.yaml",
       "truth/bank-wealth/contexts/bankwealth/sagas/bank-cash-payment-v1.saga.yaml",
       "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/confirm-fund-subscription-payment.slice.yaml",
       "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-cash-payment-succeeded.slice.yaml",
-      "v1/handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala",
-      "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+      "handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala",
+      "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
     ]
   }

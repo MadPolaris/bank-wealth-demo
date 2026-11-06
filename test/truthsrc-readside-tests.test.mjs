@@ -67,7 +67,7 @@ test('frozen manifests pin exact original files, SHA, packages, suite classes an
   assert.deepEqual(readsideSuiteNames(), fixed.map(([name]) => 'example.bankwealth.service.' + name).sort());
   const reads = [];
   assert.deepEqual(readsideTestManifest(file => { reads.push(file); return readFileSync(file, 'utf8'); }), frozen);
-  assert.deepEqual(reads, fixed.map(([name]) => join(ROOT, 'v1/test/scala', name + '.scala')));
+  assert.deepEqual(reads, fixed.map(([name]) => join(ROOT, 'test/scala', name + '.scala')));
   for (const [i, suite] of frozen.suites.entries()) {
     const [name, count, sha256] = fixed[i];
     const text = readFileSync(suite.file, 'utf8');
@@ -160,8 +160,8 @@ test('readside tasks use fixed Test/test, pre-fork source/suite assertions and o
 });
 
 test('task helper rejects basename substitutions, aliases, directories, sidecars and any source closure expansion', () => {
-  for (const file of ['/foreign/BankReadsideProjectionSpec.scala', join(ROOT, 'v1/test/scala'),
-    join(ROOT, 'tools/truthsrc-actor-ta-worker.mjs'), ROOT + '/v1/test/scala/./BankReadsideProjectionSpec.scala']) {
+  for (const file of ['/foreign/BankReadsideProjectionSpec.scala', join(ROOT, 'test/scala'),
+    join(ROOT, 'tools/truthsrc-actor-ta-worker.mjs'), ROOT + '/test/scala/./BankReadsideProjectionSpec.scala']) {
     const changed = structuredClone(manifest); changed.suites[5].file = file;
     assert.throws(() => buildTasks(generatedFiles, options, changed), /exact pinned readside source list/);
   }
@@ -219,8 +219,8 @@ test('actual Test marker binds generated staging paths and original frozen files
   }
   const stdout = closureLog(staged), first = frozen.suites[0].file;
   for (const text of ['', stdout + stdout, stdout.replace(READSIDE_SOURCES_MARKER, 'MISSING='),
-    stdout.replace(staged + '/src/', output + '/src/'), stdout.replace(first, staged + '/v1/test/scala/BankReadsideProjectionSpec.scala'),
-    stdout.replace(first, first + ',' + first), stdout.replace(first, join(ROOT, 'v1/test/scala')),
+    stdout.replace(staged + '/src/', output + '/src/'), stdout.replace(first, staged + '/test/scala/BankReadsideProjectionSpec.scala'),
+    stdout.replace(first, first + ',' + first), stdout.replace(first, join(ROOT, 'test/scala')),
     stdout.replace(first + ',', ''), stdout.replace(READSIDE_SOURCES_MARKER, READSIDE_SOURCES_MARKER + '/owned/sidecar.mjs,')])
     assert.throws(() => inspectReadsideSources(text, staged, generatedFiles, manifest));
 });

@@ -7,6 +7,7 @@
   "scripts": {
     "test": "node --test test/unified-truth.test.mjs test/historical-source.test.mjs",
     "test:workshop": "node --test --test-concurrency=1 test/bank-workshop.test.mjs test/bank-workshop-session.test.mjs test/bank-workshop-view.test.mjs test/truthsrc-runtime-lease.test.mjs test/truthsrc-runtime-sandbox.test.mjs",
+    "test:retirement": "node --test --test-concurrency=1 test/v1-retirement-layout.test.mjs test/historical-assets.test.mjs test/v1-retirement-source-map.test.mjs test/historical-source.test.mjs test/unified-truth.test.mjs test/v1-inputs.test.mjs test/v1-joint.test.mjs test/v1-service-inputs.test.mjs test/v1-release-generation.test.mjs test/v1-release-certify.test.mjs",
     "workshop": "node tools/bank-workshop.mjs",
     "test:history": "node --test test/truth.test.mjs test/projections.test.mjs test/cash-contract.test.mjs test/mock-ta.test.mjs test/i0-design.test.mjs test/cash-next-design.test.mjs",
     "test:baseline": "node --test test/truth.test.mjs test/projections.test.mjs test/cash-contract.test.mjs test/mock-ta.test.mjs",

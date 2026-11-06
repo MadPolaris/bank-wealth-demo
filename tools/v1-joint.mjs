@@ -7,9 +7,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ROOT, TOOL_ROOT } from './truth-source.mjs';
 import { bankApplicationRequest, V1_TREE } from './v1-inputs.mjs';
 import { historicalInventory } from './historical-source.mjs';
+import { readHistoricalJson, readHistoricalProductRequest, assertHistoricalCheckout } from './historical-assets.mjs';
 
 const load = file => import(pathToFileURL(join(TOOL_ROOT, file)).href);
-const { readProductRequest } = await load('lib/products/cli.mjs');
 const { compileProductSet } = await load('lib/products/compile.mjs');
 const { generateProductCli } = await load('lib/products/generate-cli.mjs');
 const { readAnchorsIndex } = await load('src/core/anchors.mjs');
@@ -57,10 +57,11 @@ export function checkInputs() {
   const before = fingerprints(V1_TREE), request = bankApplicationRequest({ historical: true }), compilation = compileProductSet(request);
   assert.deepEqual(compilation.diagnostics, []);
   const scopes = flows.map(flow => {
-    const directory = inputDirectory(flow), captured = readProductRequest(join(directory, 'files.json'));
+    const assetDirectory = 'v1/formal-inputs/' + flow + '-376', directory = inputDirectory(flow);
+    const captured = readHistoricalProductRequest(assetDirectory + '/files.json');
     assert.deepEqual(captured, request);
-    assert.deepEqual(json(join(directory, 'compiled.json')), compilation.result);
-    const scope = json(join(directory, 'scope.json'));
+    assert.deepEqual(readHistoricalJson(assetDirectory + '/compiled.json'), compilation.result);
+    const scope = readHistoricalJson(assetDirectory + '/scope.json');
     assert.equal(scope.flow, flow);
     assert.ok(scope.sourceEntry && scope.pipeline && scope.requiredOracles.length > 0);
     return { flow, directory, sourceEntry: scope.sourceEntry, pipeline: scope.pipeline, requiredOracles: scope.requiredOracles };
@@ -70,6 +71,7 @@ export function checkInputs() {
 }
 
 export async function planFlow(flow) {
+  assertHistoricalCheckout();
   assert.ok(flows.includes(flow), 'unknown flow');
   checkInputs();
   const directory = inputDirectory(flow), target = join(ROOT, '.scratch', 'v1-plan-never-written');
@@ -82,6 +84,7 @@ export async function planFlow(flow) {
 }
 
 export async function testTarget(target, evidencePrefix) {
+  assertHistoricalCheckout();
   checkedTarget(target);
   assert.ok(isAbsolute(evidencePrefix) && resolve(evidencePrefix) === evidencePrefix);
   const round = dirname(dirname(target));

@@ -2,7 +2,7 @@
 
 ## 后续三项选择与证据
 
-当前账户初始化／归属与募集映射／付款唯一启动者只按 [现金入口决策](CASH-ENTRY-DECISIONS.md) 的 `decision.cash-entry-prerequisites` 读取：note [CashPrerequisiteDecisionOverlay](../tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml)，`/payload/info/artifact/body/resolvedDecisions` 与 `/payload/info/artifact/body/remainingOpenDecisions`。三项为 selected-demo-design，其余八项 open；旧 I0 和本页引用的第一切口提议保持原字节，不倒写历史。
+当前账户初始化／归属与募集映射／付款唯一启动者只按 [现金入口决策](CASH-ENTRY-DECISIONS.md) 的 `decision.cash-entry-prerequisites` 读取：note [CashPrerequisiteDecisionOverlay](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml)，`/payload/info/artifact/body/resolvedDecisions` 与 `/payload/info/artifact/body/remainingOpenDecisions`。三项为 selected-demo-design，其余八项 open；旧 I0 和本页引用的第一切口提议保持原字节，不倒写历史。
 
 X01／X02 公共拆包见 [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md)；本轮源/设计实测见 [CASH-NEXT-DESIGN-VERIFICATION.json](CASH-NEXT-DESIGN-VERIFICATION.json)。`I0-VERIFICATION.json` 是历史快照，不覆盖新增选择/拆包。下述 open 描述属于 I0 当时状态，以新增覆盖层识别本轮三项变化；具体执行/资金/codec/bridge/恢复均未实现。当前显式测试增加 `test:next-design`，默认六文件，不执行 paused runner。
 
@@ -12,9 +12,9 @@ X01／X02 公共拆包见 [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md)；本轮�
 
 按 board `wealth-i0-design-v1`、refining seq 0 → 1 → 2 阅读：
 
-1. [覆盖/scope](I0-BASELINE.md)：`decision.i0-baseline-coverage`，[I0BaselineCoverageDesignProposal](../tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml)，`/payload/info/artifact/body/coverageRows` 与 `/payload/info/artifact/body/scopeDecisions`。
-2. [owner/公共扩展](PUBLIC-EXTENSIONS.md)：`decision.i0-boundary-ownership`，[I0BoundaryOwnershipDesignProposal](../tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml)，`/payload/info/artifact/body/ownershipRows`、`/payload/info/artifact/body/toolDisposition` 与 `/payload/info/artifact/body/publicExtensions`。
-3. **本切口唯一设计权威**：`decision.cash-first-slice-design`，note [CashFirstSliceDesignProposal](../tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml)，`/payload/info/artifact/body`。
+1. [覆盖/scope](I0-BASELINE.md)：`decision.i0-baseline-coverage`，[I0BaselineCoverageDesignProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml)，`/payload/info/artifact/body/coverageRows` 与 `/payload/info/artifact/body/scopeDecisions`。
+2. [owner/公共扩展](PUBLIC-EXTENSIONS.md)：`decision.i0-boundary-ownership`，[I0BoundaryOwnershipDesignProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml)，`/payload/info/artifact/body/ownershipRows`、`/payload/info/artifact/body/toolDisposition` 与 `/payload/info/artifact/body/publicExtensions`。
+3. **本切口唯一设计权威**：`decision.cash-first-slice-design`，note [CashFirstSliceDesignProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml)，`/payload/info/artifact/body`。
    - 产品五要素的内容与缺口：`/payload/info/artifact/body/productPlanes`。
    - endpoint、auth/identity、codec/default、receipt projection、component、observability/deploy 等需要：`/payload/info/artifact/body/technicalNeeds`。
    - 正负例、恢复与行为证据义务：`/payload/info/artifact/body/acceptanceObligations`。
@@ -25,10 +25,10 @@ X01／X02 公共拆包见 [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md)；本轮�
 
 现金切口以第三份 note 的引用为入口，再依次读取：
 
-- `contract.cash-purchase-v2` — [CashPurchaseV2Contract](../tree/inbox/refining/question-rf-cash-purchase-v2-contract-0.yaml)，`/payload/info/artifact/body`。付款/退款、TA 协议与 MockTA 配置均在该真源；具体入口、命令/事件、story、read-model 引用见 `/payload/info/artifact/references`。本页不是第二份付款契约或模拟配置。
-- `ux.cash-v2` — [CashPurchaseV2ExperienceProposal](../tree/inbox/storyMapping/relation-sm-cash-purchase-v2-experience-proposal-0.yaml)，`/payload/info/artifact/body` 与 `/payload/info/artifact/references`。体验提议不等于渲染 UI 或产品批准。
-- `flow.cash-v2` — [CashPurchaseV2LifecycleProposal](../tree/inbox/eventStorming/relation-es-cash-purchase-v2-lifecycle-proposal-0.yaml)，`/payload/info/artifact/body`。知识图关系不是运行事件投影或宿主桥接。
-- `CashFundPurchaseLifecycle` — [story](../tree/stories/story-cash-fund-purchase-lifecycle.story.yaml)；`FundCashPurchaseLifecycle` — [read model](../tree/read-models/read-model-fund-cash-purchase-lifecycle.rm.yaml)。顺着 note 的 typed references 追溯字段/事件，不能把 read-model 声明当页面或查询实现。
+- `contract.cash-purchase-v2` — [CashPurchaseV2Contract](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-purchase-v2-contract-0.yaml)，`/payload/info/artifact/body`。付款/退款、TA 协议与 MockTA 配置均在该真源；具体入口、命令/事件、story、read-model 引用见 `/payload/info/artifact/references`。本页不是第二份付款契约或模拟配置。
+- `ux.cash-v2` — [CashPurchaseV2ExperienceProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/storyMapping/relation-sm-cash-purchase-v2-experience-proposal-0.yaml)，`/payload/info/artifact/body` 与 `/payload/info/artifact/references`。体验提议不等于渲染 UI 或产品批准。
+- `flow.cash-v2` — [CashPurchaseV2LifecycleProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/eventStorming/relation-es-cash-purchase-v2-lifecycle-proposal-0.yaml)，`/payload/info/artifact/body`。知识图关系不是运行事件投影或宿主桥接。
+- `CashFundPurchaseLifecycle` — [story](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/stories/story-cash-fund-purchase-lifecycle.story.yaml)；`FundCashPurchaseLifecycle` — [read model](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/read-models/read-model-fund-cash-purchase-lifecycle.rm.yaml)。顺着 note 的 typed references 追溯字段/事件，不能把 read-model 声明当页面或查询实现。
 
 原 legacy 入口/SIP/外部入金没有在此导航中升级为现金路径；同一请求不应由新旧入口双响应。具体隔离与身份规则仍由上述真源声明维护。
 

@@ -143,18 +143,18 @@ payload:
         "查询先认证及归属判断；GET不启动账户、订单、付款、退款或补期。Unavailable/NotAuthorized等查询失败与金融失败分开。"
       ],
       "evidence": [
-        "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
-        "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
-        "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
-        "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+        "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+        "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+        "handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+        "handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
         "truth/bank-wealth/contexts/bankwealth/value-objects/bank-read-metadata.vo.yaml",
         "truth/bank-wealth/contexts/bankwealth/value-objects/bank-projection-watermark.vo.yaml"
       ]
     },
     "evidence": [
-      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
-      "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
-      "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+      "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+      "handwritten/scala/example/bankwealth/readside/BankReadside.scala",
       "truth/bank-wealth/contexts/bankwealth/formal-products/artifact-contract/bank-service.formal.yaml",
       "truth/bank-wealth/contexts/bankwealth/value-objects/bank-order-view.vo.yaml",
       "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/aggregate.yaml",

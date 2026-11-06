@@ -1,18 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {compileTree} from '../../metarch-truthsrc/lib/compile.mjs';
 import {compileProductSet} from '../../metarch-truthsrc/lib/products/compile.mjs';
-import {readProductRequest} from '../../metarch-truthsrc/lib/products/cli.mjs';
+import {readHistoricalProductRequest as readProductRequest,readHistoricalJson} from '../tools/historical-assets.mjs';
 import {generate} from '../../metarch-truthsrc/generators/scala-cqrs-effect-application-v2/generate.mjs';
-import {bankApplicationRequest,V1_TREE} from '../tools/v1-inputs.mjs';
-const file=flow=>new URL('../v1/formal-inputs/'+flow+'-376/files.json',import.meta.url).pathname;
+import {bankApplicationRequest} from '../tools/v1-inputs.mjs';
+const file=flow=>'v1/formal-inputs/'+flow+'-376/files.json';
 test('four historical bank flow requests keep their complete frozen source and distinct entry obligations',()=>{
  const tree=readProductRequest(file('payment')).documents.find(d=>d.id==='bank-v1').value,expected={payment:'bank-cash-payment-v1',refund:'bank-independent-refund-v1',ta:'bank-ta-submission-v1',sip:'bank-sip-dispatch-v1'};
  for(const [flow,pipeline] of Object.entries(expected)){
   const request=readProductRequest(file(flow));
   assert.deepEqual(request.documents.find(d=>d.id==='bank-v1').value,tree);
-  const scope=JSON.parse(fs.readFileSync(new URL('../v1/formal-inputs/'+flow+'-376/scope.json',import.meta.url)));
+  const scope=readHistoricalJson('v1/formal-inputs/'+flow+'-376/scope.json');
   assert.equal(scope.flow,flow);assert.equal(scope.pipeline,pipeline);assert.ok(scope.requiredOracles.length);
   assert.equal(scope.runtimeVerified,false);
  }
@@ -30,7 +29,7 @@ test('complete bank contracts reject amount, owner, source guard and authority s
  }
  const result=compileProductSet(input);assert.deepEqual(result.diagnostics,[]);assert.equal(result.result.products.length,14);
  const manifest=JSON.parse(fs.readFileSync(new URL('../../metarch-truthsrc/generators/scala-cqrs-effect-application-v2/generator.json',import.meta.url)));
- const options=JSON.parse(fs.readFileSync(new URL('../v1/formal-inputs/sip-376/options.json',import.meta.url)));
+ const options=readHistoricalJson('v1/formal-inputs/sip-376/options.json');
  const plan=generate({compilation:result,manifest,options});assert.deepEqual(plan.diagnostics,[]);
  assert.ok(plan.plan.entries.some(e=>e.path.endsWith('bank_sip_dispatchEffectHost.scala')));
  assert.ok(plan.plan.entries.some(e=>e.path.endsWith('bank_refund_hostHost.scala')));

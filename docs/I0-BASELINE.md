@@ -2,7 +2,7 @@
 
 ## 后续当前覆盖层
 
-I0 下述三份 note 和 [I0-VERIFICATION.json](I0-VERIFICATION.json) 现为原字节保留的历史快照。当前只将三个 demo prerequisite 设计按 [现金入口决策](CASH-ENTRY-DECISIONS.md) 的 `decision.cash-entry-prerequisites` 覆盖层收口：note [CashPrerequisiteDecisionOverlay](../tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml)，`/payload/info/artifact/body/resolvedDecisions`、`/payload/info/artifact/body/remainingOpenDecisions`；其他八项仍 open。旧 register、授权及测试不倒写，不能将旧 open 当成当前三项未选择。
+I0 下述三份 note 和 [I0-VERIFICATION.json](I0-VERIFICATION.json) 现为原字节保留的历史快照。当前只将三个 demo prerequisite 设计按 [现金入口决策](CASH-ENTRY-DECISIONS.md) 的 `decision.cash-entry-prerequisites` 覆盖层收口：note [CashPrerequisiteDecisionOverlay](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml)，`/payload/info/artifact/body/resolvedDecisions`、`/payload/info/artifact/body/remainingOpenDecisions`；其他八项仍 open。旧 register、授权及测试不倒写，不能将旧 open 当成当前三项未选择。
 
 X01／X02 的当前拆包入口见 [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md)。本轮证据为 [CASH-NEXT-DESIGN-VERIFICATION.json](CASH-NEXT-DESIGN-VERIFICATION.json)，不认证 bootstrap、authority、唯一启动行为或公共实现。以下 I0 段落描述当时边界；当前显式测试新增 `test:next-design`，默认六文件，暂停 suite 仍 excluded。
 
@@ -12,15 +12,15 @@ X01／X02 的当前拆包入口见 [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md)�
 
 三个标准 `kind: note` / `type: question` 位于 board `wealth-i0-design-v1`、refining seq 0 → 1 → 2。其 artifact 均为 `category: decision`、`status: demo-proposal`、`workshopHeld: false`；新政策保持 open。JSON Pointer 相对于解析后的单个 YAML 文档，不是本页维护的配置。
 
-1. **覆盖与 scope** — `decision.i0-baseline-coverage`，note `I0BaselineCoverageDesignProposal`，[真源文件](../tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml)。
+1. **覆盖与 scope** — `decision.i0-baseline-coverage`，note `I0BaselineCoverageDesignProposal`，[真源文件](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml)。
    - 完整设计 body：`/payload/info/artifact/body`。
    - business/product/technical coverage、design/evidence/gap/owner/ref/后续 iteration：`/payload/info/artifact/body/coverageRows`。
    - required/deferred/excluded scope 与未裁决事项：`/payload/info/artifact/body/scopeDecisions`。scope、design 状态与 evidence 层级必须分别读取；required 不等于政策获准或行为已实现。
-2. **边界与公共扩展** — `decision.i0-boundary-ownership`，note `I0BoundaryOwnershipDesignProposal`，[真源文件](../tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml)。
+2. **边界与公共扩展** — `decision.i0-boundary-ownership`，note `I0BoundaryOwnershipDesignProposal`，[真源文件](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-i0-boundary-ownership-design-proposal-1.yaml)。
    - repo/layer/owner：`/payload/info/artifact/body/ownershipRows`。
    - 工具保留/回流/暂停处置：`/payload/info/artifact/body/toolDisposition`。
    - X01–X10：`/payload/info/artifact/body/publicExtensions`；逐项导航见 [PUBLIC-EXTENSIONS.md](PUBLIC-EXTENSIONS.md)。
-3. **第一现金付款纵切** — `decision.cash-first-slice-design`，note `CashFirstSliceDesignProposal`，[真源文件](../tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml)。
+3. **第一现金付款纵切** — `decision.cash-first-slice-design`，note `CashFirstSliceDesignProposal`，[真源文件](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-first-slice-design-proposal-2.yaml)。
    - 五要素：`/payload/info/artifact/body/productPlanes`。
    - 技术需要：`/payload/info/artifact/body/technicalNeeds`。
    - 真实验收义务：`/payload/info/artifact/body/acceptanceObligations`；与已有契约的阅读关系见 [CASH-FIRST-SLICE.md](CASH-FIRST-SLICE.md)。

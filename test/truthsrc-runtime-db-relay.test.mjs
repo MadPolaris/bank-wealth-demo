@@ -30,13 +30,22 @@ test('unsafe Docker paths and container IDs are rejected before listening or spa
   ]);
 });
 
-test('ports must be numeric and exactly match one of the two reserved database pairs', async t => {
+test('ports require an explicit nonshared host port and a fixed database destination', async t => {
   await rejectsBeforeListen(t, [
-    ...[undefined, null, 0, 3306, 27017, 18761, 18764, 18762.5, '18762', NaN, Infinity].map(hostPort => ({ hostPort })),
-    ...[undefined, null, 0, 3307, 27017, '3306', NaN, Infinity].map(containerPort => ({ containerPort })),
-    { hostPort: 18763, containerPort: 3306 },
-    { hostPort: 18762, containerPort: 27017 },
+    ...[undefined, null, 0, 1024, 3306, 27017, 9000, 2551, 65536, 18762.5, '18762', NaN, Infinity].map(hostPort => ({ hostPort })),
+    ...[undefined, null, 0, 3307, 18763, '3306', NaN, Infinity].map(containerPort => ({ containerPort })),
   ]);
+});
+
+test('new lease ports reach loopback binding without a historical 18762/18763 fallback', async t => {
+  const sentinel = new Error('admitted only, no actual bind'), observed = [];
+  t.mock.method(Server.prototype, 'listen', options => { observed.push(options); throw sentinel; });
+  const spawnImpl = t.mock.fn(() => { throw new Error('no client or process is permitted'); });
+  for (const [hostPort, containerPort] of [[19782, 3306], [19783, 27017], [19792, 3306], [19793, 27017]]) {
+    await assert.rejects(startDatabaseRelay({ ...base, hostPort, containerPort, spawnImpl }), error => error === sentinel);
+  }
+  assert.deepEqual(observed, [19782, 19783, 19792, 19793].map(port => ({ host: '127.0.0.1', port, exclusive: true })));
+  assert.equal(spawnImpl.mock.callCount(), 0);
 });
 
 test('rejected configuration neither reads nor reports an unused synthetic credential environment', async t => {
@@ -56,7 +65,9 @@ test('source contract confines listeners, Docker exec targets and termination to
   const source = readFileSync(new URL('../tools/truthsrc-runtime-db-relay.mjs', import.meta.url), 'utf8');
   assert.deepEqual([...source.matchAll(/\bfrom '([^']+)'/g)].map(match => match[1]), ['node:assert/strict', 'node:child_process', 'node:net', './truthsrc-runtime-db-exec.mjs']);
   for (const contract of [
-    '[[18762, 3306], [18763, 27017]]',
+    'Number.isSafeInteger(hostPort)',
+    '![9000, 2551, 3306, 27017].includes(hostPort)',
+    '[3306, 27017].includes(containerPort)',
     "server.listen({ host: '127.0.0.1', port: hostPort, exclusive: true }",
     "'exec 3<>/dev/tcp/127.0.0.1/' + containerPort",
     "['--host', 'unix:///var/run/docker.sock', 'exec', '-i', containerId, 'bash', '-c', script]",

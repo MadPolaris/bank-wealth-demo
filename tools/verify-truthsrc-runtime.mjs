@@ -89,6 +89,7 @@ const runtimeFiles = [
   'tools/truthsrc-runtime-ta-worker.mjs', 'tools/truthsrc-actor-ta-worker.mjs', 'simulator/mock-ta-core.mjs',
   'simulator/contract.mjs', 'simulator/journal.mjs', 'tools/v1-crash-recovery.mjs', 'tools/v1-release-build-evidence.mjs',
   'tools/v1-browser-funds.mjs', 'tools/v1-browser-check.mjs', 'test/fixtures/truthsrc-actor-ta.json',
+  'tools/historical-assets.mjs', 'docs/V1-RETIREMENT-MANIFEST.json',
 ].map(file => join(ROOT, file));
 
 async function runDatabaseWindow({ admitted, evidence, round, owner, ports, taConfig, taConfigSha256, fixtureSha256, env, options, recheck, signal, runProcess }) {

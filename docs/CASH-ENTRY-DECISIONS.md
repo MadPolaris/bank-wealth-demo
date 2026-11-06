@@ -2,7 +2,7 @@
 
 ## 当前权威与历史
 
-本轮经用户批准的三项 **selected-demo-design** 只在 `decision.cash-entry-prerequisites`，note [CashPrerequisiteDecisionOverlay](../tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml) 维护：
+本轮经用户批准的三项 **selected-demo-design** 只在 `decision.cash-entry-prerequisites`，note [CashPrerequisiteDecisionOverlay](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-cash-prerequisite-decision-overlay-0.yaml) 维护：
 
 - 完整限定授权：`/payload/info/artifact/body/authorization`。
 - 三项选择及 bootstrap／mapping／唯一启动者规格：`/payload/info/artifact/body/resolvedDecisions`。
@@ -10,7 +10,7 @@
 - 其余八项仍 open：`/payload/info/artifact/body/remainingOpenDecisions`。
 - 当前完整度与未实现边界：`/payload/info/artifact/body/designCompleteness`、`/payload/info/artifact/body/evidenceBoundary`。
 
-原 [I0BaselineCoverageDesignProposal](../tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml)（`decision.i0-baseline-coverage`）的 `/payload/info/artifact/body/scopeDecisions` 和原授权仍是 I0 当时快照，字节不改。当前只按新覆盖层明确引用的三项读取选择；不能将旧 register 的 open 与新选择解释成两个同步配置，也不声称公共工具已经实现通用 supersession 语义。
+原 [I0BaselineCoverageDesignProposal](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-i0-baseline-coverage-design-proposal-0.yaml)（`decision.i0-baseline-coverage`）的 `/payload/info/artifact/body/scopeDecisions` 和原授权仍是 I0 当时快照，字节不改。当前只按新覆盖层明确引用的三项读取选择；不能将旧 register 的 open 与新选择解释成两个同步配置，也不声称公共工具已经实现通用 supersession 语义。
 
 ## 关联阅读，不复制政策
 

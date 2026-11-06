@@ -69,6 +69,14 @@ test('admission rejects unsafe namespaces, paths, reserved/duplicate ports befor
   assert.deepEqual(readdirSync(evidence), []);
 });
 
+test('explicit new lease ports propagate unchanged to both relays', async t => {
+  const { db, relays } = fixture(t, { mysqlPort: 19782, mongoPort: 19783 });
+  const config = await db.start();
+  assert.deepEqual(relays.map(row => [row.hostPort, row.containerPort]), [[19782, 3306], [19783, 27017]]);
+  assert.equal(config.mysql.port, 19782); assert.equal(config.mongo.port, 19783);
+  assert.equal((await db.stop()).stopped, true);
+});
+
 test('fresh pinned images, distinct internal bridges, loopback ports and file-only credentials', async t => {
   const { db, calls, evidence, relays } = fixture(t), config = await db.start();
   const images = calls.filter(c => c.args[0] === 'image'), runs = calls.filter(c => c.args[0] === 'run'), networks = calls.filter(c => c.args[0] === 'network');

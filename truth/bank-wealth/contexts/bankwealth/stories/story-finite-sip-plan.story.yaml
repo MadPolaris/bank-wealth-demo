@@ -32,16 +32,16 @@ payload:
       }
     ],
     "evidence": [
-      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
-      "v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)",
+      "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)",
       "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/aggregate.yaml",
       "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-create-intent.slice.yaml",
       "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/trigger-sip-installment.slice.yaml",
       "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-succeeded.slice.yaml",
       "truth/bank-wealth/contexts/bankwealth/aggregates/sip-plan/slices/record-sip-installment-failed.slice.yaml",
       "truth/bank-wealth/contexts/bankwealth/pipelines/bank-sip-dispatch-v1.pipeline.yaml",
-      "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
-      "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
-      "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+      "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+      "handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+      "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
     ]
   }

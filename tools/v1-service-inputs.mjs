@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ROOT, TOOL_ROOT, filesUnder, sha256 } from './truth-source.mjs';
 import { V1_TREE, bankApplicationRequest, bankDomainRequest } from './v1-inputs.mjs';
 import { historicalInventory } from './historical-source.mjs';
+import { assertHistoricalCheckout } from './historical-assets.mjs';
 
 const load = file => import(pathToFileURL(join(TOOL_ROOT, file)).href);
 const { profileFor } = await load('lib/products/registry.mjs');
@@ -99,6 +100,7 @@ function protectedInputs() {
 }
 
 export function writeBankServiceInputs(target, options, scope) {
+  assertHistoricalCheckout();
   assert.ok(isAbsolute(target) && resolve(target) === target, 'explicit canonical absolute output required');
   assert.equal(dirname(target), join(ROOT, 'v1/formal-inputs'), 'only a fresh owned formal-inputs/release-* directory may be written');
   assert.match(relative(join(ROOT, 'v1/formal-inputs'), target), /^release-[A-Za-z0-9][A-Za-z0-9_.-]*$/u);

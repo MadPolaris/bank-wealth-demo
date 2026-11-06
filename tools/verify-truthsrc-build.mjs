@@ -26,7 +26,7 @@ import {
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const TOOL = resolve(ROOT, '../metarch-truthsrc');
 const PROJECT = join(ROOT, 'truthsrc.project.json');
-const HANDWRITTEN = join(ROOT, 'v1/handwritten/scala');
+const HANDWRITTEN = join(ROOT, 'handwritten/scala');
 const RUNTIME = join(ROOT, '.local/truthsrc-runtime');
 const DEFAULT_JAVA_HOME = '/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home';
 const PYTHON = '/usr/bin/python3';

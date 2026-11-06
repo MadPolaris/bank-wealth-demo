@@ -1,1 +1,0 @@
-{"schemaVersion":"bank-service.interface-fixture/v1","intent":"bank typed interface and ext mount prerequisite; not application acceptance","flows":["payment","refund","ta","sip"],"runtimeVerified":false}

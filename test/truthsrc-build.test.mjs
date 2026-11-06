@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { actualBuildSourceRoot, buildTasks, command, compareBuildSources, completeGeneratedTests, generatedTestManifest, inspectGeneratedTests, isMainModule, parseArgs, plannedAnchorLocations, sortedAnchorLocations } from '../tools/verify-truthsrc-build.mjs';
 
+const ROOT = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
 const cli = fileURLToPath(new URL('../tools/verify-truthsrc-build.mjs', import.meta.url));
 const args = ['--project-output', '/unused/generated', '--archive', '/unused/clean.tar.gz', '--evidence', '/unused/evidence'];
 const suites = [
@@ -56,7 +57,8 @@ for (const [name, flags, compileTests, runTests] of [
     assert.match(tasks.at(-2), /\(Test \/ definedTests\)\.value/);
     assert.ok(tasks.at(-2).includes('TRUTHSRC-GENERATED-SUITES='));
   }
-  assert.ok(tasks.every(task => !/testOnly|runMain|Test \/ fork|UnitNoNetwork|v1\/test/.test(task)));
+  assert.ok(tasks.every(task => !/testOnly|runMain|Test \/ fork|UnitNoNetwork/.test(task) &&
+    !task.includes(join(ROOT, 'test/scala'))));
 });
 
 test('CLI rejects duplicate flags, arbitrary tasks, unknown switches and incomplete paths', () => {

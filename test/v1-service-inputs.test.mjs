@@ -1,19 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-import {compileTree} from '../../metarch-truthsrc/lib/compile.mjs';
 import {compileProductSet} from '../../metarch-truthsrc/lib/products/compile.mjs';
-import {readProductRequest} from '../../metarch-truthsrc/lib/products/cli.mjs';
+import {readHistoricalAsset,readHistoricalProductRequest as readProductRequest} from '../tools/historical-assets.mjs';
 import {bankServiceRequest} from '../tools/v1-service-inputs.mjs';
-import {bankApplicationRequest,V1_TREE} from '../tools/v1-inputs.mjs';
+import {bankApplicationRequest} from '../tools/v1-inputs.mjs';
 import {historicalSnapshot} from '../tools/historical-source.mjs';
 
 test('service source and historical application inputs are explicit separate complete versions',()=>{
  const current=historicalSnapshot('v1/tree').canonical,request=bankServiceRequest();
  assert.deepEqual(request.documents.find(d=>d.id==='bank-v1').value,current);
- const captured=readProductRequest(new URL('../v1/formal-inputs/release-pages-721/files.json',import.meta.url).pathname);
+ const captured=readProductRequest('v1/formal-inputs/release-pages-721/files.json');
  assert.deepEqual(captured,request);
- const previous=readProductRequest(new URL('../v1/formal-inputs/release-service-631/files.json',import.meta.url).pathname);
+ const previous=readProductRequest('v1/formal-inputs/release-service-631/files.json');
  const priorService=previous.documents.find(d=>d.id==='bank-v1').value.artifactContracts.find(a=>a.id==='bank-service').deployment.service;
  assert.ok(!Object.hasOwn(priorService,'pages'));
  const pages=current.artifactContracts.find(a=>a.id==='bank-service').deployment.service.pages;
@@ -38,5 +36,5 @@ test('service nominal commands retain exact request sources and ordered original
  assert.ok(service.endpoints.filter(e=>e.method==='POST').every(e=>e.csrf));
  const intent=source.valueObjects.find(v=>v.name==='BankSipCreate');
  assert.deepEqual(intent.fields.find(f=>f.name==='dueSlots'),{name:'dueSlots',dataType:'Vector[Long]'});
- assert.equal(readFileSync(new URL('../v1/integration/CONTRACT.md',import.meta.url),'utf8').includes('BankTrustedAdmission'),true);
+ assert.equal(readHistoricalAsset('v1/integration/CONTRACT.md').toString('utf8').includes('BankTrustedAdmission'),true);
 });

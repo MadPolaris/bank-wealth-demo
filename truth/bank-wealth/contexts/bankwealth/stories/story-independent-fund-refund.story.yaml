@@ -32,14 +32,14 @@ payload:
       }
     ],
     "evidence": [
-      "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
-      "v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)",
+      "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+      "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)",
       "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/request-fund-purchase-refund.slice.yaml",
       "truth/bank-wealth/contexts/bankwealth/aggregates/fund-order/slices/record-fund-refund-succeeded.slice.yaml",
       "truth/bank-wealth/contexts/bankwealth/pipelines/bank-independent-refund-v1.pipeline.yaml",
       "truth/bank-wealth/contexts/bankwealth/sagas/bank-independent-refund-v1.saga.yaml",
-      "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
-      "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
-      "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+      "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+      "handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
+      "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
     ]
   }

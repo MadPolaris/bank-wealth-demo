@@ -55,7 +55,7 @@ test('actor execution requires an exclusive explicit flag and keeps generated-on
   assert.ok(tasks.at(-2).includes('(Test / sources).value') && tasks.at(-2).includes('TRUTHSRC-ACTOR-SOURCES='));
   assert.ok(tasks.every(t => !/testOnly|runMain|Test \/ fork :=|UnitNoNetwork/.test(t)));
   const ordinary = buildTasks(testFiles, parseArgs([...args, '--run-generated-tests']), generated);
-  assert.ok(ordinary.every(t => !t.includes('/v1/test/') && !t.includes('bank.mock-ta')));
+  assert.ok(ordinary.every(t => !t.includes(join(ROOT, 'test/scala')) && !t.includes('bank.mock-ta')));
 });
 
 test('actor round derives only from a direct new bank evidence name', () => {

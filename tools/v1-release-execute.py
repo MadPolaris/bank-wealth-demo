@@ -76,7 +76,26 @@ def copy_file(source, target, expected=None):
     return digest
 
 
+def require_historical_checkout():
+    message = ('historical release source tree is retired or incomplete; replay the fixed '
+               'historical checkout 675a9366cf270995ef714e505e42c19652f0e4f0 or clean1134 '
+               'archive, not the current author toolchain; v1 will not be recreated')
+    # Do not let rglob(missing_root) silently produce an empty protected capture.
+    for part in ['tools', 'simulator', 'v1/tree', 'v1/handwritten', 'v1/test', 'v1/formal-inputs', 'v1/integration', 'v1/third-party']:
+        root = BANK / part
+        if not root.is_dir() or root.is_symlink() or root.resolve() != root:
+            raise ValueError(message)
+        files = list(root.rglob('*'))
+        if any(p.is_symlink() for p in files) or not any(p.is_file() and not set(p.relative_to(root).parts) & EXCLUDED for p in files):
+            raise ValueError(message)
+    for part in ['package.json', 'v1/tree/workshop.yaml', 'v1/integration/CONTRACT.md', 'v1/integration/ACCEPTANCE-MATRIX.md', 'v1/integration/HANDWRITTEN-SOURCE-MAP.json']:
+        file = BANK / part
+        if not file.is_file() or file.is_symlink() or file.resolve() != file or file.stat().st_size == 0:
+            raise ValueError(message)
+
+
 def capture(config):
+    require_historical_checkout()
     required = {'schemaVersion', 'bundle', 'workId', 'javaHome', 'python', 'sources'}
     if set(config) - (required | {'runtime'}) or not required <= set(config):
         raise ValueError('unexpected release configuration fields')

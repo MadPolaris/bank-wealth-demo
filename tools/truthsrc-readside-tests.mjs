@@ -61,7 +61,7 @@ const GENERATED_FILES = ['UnitConfigurationCheck', 'GeneratedActorStateSpec', 'G
   .map(name => 'src/test/scala/' + name + '.scala').sort();
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const pinnedSuites = () => FROZEN_SUITES.map(([short, sha256, tests]) => ({
-  name: 'example.bankwealth.service.' + short, file: join(ROOT, 'v1/test/scala', short + '.scala'),
+  name: 'example.bankwealth.service.' + short, file: join(ROOT, 'test/scala', short + '.scala'),
   sha256, tests: [...tests], sourceKind: 'frozen-readside-test',
 }));
 const pinnedManifest = () => ({ schemaVersion: 'bank.truthsrc-readside-tests/v1', baselineRevision: READSIDE_BASELINE_REVISION,

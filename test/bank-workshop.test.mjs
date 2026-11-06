@@ -1,12 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync, symlinkSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync, symlinkSync, unlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { parseWorkshopArgs, humanResult, workshopCli } from '../tools/bank-workshop.mjs';
 import { ARCHIVE_SHA256, ROOT, doctor, fileReference, leaseMetadata, newRunPath, nodeSupported, sha256 } from '../tools/bank-workshop-supply.mjs';
 import { inspectService, reportWorkshop, REQUIRED, verifyWorkshop } from '../tools/bank-workshop-verification.mjs';
 import { crashCases as CRASH_CASES, sipCrashCases, taCrashCases, validateChildReport } from '../tools/v1-crash-recovery.mjs';
+import { RUNTIME_NETWORK_SCOPE, RUNTIME_NETWORK_LIMITATION } from '../tools/truthsrc-runtime-sandbox.mjs';
 
 const save = (file, value) => writeFileSync(file, JSON.stringify(value), { flag: 'wx' });
 function fixture(t) {
@@ -296,7 +297,23 @@ async function serviceFixture(t) {
     writeFileSync(join(invocation, 'worker.jsonl'), transcript); writeFileSync(join(invocation, 'worker.stderr.log'), '');
     return { pid, absent: true, cleanCloseReceipt, jvmWaited: !crash, transcriptSha256: sha256(transcript) };
   };
-  processReceipt(join(evidence, 'crash-boundary/probe'));
+  const boundary = (directory, networkScope, controls = []) => {
+    mkdirSync(directory, { recursive: true });
+    const profile = join(directory, 'runtime-sandbox.sb'), probe = join(directory, 'runtime-probe.py');
+    const canary = join(f.root, 'outside-canary-' + nextPid);
+    for (const file of [profile, probe, canary, ...controls]) {
+      mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, 'synthetic boundary control, never executed');
+    }
+    const receipt = processReceipt(join(directory, 'probe'));
+    receipt.sandboxProfile = profile; receipt.sandboxProfileSha256 = sha256(readFileSync(profile));
+    writeFileSync(join(directory, 'probe.json'), JSON.stringify(receipt));
+    const before = Object.fromEntries([profile, probe, canary, configFile, ...controls].map(file => {
+      const bytes = readFileSync(file); return [file, { bytes: bytes.length, sha256: sha256(bytes) }];
+    }));
+    save(join(directory, 'boundary.json'), { passed: true, networkScope,
+      limitation: networkScope === 'deny-all' ? null : RUNTIME_NETWORK_LIMITATION, before, syscallProbe: receipt });
+  };
+  boundary(join(evidence, 'crash-boundary'), 'deny-all');
   const cases = CRASH_CASES.map((caseName, index) => {
     const root = join(round, 'case-' + caseName), namespace = 'crash_' + sha256(evidence).slice(0, 16) + '_' + index;
     const invocations = ['crash', 'recover', 'verify'].map(mode => {
@@ -314,7 +331,7 @@ async function serviceFixture(t) {
   });
   const runs = ['initial', 'restart', 'refund', 'replay'].map(mode => {
     const dir = join(evidence, 'database', mode), serviceRoot = join(round, 'service'), invocation = join(serviceRoot, 'runs', mode);
-    processReceipt(join(dir, 'probe'));
+    boundary(dir, RUNTIME_NETWORK_SCOPE, ['integration.conf', 'logback.xml', 'browser.json'].map(name => join(invocation, name)));
     const browser = mode !== 'restart' ? { completed: true, mode } : null;
     if (browser) processReceipt(join(dir, 'browser'), JSON.stringify(browser));
     const process = processReceipt(join(dir, 'server')), w = worker(serviceRoot, invocation);
@@ -326,8 +343,10 @@ async function serviceFixture(t) {
     save(join(dir, 'result.json'), row); return row;
   });
   processReceipt(join(evidence, 'database/mysql-negative/process'));
-  const database = { passed: true, browserVerified: true, productionFactory: true, cleanup: { stopped: true }, errors: [], runs,
+  const database = { passed: true, browserVerified: true, productionFactory: true,
+    cleanup: { schemaVersion: 'bank.truthsrc-runtime-databases/v1', owner: spec.owner, stopped: true }, errors: [], runs,
     mysqlNegative: { scenarios: Array.from({ length: 5 }, () => ({ status: 'passed' })) } };
+  save(join(evidence, 'database/database-stop.json'), database.cleanup);
   save(join(evidence, 'database/mysql-negative/result.json'), database.mysqlNegative);
   save(join(evidence, 'database/result.json'), database);
   const leaseRef = await fileReference(f.options.lease);
@@ -359,6 +378,26 @@ test('real service inspector rechecks every schema process receipt and rejects b
   writeFileSync(file, JSON.stringify(result));
   writeFileSync(join(evidence, 'database/replay/browser.stdout.log'), '{"completed":false}');
   await assert.rejects(inspectService(options), 'tampered nested browser log must fail even if root says passed');
+});
+
+test('service inspector seals boundary controls and the original database stop receipt', async t => {
+  const { evidence, options } = await serviceFixture(t);
+  const first = await inspectService(options), references = new Set(first.refs.map(row => row.file));
+  const paths = ['crash-boundary', ...['initial', 'restart', 'refund', 'replay'].map(mode => 'database/' + mode)];
+  for (const directory of paths) {
+    for (const name of ['boundary.json', 'runtime-probe.py']) assert.ok(references.has(join(evidence, directory, name)));
+  }
+  const files = [join(evidence, 'database/database-stop.json'), join(evidence, 'crash-boundary/boundary.json'),
+    join(evidence, 'database/replay/runtime-probe.py')];
+  for (const file of files) {
+    assert.ok(references.has(file)); const bytes = readFileSync(file);
+    writeFileSync(file, file.endsWith('.json') ? '{"stopped":false}' : 'changed control');
+    await assert.rejects(inspectService(options));
+    writeFileSync(file, bytes); unlinkSync(file);
+    await assert.rejects(inspectService(options));
+    writeFileSync(file, bytes, { flag: 'wx' });
+  }
+  assert.equal((await inspectService(options)).passed, true);
 });
 
 test('file references detect byte changes without exposing contents', async t => {

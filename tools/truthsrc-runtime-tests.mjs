@@ -24,7 +24,7 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 
 export function runtimeTestManifest(read = file => readFileSync(file, 'utf8')) {
   const sources = RUNTIME_MAINS.map((name, index) => {
-    const short = name.split('.').at(-1), file = join(ROOT, 'v1/test/scala', short + '.scala');
+    const short = name.split('.').at(-1), file = join(ROOT, 'test/scala', short + '.scala');
     const content = read(file);
     assert.equal(hash(content), FROZEN_MAIN_SHA256[index], 'frozen runtime test bytes changed: ' + short);
     assert.deepEqual([...content.matchAll(/^package ([A-Za-z][A-Za-z0-9.]*)$/gm)].map(row => row[1]), ['example.bankwealth.service']);

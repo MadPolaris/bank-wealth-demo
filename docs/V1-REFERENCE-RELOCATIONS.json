@@ -1,0 +1,1100 @@
+{
+  "schemaVersion": "bank.v1-reference-relocations/v1",
+  "revision": "4515b6b97d91714116b451b4e930dc81e112e528",
+  "scope": "Only current documentary evidence locators changed. Reversing the listed fields reproduces original author bytes; business fields, frozen origins and historical source captures remain unchanged.",
+  "files": [
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/read-models/read-model-bank-account-view.rm.yaml",
+      "before": {
+        "bytes": 5873,
+        "sha256": "b33f766ed2d4ca1ba534bcf5ae6a1e7b8180cb1ca3523637aac1274e9d616df8"
+      },
+      "after": {
+        "bytes": 6041,
+        "sha256": "b37a25ea65929921e6d71a2b20c7d63615db27658c1ff97f04c248951039f6ca"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/metadata/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala"
+        },
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/evidence/11",
+          "from": "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala",
+          "to": "handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/read-models/read-model-bank-cash-request-view.rm.yaml",
+      "before": {
+        "bytes": 7471,
+        "sha256": "5d552322a5edbc77359d4046f7ffee1c62be6285c51283ef56dfc1f618b14392"
+      },
+      "after": {
+        "bytes": 7636,
+        "sha256": "dc779422e5a4faac5ad4f1026b1e78acacf8f2da2da8e513041764535dd974b9"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/metadata/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala"
+        },
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/evidence/23",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankCashRequests.scala"
+        },
+        {
+          "pointer": "/payload/evidence/24",
+          "from": "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala",
+          "to": "handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/read-models/read-model-bank-order-view.rm.yaml",
+      "before": {
+        "bytes": 11380,
+        "sha256": "ac1e43bf9ba37ca0b959c146ee1ba7b09fa21a320f0def79246f03e2e7186265"
+      },
+      "after": {
+        "bytes": 11551,
+        "sha256": "48ddad534c50a146d0462e2e06f0d25d6b1aa47061fc53266e7ca789e179043b"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/metadata/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala"
+        },
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/read-models/read-model-bank-pending-operation-view.rm.yaml",
+      "before": {
+        "bytes": 9412,
+        "sha256": "f334d076096fd88b93d5c3c5772a53ce4f624cd08745df08e870f659fb629395"
+      },
+      "after": {
+        "bytes": 9577,
+        "sha256": "4abea172660c34897c5aee9ac029370e82e6593f2b70d1e39cb5f2c53dd1ab2c"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/metadata/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala"
+        },
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/evidence/24",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+        },
+        {
+          "pointer": "/payload/evidence/25",
+          "from": "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala",
+          "to": "handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/read-models/read-model-bank-sip-occurrence-view.rm.yaml",
+      "before": {
+        "bytes": 9490,
+        "sha256": "ec92f77cd5b7843e0f16123a81a5f63a1ce950834b0c4b8bfef8b8a185c852b1"
+      },
+      "after": {
+        "bytes": 9658,
+        "sha256": "61f461e102a03e977e4ce3098ce4b13f7536cfe27a0f1a667c3685ddf1aa1de2"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/metadata/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala"
+        },
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/evidence/30",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/read-models/read-model-bank-sip-plan-view.rm.yaml",
+      "before": {
+        "bytes": 9334,
+        "sha256": "e2f9e255149515e8d233a9386626c8cdd23dc5f35d29040dbb6f90723667ef8c"
+      },
+      "after": {
+        "bytes": 9499,
+        "sha256": "f91c9424bf94f6f520a22bf60a784dc40c66fc8bf8fc8c70643cb9990b21637e"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/metadata/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/metadata/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala"
+        },
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/evidence/20",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala"
+        },
+        {
+          "pointer": "/payload/evidence/21",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/stories/story-cash-fund-purchase.story.yaml",
+      "before": {
+        "bytes": 2166,
+        "sha256": "afbdeacf2ac7607c7b88872c675b647c2ed7408aa7f6dc5751aca9e322a8746f"
+      },
+      "after": {
+        "bytes": 2244,
+        "sha256": "ecce6609946f45ce43004091e73ad2716bec5d263e958e6c4d65c465d29a6876"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)"
+        },
+        {
+          "pointer": "/payload/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+        },
+        {
+          "pointer": "/payload/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankCashRequests.scala"
+        },
+        {
+          "pointer": "/payload/evidence/10",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala"
+        },
+        {
+          "pointer": "/payload/evidence/11",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/stories/story-finite-sip-plan.story.yaml",
+      "before": {
+        "bytes": 2043,
+        "sha256": "c078773eb538f296f2704954e5409d994f172891d3f624e16da8b2fac1436cec"
+      },
+      "after": {
+        "bytes": 2124,
+        "sha256": "906e7a921207efa0f3697a2edf14d37eca0d4920fcbd7b69120a1872049efaf3"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)"
+        },
+        {
+          "pointer": "/payload/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala"
+        },
+        {
+          "pointer": "/payload/evidence/9",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+        },
+        {
+          "pointer": "/payload/evidence/10",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/stories/story-fund-ta-settlement.story.yaml",
+      "before": {
+        "bytes": 1957,
+        "sha256": "f5fe3e9e0cbdc5a5eadd6b9ea994cbb516614f75207edb852a8e5c5602ddbc67"
+      },
+      "after": {
+        "bytes": 2041,
+        "sha256": "c9702aa3beadf9764d50f0d3c4efea03e346abf279db5ff0a2e31e79ef5f6a45"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)"
+        },
+        {
+          "pointer": "/payload/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/evidence/9",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/stories/story-independent-fund-refund.story.yaml",
+      "before": {
+        "bytes": 1827,
+        "sha256": "de48eb948a362fd7fb250910e8afa225b59da115f2a3d52e079b0ff12b1a722d"
+      },
+      "after": {
+        "bytes": 1908,
+        "sha256": "abe9eb688b77c66f506a404ef1582844372be1489bd30ad0e2e508fb6ee5b182"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)"
+        },
+        {
+          "pointer": "/payload/evidence/6",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/evidence/7",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala"
+        },
+        {
+          "pointer": "/payload/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/contexts/bankwealth/use-cases.yaml",
+      "before": {
+        "bytes": 62741,
+        "sha256": "06ce22190c0ca4999ec78a084fb805e9596635ae08714621ca397d8e33b5e911"
+      },
+      "after": {
+        "bytes": 63983,
+        "sha256": "531663b9e938256b465d3b302a4d5e6798aacb689cd198a795668764aadb3b5e"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/useCases/0/steps/0/evidence/1",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/steps/0/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankCashRequests.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/steps/3/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/steps/5/evidence/0",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/extensions/0/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/0/extensions/0/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/0/extensions/0/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/extensions/0/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankCashRequests.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/extensions/0/evidence/10",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/extensions/0/evidence/11",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/extensions/1/evidence/3",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P27-3)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P27-3)"
+        },
+        {
+          "pointer": "/payload/useCases/0/extensions/2/evidence/2",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P27-2, P27-4, P27-5)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P27-2, P27-4, P27-5)"
+        },
+        {
+          "pointer": "/payload/useCases/0/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/0/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P27-1..P27-5; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/0/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankCashRequests.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/evidence/10",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankPaymentBindings.scala"
+        },
+        {
+          "pointer": "/payload/useCases/0/evidence/11",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        },
+        {
+          "pointer": "/payload/useCases/1/steps/1/evidence/1",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/1/steps/4/evidence/0",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/0/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/0/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/0/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/0/evidence/9",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/1/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/1/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/1/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/1/evidence/9",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/2/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/2/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/2/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/1/extensions/2/evidence/9",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala"
+        },
+        {
+          "pointer": "/payload/useCases/1/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/1/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P28-1..P28-3; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/1/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/1/evidence/9",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankTaBridge.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/steps/1/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/steps/1/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/steps/3/evidence/0",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/steps/4/evidence/1",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/0/evidence/2",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P29-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P29-1)"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/1/evidence/2",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/1/evidence/3",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/1/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/1/evidence/9",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/1/evidence/10",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/2/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/2/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/2/evidence/6",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/2/evidence/7",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/extensions/2/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/2/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P29-1..P29-3; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/2/evidence/6",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/evidence/7",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankRefundBindings.scala"
+        },
+        {
+          "pointer": "/payload/useCases/2/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/steps/0/evidence/1",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/steps/5/evidence/1",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala (tick)",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala (tick)"
+        },
+        {
+          "pointer": "/payload/useCases/3/steps/9/evidence/1",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/steps/9/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankCashRequests.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/steps/11/evidence/0",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/0/evidence/0",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/0/evidence/2",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P30-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P30-2)"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/1/evidence/0",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/1/evidence/5",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P30-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P30-2)"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/2/evidence/0",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/2/evidence/2",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P30-4)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P30-4)"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/3/evidence/0",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/3/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P30-3, P30-4)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P30-3, P30-4)"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/4/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/4/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/4/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/4/evidence/9",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/extensions/4/evidence/10",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/useCases/3/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P30-1..P30-4; P31-1)"
+        },
+        {
+          "pointer": "/payload/useCases/3/evidence/8",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/evidence/9",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+        },
+        {
+          "pointer": "/payload/useCases/3/evidence/10",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+        },
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P30-4; P31-1..P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P30-4; P31-1..P31-2)"
+        },
+        {
+          "pointer": "/payload/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/inbox/02-commands/role-cs-customer-0.yaml",
+      "before": {
+        "bytes": 2502,
+        "sha256": "70d0ab96b374f7c700bd6a50b34e260013e3b28986dd6fc7b2b426c519c5ef4f"
+      },
+      "after": {
+        "bytes": 2577,
+        "sha256": "a2f0097371f97fd09458c40ed32d6cd753963acd8d86d586a547ad4fdd5af788"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P28-1; P29-2; P30-1..P30-4; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-1..P26-3; P28-1; P29-2; P30-1..P30-4; P31-2)"
+        },
+        {
+          "pointer": "/payload/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala",
+          "to": "handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala"
+        },
+        {
+          "pointer": "/payload/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankTrustedAdmission.scala"
+        },
+        {
+          "pointer": "/payload/evidence/5",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankCashRequests.scala"
+        },
+        {
+          "pointer": "/payload/evidence/6",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala"
+        },
+        {
+          "pointer": "/payload/evidence/7",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/inbox/02-commands/role-cs-operator-1.yaml",
+      "before": {
+        "bytes": 1790,
+        "sha256": "d31a687058a12919eef470f88df16f7cd9f8b8ad7b49cdb4928b199d02d758ff"
+      },
+      "after": {
+        "bytes": 1868,
+        "sha256": "a2365a46903f6b8e45456e06e0e87fd2a5088a543e271c0d344a00e6cd024538"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P27-4..P27-5; P29-2..P29-3; P30-2; P31-2)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-2; P27-4..P27-5; P29-2..P29-3; P30-2; P31-2)"
+        },
+        {
+          "pointer": "/payload/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala",
+          "to": "handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala"
+        },
+        {
+          "pointer": "/payload/evidence/4",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/evidence/5",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala"
+        },
+        {
+          "pointer": "/payload/evidence/6",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankRecovery.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankRecovery.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/inbox/02-commands/role-cs-system-2.yaml",
+      "before": {
+        "bytes": 10242,
+        "sha256": "2c4389f297c827526b96f764b49de8e755e627ecbae957a32d60bfcce2201ea4"
+      },
+      "after": {
+        "bytes": 10317,
+        "sha256": "69cdcfeafac1789a0472b93a29fbd07a68cd7e3aa614c3a8c6075e9d1df7b114"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26-3; P28-1..P28-3; P29-1..P29-3; P30-1..P30-4)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26-3; P28-1..P28-3; P29-1..P29-3; P30-1..P30-4)"
+        },
+        {
+          "pointer": "/payload/evidence/2",
+          "from": "v1/handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala",
+          "to": "handwritten/scala/example/bankwealth/security/BankDemoAuthority.scala"
+        },
+        {
+          "pointer": "/payload/evidence/3",
+          "from": "v1/handwritten/scala/example/bankwealth/integration/BankCashRequests.scala",
+          "to": "handwritten/scala/example/bankwealth/integration/BankCashRequests.scala"
+        },
+        {
+          "pointer": "/payload/evidence/4",
+          "from": "v1/handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/ta/BankTaRefundApplication.scala"
+        },
+        {
+          "pointer": "/payload/evidence/5",
+          "from": "v1/handwritten/scala/example/bankwealth/sip/BankSipApplication.scala",
+          "to": "handwritten/scala/example/bankwealth/sip/BankSipApplication.scala"
+        },
+        {
+          "pointer": "/payload/evidence/6",
+          "from": "v1/handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala",
+          "to": "handwritten/scala/example/bankwealth/bindings/BankSipTerminalBridge.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/inbox/05-context-map/context-cm-bankwealth-0.yaml",
+      "before": {
+        "bytes": 5184,
+        "sha256": "75e4bc66fa3dd3e6ea6ca7bc110ad4ac6fbfeb4158a4dfacb2d94a936b4840d4"
+      },
+      "after": {
+        "bytes": 5268,
+        "sha256": "2283142c80ce3f3eef8554dbf08e9051a5695d844ba2ac3b45e11627280d57c5"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/evidence/0",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md (1134既定本地demo签出；不是本次执行证明)"
+        },
+        {
+          "pointer": "/payload/evidence/1",
+          "from": "v1/integration/ACCEPTANCE-MATRIX.md (P26..P30; P31-1..P31-2; 1134适用边界)",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/ACCEPTANCE-MATRIX.md (P26..P30; P31-1..P31-2; 1134适用边界)"
+        },
+        {
+          "pointer": "/payload/evidence/12",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadside.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadside.scala"
+        },
+        {
+          "pointer": "/payload/evidence/13",
+          "from": "v1/handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala",
+          "to": "handwritten/scala/example/bankwealth/readside/BankReadsideSchema.scala"
+        }
+      ]
+    },
+    {
+      "file": "truth/bank-wealth/inbox/06-aggregate-detail/question-rf-bank-v1-implementation-0.yaml",
+      "before": {
+        "bytes": 18954,
+        "sha256": "7e1aeeba7d4d5983df045e9377f12c48be26adbc80f51667ac9cb8625cb75068"
+      },
+      "after": {
+        "bytes": 18999,
+        "sha256": "9b5c73fd78e25b53a08f8ee6badaa5fa3643a15efd94c7242d5f9b1a5a048d16"
+      },
+      "changes": [
+        {
+          "pointer": "/payload/info/artifact/body/readiness/acceptedRelease",
+          "from": "v1/integration/RELEASE-SIGNOUT-1134.md",
+          "to": "git:4515b6b97d91714116b451b4e930dc81e112e528:v1/integration/RELEASE-SIGNOUT-1134.md"
+        }
+      ]
+    }
+  ]
+}

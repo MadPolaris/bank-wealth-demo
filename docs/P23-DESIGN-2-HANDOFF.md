@@ -5,7 +5,7 @@
 ## 当前输入与修订范围
 
 - 银行基线提交：`5bf91e0eb6fc841c571a4c459f0ad9411b150c95`，分支 `feature/bank-wealth-truth-preview`。本修订为该提交后的工作树增量，未自动提交或推送；当前字节以本版回执及清单为准。
-- 唯一权威输入：[P23BankV1HandoffContract](../tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)，artifact `decision.p23-bank-v1-handoff`。
+- 唯一权威输入：[P23BankV1HandoffContract](https://github.com/MadPolaris/bank-wealth-demo/blob/675a9366cf270995ef714e505e42c19652f0e4f0/tree/inbox/refining/question-rf-p23-bank-v1-handoff-contract-0.yaml)，artifact `decision.p23-bank-v1-handoff`。
 - `bank-v1-p23-design-2` 显式承接 `bank-v1-p23-design-1`。只修已记录的 P23-R01–R06，不改已选政策、不增加里程碑。仍为四个 flow、30 个未执行设计场景、23 条覆盖项、P23–P32 的 40 个验收包。
 - 四个 flow 的正文、版本与 bindings 入口仍为 `/payload/info/artifact/body/flows/0` 至 `/3`；所有场景在 `/payload/info/artifact/body/scenarios`。六份 binding 原文件、旧业务原子、runtime、公共工具源码和暂停资格草稿均不在本次写面。
 
