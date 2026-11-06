@@ -1,30 +1,40 @@
-# Bank Wealth Demo：从业务知识到可运行系统
+# Bank Wealth Workshop
 
-> 给第一次打开本仓库的同学，尤其是关心“Palantir 本体论的思路怎样落到系统研发”的同学。
->
-> **本项目用银行账户、基金申购、退款和定投，演示一条可以追溯的研发链路：业务真源 → 编译 → 代码生成 → 手写边界集成 → 运行验证 → 代码回锚。** 它不是 Palantir 产品、插件或兼容实现，也不是可用于真实资金的生产银行系统。
->
-> 阅读核对日期：2026-11-06。当前开发入口已收敛为根 `truthsrc.project.json` 和 [`truth/bank-wealth/`](truth/bank-wealth/)，先宏压缩、再受控微语法降噪；旧两树已退役。代码通过本地 SQLite 知识图导出的 AST 生成，再回锚同图。原1134发行和下文旧运行位置仍是历史证据，不与当前源码混用。
->
-> **当前操作从 [真源教程](docs/TRUTH-TUTORIAL.md) 开始。** 本地无 npm 依赖的工具可安装为 `truthsrc` CLI；银行完整生成还需要已冻结runtime供给。用户选定的兼容分层／生成读侧已通过四流64项与读侧47项测试，见[验收记录](docs/TRUTH-COMPATIBLE-COMPOSITION.md)。BC家族与必要兼容差异见工具仓 `TEMPLATE-PARITY.md`，不冒称原样字节对齐或集群sharding。
+## 一笔申购，看到每一步的来处
 
-## 先用一分钟回答最常见的问题
+客户提交100元申购。钱扣了，投资就成功了吗？如果基金公司拒绝，为什么需要另一笔退款？定投每一期又怎样复用这些规则？
 
-| 你想找什么 | 从这里开始 |
+这个本地示例把答案连成一条可检查的链：**业务真源 → 严格编译 → 本地知识图 → 生成代码 → 精确回锚 → 代码与银行服务验收。** 它不是生产银行系统，不处理真实资金，也不是 Palantir 产品或兼容实现。
+
+### 从这里开始
+
+1. **第一次接触工具：**先完成[Counter入门](https://github.com/zhongdj/metarch-truthsrc/blob/execution-compiler-v1/TUTORIAL.md)，不需要Java或数据库。
+2. **看懂银行与代码：**跟随[银行真源教程](docs/TRUTH-TUTORIAL.md)。从一个业务问题进入真实声明、代码高亮和双向检索。
+3. **检查整条管线：**使用[银行工作坊向导](docs/BANK-WORKSHOP.md)。先预检材料，再核验回锚、实际代码及当前银行服务；不同范围分别报告。
+
+已有经验可以直接读下方业务说明。**新手不必先通读本文，也不必理解历史验收编号。**
+
+| 你要完成什么 | 需要什么 |
 |---|---|
-| 项目当前要展示的银行业务 | [`truth/bank-wealth/`](truth/bank-wealth/) 与根 `truthsrc.project.json` |
-| `v1/` 是什么 | 保留的手写实现、测试、历史绑定、集成材料和发行证据；旧 `v1/tree` 已退役 |
-| 真源编译后的 JSON | [`v1/formal-inputs/release-bridge-1069/bank-v1.json`](v1/formal-inputs/release-bridge-1069/bank-v1.json) 是发行输入快照；新编译输出应放到新目录 |
-| 给生成器的完整输入 | 同目录的 [`files.json`](v1/formal-inputs/release-bridge-1069/files.json)、[`request.json`](v1/formal-inputs/release-bridge-1069/request.json) 和 [`compiled.json`](v1/formal-inputs/release-bridge-1069/compiled.json) |
-| 生成后的 Scala 应用 | 在每次生成的目标目录中，不在 `v1/handwritten/`；本机已验位置见第 4 节 |
-| 必须手写的代码 | [`v1/handwritten/scala/example/bankwealth/`](v1/handwritten/scala/example/bankwealth/) |
-| 代码回锚 | 项目 `.truthsrc/knowledge.sqlite` 与生成目标的派生 `anchors.json`、`truthsrc.ledger.json`；手写来源另见 [`HANDWRITTEN-SOURCE-MAP.json`](v1/integration/HANDWRITTEN-SOURCE-MAP.json) |
-| 前端 | 有。当前页面实现是 [`BankBrowserPages.scala`](v1/handwritten/scala/example/bankwealth/web/BankBrowserPages.scala)，应用内路径 `/bank/v1` |
-| 怎样演示 | 第 5 节是无数据库的小演示；第 9 节是完整银行发行复演 |
-| 什么已经验收 | [`RELEASE-SIGNOUT-1134.md`](v1/integration/RELEASE-SIGNOUT-1134.md) |
-| 旧两套作者树去了哪里 | 已经逐文件核对后移除；固定 Git revision 和 [`TRUTH-LEGACY-BASELINE.json`](docs/TRUTH-LEGACY-BASELINE.json) 保留历史来源 |
+| Counter首次生成；银行真源校验/编译 | Node ≥22.13.0、完整工具与相邻银行源码；推荐已验证的22.23.4 |
+| 银行代码生成、知识图与回锚 | 再准备六份冻结JAR/POM；现有prepare从干净1134归档提取，不运行JVM |
+| 银行代码构建与测试 | JDK11、干净归档内固定构建供给及macOS受限执行工具 |
+| 银行真实HTTP、数据库、网页和恢复验收 | 另需Docker就绪、指定数据库镜像及浏览器材料，并使用新的独占资源租约 |
 
-**新手推荐顺序：**先读第 1–4 节，再做第 5 节的小演示。想看“知识怎样变成代码”，读第 6–8 节；准备运行银行，再读第 9 节。不需要先读所有编号报告。
+材料不足时可以先完成前一层，**不能把部分通过称为完整银行验收通过**。工具源码/银行材料的取得与平台边界见工作坊向导；当前功能位于配套功能分支，不假设两仓main已包含它们。
+
+### 只记住四个位置
+
+| 位置 | 用途 |
+|---|---|
+| `truthsrc.project.json` 与 `truth/bank-wealth/` | 唯一当前作者入口；业务定义在这里修改 |
+| 你本次指定的生成输出目录 | Scala、配置和派生证据；不要手改生成区 |
+| 项目 `.truthsrc/knowledge.sqlite` | 自动构建的知识/代码关联；不是另一编辑面 |
+| `v1/handwritten/scala/` | 显式手写实现边界；冻结业务测试与历史发行仍单独保护 |
+
+交互知识图是**导出时核验的离线快照**，不访问网络、不会运行交易，也不能知道后续文件变化。图中代码关联、代码测试和银行服务证据分别显示。已有兼容迁移的四流64项与读侧47项测试记录见[原验收](docs/TRUTH-COMPATIBLE-COMPOSITION.md)，不能自动继承为以后所有候选的服务认证。
+
+旧 `tree/`、`v1/tree/` 已退役，固定历史定位保留在[迁移基线](docs/TRUTH-LEGACY-BASELINE.json)。下文1134发行及旧运行位置是注明时点的历史资料，不是新clone的默认操作路线。
 
 ---
 
@@ -235,7 +245,7 @@ ScalaPB 等构建工具还会根据 `.proto` 产生 managed sources；它们属�
 
 ### 5.1 当前银行入口
 
-在本仓库根目录，使用 Node ≥22.5。只编译真源不需要数据库、Docker或BC服务：
+在本仓库根目录，使用 Node ≥22.13.0（推荐22.23.4）。只编译真源不需要数据库、Docker或BC服务：
 
 ```bash
 node tools/truthsrc-project.mjs validate
@@ -255,7 +265,7 @@ node tools/truthsrc-project.mjs generate --out "$PWD/generated/current"
 
 已有输出需要先 `status`，检查变更后显式 `--update --plan` / `--update`，不覆盖陌生文件。
 项目知识图在 `.truthsrc/knowledge.sqlite`；生成器实际消费图导出的AST，再将代码锚写回同图。
-当前service生成199份源码/配置及4份派生证据，账本和锚交换文件另计。
+兼容迁移基线的service生成229份源码/配置及4份派生证据，账本和锚交换文件另计；本次实际数量以生成计划为准。
 
 ### 5.2 从空目录体验工具
 
@@ -396,21 +406,15 @@ Golden example 通常指“预先认定的输入与期望输出”，用来检�
 
 ### 8.2 查询知识之间的关系
 
-以下在银行根目录执行，只读内存编译与查询：
+以下在银行根目录、已有本次生成输出时执行：
 
 ```bash
-node --input-type=module <<'JS'
-import { compileTree } from '../metarch-truthsrc/lib/compile.mjs';
-import { buildGraph, search, expand } from '../metarch-truthsrc/lib/query.mjs';
-const graph = buildGraph(JSON.parse(compileTree('v1/tree')));
-console.log(search(graph, 'InitializeAccount'));
-console.log(expand(graph, 'command:InitializeAccount', {
-  depth: 1, direction: 'out'
-}));
-JS
+node ../metarch-truthsrc/bin/truthsrc.js query-project \
+  --project truthsrc.project.json --out generated/current \
+  --knowledge InitializeAccount --format human
 ```
 
-本例能找到命令／切片，以及命令产生 `AccountInitialized` 的关系。当前 `search` 是名称／ID 子串查找，`expand` 等是明确关系查询，不是任意自然语言语义搜索，也不会补造没有声明的边。
+它从当前项目的同一知识图核对知识与最终代码。可携带交互图的导出步骤见[真源教程](docs/TRUTH-TUTORIAL.md#3-打开知识与代码地图)。旧`buildGraph`展示关系API仍属兼容工具，但不再用退役的`v1/tree`作为当前教学输入；也不把它混成新知识库的全部关系。
 
 ### 8.3 从知识找代码，也从代码找知识
 
@@ -510,7 +514,7 @@ Customer                    Operator
 
 ### 9.4 完整可搬移复演
 
-**先说明体验边界：当前正式复演会启动无头浏览器自动操作页面，然后关闭应用、浏览器和自建数据库容器。它不会留下一个常驻网页供你随后点击。** 仓库尚无本页已核实的“新手一键常驻启动”流程；`BankProductionHttpMain` 是有时限的集成测试入口，不能冒充常驻部署程序。
+**先说明体验边界：冻结1134复演会启动无头浏览器自动操作页面，然后关闭应用、浏览器和自建数据库容器。它不会留下一个常驻网页供你随后点击。** 新增的[工作坊人工会话](docs/BANK-WORKSHOP.md#6-只读知识视图与人工体验的接口边界)使用独立Launcher，源码已编译，真实服务启停仍须通过本机资源窗口验证；不能把`BankProductionHttpMain`的有时限测试入口冒充常驻部署程序。
 
 可转交的是本机 `dist/bank-wealth-v1-darwin-x64-1134.tar.gz` 及相邻 `.sha256` 文件，**不是整个已经运行过的 `dist/v1/`**。干净归档含冻结生成器、输入、独立手写源码、Node 和构建供给，不含已生成应用、数据库、凭证、journal 或构建缓存；复演时重新生成和构建。
 
@@ -559,7 +563,7 @@ CONFIG=/absolute/.scratch/new-control/CONFIG.json
 5. 在手写边界完成必要适配，保留明确来源映射。
 6. 跑对应的独立行为测试，再核对输入、代码、ledger 和 anchors。
 
-本页第 5.3 节展示新通用项目入口；冻结银行发行仍走自己的固定输入和发行流程。把银行的持续迭代完整接入新入口，需要工具链与银行消费方按稳定合同协作，不能仅因为新增了一个 CLI 就宣称全部迁移完成。
+当前银行持续迭代已经通过根项目入口完成编译、图导出生成和受控更新，操作见[真源教程](docs/TRUTH-TUTORIAL.md)。冻结发行仍按自己的固定输入复演；新候选的回锚、代码和服务验收分别产生新回执，不能把旧发行通过继承为新源码通过。
 
 ### 10.2 agent 的读写边界
 

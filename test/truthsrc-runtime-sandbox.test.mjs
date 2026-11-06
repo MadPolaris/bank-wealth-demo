@@ -150,6 +150,8 @@ test('real Seatbelt syscall denials and owned filesystem exceptions, without all
   assert.equal(result.error, undefined); assert.equal(result.signal, null);
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /TRUTHSRC-RUNTIME-SANDBOX-OK scope=deny-all depth=2/);
+  for (const [index, path] of ['tree', 'v1/tree'].entries()) if (!existsSync(join(BANK, path)))
+    assert.match(result.stdout, new RegExp('ABSENT historical-read-' + index + ' baseline=missing no-denial-proof'));
   for (const label of ['ipv4-connect', 'ipv4-bind', 'ipv6-connect', 'ipv6-bind', 'ipv6-http-connect',
     'unix-bind', 'http-bind-0.0.0.0', 'remote-connect', 'udp-53', 'database-bind-29481',
     'outside-write', 'readonly-0', 'readonly-1', 'readonly-2', 'readonly-3', 'readonly-4', 'historical-read-4', 'symlink-write-escape'])

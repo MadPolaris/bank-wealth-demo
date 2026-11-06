@@ -68,6 +68,44 @@ function javaOptions(e) {
     '-Dsbt.server.autostart=false', '-Dsbt.server.forcestart=true', '-Dsbt.supershell=false', '-Dsbt.log.noformat=true', '-Dsbt.ci=true'];
 }
 
+// These are the project-plan envelope, not a fixed number of generated products.
+const PROJECT_EVIDENCE = ['canonical', 'request', 'compiled', 'inputs'].map(name => '.truthsrc/' + name + '.json');
+export function validateRuntimeSourceInventory(files, ledger, inputs) {
+  assert.equal(ledger.generator, 'scala-cqrs-play-service');
+  assert.ok(Array.isArray(ledger.entries) && Array.isArray(inputs.generatedFiles) && inputs.generatedFiles.length > 0);
+  assert.ok(inputs.generatedFiles.every(file => !PROJECT_EVIDENCE.includes(file) && !['truthsrc.ledger.json', 'anchors.json'].includes(file)),
+    'generated files cannot claim ledger/anchor/evidence envelopes');
+  const planned = [...inputs.generatedFiles, ...PROJECT_EVIDENCE];
+  for (const file of [...planned, ...ledger.entries.map(row => row.path)])
+    assert.ok(typeof file === 'string' && /^(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]+$/.test(file) &&
+      !file.split('/').some(part => ['.', '..'].includes(part)), 'plain relative inventory path required');
+  assert.equal(new Set(planned.map(file => file.toLowerCase())).size, planned.length, 'duplicate generated/evidence paths');
+  equal(ledger.entries.map(row => row.path).sort(), [...planned].sort(), 'retained/missing/foreign ledger entries forbidden');
+  keys(files, [...planned, 'truthsrc.ledger.json', 'anchors.json'], 'missing or unplanned build input');
+  for (const [file, stamp] of Object.entries(files)) {
+    assert.ok(Number.isSafeInteger(stamp.bytes) && stamp.bytes >= 0, 'invalid inventory size: ' + file);
+    assert.match(stamp.sha256, /^[0-9a-f]{64}$/);
+  }
+  for (const row of ledger.entries) {
+    equal([row.ownership?.id, row.ownership?.generator], [PROJECT, ledger.generator], 'foreign ownership');
+    assert.equal(row.ownership.fingerprint, 'sha256:' + files[row.path].sha256, 'stale ledger fingerprint');
+    assert.equal(row.kind === 'project-evidence', PROJECT_EVIDENCE.includes(row.path), 'foreign project evidence');
+  }
+  return Object.keys(files).length;
+}
+
+// Bind the parsed inventory to the exact bytes sealed by the build, not a caller's
+// self-consistent replacement ledger. admitCandidate additionally re-derives the
+// current producer plan; these captured envelopes remain in assertUnchanged.
+export function captureRuntimeSourceInventory(output, files, capture = captureRuntimeFile) {
+  const read = name => {
+    const captured = capture(join(output, name), { json: true });
+    equal(fingerprint(captured), files[name], 'build inventory envelope changed: ' + name);
+    return captured.value;
+  };
+  return validateRuntimeSourceInventory(files, read('truthsrc.ledger.json'), read('.truthsrc/inputs.json'));
+}
+
 // Pure receipt gate, separately testable without generating/admitting an application or launching a JVM.
 export function validateRuntimeReceipts({ evidence, input, result, runtime, build, actual, before, after, runtimeBefore, runtimeAfter, plan, stdout, stderr }) {
   assert.equal(result.schemaVersion, 'bank.truthsrc-build/v1'); assert.equal(runtime.schemaVersion, 'bank.truthsrc-runtime-build/v1');
@@ -118,8 +156,9 @@ export function validateRuntimeReceipts({ evidence, input, result, runtime, buil
   equal([plan.sandbox.profile, plan.sandbox.sha256], [join(evidence, 'sandbox.sb'), build.sandboxProfileSha256]);
   const actualRoot = actualBuildSourceRoot(stdout.toString('utf8'), output, evidence);
   equal([runtime.actualRoot, actual.root], [actualRoot, actualRoot]); assert.equal(actual.staged, actualRoot !== output);
-  assert.equal(actual.passed, true); assert.equal(actual.files, 199); assert.equal(Object.keys(before.output).length, 199);
-  compareBuildSources(before.output, actual.sources);
+  assert.equal(actual.passed, true);
+  const sourceFiles = compareBuildSources(before.output, actual.sources).files;
+  assert.equal(actual.files, sourceFiles, 'actual source count differs from complete build inventory');
   keys(before, ['output', 'handwritten', 'localRuntime']); keys(after, [...Object.keys(before), 'supply']);
   for (const key of Object.keys(before)) { assert.ok(Object.keys(before[key]).length > 0, 'empty source inventory'); equal(after[key], before[key]); }
   assert.equal(Object.keys(after.supply).length, 1065);
@@ -138,17 +177,20 @@ export async function admitRuntimeBuild(buildEvidence) {
   assert.ok(within(join(ROOT, 'target'), buildEvidence), 'build evidence must be under bank target/');
   equal(snapshot(SUPPORT), loadedSupport, 'loaded admission/verifier/helper changed');
   const receipts = {}, limits = {};
-  const read = (file, json = true) => {
+  const capture = (file, { json = true } = {}) => {
     const limit = json ? MAX_JSON_BYTES : 32 * 1024 * 1024, captured = captureRuntimeFile(file, { json, limit });
     assert.ok(!Object.hasOwn(receipts, file), 'duplicate capture'); receipts[file] = fingerprint(captured); limits[file] = limit;
-    return captured.value;
+    return captured;
   };
+  const read = (file, json = true) => capture(file, { json }).value;
   const names = { input: 'input', result: 'result', runtime: 'runtime-build', build: 'build', actual: 'actual-build-sources',
     before: 'sources-before', after: 'sources-after', runtimeBefore: 'runtime-inputs-before', runtimeAfter: 'runtime-inputs-after', plan: 'build-plan' };
   const records = Object.fromEntries(Object.entries(names).map(([key, name]) => [key, read(join(buildEvidence, name + '.json'))]));
   const stdout = read(join(buildEvidence, 'build.stdout.log'), false), stderr = read(join(buildEvidence, 'build.stderr.log'), false);
   const descriptor = validateRuntimeReceipts({ ...records, evidence: buildEvidence, stdout, stderr });
   const { output, actualRoot, classpath, javaHome, java } = descriptor, { input, runtime, before, after, result, plan } = records;
+  const sourceCount = captureRuntimeSourceInventory(output, before.output, capture);
+  assert.equal(sourceCount, records.actual.files, 'actual sources differ from source-bound plan');
   for (const root of [output, actualRoot, javaHome, TOOL, HAND, LOCAL]) { safePath(root); assert.equal(realpathSync(root), root); }
   const toolchain = [java, join(javaHome, 'bin/javac'), join(javaHome, 'release'), '/usr/bin/python3', '/usr/bin/sandbox-exec'];
   keys(input.toolchain, toolchain); equal(input.verifier, { file: VERIFIER, sha256: loadedSupport[VERIFIER].sha256 });
@@ -226,13 +268,13 @@ export async function admitRuntimeBuild(buildEvidence) {
     checkCanaries(); equal(inventory(output), artifactsBefore, 'build artifacts changed'); assertJarReferencesUnchanged(jarReferences, helpers);
     admitted.assertUnchanged(admitted.captured); equal(snapshot(Object.keys(sourceFiles)), sourceFiles); equal(toolTree(), toolBefore);
     for (const [key, root, opts] of [['output', output, { afterBuild: true }], ['handwritten', HAND, {}], ['localRuntime', LOCAL, {}], ['supply', join(buildEvidence, 'supply'), {}]]) equal(inventory(root, opts), after[key], key + ' changed');
-    assert.equal(compareBuildSources(before.output, inventory(actualRoot, { afterBuild: true })).files, 199);
+    assert.equal(compareBuildSources(before.output, inventory(actualRoot, { afterBuild: true })).files, sourceCount);
     equal(snapshot(Object.keys(runtimeInputs)), runtimeInputs); equal(runtimeTestManifest(file => captureRuntimeFile(file).value.toString('utf8')), manifest);
     equal(runtimeClasspathInventory(classpath, actualRoot, buildEvidence, helpers), runtime.classpathInventory, 'runtime classpath changed');
     for (const name of CACHES) equal(inventory(join(buildEvidence, name)), cacheAfter[name], 'build cache changed: ' + name);
   };
   await assertUnchanged();
   return freeze({ ...descriptor, node, buildEvidence, manifest, mains: [...RUNTIME_MAINS], jarReferences,
-    before: { sourceFiles: 199, runtimeSources: 5, generatedTestSources: 6, checks: CHECKS.length, receipts: structuredClone(receipts),
+    before: { sourceFiles: sourceCount, runtimeSources: 5, generatedTestSources: 6, checks: CHECKS.length, receipts: structuredClone(receipts),
       classpathInventory: structuredClone(runtime.classpathInventory), toolchain: structuredClone(tools), runtimeInputs: structuredClone(runtimeInputs) }, assertUnchanged });
 }

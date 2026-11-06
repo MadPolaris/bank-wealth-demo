@@ -18,7 +18,7 @@
 - `node tools/truthsrc-project.mjs status|query --out <owned>`：同项目输入/代码新鲜度与双向文件来源。
 - `npm run test:runtime-verifier`：明确列出的Node合同测试，覆盖构建交接、隔离/监督、TA/HTTP/DB驱动；不自动启动JVM或数据库。
 - `node tools/verify-truthsrc-build.mjs ... --compile-runtime-tests`：新候选在空缓存/禁网中编译固定五main＋六生成测试并封存实际classpath，不能执行测试或服务。
-- `node tools/verify-truthsrc-runtime.mjs --build-evidence <本轮成功构建> --evidence <新目录> --round <新TA根> --window crash|database|all`：当前source-bound运行验证；crash全禁网、database使用登记本机端口/新凭据/独占存储。原断言只读复用，不调用旧发行总编排，不重签1134。
+- `node tools/verify-truthsrc-runtime.mjs --lease <新owner租约> --build-evidence <本轮成功构建> --evidence <新目录> --round <新TA根> --window crash|database|all`：当前source-bound运行验证；显式租约拒绝旧已归还owner，crash全禁网、database使用新凭据/独占存储。原断言只读复用，不调用旧发行总编排，不重签1134。新人优先使用[工作坊入口](BANK-WORKSHOP.md)的doctor/verify/report/view。
 - 老validate/project/formal、V1 domain/service/joint直接CLI必须显式 `--historical`。冻结完整请求API无参拒绝；复演调用 `bankApplicationRequest({ historical:true })`，fresh V1 adapter仅用于历史比较。
 - 新入口不读编号请求或旧authoring binding；必要技术选择迁到 `bindings/implementation/`，runtime/external source选项以项目相对路径显式提供。
 

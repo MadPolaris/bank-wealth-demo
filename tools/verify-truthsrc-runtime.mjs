@@ -3,10 +3,10 @@ import { randomBytes, createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createServer } from 'node:net';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseStrictJson } from '../../metarch-truthsrc/lib/strict-json.mjs';
 import { admitRuntimeBuild } from './truthsrc-runtime-admission.mjs';
+import { acquireRuntimeLease, assertRuntimePortFree as freePort } from './truthsrc-runtime-lease.mjs';
 import { fileDigest, inventory, isMainModule, safePath, snapshotFiles } from './verify-truthsrc-build.mjs';
 import { runtimeSandboxText, runtimeProbeSource, validateRuntimeSandboxPaths, RUNTIME_NETWORK_SCOPE, RUNTIME_NETWORK_LIMITATION } from './truthsrc-runtime-sandbox.mjs';
 import { runRuntimeProcess } from './truthsrc-runtime-process.mjs';
@@ -16,36 +16,27 @@ import { issueRuntimeCredentials, productionConfiguration } from './truthsrc-run
 import { exerciseProductionHttp, exerciseTransportAuth } from './truthsrc-runtime-http.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const OWNER = 'truthsrc-unification-runtime-20261105';
-const COORDINATION = join(ROOT, '../backkend-codegen/AGENT_COORDINATION.md');
 const FIXTURE = join(ROOT, 'test/fixtures/truthsrc-actor-ta.json');
 const WORKER = join(ROOT, 'tools/truthsrc-runtime-ta-worker.mjs');
-const HTTP = 18761, MYSQL = 18762, MONGO = 18763;
 const save = (file, value) => writeFileSync(file, JSON.stringify(value, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
 const write = (file, text) => writeFileSync(file, text, { flag: 'wx', mode: 0o600 });
 const json = file => parseStrictJson(readFileSync(file));
-const usage = 'Usage: node tools/verify-truthsrc-runtime.mjs --build-evidence <absolute> --evidence <absolute-new> --round <absolute-new> --window crash|database|all [--browser-module <absolute> --browser-executable <absolute>]';
+const usage = 'Usage: node tools/verify-truthsrc-runtime.mjs --lease <absolute-json> --build-evidence <absolute> --evidence <lease.runRoot> --round <owner-TA-root> --window crash|database|all [--browser-module <absolute> --browser-executable <absolute>]';
 
 export function runtimeArgs(args) {
   if (args.length === 1 && args[0] === '--help') return null;
   const values = new Map();
   for (let i = 0; i < args.length; i += 2) {
     const flag = args[i];
-    assert.ok(['--build-evidence', '--evidence', '--round', '--window', '--browser-module', '--browser-executable'].includes(flag) &&
+    assert.ok(['--lease', '--build-evidence', '--evidence', '--round', '--window', '--browser-module', '--browser-executable'].includes(flag) &&
       !values.has(flag) && args[i + 1] && !args[i + 1].startsWith('--'), usage);
     values.set(flag, args[i + 1]);
   }
-  for (const flag of ['--build-evidence', '--evidence', '--round', '--window']) assert.ok(values.has(flag), usage);
+  for (const flag of ['--lease', '--build-evidence', '--evidence', '--round', '--window']) assert.ok(values.has(flag), usage);
   assert.ok(['crash', 'database', 'all'].includes(values.get('--window')), usage);
   assert.equal(values.has('--browser-module'), values.has('--browser-executable'), usage);
-  return { buildEvidence: values.get('--build-evidence'), evidence: values.get('--evidence'), round: values.get('--round'),
+  return { lease: values.get('--lease'), buildEvidence: values.get('--build-evidence'), evidence: values.get('--evidence'), round: values.get('--round'),
     window: values.get('--window'), browserModule: values.get('--browser-module') ?? null, browserExecutable: values.get('--browser-executable') ?? null };
-}
-
-async function freePort(port) {
-  const server = createServer();
-  await new Promise((yes, no) => { server.once('error', no); server.listen({ host: '127.0.0.1', port, exclusive: true }, yes); });
-  await new Promise((yes, no) => server.close(error => error ? no(error) : yes()));
 }
 
 async function verifyListener(pid, port) {
@@ -68,12 +59,12 @@ function baseEnvironment(evidence, javaHome) {
     PATH: join(javaHome, 'bin') + ':/usr/bin:/bin', LANG: 'en_US.UTF-8', NODE_V8_COVERAGE: '' };
 }
 
-async function boundary({ root, writeRoot, round, immutable, readOnlyRoots = [], env, network = false, databases = [], processRunner = runRuntimeProcess }) {
+async function boundary({ root, writeRoot, round, httpPort, immutable, readOnlyRoots = [], env, network = false, databases = [], processRunner = runRuntimeProcess }) {
   mkdirSync(root, { mode: 0o700 });
   const profile = join(root, 'runtime-sandbox.sb'), probe = join(root, 'runtime-probe.py');
   const canaryRoot = mkdtempSync(join(ROOT, 'target/truthsrc-runtime-canary-')), canary = join(canaryRoot, 'unchanged');
   write(canary, 'owned immutable outside canary\n');
-  const options = { evidence: writeRoot ?? root, taRoot: round, httpPort: HTTP, databasePorts: databases,
+  const options = { evidence: writeRoot ?? root, taRoot: round, httpPort, databasePorts: databases,
     readOnlyFiles: [...immutable, ...readOnlyRoots, profile, probe], networkScope: network ? RUNTIME_NETWORK_SCOPE : 'deny-all' };
   write(profile, runtimeSandboxText(options));
   write(probe, runtimeProbeSource({ ...options, canary, positiveNetwork: network, probeName: 'runtime-probe-' + basename(root) }));
@@ -92,7 +83,7 @@ async function boundary({ root, writeRoot, round, immutable, readOnlyRoots = [],
 }
 
 const runtimeFiles = [
-  'tools/verify-truthsrc-runtime.mjs', 'tools/truthsrc-runtime-admission.mjs', 'tools/truthsrc-runtime-sandbox.mjs',
+  'tools/verify-truthsrc-runtime.mjs', 'tools/truthsrc-runtime-admission.mjs', 'tools/truthsrc-runtime-lease.mjs', 'tools/truthsrc-runtime-sandbox.mjs',
   'tools/truthsrc-runtime-process.mjs', 'tools/truthsrc-runtime-crash.mjs', 'tools/truthsrc-runtime-databases.mjs', 'tools/truthsrc-runtime-db-relay.mjs', 'tools/truthsrc-runtime-db-exec.mjs',
   'tools/truthsrc-runtime-config.mjs', 'tools/truthsrc-runtime-http.mjs', 'tools/truthsrc-runtime-browser.mjs',
   'tools/truthsrc-runtime-ta-worker.mjs', 'tools/truthsrc-actor-ta-worker.mjs', 'simulator/mock-ta-core.mjs',
@@ -100,9 +91,10 @@ const runtimeFiles = [
   'tools/v1-browser-funds.mjs', 'tools/v1-browser-check.mjs', 'test/fixtures/truthsrc-actor-ta.json',
 ].map(file => join(ROOT, file));
 
-async function runDatabaseWindow({ admitted, evidence, round, taConfig, taConfigSha256, fixtureSha256, env, options, recheck, signal }) {
+async function runDatabaseWindow({ admitted, evidence, round, owner, ports, taConfig, taConfigSha256, fixtureSha256, env, options, recheck, signal, runProcess }) {
+  const { http: HTTP, mysql: MYSQL, mongo: MONGO } = ports;
   const root = join(evidence, 'database'); mkdirSync(root, { mode: 0o700 });
-  const databases = new OwnedRuntimeDatabases({ evidence: root, owner: OWNER, mysqlPort: MYSQL, mongoPort: MONGO, signal });
+  const databases = new OwnedRuntimeDatabases({ evidence: root, owner, mysqlPort: MYSQL, mongoPort: MONGO, signal });
   const credentials = issueRuntimeCredentials(), playSecret = randomBytes(32).toString('hex'), machineToken = randomBytes(32).toString('hex');
   const secrets = [...Object.values(credentials).flatMap(row => [row.token, row.csrf]), playSecret, machineToken, ...databases.credentialsList];
   const namespace = 'truthsrc_' + createHash('sha256').update(evidence).digest('hex').slice(0, 16), replaySchema = namespace + '_replay';
@@ -127,12 +119,12 @@ async function runDatabaseWindow({ admitted, evidence, round, taConfig, taConfig
       const browserConfig = join(run, 'browser.json');
       save(browserConfig, { synthetic: true, baseURL: value.origin, mode: mode === 'restart' ? 'replay' : mode, credentials });
       const runEvidence = join(root, mode);
-      const b = await boundary({ root: runEvidence, writeRoot: evidence, round, immutable: [config, logback, browserConfig, taConfig],
-        readOnlyRoots: databases.readOnlyPaths, env, network: true, databases: [MYSQL, MONGO] });
+      const b = await boundary({ root: runEvidence, writeRoot: evidence, round, httpPort: HTTP, immutable: [config, logback, browserConfig, taConfig],
+        readOnlyRoots: databases.readOnlyPaths, env, network: true, databases: [MYSQL, MONGO], processRunner: runProcess });
       let observation, browser, beforeGet, afterGet, negatives, listener, callbackFailure;
       let runtimePhase = 'server-start';
       const childEnv = { ...env, BANK_RUNTIME_TA_CONFIG: taConfig, BANK_RUNTIME_TA_CONFIG_SHA256: taConfigSha256 };
-      const process = await runRuntimeProcess({ executable: admitted.java, args: ['-Xmx1G', '-XX:ActiveProcessorCount=2', '-XX:-UsePerfData', '-Djava.net.preferIPv4Stack=true',
+      const process = await runProcess({ executable: admitted.java, args: ['-Xmx1G', '-XX:ActiveProcessorCount=2', '-XX:-UsePerfData', '-Djava.net.preferIPv4Stack=true',
         '-Duser.home=' + env.HOME, '-Djava.io.tmpdir=' + env.TMPDIR, '-Dconfig.file=' + config, '-Dlogback.configurationFile=' + logback,
         '-cp', admitted.classpath.join(':'), 'example.bankwealth.service.BankProductionHttpMain', run, config],
         cwd: admitted.actualRoot, env: childEnv, base: join(runEvidence, 'server'), timeoutMs: 330_000, sandbox: b.sandbox, secrets, signal,
@@ -168,7 +160,7 @@ async function runDatabaseWindow({ admitted, evidence, round, taConfig, taConfig
           runtimePhase = 'business-observation';
           if (['restart', 'replay'].includes(mode)) beforeGet = await databases.mongoSnapshot(namespace);
           if (options.browserModule && ['initial', 'refund', 'replay'].includes(mode)) {
-            const browserProcess = await runRuntimeProcess({ executable: admitted.node,
+            const browserProcess = await runProcess({ executable: admitted.node,
               args: [join(ROOT, 'tools/truthsrc-runtime-browser.mjs'), browserConfig, options.browserModule, options.browserExecutable],
               cwd: admitted.actualRoot, env, base: join(runEvidence, 'browser'), timeoutMs: 200_000, sandbox: b.sandbox, secrets, signal: child.signal });
             assert.equal(browserProcess.passed, true, 'browser process failed');
@@ -207,7 +199,7 @@ async function runDatabaseWindow({ admitted, evidence, round, taConfig, taConfig
     const policy = { evidence, taRoot: round, readOnlyFiles: [...databases.readOnlyPaths, negativePolicy, negativeLogback],
       httpPort: HTTP, databasePorts: [MYSQL], networkScope: RUNTIME_NETWORK_SCOPE };
     write(negativePolicy, runtimeSandboxText(policy));
-    const negative = await runRuntimeProcess({ executable: admitted.java, args: ['-Xmx1G', '-XX:ActiveProcessorCount=2', '-XX:-UsePerfData', '-Djava.net.preferIPv4Stack=true',
+    const negative = await runProcess({ executable: admitted.java, args: ['-Xmx1G', '-XX:ActiveProcessorCount=2', '-XX:-UsePerfData', '-Djava.net.preferIPv4Stack=true',
       '-Duser.home=' + env.HOME, '-Djava.io.tmpdir=' + env.TMPDIR, '-Dlogback.configurationFile=' + negativeLogback, '-cp', admitted.classpath.join(':'),
       'example.bankwealth.service.BankMysqlNegativeMain', neg, 'jdbc:mysql://127.0.0.1:' + MYSQL, endpoints.mysql.rootPasswordFile],
       cwd: admitted.actualRoot, env, base: join(neg, 'process'), timeoutMs: 180_000,
@@ -227,25 +219,42 @@ async function runDatabaseWindow({ admitted, evidence, round, taConfig, taConfig
   return result;
 }
 
-export async function verifyRuntime(options) {
+// Dependency seams exercise controller ordering/cleanup with Node doubles only;
+// the CLI never accepts an alternate admission, lease manager or process runner.
+export async function verifyRuntime(options, { admitBuild = admitRuntimeBuild, acquireLease = acquireRuntimeLease,
+  runCrash = runRuntimeCrashCases, runDatabase = runDatabaseWindow, checkBoundary = boundary, processRunner = runRuntimeProcess,
+  checkPort = freePort } = {}) {
+  options = Object.freeze({ ...options });
+  assert.ok(options.lease, '--lease is required; the historical reservation has been returned');
+  assert.ok(['crash', 'database', 'all'].includes(options.window), usage);
   const { evidence, round } = options;
-  safePath(evidence, 'new'); safePath(round, 'new');
-  assert.equal(dirname(evidence), join(ROOT, 'target'));
-  assert.equal(dirname(round), join(ROOT, '.local/mock-ta'));
-  assert.ok(basename(evidence).startsWith('truthsrc-runtime-') && basename(round).startsWith('truthsrc-runtime-'));
-  const reservation = readFileSync(COORDINATION, 'utf8').split('\n').filter(line => line.includes(OWNER));
-  assert.ok(reservation.some(line => line.includes('18761') && line.includes('18762') && line.includes('18763')), 'current owner reservation missing');
-  const admitted = await admitRuntimeBuild(options.buildEvidence);
-  mkdirSync(evidence, { mode: 0o700 }); mkdirSync(round, { mode: 0o700 });
   const cancelled = new AbortController();
   const onInt = () => cancelled.abort('SIGINT'), onTerm = () => cancelled.abort('SIGTERM');
   process.on('SIGINT', onInt); process.on('SIGTERM', onTerm);
-  const result = { schemaVersion: 'bank.truthsrc-runtime/v1', status: 'blocked', owner: OWNER, buildEvidence: options.buildEvidence,
+  const result = { schemaVersion: 'bank.truthsrc-runtime/v1', status: 'blocked', owner: null, buildEvidence: options.buildEvidence,
     evidence, round, window: options.window, checks: {}, errors: [], runtimeRebuilt: false, runtimePublished: false,
     release1134Resigned: false, runtimeRetryBackoffDeadline: 'OPEN' };
-  let before, config, env, browserInputs;
+  let lease, admitted, evidenceCreated = false, before, config, env, browserInputs, databaseDispatched = false, processesStopped = true;
+  const runProcess = async args => {
+    try {
+      const receipt = await processRunner({ ...args, signal: args.signal ?? cancelled.signal });
+      if (receipt.groupAliveAfter !== false || receipt.directChildClosed !== true || receipt.directChildReaped !== true)
+        processesStopped = false;
+      return receipt;
+    } catch (error) { processesStopped = false; throw error; }
+  };
   try {
-    if (options.window !== 'crash') for (const port of [HTTP, MYSQL, MONGO]) await freePort(port);
+    // No old reservation lookup and no candidate admission/launch before an
+    // explicit new lease has passed file exclusivity and actual port preflight.
+    lease = await acquireLease(options);
+    const { owner, ports } = lease.spec;
+    result.owner = owner; result.lease = lease.record;
+    cancelled.signal.throwIfAborted(); lease.assertHeld();
+    admitted = await admitBuild(options.buildEvidence);
+    cancelled.signal.throwIfAborted(); lease.assertHeld();
+    safePath(evidence, 'new'); safePath(round, 'new');
+    mkdirSync(evidence, { mode: 0o700 }); evidenceCreated = true;
+    mkdirSync(round, { mode: 0o700 });
     if (options.browserModule) {
       safePath(options.browserModule, 'file'); assert.equal(realpathSync(options.browserExecutable), options.browserExecutable);
       assert.equal(basename(options.browserExecutable), 'chrome-headless-shell', 'explicit headless-shell distribution required; application bundles need separate closure admission');
@@ -256,26 +265,34 @@ export async function verifyRuntime(options) {
     config = join(round, 'runtime-ta.json');
     const fixtureSha256 = fileDigest(FIXTURE);
     save(config, { schemaVersion: 'bank.truthsrc-runtime-ta/v1', ownedRoot: round, fixture: { file: FIXTURE, sha256: fixtureSha256 } });
-    before = snapshotFiles([...runtimeFiles, config, ...(options.browserModule ? [options.browserModule, options.browserExecutable] : [])]);
-    save(join(evidence, 'inputs.json'), { owner: OWNER, build: admitted.before, runtime: before, browserInputs: browserInputs ?? null, options,
-      reservation, networkScope: options.window === 'crash' ? 'deny-all' : RUNTIME_NETWORK_SCOPE, networkLimitation: RUNTIME_NETWORK_LIMITATION });
+    before = snapshotFiles([...runtimeFiles, options.lease, config, ...(options.browserModule ? [options.browserModule, options.browserExecutable] : [])]);
+    save(join(evidence, 'inputs.json'), { owner, build: admitted.before, runtime: before, browserInputs: browserInputs ?? null, options,
+      lease: lease.record, networkScope: options.window === 'crash' ? 'deny-all' : RUNTIME_NETWORK_SCOPE, networkLimitation: RUNTIME_NETWORK_LIMITATION });
     const recheck = async () => {
-      cancelled.signal.throwIfAborted();
+      cancelled.signal.throwIfAborted(); lease.assertHeld();
       assert.deepEqual(snapshotFiles(Object.keys(before)), before, 'runtime inputs changed');
       if (browserInputs) for (const [root, expected] of Object.entries(browserInputs)) assert.deepEqual(inventory(root), expected, 'browser input changed');
       await admitted.assertUnchanged();
     };
-    const context = { admitted, evidence, round, node: admitted.node, worker: WORKER, taConfig: config,
-      taConfigSha256: fileDigest(config), fixtureSha256, env, recheck, options, signal: cancelled.signal };
+    const context = { admitted, evidence, round, owner, ports, node: admitted.node, worker: WORKER, taConfig: config,
+      taConfigSha256: fileDigest(config), fixtureSha256, env, recheck, options, signal: cancelled.signal, runProcess };
     if (options.window !== 'database') {
-      const b = await boundary({ root: join(evidence, 'crash-boundary'), writeRoot: evidence, round, immutable: [config], env });
+      await recheck();
+      const b = await checkBoundary({ root: join(evidence, 'crash-boundary'), writeRoot: evidence, round, httpPort: ports.http,
+        immutable: [config], env, processRunner: runProcess });
       context.sandbox = b.sandbox;
-      context.runProcess = args => runRuntimeProcess({ ...args, signal: cancelled.signal });
-      result.crash = await runRuntimeCrashCases(context); b.recheck();
+      result.crash = await runCrash(context); b.recheck();
       result.checks.crashPassed = result.crash.passed;
+      assert.equal(result.crash.passed, true, 'crash runtime window failed');
     }
     if (options.window !== 'crash') {
-      result.database = await runDatabaseWindow(context);
+      await recheck();
+      // Repeat the kernel preflight immediately before database creation. A
+      // foreign binder after this point is rejected by bind/listener verification.
+      for (const port of Object.values(ports)) await checkPort(port);
+      await recheck();
+      databaseDispatched = true;
+      result.database = await runDatabase(context);
       result.checks.databasePassed = result.database.passed;
       if (!result.database.passed) result.errors.push('database runtime window failed');
     }
@@ -283,19 +300,31 @@ export async function verifyRuntime(options) {
   } catch (error) { result.errors.push(error.message ?? 'runtime verification failed'); }
   finally {
     try {
-      if (before) assert.deepEqual(snapshotFiles(Object.keys(before)), before);
-      if (browserInputs) for (const [root, expected] of Object.entries(browserInputs)) assert.deepEqual(inventory(root), expected);
-      await admitted.assertUnchanged(); result.checks.inputsUnchanged = true;
+      try {
+        if (before) assert.deepEqual(snapshotFiles(Object.keys(before)), before);
+        if (browserInputs) for (const [root, expected] of Object.entries(browserInputs)) assert.deepEqual(inventory(root), expected);
+        if (admitted) { await admitted.assertUnchanged(); result.checks.inputsUnchanged = true; }
+        if (lease) lease.assertHeld();
+      } catch { result.checks.inputsUnchanged = false; result.errors.push('final runtime input/lease verification failed'); }
+      await new Promise(done => setImmediate(done)); await delay(0);
+      result.cancelled = cancelled.signal.aborted;
+      if (lease) {
+        try {
+          assert.ok(processesStopped && (!databaseDispatched || result.database?.cleanup?.stopped === true),
+            'resource exit unverified; lease retained for acquiring owner investigation');
+          result.leaseRelease = lease.release(result.owner);
+        } catch (error) { result.leaseRelease = { owner: result.owner, released: false }; result.errors.push(error.message); }
+      }
+      result.status = result.errors.length === 0 && !result.cancelled && result.checks.sourceBound && result.checks.inputsUnchanged &&
+        result.leaseRelease?.released === true ? 'passed' : 'blocked';
+      if (evidenceCreated) save(join(evidence, 'result.json'), result);
+    } finally {
+      process.off('SIGINT', onInt); process.off('SIGTERM', onTerm);
     }
-    catch { result.checks.inputsUnchanged = false; result.errors.push('final runtime input verification failed'); }
-    await new Promise(done => setImmediate(done)); await delay(0);
-    result.cancelled = cancelled.signal.aborted;
-    result.status = result.errors.length === 0 && !result.cancelled && result.checks.sourceBound && result.checks.inputsUnchanged ? 'passed' : 'blocked';
-    save(join(evidence, 'result.json'), result);
-    process.off('SIGINT', onInt); process.off('SIGTERM', onTerm);
   }
-  console.log(JSON.stringify({ status: result.status, evidence, crashCases: result.crash?.count ?? 0,
-    databasePassed: result.database?.passed ?? false, browserVerified: result.database?.browserVerified ?? false }));
+  console.log(JSON.stringify({ status: result.status, evidence, owner: result.owner, leaseReleased: result.leaseRelease?.released ?? false,
+    crashCases: result.crash?.count ?? 0, databasePassed: result.database?.passed ?? false, browserVerified: result.database?.browserVerified ?? false,
+    errors: evidenceCreated ? undefined : result.errors }));
   return result;
 }
 

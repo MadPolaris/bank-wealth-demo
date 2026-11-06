@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { linkSync, mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { captureRuntimeFile, validateRuntimeReceipts } from '../tools/truthsrc-runtime-admission.mjs';
+import { admitRuntimeBuild, captureRuntimeFile, captureRuntimeSourceInventory, validateRuntimeReceipts, validateRuntimeSourceInventory } from '../tools/truthsrc-runtime-admission.mjs';
 import { RUNTIME_MANIFEST_FILE, runtimeBuildTasks, runtimeTestManifest } from '../tools/truthsrc-runtime-tests.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
@@ -15,9 +15,10 @@ const CHECKS = ['osSandboxEnforced', 'outputUnchanged', 'handwrittenUnchanged', 
   'currentInputsUnchanged', 'sandboxControlsAndCanariesUnchanged', 'ownedCachesInventoried', 'verifierUnchanged',
   'actualBuildSourcesVerified', 'runtimeTestInputsUnchanged', 'actualRuntimeTestSourcesVerified', 'runtimeClasspathVerified', 'runtimeCompilationPassed'];
 
-function fixture({ staged = true } = {}) {
-  const evidence = join(ROOT, 'target/mock-runtime-evidence'), output = join(ROOT, 'generated/mock-runtime-candidate');
-  const actualRoot = staged ? join(evidence, 'global/staging/a123/mock-runtime-candidate') : output;
+function fixture({ staged = true, sourceCount = 235, ownedRoot = null } = {}) {
+  const evidence = ownedRoot ? join(ownedRoot, 'build') : join(ROOT, 'target/mock-runtime-evidence');
+  const output = ownedRoot ? join(ownedRoot, 'candidate') : join(ROOT, 'generated/mock-runtime-candidate');
+  const actualRoot = staged ? join(evidence, 'global/staging/a123', basename(output)) : output;
   const javaHome = '/opt/fixture-jdk11', archive = join(ROOT, 'dist/fixture.tar.gz');
   const generated = ['GeneratedActorStateSpec', 'GeneratedDomainRoundtripSpec', 'GeneratedFiniteHostSpec', 'GeneratedServiceConfigurationSpec',
     'GeneratedUnitStorageSpec', 'UnitConfigurationCheck'].map(name => 'src/test/scala/' + name + '.scala').sort();
@@ -42,9 +43,9 @@ function fixture({ staged = true } = {}) {
     classpathInventory: Object.fromEntries(classpath.map(file => [file, { ...stamp }])), buildStdoutSha256: hash(stdout),
     jarReferences: { schemaVersion: 'bank.truthsrc-runtime-jars/v1', jars: classpath.filter(file => file.endsWith('.jar')).map(file => ({ file, sha256: stamp.sha256, classPath: [] })), references: [] },
     testsExecuted: false, servicesStarted: false, passed: true, sourceBound: true, processPassed: true, errors: [] };
-  const before = { output: Object.fromEntries(Array.from({ length: 199 }, (_, i) => ['source-' + i, { ...stamp }])), handwritten: { 'Original.scala': stamp }, localRuntime: { 'Frozen.jar': stamp } };
+  const before = { output: Object.fromEntries(Array.from({ length: sourceCount }, (_, i) => ['source-' + i, { ...stamp }])), handwritten: { 'Original.scala': stamp }, localRuntime: { 'Frozen.jar': stamp } };
   const after = { ...structuredClone(before), supply: Object.fromEntries(Array.from({ length: 1065 }, (_, i) => ['supply-' + i, { ...stamp }])) };
-  const actual = { passed: true, files: 199, root: actualRoot, staged, admittedOutput: output, stdoutSha256: hash(stdout), sources: structuredClone(before.output) };
+  const actual = { passed: true, files: sourceCount, root: actualRoot, staged, admittedOutput: output, stdoutSha256: hash(stdout), sources: structuredClone(before.output) };
   const archiveSha256 = '95daa7b9d1d394aa647175fd1b6418fd9ddac943026302a4174697bffba2cade';
   const input = { output, evidence, archive, javaHome, project: join(ROOT, 'truthsrc.project.json'), handwrittenRoot: join(ROOT, 'v1/handwritten/scala'),
     toolRoot: fileURLToPath(new URL('../../metarch-truthsrc', import.meta.url)), generator: { id: 'scala-cqrs-play-service', version: '1' },
@@ -150,6 +151,109 @@ for (const [name, mutate] of [
   ['classpath log mismatch', f => relog(f, f.stdout.toString().replace('/dependency.jar', '/foreign.jar'))],
   ['noncanonical evidence', f => { f.evidence += '/..'; }],
 ]) test('receipt gate rejects ' + name, () => { const f = fixture(); mutate(f); assert.throws(() => validateRuntimeReceipts(f)); });
+
+test('receipt gate uses complete source inventory size, not a historical product count', () => {
+  for (const sourceCount of [7, 199, 235, 301]) {
+    const f = fixture({ sourceCount });
+    assert.doesNotThrow(() => validateRuntimeReceipts(f));
+    f.actual.files--;
+    assert.throws(() => validateRuntimeReceipts(f), /actual source count/);
+  }
+});
+
+function sourceInventory(generatedCount = 229) {
+  const inputs = { generatedFiles: Array.from({ length: generatedCount }, (_, i) => 'app/Source-' + i + '.scala') };
+  const envelopes = ['canonical', 'request', 'compiled', 'inputs'].map(name => '.truthsrc/' + name + '.json');
+  const files = Object.fromEntries([...inputs.generatedFiles, ...envelopes, 'anchors.json'].map(file => [file, { ...stamp }]));
+  const text = JSON.stringify(inputs) + '\n';
+  files['.truthsrc/inputs.json'] = { bytes: Buffer.byteLength(text), sha256: hash(text) };
+  const ledger = { generator: 'scala-cqrs-play-service', entries: [...inputs.generatedFiles, ...envelopes].map(path => ({ path,
+    kind: envelopes.includes(path) ? 'project-evidence' : 'generated-source',
+    ownership: { id: join(ROOT, 'truthsrc.project.json'), generator: 'scala-cqrs-play-service', fingerprint: 'sha256:' + files[path].sha256 } })) };
+  const ledgerText = JSON.stringify(ledger) + '\n';
+  files['truthsrc.ledger.json'] = { bytes: Buffer.byteLength(ledgerText), sha256: hash(ledgerText) };
+  return { files, ledger, inputs, text, ledgerText };
+}
+
+test('inventory is exactly generatedFiles plus four evidence envelopes, ledger and anchors', () => {
+  for (const generatedCount of [1, 193, 229, 295]) {
+    const f = sourceInventory(generatedCount);
+    assert.equal(validateRuntimeSourceInventory(f.files, f.ledger, f.inputs), generatedCount + 6);
+  }
+});
+
+for (const [name, mutate] of [
+  ['missing product', f => { delete f.files['app/Source-0.scala']; }],
+  ['extra unplanned script', f => { f.files['project/evil.sbt'] = stamp; }],
+  ['missing anchor envelope', f => { delete f.files['anchors.json']; }],
+  ['missing ledger row', f => { f.ledger.entries.pop(); }],
+  ['duplicate ledger row', f => { f.ledger.entries.push(f.ledger.entries[0]); }],
+  ['retained file and ledger row', f => { f.files['retained.scala'] = stamp; f.ledger.entries.push({ ...f.ledger.entries[0], path: 'retained.scala' }); }],
+  ['duplicate generated path', f => { f.inputs.generatedFiles.push(f.inputs.generatedFiles[0]); }],
+  ['case-folded alias', f => { f.inputs.generatedFiles.push('app/source-0.scala'); }],
+  ['traversal', f => { f.inputs.generatedFiles[0] = '../foreign'; }],
+  ['absolute path', f => { f.inputs.generatedFiles[0] = '/foreign'; }],
+  ['generated file claiming envelope', f => { f.inputs.generatedFiles.push('anchors.json'); }],
+  ['foreign owner', f => { f.ledger.entries[0].ownership.id = '/other/project.json'; }],
+  ['foreign generator', f => { f.ledger.entries[0].ownership.generator = 'foreign'; }],
+  ['stale ledger digest', f => { f.ledger.entries[0].ownership.fingerprint = 'sha256:' + hash('stale'); }],
+  ['invalid SHA', f => { f.files['anchors.json'].sha256 = 'x'; }],
+  ['invalid byte count', f => { f.files['anchors.json'].bytes = -1; }],
+  ['foreign evidence kind', f => { f.ledger.entries[0].kind = 'project-evidence'; }],
+  ['missing generatedFiles', f => { delete f.inputs.generatedFiles; }],
+  ['empty producer plan', f => { f.inputs.generatedFiles = []; }],
+]) test('source-bound inventory rejects ' + name, () => {
+  const f = sourceInventory(); mutate(f);
+  assert.throws(() => validateRuntimeSourceInventory(f.files, f.ledger, f.inputs));
+});
+
+test('real source-envelope capture binds ledger/generatedFiles to sealed build bytes', t => {
+  const root = temporary(t), f = sourceInventory(); mkdirSync(join(root, '.truthsrc'));
+  writeFileSync(join(root, 'truthsrc.ledger.json'), f.ledgerText);
+  writeFileSync(join(root, '.truthsrc/inputs.json'), f.text);
+  assert.equal(captureRuntimeSourceInventory(root, f.files), 235);
+  // The count and all remaining stamps still agree: deletion must not pass.
+  const fewer = structuredClone(f.files); delete fewer['app/Source-0.scala'];
+  assert.throws(() => captureRuntimeSourceInventory(root, fewer), /missing or unplanned/);
+  const more = { ...f.files, 'project/evil.sbt': stamp };
+  assert.throws(() => captureRuntimeSourceInventory(root, more), /missing or unplanned/);
+  // A self-consistent forged manifest is still not the build's captured manifest.
+  f.inputs.generatedFiles.shift(); f.ledger.entries.shift();
+  writeFileSync(join(root, '.truthsrc/inputs.json'), JSON.stringify(f.inputs));
+  writeFileSync(join(root, 'truthsrc.ledger.json'), JSON.stringify(f.ledger));
+  assert.throws(() => captureRuntimeSourceInventory(root, fewer), /envelope changed/);
+  writeFileSync(join(root, 'truthsrc.ledger.json'), f.ledgerText);
+  assert.throws(() => captureRuntimeSourceInventory(root, f.files), /inputs.json/);
+});
+
+// Exercise the real exported admission entry, not only the standalone helper.
+// Coherently editing all receipt counts/snapshots must still fail against the
+// captured envelopes, BEFORE any JDK/runtime-supply admission is attempted.
+for (const mode of ['fewer', 'more', 'retained', 'stale-envelope']) test('real admission rejects coordinated ' + mode + ' inventory without a JVM', async t => {
+  assert.equal(realpathSync(join(ROOT, 'target')), join(ROOT, 'target'));
+  const ownedRoot = mkdtempSync(join(ROOT, 'target/runtime-admission-test-'));
+  t.after(() => rmSync(ownedRoot, { recursive: true, force: true }));
+  const f = fixture({ ownedRoot }), inventory = sourceInventory();
+  mkdirSync(f.evidence); mkdirSync(join(f.input.output, '.truthsrc'), { recursive: true });
+  if (mode === 'fewer') delete inventory.files['app/Source-0.scala'];
+  if (mode === 'more' || mode === 'retained') inventory.files['retained.scala'] = { ...stamp };
+  if (mode === 'retained') {
+    inventory.ledger.entries.push({ ...inventory.ledger.entries[0], path: 'retained.scala' });
+    inventory.ledgerText = JSON.stringify(inventory.ledger) + '\n';
+    inventory.files['truthsrc.ledger.json'] = { bytes: Buffer.byteLength(inventory.ledgerText), sha256: hash(inventory.ledgerText) };
+  }
+  f.before.output = inventory.files; f.after.output = structuredClone(inventory.files);
+  f.actual.sources = structuredClone(inventory.files); f.actual.files = Object.keys(inventory.files).length;
+  assert.doesNotThrow(() => validateRuntimeReceipts(f)); // Counts and before/after equality alone are insufficient.
+  const names = { input: 'input', result: 'result', runtime: 'runtime-build', build: 'build', actual: 'actual-build-sources',
+    before: 'sources-before', after: 'sources-after', runtimeBefore: 'runtime-inputs-before', runtimeAfter: 'runtime-inputs-after', plan: 'build-plan' };
+  for (const [key, name] of Object.entries(names)) writeFileSync(join(f.evidence, name + '.json'), JSON.stringify(f[key]));
+  writeFileSync(join(f.evidence, 'build.stdout.log'), f.stdout); writeFileSync(join(f.evidence, 'build.stderr.log'), f.stderr);
+  writeFileSync(join(f.input.output, 'truthsrc.ledger.json'), mode === 'stale-envelope' ? inventory.ledgerText + '\n' : inventory.ledgerText);
+  writeFileSync(join(f.input.output, '.truthsrc/inputs.json'), inventory.text);
+  await assert.rejects(admitRuntimeBuild(f.evidence), mode === 'retained' ? /retained\/missing\/foreign ledger/ :
+    mode === 'stale-envelope' ? /envelope changed/ : /missing or unplanned build input/);
+});
 
 function temporary(t) {
   const root = mkdtempSync(join(realpathSync(tmpdir()), 'runtime-admission-test-'));

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "bank.onboarding-acceptance-index/v1",
+  "date": "2026-11-06",
+  "status": "local-code-and-workshop-verified-service-blocked",
+  "fullPipelinePassed": false,
+  "deliveryReady": false,
+  "usabilityAccepted": false,
+  "onboardingComplete": false,
+  "protectedFilesUnchanged": 241,
+  "evidence": [
+    {
+      "file": "target/onboarding-code-20261106-02/report.json",
+      "bytes": 1279,
+      "sha256": "77b51a781a81bd1ae30229c1ee62bf91e611413db6d5bab31c168a9148ae7c39"
+    },
+    {
+      "file": "target/onboarding-code-20261106-02-actor-build/result.json",
+      "bytes": 38391,
+      "sha256": "da3b0079ae7a4e4e1cb72295d1e388b635885b4e377c677193fa4d3d84069ec7"
+    },
+    {
+      "file": "target/onboarding-code-20261106-02-readside-build/result.json",
+      "bytes": 33942,
+      "sha256": "5e856705117ed8d1ff4cc13b5a18b80c9160acc392ade7551fbfe54ee0cafd34"
+    },
+    {
+      "file": "target/onboarding-runtime-build-20261106-02/result.json",
+      "bytes": 693089,
+      "sha256": "bcdf2a64ae8d7483e6fb294c42becb99b62c0419ab44a72452944b0ae17f7d55"
+    },
+    {
+      "file": "target/onboarding-launcher-compile-20261106-01/compile-final.json",
+      "bytes": 3128,
+      "sha256": "6217a43e28b2246d32d10546fff550921415b9b495f162c0c1434561b52ac5b5"
+    },
+    {
+      "file": "target/truthsrc-runtime-onboarding-crash-20261106-02/result.json",
+      "bytes": 17648373,
+      "sha256": "eafde52bcb8f2a77c1f6365846dac1d58ca16739e7f8c085e727d02717403ab0"
+    },
+    {
+      "file": "target/onboarding-delivery-20261106-final/manifest.json",
+      "bytes": 2492,
+      "sha256": "bac5a3ef537330cb37716d13053d5275e87775be74aa89b06d2c31fc488504d4"
+    },
+    {
+      "file": "target/onboarding-delivery-20261106-final/installation.json",
+      "bytes": 499,
+      "sha256": "8c280ac9287326945d370e3070f939c2059528351f9f0dde97c0ed9fe943c9fb"
+    },
+    {
+      "file": "target/onboarding-baseline-20261106.4rIRIO/final-browser-02.json",
+      "bytes": 445,
+      "sha256": "4742d89c4789df5861233bedfb4f8bb61ab2f6607cfe46b06cd94425cff36474"
+    },
+    {
+      "file": "target/onboarding-baseline-20261106.4rIRIO/current-verify.json",
+      "bytes": 38725,
+      "sha256": "6e11648f224a1049246348434872b432d12ae6a6cbb5c34f73173225799aea1a"
+    },
+    {
+      "file": "target/onboarding-baseline-20261106.4rIRIO/protected-final.json",
+      "bytes": 160,
+      "sha256": "b91df2033e5fcafe4002105f6c4ea0c2d43e7d87d64d95f2bfedbf5e670667a2"
+    }
+  ],
+  "notPerformed": [
+    "Mongo/MySQL/HTTP service and browser reacceptance",
+    "human foreground banking session startup/shutdown",
+    "human newcomer usability study",
+    "remote package/source publication",
+    "v1 directory migration"
+  ]
+}

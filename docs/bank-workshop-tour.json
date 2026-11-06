@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "truthsrc.workshop-tour/v1",
+  "title": "一笔申购的来龙去脉",
+  "subtitle": "100元，从业务意图到可核验的代码。沿着五个问题，看懂真源、知识图和实际实现。",
+  "maxNodes": 120,
+  "chapters": [
+    {
+      "id": "intent",
+      "kicker": "01 / THE BUSINESS QUESTION",
+      "title": "钱扣了，投资就成功了吗？",
+      "description": "不是。现金付款、基金公司确认和投资完成是不同事实。先从客户故事出发，看清三个阶段，再进入内部机制。图中是声明关系，不是正在发生的交易。",
+      "knowledge": [
+        "knowledge:bank-wealth/bankwealth/story/cash-fund-purchase",
+        "knowledge:bank-wealth/bankwealth/story/fund-ta-settlement",
+        "knowledge:bank-wealth/bankwealth/use-case/purchase-fund-with-cash",
+        "knowledge:bank-wealth/bankwealth/use-case/settle-paid-fund-order-with-ta",
+        "knowledge:bank-wealth/bankwealth/pipeline/bank-cash-payment-v1",
+        "knowledge:bank-wealth/bankwealth/pipeline/bank-ta-submission-v1"
+      ],
+      "questions": ["受理、付款成功、投资成功分别是什么？", "TA的accepted为什么还不是最终确认？"]
+    },
+    {
+      "id": "transaction",
+      "kicker": "02 / ONE DECLARATION, MANY MEANINGS",
+      "title": "一笔付款，怎样保护资金？",
+      "description": "进入付款事务的Prepare：ReserveFunds先预留本次出款资金。点开命令、正金额规则和状态更新，能看到多个展开知识仍指向同一份紧凑作者声明。",
+      "knowledge": [
+        "knowledge:bank-wealth/bankwealth/saga/bank-cash-payment-v1",
+        "knowledge:bank-wealth/bankwealth/saga-host/bank-payment-host",
+        "knowledge:bank-wealth/bankwealth/command/CreditBalance/ReserveFunds",
+        "knowledge:bank-wealth/bankwealth/guard/CreditBalance/ReserveFunds/LEDGER_POSITIVE",
+        "knowledge:bank-wealth/bankwealth/guard/CreditBalance/ReserveFunds/LEDGER_SUFFICIENT",
+        "knowledge:bank-wealth/bankwealth/event/CreditBalance/ReserveFundsConfirmed",
+        "knowledge:bank-wealth/bankwealth/fold/CreditBalance/ReserveFundsConfirmed/reservedAmount",
+        "knowledge:bank-wealth/bankwealth/fold/CreditBalance/ReserveFundsConfirmed/accountBalance"
+      ],
+      "questions": ["规则的真实编辑位置在哪里？", "相邻两条fold能否查回不同知识？"]
+    },
+    {
+      "id": "rejection",
+      "kicker": "03 / FAILURE IS PART OF THE MODEL",
+      "title": "TA拒绝后，为什么另做一笔退款？",
+      "description": "付款已经成功，不能把历史抹去。可信TA拒绝后启动独立的原本金反向事务。它不是原付款Saga的补偿，也不能被重复回执多次执行。",
+      "knowledge": [
+        "knowledge:bank-wealth/bankwealth/story/independent-fund-refund",
+        "knowledge:bank-wealth/bankwealth/use-case/refund-ta-rejected-purchase",
+        "knowledge:bank-wealth/bankwealth/saga/bank-independent-refund-v1",
+        "knowledge:bank-wealth/bankwealth/saga-host/bank-refund-host",
+        "knowledge:bank-wealth/bankwealth/pipeline/bank-independent-refund-v1"
+      ],
+      "questions": ["原付款成功事实还在吗？", "退款与Saga补偿有什么区别？"]
+    },
+    {
+      "id": "recurring",
+      "kicker": "04 / REUSE THE SAME BUSINESS PATH",
+      "title": "定投不是另一套资金规则",
+      "description": "有限日程先留存，再由显式tick派发每一期。期次复用同一现金申购入口，只有相关终态才计数。三次失败自动暂停不属于当前已实现政策。",
+      "knowledge": [
+        "knowledge:bank-wealth/bankwealth/story/finite-sip-plan",
+        "knowledge:bank-wealth/bankwealth/use-case/run-finite-sip-plan",
+        "knowledge:bank-wealth/bankwealth/aggregate/SipPlan",
+        "knowledge:bank-wealth/bankwealth/pipeline/bank-sip-dispatch-v1",
+        "knowledge:bank-wealth/bankwealth/effect-host/bank-sip-dispatch"
+      ],
+      "questions": ["付款完成是否就能增加投资终态计数？", "每一期复用了哪条业务路径？"]
+    },
+    {
+      "id": "proof",
+      "kicker": "05 / DON'T TRUST A GREEN PICTURE",
+      "title": "回到代码，再看证据",
+      "description": "选择正金额规则，在右侧切到“生成代码”，点击高亮行反查真实知识。再打开证据抽屉：源码同步、代码测试与银行服务验收分别报告，缺少任何回执都不会被图上的连线掩盖。修改演练在独立Counter项目完成，不改变这份银行业务快照。",
+      "knowledge": [
+        "knowledge:bank-wealth/bankwealth/guard/CreditBalance/ReserveFunds/LEDGER_POSITIVE",
+        "knowledge:bank-wealth/bankwealth/fold/CreditBalance/ReserveFundsConfirmed/reservedAmount",
+        "knowledge:bank-wealth/bankwealth/fold/CreditBalance/ReserveFundsConfirmed/accountBalance",
+        "knowledge:bank-wealth/bankwealth/artifact-contract/bank-service"
+      ],
+      "questions": ["代码精确回锚是否等于服务已经验收？", "这份静态页面能知道明天的文件变化吗？"]
+    }
+  ]
+}

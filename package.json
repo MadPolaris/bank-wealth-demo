@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.5" },
+  "engines": { "node": ">=22.13.0" },
   "scripts": {
     "test": "node --test test/unified-truth.test.mjs test/historical-source.test.mjs",
+    "test:workshop": "node --test --test-concurrency=1 test/bank-workshop.test.mjs test/bank-workshop-session.test.mjs test/bank-workshop-view.test.mjs test/truthsrc-runtime-lease.test.mjs test/truthsrc-runtime-sandbox.test.mjs",
+    "workshop": "node tools/bank-workshop.mjs",
     "test:history": "node --test test/truth.test.mjs test/projections.test.mjs test/cash-contract.test.mjs test/mock-ta.test.mjs test/i0-design.test.mjs test/cash-next-design.test.mjs",
     "test:baseline": "node --test test/truth.test.mjs test/projections.test.mjs test/cash-contract.test.mjs test/mock-ta.test.mjs",
     "test:design": "node --test test/i0-design.test.mjs",

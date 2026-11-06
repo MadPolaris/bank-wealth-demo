@@ -89,6 +89,10 @@ export function runtimeProbeSource({ canary, positiveNetwork = false, probeName 
   assert.ok(![evidence, taRoot].some(root => overlap(root, canary)) && !HISTORICAL.some(p => overlap(p, canary)), 'outside owned canary required');
   assert.equal(typeof positiveNetwork, 'boolean');
   assert.ok(!positiveNetwork || networkScope === RUNTIME_NETWORK_SCOPE, 'positive probe needs explicit registered-port scope');
+  const history = HISTORICAL.map(file => {
+    try { lstatSync(file); return { file, existed: true }; }
+    catch (error) { if (error.code === 'ENOENT') return { file, existed: false }; throw error; }
+  });
   return `import errno, os, signal, socket, subprocess, sys
 signal.alarm(20)
 os.chdir(${quote(evidence)})
@@ -126,8 +130,19 @@ for suffix in ['class', 'jar']:
 for i, file in enumerate(${quote(readOnlyFiles)}):
     if os.path.isdir(file): denied('readonly-' + str(i), lambda: write_attempt(os.path.join(file, 'must-not-create')))
     else: denied('readonly-' + str(i), lambda: write_attempt(file))
-for i, file in enumerate(${quote(HISTORICAL)}):
-    denied('historical-read-' + str(i), lambda: os.stat(file))
+for i, (file, existed) in enumerate(${quote(history.map(row => [row.file, Number(row.existed)]))}):
+    label = 'historical-read-' + str(i)
+    if existed:
+        denied(label, lambda: os.stat(file))
+    else:
+        try: os.stat(file)
+        except OSError as error:
+            if error.errno == errno.ENOENT:
+                print('ABSENT ' + label + ' baseline=missing no-denial-proof', flush=True)
+            else:
+                assert error.errno in (errno.EPERM, errno.EACCES), label + ' wrong errno=' + str(error.errno)
+                print('DENIED ' + label + ' errno=' + str(error.errno), flush=True)
+        else: raise RuntimeError('UNSAFE history appeared and is readable: ' + label)
 if len(sys.argv) == 1:
     for i, root in enumerate(${quote([evidence, taRoot])}):
         with open(os.path.join(root, ${quote(probeName)}), 'xb') as stream: stream.write(b'owned-write-allowed\\n')
