@@ -268,11 +268,11 @@ test('actual sbt source must be the candidate or its fresh owned staging copy', 
 });
 
 test('actual loaded source reconciliation rejects changed, missing or extra source files', () => {
-  const before = { 'build.sbt': { bytes: 3, sha256: 'aaa' }, 'src/test/scala/Test.scala': { bytes: 5, sha256: 'bbb' } };
+  const before = { 'build.sbt': { bytes: 3, sha256: 'a'.repeat(64) }, 'src/test/scala/Test.scala': { bytes: 5, sha256: 'b'.repeat(64) } };
   assert.deepEqual(compareBuildSources(before, structuredClone(before)), { passed: true, files: 2 });
   assert.throws(() => compareBuildSources(before, { 'build.sbt': before['build.sbt'] }));
-  assert.throws(() => compareBuildSources(before, { ...before, 'extra.sbt': { bytes: 0, sha256: 'ccc' } }));
-  assert.throws(() => compareBuildSources(before, { ...before, 'build.sbt': { bytes: 3, sha256: 'changed' } }));
+  assert.throws(() => compareBuildSources(before, { ...before, 'extra.sbt': { bytes: 0, sha256: 'c'.repeat(64) } }));
+  assert.throws(() => compareBuildSources(before, { ...before, 'build.sbt': { bytes: 3, sha256: 'd'.repeat(64) } }));
 });
 
 test('executor retains OS confinement, fixed task admission and cleanup-free lifecycle', () => {

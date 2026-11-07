@@ -33,7 +33,7 @@
       "responsibility": {"summary": "Sequence fresh candidates and inspect source/anchors/code/service evidence.", "owners": ["bank workshop maintainers"], "nature": "mixed", "mechanism": "Public project generation/verification and adapter-backed static file/process/worker capture.", "policy": "Required slices, actor/readside/runtime stages, snapshots and fullPipelinePassed criteria remain bank-specific."},
       "lifecycle": "current",
       "consumers": [{"file": "test/bank-workshop.test.mjs", "kind": "test", "evidence": "from '../tools/bank-workshop-verification.mjs'", "note": "Explicit workshop contract tests; not bank service execution."}],
-      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/process.mjs", "consumer": "tools/truthsrc-runtime-process.mjs", "specifier": "../../metarch-truthsrc/lib/verification/process.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/worker-evidence.mjs", "consumer": "tools/truthsrc-worker-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/worker-evidence.mjs"}], "note": "Evidence capture uses public adapters; generic build-report logic and orchestration remain unextracted. Historical crash report policy is still imported."}
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/runner.mjs", "consumer": "tools/bank-workshop-verification.mjs", "specifier": "../../metarch-truthsrc/lib/verification/runner.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/inventory.mjs", "consumer": "tools/bank-workshop-verification.mjs", "specifier": "../../metarch-truthsrc/lib/verification/inventory.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/outcome.mjs", "consumer": "tools/bank-workshop-verification.mjs", "specifier": "../../metarch-truthsrc/lib/verification/outcome.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/process.mjs", "consumer": "tools/truthsrc-runtime-process.mjs", "specifier": "../../metarch-truthsrc/lib/verification/process.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/worker-evidence.mjs", "consumer": "tools/truthsrc-worker-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/worker-evidence.mjs"}], "note": "Source uses a public leased action/verifier/report lifecycle; references and stage arithmetic are public. Fresh code/service candidate scheduling, exact bank inspectors and historical crash policy remain local."}
     },
     {
       "file": "tools/bank-workshop-view.mjs",
@@ -70,10 +70,10 @@
     {
       "file": "tools/verify-truthsrc-build.mjs",
       "provenance": {"kind": "engineering-authored", "basis": "Current isolated build verifier maintained independently of generated bank source."},
-      "responsibility": {"summary": "Admit fresh generated candidates and run explicitly selected isolated build modes.", "owners": ["bank build maintainers"], "nature": "mixed", "mechanism": "Public-backed path checks; local archive, sandbox, process, staging and log verification.", "policy": "Frozen supply, exact sources/tasks, suite manifests, guard snapshots and admission remain bank-owned."},
+      "responsibility": {"summary": "Admit fresh generated candidates and run explicitly selected isolated build modes.", "owners": ["bank build maintainers"], "nature": "mixed", "mechanism": "Public file fingerprints, inventories and completion arithmetic; local archive, sandbox, build-process and staging policy.", "policy": "Frozen supply, exact sources/tasks, suite manifests, guard snapshots and admission remain bank-owned."},
       "lifecycle": "current",
       "consumers": [{"file": "tools/bank-workshop-verification.mjs", "kind": "entry", "evidence": "script: 'verify-truthsrc-build.mjs'", "note": "Fresh actor/readside/runtime build stages."}],
-      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "safePath delegates through truthsrc-evidence; this does not claim all hashing, build process supervision, reports or snapshot policies have migrated."}
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/verify-truthsrc-build.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/inventory.mjs", "consumer": "tools/verify-truthsrc-build.mjs", "specifier": "../../metarch-truthsrc/lib/verification/inventory.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/outcome.mjs", "consumer": "tools/verify-truthsrc-build.mjs", "specifier": "../../metarch-truthsrc/lib/verification/outcome.mjs"}], "note": "Streaming fingerprints, exact inventories and completion arithmetic delegate publicly. Bank candidate admission, sbt recipes, legacy build supervision, exclusions and snapshot policy remain local."}
     },
     {
       "file": "tools/truthsrc-actor-tests.mjs",
@@ -97,7 +97,7 @@
       "responsibility": {"summary": "Compile five fixed runtime mains and seal actual ordered classpath/source inventory.", "owners": ["bank build maintainers"], "nature": "mixed", "mechanism": "Local compile-log and classpath inventory checks.", "policy": "Fixed main names, hashes, dependencies, paths and successful build handoff."},
       "lifecycle": "current",
       "consumers": [{"file": "tools/bank-workshop-session.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-tests.mjs'", "note": "Session classpath inspection; inventory checking does not execute it."}],
-      "publicMechanism": {"status": "deferred", "targets": [], "note": "Generic classpath/build-report mechanisms remain local; compile-only never implies service execution."}
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/outcome.mjs", "consumer": "tools/truthsrc-runtime-tests.mjs", "specifier": "../../metarch-truthsrc/lib/verification/outcome.mjs"}], "note": "Completion uses public strict-true arithmetic. Fixed mains, ordered classpath and compile-only versus execution semantics remain bank policy."}
     },
     {
       "file": "tools/truthsrc-runtime-admission.mjs",
@@ -105,7 +105,7 @@
       "responsibility": {"summary": "Admit source-bound runtime builds and their actual staging/classpath receipts.", "owners": ["bank runtime maintainers"], "nature": "mixed", "mechanism": "Use public-backed captured files through the bank evidence adapter.", "policy": "Bank schemas, exact build provenance, support files, classpath and frozen supply guards remain local."},
       "lifecycle": "current",
       "consumers": [{"file": "tools/bank-workshop-session.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-admission.mjs'", "note": "Session admission; runtime controller also consumes it."}],
-      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "captureRuntimeFile/safePath use the public file adapter; bank admission and guard snapshots are not public defaults."}
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/inventory.mjs", "consumer": "tools/truthsrc-runtime-admission.mjs", "specifier": "../../metarch-truthsrc/lib/verification/inventory.mjs"}], "note": "Bank captures strict evidence and retains/rechecks references through the public inventory mechanism; exact receipt and source/classpath guard policies remain here."}
     },
     {
       "file": "tools/truthsrc-runtime-jars.mjs",
@@ -133,11 +133,11 @@
     },
     {
       "file": "tools/truthsrc-runtime-lease.mjs",
-      "provenance": {"kind": "engineering-authored", "basis": "Bank-owned cooperative lease implementation retained during P1."},
-      "responsibility": {"summary": "Validate/acquire/release the current owner lease and check reserved ports.", "owners": ["bank runtime maintainers"], "nature": "mixed", "mechanism": "Local exclusive lease/port operations; direct import of the public-backed file adapter.", "policy": "Bank owner identity, run/TA roots, port policy and no unknown-resource takeover."},
+      "provenance": {"kind": "engineering-authored", "basis": "Bank lease adapter retaining the original disk protocol while consuming the public cooperative lease."},
+      "responsibility": {"summary": "Validate/acquire/release the current owner lease and check reserved ports.", "owners": ["bank runtime maintainers"], "nature": "adapter", "mechanism": "Public cooperative file-lock acquisition, held checks and owner-capability release.", "policy": "Bank schema, strict JSON, record layout, owner identity, run/TA roots and actual port probing."},
       "lifecycle": "current",
       "consumers": [{"file": "test/truthsrc-runtime-lease.test.mjs", "kind": "test", "evidence": "from '../tools/truthsrc-runtime-lease.mjs'", "note": "Explicit lease contracts; not executed by inventory validation."}],
-      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "Lease directly imports truthsrc-evidence for file/path policy; lease acquisition, release and port mechanisms remain bank implementation, not migrated."}
+      "publicMechanism": {"status": "migrated", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/lease.mjs", "consumer": "tools/truthsrc-runtime-lease.mjs", "specifier": "../../metarch-truthsrc/lib/verification/lease.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "File lease mechanics are public; bank keeps exact lock/marker record bytes, owner/port/root validation, strict parsing and probe policy. This does not claim Docker or kernel-port reservation."}
     },
     {
       "file": "tools/truthsrc-runtime-sandbox.mjs",

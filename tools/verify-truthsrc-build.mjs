@@ -3,12 +3,15 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
   closeSync, createReadStream, lstatSync, mkdirSync, mkdtempSync, openSync, readFileSync,
-  readdirSync, readlinkSync, readSync, realpathSync, symlinkSync, writeFileSync,
+  readdirSync, readlinkSync, realpathSync, symlinkSync, writeFileSync,
 } from 'node:fs';
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { safePath } from './truthsrc-evidence.mjs';
+import { fingerprintEvidenceFile } from '../../metarch-truthsrc/lib/verification/files.mjs';
+import { compareEvidenceInventories, inventoryEvidence, snapshotEvidenceFiles } from '../../metarch-truthsrc/lib/verification/inventory.mjs';
+import { verificationOutcome } from '../../metarch-truthsrc/lib/verification/outcome.mjs';
 
 export { safePath } from './truthsrc-evidence.mjs';
 import {
@@ -74,7 +77,7 @@ network resolution, runtime rebuild/publish, or historical acceptance runner.`;
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const READSIDE_HELPER_SHA256 = fileDigest(READSIDE_MANIFEST_FILE);
 export const BUILD_SUPPORT = Object.freeze([join(ROOT, 'tools/truthsrc-evidence.mjs'),
-  ...['verification/files', 'immutable-data', 'strict-json'].map(name => join(TOOL, 'lib', name + '.mjs'))]);
+  ...['verification/files', 'verification/inventory', 'verification/outcome', 'immutable-data', 'strict-json'].map(name => join(TOOL, 'lib', name + '.mjs'))]);
 const loadedBuildSupport = snapshotFiles(BUILD_SUPPORT);
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const save = (file, value) => writeFileSync(file, json(value), { flag: 'wx', mode: 0o600 });
@@ -227,8 +230,8 @@ export function actualBuildSourceRoot(stdout, output, evidence) {
 }
 
 export function compareBuildSources(before, after) {
-  assert.deepEqual(after, before, 'actual sbt-loaded input bytes/file set differ from admitted candidate');
-  return { passed: true, files: Object.keys(before).length };
+  try { return compareEvidenceInventories(before, after); }
+  catch { throw new Error('actual sbt-loaded input bytes/file set differ from admitted candidate'); }
 }
 
 const EXECUTION_CHECKS = ['osSandboxEnforced', 'outputUnchanged', 'handwrittenUnchanged', 'localRuntimeUnchanged',
@@ -242,13 +245,15 @@ export function completeGeneratedTests(observation, receipt, checks, cancellatio
   catch (error) { errors.push(error.message); }
   const requiredChecks = [...EXECUTION_CHECKS, ...(observation.expected?.readsideTests ? READSIDE_EXECUTION_CHECKS :
     observation.expected?.businessTests ? ['actorInputsUnchanged', 'actorWorkersVerified', 'actorBoundaryEnforced', 'actualTestSourcesVerified'] : [])];
-  const unverified = requiredChecks.filter(name => checks[name] !== true);
+  const outcome = verificationOutcome({ observationPassed: observation.passed === true, processPassed,
+    requiredChecks, checks: Object.fromEntries(requiredChecks.map(name => [name, Object.hasOwn(checks, name) && checks[name] === true])),
+    cancelled: !!cancellation, errors: [...errors, ...verificationErrors] });
+  const { unverified } = outcome;
   if (unverified.length) errors.push('unverified source/boundary checks: ' + unverified.join(', '));
   if (cancellation) errors.push('cancelled: ' + cancellation);
   errors.push(...verificationErrors);
-  const outputPassed = observation.passed === true;
-  return { ...observation, outputPassed, processPassed, sourceBound: unverified.length === 0,
-    passed: outputPassed && processPassed && errors.length === 0, errors: [...new Set(errors)] };
+  return { ...observation, outputPassed: outcome.outputPassed, processPassed, sourceBound: outcome.sourceBound,
+    passed: outcome.passed, errors: [...new Set(errors)] };
 }
 
 // A macrotask turn is required after synchronous hashing; Promise.resolve alone
@@ -265,13 +270,7 @@ export function isMainModule(argv, moduleUrl) {
 }
 
 export function fileDigest(file) {
-  const fd = openSync(file, 'r');
-  try {
-    const digest = createHash('sha256'), buffer = Buffer.allocUnsafe(1024 * 1024);
-    let bytes;
-    while ((bytes = readSync(fd, buffer, 0, buffer.length, null)) > 0) digest.update(buffer.subarray(0, bytes));
-    return digest.digest('hex');
-  } finally { closeSync(fd); }
+  return fingerprintEvidenceFile(file, { allowHardlinks: stat => file === PYTHON && stat.uid === 0 && (stat.mode & 0o022) === 0 }).sha256;
 }
 
 async function archiveDigest(file) {
@@ -282,36 +281,12 @@ async function archiveDigest(file) {
 
 export function inventory(root, { afterBuild = false } = {}) {
   safePath(root);
-  const files = {};
-  function visit(dir) {
-    const names = readdirSync(dir).sort();
-    assert.equal(new Set(names.map(fold)).size, names.length, 'case/unicode aliases in ' + dir);
-    for (const name of names) {
-      assert.ok(!/[\\\x00-\x1f\x7f]/.test(name), 'unsafe inventory name');
-      const file = join(dir, name), key = relative(root, file), stat = lstatSync(file);
-      assert.ok(!stat.isSymbolicLink(), 'symlink in inventory: ' + file);
-      if (ARTIFACT_DIRS.includes(key) && root !== HANDWRITTEN && afterBuild) {
-        assert.ok(stat.isDirectory(), 'artifact directory replaced: ' + file);
-        continue;
-      }
-      if (stat.isDirectory()) visit(file);
-      else {
-        assert.ok(stat.isFile() && stat.nlink === 1, 'regular, non-hardlinked input required: ' + file);
-        files[key] = { bytes: stat.size, sha256: fileDigest(file) };
-      }
-    }
-  }
-  visit(root);
-  return files;
+  return inventoryEvidence(root, { excludeDirectories: root !== HANDWRITTEN && afterBuild ? ARTIFACT_DIRS : [] });
 }
 
 export function snapshotFiles(files) {
-  return Object.fromEntries(files.map(file => {
-    safePath(file, 'file');
-    const stat = lstatSync(file);
-    assert.equal(stat.nlink, 1, 'hardlinked actor input forbidden');
-    return [file, { bytes: stat.size, sha256: fileDigest(file) }];
-  }));
+  for (const file of files) safePath(file, 'file');
+  return snapshotEvidenceFiles(files);
 }
 
 async function prepareActors(evidence, generatedManifest) {

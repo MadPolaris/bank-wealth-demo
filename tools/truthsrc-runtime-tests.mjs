@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { verificationOutcome } from '../../metarch-truthsrc/lib/verification/outcome.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
 export const RUNTIME_MAINS = Object.freeze([
@@ -116,8 +117,8 @@ export function completeRuntimeCompilation(observation, checks, processPassed, e
     'supplyUnchanged', 'currentInputsUnchanged', 'sandboxControlsAndCanariesUnchanged', 'ownedCachesInventoried',
     'verifierUnchanged', 'actualBuildSourcesVerified', 'runtimeTestInputsUnchanged', 'actualRuntimeTestSourcesVerified',
     'runtimeClasspathVerified'];
-  const unverified = required.filter(key => checks[key] !== true);
-  return { ...observation, processPassed, sourceBound: unverified.length === 0,
-    passed: !!observation && processPassed && unverified.length === 0 && errors.length === 0,
-    errors: [...errors, ...unverified.map(key => 'unverified: ' + key)] };
+  const outcome = verificationOutcome({ observationPassed: !!observation, processPassed, requiredChecks: required,
+    checks: Object.fromEntries(required.map(name => [name, Object.hasOwn(checks, name) && checks[name] === true])), errors });
+  return { ...observation, processPassed: outcome.processPassed, sourceBound: outcome.sourceBound,
+    passed: outcome.passed, errors: [...errors, ...outcome.unverified.map(key => 'unverified: ' + key)] };
 }

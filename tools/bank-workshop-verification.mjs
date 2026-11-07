@@ -10,6 +10,9 @@ import {
 import { captureRuntimeFile } from './truthsrc-evidence.mjs';
 import { inspectRuntimeWorker } from './truthsrc-worker-evidence.mjs';
 import { inspectRuntimeProcessEvidence } from './truthsrc-runtime-process.mjs';
+import { createEvidenceReferences } from '../../metarch-truthsrc/lib/verification/inventory.mjs';
+import { summarizeVerificationStages } from '../../metarch-truthsrc/lib/verification/outcome.mjs';
+import { inspectVerificationRun, runVerification } from '../../metarch-truthsrc/lib/verification/runner.mjs';
 
 export const CONTRACT = 'bank.workshop-verification/v1';
 // These are selectors, not copies of financial rules/oracles. Qualified identities
@@ -65,6 +68,26 @@ async function compileSource(project) {
     validation: result.validation, roundtrip: result.validation.roundtrip,
     strictCompile: { passed: true, digest: stamp(result.compilation.result), diagnostics: result.compilation.diagnostics ?? [] },
     snapshot: result.sourceIndex?.snapshot, canonicalDigest: stamp(result.canonical), runtimeVerified: false };
+}
+
+function checkSourceResult(source) {
+  requirePassed(source.passed); requirePassed(source.strictCompile?.passed); requirePassed(source.roundtrip?.ok);
+  same(source.validation?.hard, []); assert.ok(typeof source.snapshot === 'string' && source.snapshot.length > 0);
+}
+
+function sourceVerificationPlan(currentFile) {
+  const file = join(ROOT, 'tools/bank-workshop-verification.mjs');
+  return { contract: { id: 'bank-workshop-source', version: '1' }, inputs: { files: [currentFile], trees: [] },
+    actionFile: file, verifiers: [{ id: 'source-contract', file }], artifacts: ['source.json'], processCount: 0 };
+}
+
+function sourceVerifiers(ops, currentFile) {
+  return { 'source-contract': async ({ artifactRoot, value }) => {
+    const source = readJson(join(artifactRoot, 'source.json')); checkSourceResult(source);
+    same(source.snapshot, value.snapshot);
+    same(await ops.current(), readJson(currentFile), 'current source/tool/handwritten closure changed');
+    return true;
+  } };
 }
 
 async function generate(project, out) {
@@ -181,9 +204,9 @@ export async function inspectService({ evidence, buildEvidence, lease, round }) 
   assert.equal(result.leaseRelease.owner, spec.owner); requirePassed(result.leaseRelease.dataPreserved);
   assert.equal(result.leaseRelease.reusable, false);
   for (const key of ['runtimeRebuilt', 'runtimePublished', 'release1134Resigned']) assert.equal(result[key], false);
-  const refs = new Map();
+  const refs = new Map(), capturedReferences = createEvidenceReferences();
   const retainReference = ref => {
-    if (refs.has(ref.file)) same(ref, refs.get(ref.file), 'evidence changed during inspection');
+    capturedReferences.retain(ref);
     refs.set(ref.file, ref); return ref;
   };
   const reference = async file => retainReference(await fileReference(file));
@@ -289,6 +312,7 @@ export async function inspectService({ evidence, buildEvidence, lease, round }) 
   await processEvidence(join(evidence, 'database/mysql-negative/process'));
   same(await rawJson(join(evidence, 'database/mysql-negative/result.json')), database.mysqlNegative);
   await reference(join(evidence, 'result.json')); await reference(join(evidence, 'inputs.json'));
+  capturedReferences.assertUnchanged();
   return { passed: true, owner: spec.owner, browserVerified: true, resourcesExited: true,
     inspection: 'static-sealed-evidence', liveResourcesProbed: false, refs: [...refs.values()] };
 }
@@ -308,13 +332,13 @@ function checkAnchorResult(result) {
 }
 
 function summary(index, checks, diagnostics) {
-  const stages = requestedStages(index.through);
-  const requestedScopePassed = diagnostics.length === 0 && stages.every(id => index.stages[id]?.status === 'passed' && checks[id] === true);
+  const { requestedScopePassed, stages } = summarizeVerificationStages({ stageIds: STAGES,
+    requiredStages: requestedStages(index.through), stages: index.stages, checks, diagnostics });
   return { schemaVersion: 'bank.workshop-report/v1', run: index.run, through: index.through, executionKind: index.executionKind,
     checkedAt: now(), staticSnapshot: true, requestedScopePassed, fullPipelinePassed: requestedScopePassed && index.through === 'service' && index.executionKind === 'real',
     deliveryReady: false, usabilityAccepted: false, onboardingComplete: false,
     snapshot: index.snapshot ?? null, codeDigest: index.codeDigest ?? null,
-    stages: STAGES.map(id => ({ id, status: index.stages[id]?.status ?? 'skipped', rechecked: checks[id] === true })), diagnostics,
+    stages, diagnostics,
     runtimeRetryBackoffDeadline: 'OPEN',
     limitations: ['Partial scope is not full bank acceptance.', 'Local hashes are not third-party signatures or hostile-host isolation.',
       'Delivery channel, platform minimum and independent newcomer usability are separate unaccepted gates.'] };
@@ -404,9 +428,23 @@ export async function verifyWorkshop(options, overrides = {}) {
       index.runtime = { evidence: metadata.spec.runRoot, round: metadata.round, lease: options.lease };
     }
     current = await ops.current(); index.current = await record('current-inputs', current);
-    source = await operation('source', () => ops.source(project));
-    requirePassed(source.passed); requirePassed(source.strictCompile?.passed); requirePassed(source.roundtrip?.ok);
-    same(source.validation?.hard, []); index.snapshot = source.snapshot;
+    source = await operation('source', async () => {
+      const directory = join(attempt, 'source-verification'), plan = sourceVerificationPlan(index.current.file);
+      index.sourceVerification = { directory, schemaVersion: 'truthsrc.verification-run/v1' };
+      const verified = await runVerification({ directory, plan, signal: controller.signal,
+        lease: { registry: join(root, 'target/workshop-source-leases'),
+          lockNames: ['project-' + sha256(project) + '.lock'], usedName: 'run-' + sha256(run) + '.used.json',
+          record: { owner: basename(run), project } },
+        action: async ({ artifactRoot }) => {
+          const result = await ops.source(project); checkSourceResult(result);
+          save(join(artifactRoot, 'source.json'), result); return { snapshot: result.snapshot };
+        },
+        verify: sourceVerifiers(ops, index.current.file),
+      });
+      requirePassed(verified.passed);
+      return readJson(join(directory, 'artifacts/source.json'));
+    });
+    checkSourceResult(source); index.snapshot = source.snapshot;
     index.source = index.refs.at(-1); await unchanged(); index.stages.source.status = 'passed';
     if (stages.includes('anchors')) {
       active = 'anchors';
@@ -483,11 +521,17 @@ export async function reportWorkshop({ run }, overrides = {}) {
   try {
     assert.ok(!missing);
     assert.ok(Array.isArray(index.refs) && index.refs.length > 0);
-    for (const ref of index.refs) same(await fileReference(ref.file), ref, 'receipt bytes changed/missing');
+    const references = createEvidenceReferences();
+    for (const ref of index.refs) { checkedPath(ref.file); references.retain(ref); }
+    references.assertUnchanged();
     same(readJson(join(run, 'attempts/0001/completed.json')).stages, index.stages, 'stage statuses differ from sealed attempt');
     const current = readJson(index.current.file); same(await ops.current(), current, 'current inputs/tool/handwritten dependencies changed');
-    const source = readJson(index.source.file);
-    requirePassed(source.passed); requirePassed(source.strictCompile?.passed); requirePassed(source.roundtrip?.ok); same(source.validation?.hard, []);
+    const source = readJson(index.source.file); checkSourceResult(source);
+    const directory = join(run, 'attempts/0001/source-verification');
+    same(index.sourceVerification, { directory, schemaVersion: 'truthsrc.verification-run/v1' });
+    requirePassed((await inspectVerificationRun({ directory, plan: sourceVerificationPlan(index.current.file),
+      verify: sourceVerifiers(ops, index.current.file) })).passed);
+    same(source, readJson(join(directory, 'artifacts/source.json')));
     checks.source = true;
     const required = requestedStages(index.through);
     if (required.includes('anchors')) {
@@ -514,7 +558,7 @@ export async function reportWorkshop({ run }, overrides = {}) {
       }
     }
     // Recheck after read-only validation too; parallel edits never become green.
-    same(await ops.current(), current);
+    same(await ops.current(), current); references.assertUnchanged();
   } catch {
     diagnostics.push({ code: 'WORKSHOP_RECHECK_FAILED', message: 'Evidence is incomplete, stale, changed or did not meet its stage contract. Nothing was rerun or repaired.' });
   }

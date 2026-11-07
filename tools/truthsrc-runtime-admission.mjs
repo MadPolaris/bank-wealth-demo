@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MAX_JSON_BYTES, parseStrictJson } from '../../metarch-truthsrc/lib/strict-json.mjs';
 import { BUILD_SUPPORT, admitCandidate, actualBuildSourceRoot, compareBuildSources, fileDigest, inventory, succeeded } from './verify-truthsrc-build.mjs';
 import { captureRuntimeFile, safePath } from './truthsrc-evidence.mjs';
+import { createEvidenceReferences } from '../../metarch-truthsrc/lib/verification/inventory.mjs';
 
 export { captureRuntimeFile } from './truthsrc-evidence.mjs';
 import { RUNTIME_MANIFEST_FILE, RUNTIME_MAINS, completeRuntimeCompilation, inspectRuntimeCompilation, runtimeBuildTasks, runtimeClasspathInventory, runtimeTestManifest } from './truthsrc-runtime-tests.mjs';
@@ -30,7 +31,7 @@ const snapshot = files => Object.fromEntries(files.map(file => [file, fingerprin
 const RUNTIME_SUPPORT = [RUNTIME_MANIFEST_FILE, join(ROOT, 'tools/truthsrc-runtime-jars.mjs')];
 const SUPPORT = [fileURLToPath(import.meta.url), VERIFIER, ...RUNTIME_SUPPORT, join(ROOT, 'tools/truthsrc-actor-tests.mjs'),
   join(ROOT, 'tools/truthsrc-evidence.mjs'),
-  ...['strict-json', 'immutable-data', 'verification/files', 'verification/worker-evidence', 'products/request']
+  ...['strict-json', 'immutable-data', 'verification/files', 'verification/inventory', 'verification/outcome', 'verification/worker-evidence', 'products/request']
     .map(name => join(TOOL, 'lib', name + '.mjs')), join(TOOL, 'bin/truthsrc.js'), join(TOOL, 'package.json')];
 const loadedSupport = snapshot(SUPPORT);
 
@@ -163,10 +164,11 @@ export async function admitRuntimeBuild(buildEvidence) {
   safePath(buildEvidence); assert.equal(realpathSync(buildEvidence), buildEvidence);
   assert.ok(within(join(ROOT, 'target'), buildEvidence), 'build evidence must be under bank target/');
   equal(snapshot(SUPPORT), loadedSupport, 'loaded admission/verifier/helper changed');
-  const receipts = {}, limits = {};
+  const receipts = {}, references = createEvidenceReferences();
   const capture = (file, { json = true } = {}) => {
     const limit = json ? MAX_JSON_BYTES : 32 * 1024 * 1024, captured = captureRuntimeFile(file, { json, limit });
-    assert.ok(!Object.hasOwn(receipts, file), 'duplicate capture'); receipts[file] = fingerprint(captured); limits[file] = limit;
+    assert.ok(!Object.hasOwn(receipts, file), 'duplicate capture'); receipts[file] = fingerprint(captured);
+    references.retain({ file, ...fingerprint(captured) }, { limit });
     return captured;
   };
   const read = (file, json = true) => capture(file, { json }).value;
@@ -251,7 +253,8 @@ export async function admitRuntimeBuild(buildEvidence) {
   const artifactsBefore = inventory(output);
   // No mutable build-cache exemption; runtime journals belong to the controller's NEW round, not here.
   const assertUnchanged = async () => {
-    for (const [file, expected] of Object.entries(receipts)) equal(fingerprint(captureRuntimeFile(file, { limit: limits[file] })), expected, 'receipt/support changed: ' + file);
+    for (const file of Object.keys(receipts)) safePath(file, 'file');
+    references.assertUnchanged();
     equal(snapshot(SUPPORT), loadedSupport); equal(snapshot(Object.keys(tools)), tools); equal(snapshot(Object.keys(controls)), controls);
     checkCanaries(); equal(inventory(output), artifactsBefore, 'build artifacts changed'); assertJarReferencesUnchanged(jarReferences, helpers);
     admitted.assertUnchanged(admitted.captured); equal(snapshot(Object.keys(sourceFiles)), sourceFiles); equal(toolTree(), toolBefore);

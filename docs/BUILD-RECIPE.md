@@ -95,7 +95,11 @@
 本轮已有公共机制：
 
 - `handwritten-provenance`：显式文件/知识关联校验。银行保留snapshot、35文件/54引用与关系政策。
-- `verification/files`：规范路径、有限同缓冲区文件取证。银行保留plain POSIX路径、`.scratch`禁入和系统Python例外。
+- `verification/files`：规范路径、同缓冲区取证及有界流式指纹。银行保留plain POSIX路径、`.scratch`禁入和系统Python例外。
+- `verification/inventory`：显式文件/目录成员清单、重复引用一致性和复核。银行选择输入集合、三个sbt输出目录例外及各回执大小上限。
+- `verification/outcome`：完成条件和阶段汇总的严格true运算；银行继续决定哪些检查必选、部分范围与完整服务的区别。
+- `verification/lease`：私有注册目录、排他锁、永久used marker、受控释放。银行保留schema、锁文件/记录格式、owner/port/TA根及真实端口探测。
+- `verification/runner`：显式action、独立verifier、输入/产物、租约和只读报告的串行闭环。当前工作坊source阶段实际消费，不替换后续银行场景调度和旧build进程合同。
 - `verification/process`：受限进程、脱敏、排他日志、取消/清理及静态回执检查。银行保留schema、profile和场景选择。
 - `verification/worker-evidence`：纯线程协议/关闭证据校验。银行保留TA路径、schema、fixture、锁和金融journal政策。
 - `verification/tooling-ownership`：只读库存/声明引用校验，不执行被检查工具。
@@ -106,7 +110,9 @@
 
 当前会话清理不再为了worker退出检查而提前加载旧crash/release-build模块；lease不再为文件原语加载完整build/admission。但现役crash/report仍借用历史crash政策，browser仍借用旧browser政策。旧`v1-`名字不等于无调用；历史工具原字节保留，不能整目录搬到公共仓或删掉。
 
-其余P1尚有完整lease、build/report、工作坊编排、Docker资源与历史银行政策分拆。基础source CLI没有因此新增JDK/Docker要求。
+[公共Catalog验证示例](../../metarch-truthsrc/scaffold/verification-project/README.md)展示安装后的独立项目怎样提供输入、builder、独立oracle与配置，再复用租约、构建/验证和只读报告；它不复制银行生命周期脚本，也不冒称Scala或银行服务验收。source工作坊新回执含`source-verification`子运行；旧回执不补签该事实，也不会在报告时重跑编译。
+
+其余P1尚有旧build进程监督合同、工作坊其余阶段、Docker资源与历史银行政策分拆。基础source CLI没有因此新增JDK/Docker要求。
 
 ## 5. 仓库实际形成的先后关系
 

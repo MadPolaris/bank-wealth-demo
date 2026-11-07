@@ -40,7 +40,7 @@ const SUPPORT = [fileURLToPath(import.meta.url), SOURCE, WORKER, FIXTURE,
     'truthsrc-runtime-db-relay', 'truthsrc-runtime-db-exec', 'truthsrc-runtime-process', 'truthsrc-runtime-sandbox',
     'truthsrc-runtime-tests', 'truthsrc-actor-ta-worker', 'truthsrc-worker-evidence', 'truthsrc-evidence',
     'truthsrc-runtime-jars', 'verify-truthsrc-build'].map(name => join(ROOT, 'tools', name + '.mjs')),
-  ...['strict-json', 'immutable-data', 'verification/files', 'verification/worker-evidence', 'verification/process']
+  ...['strict-json', 'immutable-data', 'verification/files', 'verification/inventory', 'verification/outcome', 'verification/lease', 'verification/callbacks', 'verification/worker-evidence', 'verification/process']
     .map(name => join(ROOT, '../metarch-truthsrc/lib', name + '.mjs')),
   join(ROOT, 'tools/historical-assets.mjs'), join(ROOT, 'docs/V1-RETIREMENT-MANIFEST.json'),
   ...['contract', 'journal', 'mock-ta-core'].map(name => join(ROOT, 'simulator', name + '.mjs'))];

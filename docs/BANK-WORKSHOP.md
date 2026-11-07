@@ -49,6 +49,8 @@ node "$BANK/tools/bank-workshop.mjs" report \
 结果：源码通过不是银行服务通过。`source` 不要求、不读取归档，不创建银行生成候选，
 不启动 JVM/容器/浏览器。公共 roundtrip 自己管理临时校验目录。
 
+source阶段使用公共串行验证运行器，在`attempts/0001/source-verification/`保存输入、严格编译结果及独立检查回执；`target/workshop-source-leases/`中创建按项目区分的协作锁和永久used marker。正常完成只释放自己的锁，不删除marker或数据；不同run的source检查因此不会同时持有同一个项目锁。这不是整个工作坊或共享知识图的全局锁，后续生成仍须由输出owner协调。只读report不再编译、不抢租约、不补签旧回执。
+
 ## 3. 从回锚到代码：不复制生成目录
 
 先准备实际材料；变量是本机已取得的路径，不是下载地址。

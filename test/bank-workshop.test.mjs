@@ -101,6 +101,12 @@ test('source double requires no archive or runner, retains exclusive attempts an
   assert.ok(readdirSync(options.run).includes('results.json'));
   assert.deepEqual(JSON.parse(readFileSync(join(options.run, 'report.json'))), result);
   assert.equal(result.staticSnapshot, true);
+  const sourceDirectory = join(options.run, 'attempts/0001/source-verification');
+  const sourceResult = JSON.parse(readFileSync(join(sourceDirectory, 'result.json')));
+  assert.equal(sourceResult.schemaVersion, 'truthsrc.verification-run/v1');
+  assert.equal(sourceResult.passed, true); assert.equal(sourceResult.leaseReleased, true);
+  assert.equal(sourceResult.processes.length, 0, 'source-only must not dispatch a subprocess');
+  assert.ok(!readdirSync(join(f.root, 'target/workshop-source-leases')).some(name => name.endsWith('.lock')));
   assert.match(readFileSync(join(options.run, 'report.md'), 'utf8'), /Static snapshot checked at/);
   for (const name of ['report.json', 'report.md']) assert.equal(statSync(join(options.run, name)).mode & 0o777, 0o600);
   await assert.rejects(verifyWorkshop(options, f.overrides));

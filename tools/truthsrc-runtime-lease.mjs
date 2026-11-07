@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
-import { closeSync, fstatSync, fsyncSync, lstatSync, mkdirSync, openSync, unlinkSync, writeFileSync } from 'node:fs';
+import { acquireFileLease } from '../../metarch-truthsrc/lib/verification/lease.mjs';
+import { parseStrictJson } from '../../metarch-truthsrc/lib/strict-json.mjs';
 import { createServer } from 'node:net';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,7 +15,6 @@ const exact = (value, fields) => {
 };
 const inside = (a, b) => b.toLowerCase() === a.toLowerCase() || b.toLowerCase().startsWith(a.toLowerCase() + '/');
 const overlap = (a, b) => inside(a, b) || inside(b, a);
-const identity = stat => [stat.dev, stat.ino];
 const stamp = ({ bytes, sha256 }) => ({ bytes, sha256 });
 const freeze = value => {
   if (value && typeof value === 'object') { Object.values(value).forEach(freeze); Object.freeze(value); }
@@ -64,90 +64,38 @@ export async function assertRuntimePortFree(port) {
   }
 }
 
-function privateDirectory(path) {
-  safePath(path);
-  const stat = lstatSync(path);
-  assert.ok(stat.uid === process.getuid() && (stat.mode & 0o077) === 0, 'private current-user lease directory required');
-  return identity(stat);
-}
-
-// Cooperative file leases are not hostile-process isolation. The kernel must
-// still reject bind races and the existing runtime verifies actual listeners.
-// Never steal a stale lock: SIGKILL/unknown cleanup requires owner investigation.
-// `root` and `probePort` are Node-test seams; there are no corresponding CLI flags.
+// Cooperative file leases do not reserve kernel sockets. The runtime still
+// verifies actual listeners; an abandoned grant requires owner investigation.
+// `root` and `probePort` are Node-test seams, not CLI flags.
 export async function acquireRuntimeLease(options, { root = ROOT, probePort = assertRuntimePortFree } = {}) {
   options = Object.freeze({ ...options });
   const { spec, input } = readRuntimeLease(options, { root });
   const registry = join(root, 'target/truthsrc-runtime-leases');
   safePath(dirname(registry));
-  try { mkdirSync(registry, { mode: 0o700 }); } catch (error) { if (error.code !== 'EEXIST') throw error; }
-  const registryIdentity = privateDirectory(registry);
   const record = freeze({ ...spec, input, round: options.round, buildEvidence: options.buildEvidence,
     token: randomBytes(24).toString('hex'), pid: process.pid, acquiredAt: new Date().toISOString() });
-  const text = JSON.stringify(record) + '\n', locks = [];
-  let released = false;
-  const checkRegistry = () => assert.deepEqual(privateDirectory(registry), registryIdentity, 'lease directory replaced');
-  const checkLocks = () => {
-    checkRegistry();
-    for (const lock of locks) {
-      assert.deepEqual(identity(lstatSync(lock.file)), lock.identity, 'lease lock replaced');
-      const current = captureRuntimeFile(lock.file, { json: true, limit: 32 * 1024 });
-      assert.deepEqual(current.value, record, 'lease owner/token/content changed');
-      assert.deepEqual(identity(fstatSync(lock.fd)), lock.identity, 'lease handle changed');
-    }
-  };
-  const releaseLocks = () => {
-    checkLocks(); // Check every lock BEFORE removing any; never touch another owner's file.
-    while (locks.length) {
-      const lock = locks.at(-1);
-      unlinkSync(lock.file); closeSync(lock.fd); locks.pop();
-    }
-  };
+  const checkInput = () => assert.deepEqual(stamp(captureRuntimeFile(input.file, { json: true, limit: 16 * 1024 })),
+    stamp(input), 'lease input changed');
+  let lease;
   try {
-    for (const name of ['owner-' + spec.owner, ...Object.values(spec.ports).sort((a, b) => a - b).map(port => 'port-' + port)]) {
-      checkRegistry();
-      const file = join(registry, name + '.lock');
-      let fd;
-      try { fd = openSync(file, 'wx', 0o600); }
-      catch (error) {
-        if (error.code === 'EEXIST') throw new Error('runtime lease already held: ' + name + '; no automatic takeover');
-        throw error;
-      }
-      locks.push({ file, fd, identity: identity(fstatSync(fd)) });
-      writeFileSync(fd, text); fsyncSync(fd);
-    }
-    // Hold all cooperative locks during the probes and the subsequent runtime.
-    for (const port of Object.values(spec.ports)) await probePort(port);
-    assert.deepEqual(stamp(captureRuntimeFile(input.file, { json: true, limit: 16 * 1024 })), stamp(input), 'lease input changed');
-    validateRuntimeLease(spec, options, { root });
-    checkLocks();
-    // Persistent single-use owner marker, retained along with all data/evidence.
-    // This prevents a released lease or copied old JSON from becoming a new grant.
-    const used = join(registry, 'owner-' + spec.owner + '.used.json');
-    try {
-      const fd = openSync(used, 'wx', 0o600);
-      try { writeFileSync(fd, text); fsyncSync(fd); } finally { closeSync(fd); }
-    } catch (error) {
-      if (error.code === 'EEXIST') throw new Error('runtime owner already used/returned; choose a new owner');
-      throw error;
-    }
+    lease = await acquireFileLease({ registry, record, parseRecord: parseStrictJson,
+      lockNames: ['owner-' + spec.owner, ...Object.values(spec.ports).sort((a, b) => a - b).map(port => 'port-' + port)].map(name => name + '.lock'),
+      usedName: 'owner-' + spec.owner + '.used.json',
+      preflight: async () => {
+        for (const port of Object.values(spec.ports)) await probePort(port);
+        checkInput(); validateRuntimeLease(spec, options, { root });
+      },
+    });
   } catch (error) {
-    try { releaseLocks(); }
-    catch (cleanupError) {
-      for (const lock of locks) { try { closeSync(lock.fd); } catch { /* files remain held, no takeover */ } }
-      throw new AggregateError([error, cleanupError], 'lease acquisition failed; changed locks retained for owner investigation');
-    }
+    if (error.code === 'FILE_LEASE_HELD') throw new Error('runtime lease already held: ' + error.lockName.slice(0, -5) + '; no automatic takeover');
+    if (error.code === 'FILE_LEASE_USED') throw new Error('runtime owner already used/returned; choose a new owner');
     throw error;
   }
-  return Object.freeze({
-    spec, record, registry,
-    assertHeld() {
-      assert.equal(released, false, 'lease already released'); checkLocks();
-      assert.deepEqual(stamp(captureRuntimeFile(input.file, { json: true, limit: 16 * 1024 })), stamp(input), 'lease input changed');
-    },
+  return Object.freeze({ spec, record: lease.record, registry,
+    assertHeld() { lease.assertHeld(); checkInput(); },
     release(owner) {
       assert.equal(owner, spec.owner, 'only the acquiring owner can release this lease');
-      if (!released) { releaseLocks(); released = true; }
+      lease.release();
       return { owner, released: true, dataPreserved: true, reusable: false };
     },
   });

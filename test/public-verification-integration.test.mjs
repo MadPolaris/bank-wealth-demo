@@ -50,6 +50,7 @@ test('cooperative lease imports only its bank file-policy adapter and public pri
     'tools/truthsrc-runtime-lease.mjs', 'tools/truthsrc-evidence.mjs',
   ]);
   assert.ok(closure.includes(url('../metarch-truthsrc/lib/verification/files.mjs')));
+  assert.ok(closure.includes(url('../metarch-truthsrc/lib/verification/lease.mjs')));
   assert.ok(!closure.some(file => file.endsWith('/verify-truthsrc-build.mjs')));
 });
 

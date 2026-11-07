@@ -95,7 +95,7 @@ const runtimeFiles = [
   'simulator/contract.mjs', 'simulator/journal.mjs', 'tools/v1-crash-recovery.mjs', 'tools/v1-release-build-evidence.mjs',
   'tools/v1-browser-funds.mjs', 'tools/v1-browser-check.mjs', 'test/fixtures/truthsrc-actor-ta.json',
   'tools/historical-assets.mjs', 'docs/V1-RETIREMENT-MANIFEST.json',
-].map(file => join(ROOT, file)).concat(['strict-json', 'immutable-data', 'verification/files', 'verification/worker-evidence', 'verification/process']
+].map(file => join(ROOT, file)).concat(['strict-json', 'immutable-data', 'verification/files', 'verification/inventory', 'verification/outcome', 'verification/lease', 'verification/callbacks', 'verification/worker-evidence', 'verification/process']
   .map(name => join(ROOT, '../metarch-truthsrc/lib', name + '.mjs')));
 
 async function runDatabaseWindow({ admitted, evidence, round, owner, ports, taConfig, taConfigSha256, fixtureSha256, env, options, recheck, signal, runProcess }) {

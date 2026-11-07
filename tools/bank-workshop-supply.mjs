@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
-import { accessSync, constants, createReadStream, existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
+import { accessSync, constants, existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { basename, dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { captureEvidenceFile } from '../../metarch-truthsrc/lib/verification/files.mjs';
+import { captureEvidenceFile, fingerprintEvidenceFile } from '../../metarch-truthsrc/lib/verification/files.mjs';
 import { safePath } from './truthsrc-evidence.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -63,13 +63,7 @@ export function readJson(file) {
 
 export async function fileReference(file) {
   checkedPath(file);
-  const before = lstatSync(file), hash = createHash('sha256');
-  assert.ok(before.nlink === 1, 'hardlinked evidence/input is not admitted');
-  for await (const bytes of createReadStream(file)) hash.update(bytes);
-  const after = lstatSync(file);
-  assert.deepEqual([after.dev, after.ino, after.size, after.mtimeMs, after.ctimeMs],
-    [before.dev, before.ino, before.size, before.mtimeMs, before.ctimeMs], 'file changed while hashing');
-  return { file, bytes: before.size, sha256: hash.digest('hex') };
+  return { file, ...fingerprintEvidenceFile(file) };
 }
 
 function sourceFiles(root, filter = () => true) {

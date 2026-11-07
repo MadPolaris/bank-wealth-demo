@@ -107,3 +107,56 @@ P1首个公共回流为显式手写来源验证：`tools/verify-handwritten-map.
 **教学输出当前为工具指纹changed，不是synchronized。** 229源码/配置没有变化；本批没有apply、回签旧ledger/anchors或修改历史构建/服务回执。此前聚合批的current状态只适用于当时工具版本。后续受控更新与新构建必须使用新的对应证据。
 
 P1尚有完整lease/build-report/工作坊编排及资源adapter归属、剩余历史银行政策分拆；P2全量命名/多模块/新profile参考、P3物理目录收敛、P4 service02 replay/材料分发/真人上手、retry/backoff/deadline OPEN与R2下游任务保持未完成。上述实施验收捕获时尚未commit、push、tag或publish；后续本地提交状态以各仓Git历史为准，提交不代表推送或发布。
+
+### 2026-11-07：公共租约、文件清单与独立验证闭环
+
+本批从已提交的工具`31a1480db11f`、银行`cf75af01b716`继续P1，未重复提交。公共`lib/verification/`新增协作lease、inventory/reference、outcome和串行runner；共享callback边界用于租约预检、action/verifier及进程barrier。银行现役lease、build清单/完成状态、runtime admission及报告实际消费；工作坊source阶段也通过公共runner运行。银行仍控制schema、plain路径、锁/marker字节格式、严格JSON、端口/TA根、冻结suite、金融oracle和完整服务判据。
+
+[随包Catalog示例](../../metarch-truthsrc/scaffold/verification-project/README.md)将输入、builder、独立预期/checker和运行配置分开。离线tarball安装并移动prefix后，独立副本完成构建、验证、释放租约和静态报告；loader拒绝回退原checkout，修改产物或新增输入均被拒绝。新业务不必复制银行的锁/取证/串行运行生命周期；但仍必须提供真实业务实现、独立oracle与完整依赖声明，不能只凭truth自动补全工程。
+
+本批反例修复了未await进程返回另一条未处理Promise、预检Promise形状失败被误当工作结束、同步结果在microtask后才捕获、generator/thenable冒充barrier、释放租约后再调用verifier、取消信号上下文不一致、无进程的准入失败误保留锁、保留锁时句柄泄漏及最终事件循环让出后产物变更。锁文件不自动接管；未验证退出/无法确认的I/O保留证据，放弃能力只关闭句柄、不删锁。回执解析前实行实际字节上限；静态检查核租约声明和私有目录。新process事件时间由启动墙钟加单调偏移构造，保持原schema/字段和排序合同；不是修改系统时钟或重签历史回执。
+
+| 检查 | 本批结果 |
+|---|---|
+| 公共完整回归 | **3336项：3321通过、15明确opt-in跳过、0失败**；1102源码/测试/package/catalog文件执行前后SHA相同 |
+| 银行显式Node合同 | **514项：513通过、1项18762网络opt-in跳过、0失败**；不是银行Scala/JVM/数据库重跑 |
+| 银行公共适配与库存 | **46通过**；工具仍64份，未增加银行生命周期脚本 |
+| 当前source合同 | **8通过、1完整生成集成opt-in跳过**；source doctor、validate/157原子roundtrip通过 |
+| 独立安装 | 移址tarball的Catalog完整闭环及漂移反例通过；已有Counter、文件/进程/worker/归属检查同样通过 |
+| 真实银行source | 新`target/workshop-public-lifecycle-3zfgpoyd-source02`的verify和read-only report通过；13份run文件字节/mtime未改，`fullPipelinePassed:false` |
+| artifact说明 | 定向28通过；8仓**3181**来源文件对账、BC50/Play32兼容副本检查通过；125类别/284变体/39manifest不变 |
+| 保护与生成 | 显式保护354份公共生成/schema/core/reference/原scaffold及302份银行作者/绑定/Scala/历史/许可/模拟器等未变；229生成源码/配置与纯update计划逐字节相同 |
+
+结果有重叠，不相加成独立测试总数。公共15跳过为BC真实消费/迁移及actual-bank opt-in；银行1项网络测试未获本批固定端口运行授权。实际平台为Node22.23.4/Darwin，未再次执行最低Node或原生Windows。没有银行JVM、数据库、共享服务或新的真实service窗口。
+
+本机证据在工具`.rounds/public-verification-lifecycle-3zfgpoyd/`：`baseline.json`、`SCOPE.md`、`REVIEW-DISPOSITIONS.md`、`js-full-01.log`、`bank-contracts-02.log`、`full-regression-result.json`、`installed-02.log`、`bank-public-02.log`、`source-workshop-02.log`、`catalog-cross-01.json`、`catalog-compat-01.json`、`protection-01.json`及`teaching-code-comparison.json`。限流/通信失败代理不计审阅通过；有返回的具体问题经反例与实际回归确认。原失败日志保留，未据通信层的ENOSPC提示删除磁盘材料。
+
+**教学输出仍是工具指纹changed，不是synchronized。** 纯update计划233项中232项相同，仅1输入证据拟更新；没有实际apply、写图或改旧ledger/anchors。source子运行的通过不更新旧code/service验收。
+
+P1剩余为旧build进程监督合同、工作坊其余阶段、Docker/relay资源适配及历史crash/browser政策分拆；本批公共闭环完成不代表所有银行工具已经公共化。P2全量Scala命名/多模块参考、P3物理目录、P4新读库replay/材料分发/真人上手、retry/backoff/deadline **OPEN**与独立R2下游仍未关闭。本批未commit、push、tag或publish，原`.gitignore`、`.DS_Store`和Python缓存不纳入修改。
+
+### 2026-11-07：ArtifactType盘点与剩余落地计划
+
+用户要求保存最新盘点并给出实施路线；正式记录集中在[公共现状报告与实施计划](../../metarch-truthsrc/docs/artifacts/STATUS-AND-IMPLEMENTATION-PLAN.md)，银行不再维护另一份类别台账。当前125类/125登记/125份说明齐套，66类只是JS支持登记数，不是已逐类核验的生成覆盖；6项JS变体缺直接本仓producer引用，Saga serializer的generated/library归属存在矛盾。最终质量验收为0类，7份聚合参考是文件级工程候选，不算7类最终完成。
+
+推荐起手批改为全量校准125类/284变体/39入口的能力与所有权矩阵，再固定目标profile、命名和参考质量合同，按依赖家族处理模板；其余公共工具/目录收敛沿真实消费需要推进，不再用零散guard批次代替生成器主线。完整service、R2、重试债、材料和真人验收仍各自有独立门。本次只落报告/计划及导航，不修改登记数字消红、不实施生成器、不重签旧证据，也不提交或发布。
+
+### 2026-11-07：全量生成能力台账校准
+
+第一实施批已落实为公共v2[能力合同](../../metarch-truthsrc/docs/artifacts/CAPABILITY-CONTRACT.md)、[派生矩阵](../../metarch-truthsrc/docs/artifacts/CAPABILITY-MATRIX.md)和[验收记录](../../metarch-truthsrc/docs/artifacts/CAPABILITY-ACCEPTANCE.md)。原125类/284变体全部核对，补入189条漏登/拆分profile后为473变体；类别仍125，39manifest分别记录主入口、子生产者、wrapper、静态拷贝及退役通道。原66登记不再当生成完成数。现役JS代码/装配61类定位到producer，60类有本批真实纯生成样例；3类派生证据中2类有样例。新台账的目标编译、独立行为和最终审定均未借旧结果晋升。
+
+六项缺引用/归属问题已按实际生产链纠正：JS HostSerializer与运行库StrictSagaSerializer分开，StrictParticipant/phase/bootstrap是应用装配，旧projection Repository、role/view-map和应用serialization注册有明确来源。125类别说明、BC50/Play32兼容副本已同步，运行库内核不被复制算为模板；已发现的BC结构/默认值/多模块代码债保留，未修生成器。
+
+本批公共完整3376项中3361通过、15明确opt-in跳过、0失败；artifact定向66通过，离线移址包及8仓3206来源对账通过，973份回归输入前后SHA一致。银行只运行source doctor与validate/157原子roundtrip（0hard，既有notice保留），没有JVM/数据库/完整service重跑，银行业务/固定测试/绑定/生成目录未改。教学输出仍tool changed，旧code/service回执不重签；P23/R2、90秒replay失败、retry OPEN、材料及真人门均保持独立。本批无commit/push/tag/publish。
+
+### 2026-11-07：第二批目标profile、集中命名与独立参考
+
+公共[目标合同](../../metarch-truthsrc/docs/artifacts/scala-cqrs/TARGET-PROFILES.md)把银行既有legacy-compatible与新项目modular-candidate分开：旧名字显式保留，新合同单独解析Scala类型/成员/package，知识ID、SQL/PB/wire/PID/operation/codec不随风格改变。新公共`lib/scala-target/`只提供纯命名/冲突和结构模型校验，没有接入现役renderer或新增generator manifest，因此不是银行命名已迁移。
+
+原Warehouse七源码保护；新增非银行Parcel四模块参考，10生产Scala/3独立suite覆盖计算、只读Repository、应用flow、完整签名VO闭包、同层Bridge、外置实现与root绑定。新候选实际逐模块编译、34行为、7对编译拒绝及无实现红灯控制通过；target Node38、artifact68、原聚合结构/源码36通过。机械通过不代替架构owner批准，BC mjs仍不是金样。完整回归、安装及最终保护由[本批验收](../../metarch-truthsrc/docs/artifacts/TARGET-PROFILE-ACCEPTANCE.md)统一记录，不在银行维护第二份类别统计。
+
+catalog新增14个reference-only变体，类别125不变、变体487、入口39；现役61代码职责/60生成样例不因新参考而增加。工具版本变化后实际重放12个生成样例，输入和源码字节与原样例相同；旧回执原路径/原字节保留，历史声明不计当前能力。新参考不晋升现役生成器compiled/behavior/final状态。
+
+完整公共回归3418项中3403通过、15明确opt-in跳过、0失败，993输入SHA保持；离线移址安装、8仓3225来源和五仓写面保护通过。定向检查与完整回归有重叠，不相加为独立覆盖。
+
+银行本批仍仅更新本页并重验source doctor/validate/157原子roundtrip，0hard和37既有notice；没有银行JVM/数据库/服务运行、apply、图/ledger/anchors或旧code/service回执写入。冻结载体/PB/PID/runtime、金融政策与当前生成结果不变；完整service replay失败、90秒期限、R2下游、retry/backoff/deadline OPEN及材料/真人门继续开放，未commit/push/tag/publish。

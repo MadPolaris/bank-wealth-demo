@@ -110,7 +110,10 @@ test('public targets distinguish actual adapters from bank-owned lease, actor an
   assert.equal(target('truthsrc-evidence', 'lib/verification/files.mjs', 'truthsrc-evidence').status, 'migrated');
   assert.equal(target('verify-handwritten-map', 'lib/handwritten-provenance.mjs', 'verify-handwritten-map').status, 'migrated');
   assert.equal(target('truthsrc-actor-tests', 'lib/verification/worker-evidence.mjs', 'truthsrc-actor-tests').status, 'partial');
-  assert.equal(target('truthsrc-runtime-lease', 'lib/verification/files.mjs', 'truthsrc-evidence').status, 'partial');
+  assert.equal(target('truthsrc-runtime-lease', 'lib/verification/lease.mjs', 'truthsrc-runtime-lease').status, 'migrated');
+  assert.equal(target('bank-workshop-verification', 'lib/verification/runner.mjs', 'bank-workshop-verification').status, 'partial');
+  assert.equal(target('verify-truthsrc-build', 'lib/verification/inventory.mjs', 'verify-truthsrc-build').status, 'partial');
+  assert.equal(target('truthsrc-runtime-tests', 'lib/verification/outcome.mjs', 'truthsrc-runtime-tests').status, 'partial');
   assert.ok(read('tools/truthsrc-runtime-lease.mjs').includes("from './truthsrc-evidence.mjs'"));
   for (const name of ['bank-workshop-supply', 'verify-truthsrc-build', 'truthsrc-runtime-admission']) {
     assert.equal(entries.get(toolPath(name)).publicMechanism.status, 'partial');
