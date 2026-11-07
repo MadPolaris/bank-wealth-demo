@@ -6,15 +6,16 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { setTimeout as delay } from 'node:timers/promises';
-import { admitRuntimeBuild, captureRuntimeFile } from './truthsrc-runtime-admission.mjs';
+import { admitRuntimeBuild } from './truthsrc-runtime-admission.mjs';
+import { captureRuntimeFile, safePath } from './truthsrc-evidence.mjs';
 import { acquireRuntimeLease } from './truthsrc-runtime-lease.mjs';
 import { issueRuntimeCredentials, productionConfiguration } from './truthsrc-runtime-config.mjs';
 import { OwnedRuntimeDatabases } from './truthsrc-runtime-databases.mjs';
-import { runRuntimeProcess } from './truthsrc-runtime-process.mjs';
+import { processEvidencePaths, runRuntimeProcess } from './truthsrc-runtime-process.mjs';
 import { runtimeSandboxText, runtimeProbeSource, validateRuntimeSandboxPaths, RUNTIME_NETWORK_SCOPE, RUNTIME_NETWORK_LIMITATION } from './truthsrc-runtime-sandbox.mjs';
 import { runtimeClasspathInventory } from './truthsrc-runtime-tests.mjs';
-import { checkRuntimeWorker } from './truthsrc-runtime-crash.mjs';
-import { fileDigest, inventory, safePath } from './verify-truthsrc-build.mjs';
+import { checkRuntimeWorker } from './truthsrc-worker-evidence.mjs';
+import { fileDigest, inventory } from './verify-truthsrc-build.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const MAIN = 'example.bankwealth.workshop.BankWorkshopMain';
@@ -37,9 +38,10 @@ const same = assert.deepEqual;
 const SUPPORT = [fileURLToPath(import.meta.url), SOURCE, WORKER, FIXTURE,
   ...['truthsrc-runtime-admission', 'truthsrc-runtime-lease', 'truthsrc-runtime-config', 'truthsrc-runtime-databases',
     'truthsrc-runtime-db-relay', 'truthsrc-runtime-db-exec', 'truthsrc-runtime-process', 'truthsrc-runtime-sandbox',
-    'truthsrc-runtime-tests', 'truthsrc-actor-ta-worker', 'truthsrc-runtime-crash', 'v1-crash-recovery',
-    'v1-release-build-evidence', 'truthsrc-runtime-jars', 'verify-truthsrc-build'].map(name => join(ROOT, 'tools', name + '.mjs')),
-  join(ROOT, '../metarch-truthsrc/lib/strict-json.mjs'),
+    'truthsrc-runtime-tests', 'truthsrc-actor-ta-worker', 'truthsrc-worker-evidence', 'truthsrc-evidence',
+    'truthsrc-runtime-jars', 'verify-truthsrc-build'].map(name => join(ROOT, 'tools', name + '.mjs')),
+  ...['strict-json', 'immutable-data', 'verification/files', 'verification/worker-evidence', 'verification/process']
+    .map(name => join(ROOT, '../metarch-truthsrc/lib', name + '.mjs')),
   join(ROOT, 'tools/historical-assets.mjs'), join(ROOT, 'docs/V1-RETIREMENT-MANIFEST.json'),
   ...['contract', 'journal', 'mock-ta-core'].map(name => join(ROOT, 'simulator', name + '.mjs'))];
 const loadedSupport = snapshots(SUPPORT);
@@ -96,7 +98,8 @@ export function sessionCompilePlan({ admitted, session, sourceSha256 }) {
   // neither a warm cache nor an arbitrary scalac/JDK flag is admitted.
   const profile = ['(version 1)', '(allow default)', '(deny network*)', '(deny file-write*)',
     `(allow file-write* (subpath ${JSON.stringify(build)}) (literal "/dev/null"))`,
-    `(deny file-write* (literal ${JSON.stringify(source)}) (literal ${JSON.stringify(join(build, 'sandbox.sb'))}))`,
+    `(deny file-write* ${[source, join(build, 'sandbox.sb'), ...Object.values(processEvidencePaths(join(build, 'compile')))]
+      .map(file => `(literal ${JSON.stringify(file)})`).join(' ')})`,
     `(deny file-write-unlink (literal ${JSON.stringify(build)}))`, ''].join('\n');
   return { build, classes, source, sourceSha256, compiler, profile,
     args: ['-Xmx1G', '-XX:ActiveProcessorCount=2', '-XX:-UsePerfData', '-Duser.home=' + join(build, 'home'),
@@ -104,7 +107,7 @@ export function sessionCompilePlan({ admitted, session, sourceSha256 }) {
       '-cp', compiler.join(':'), 'scala.tools.nsc.Main', '-encoding', 'UTF-8', '-classpath', admitted.classpath.join(':'), '-d', classes, source] };
 }
 
-async function compileLauncher({ admitted, session, env, signal }) {
+async function compileLauncher({ admitted, session, env, signal, runProcess = runRuntimeProcess }) {
   const original = captureRuntimeFile(SOURCE), plan = sessionCompilePlan({ admitted, session, sourceSha256: original.sha256 });
   const compiler = snapshots(plan.compiler);
   const supply = read(join(admitted.buildEvidence, 'supply-before.json')).files;
@@ -112,7 +115,7 @@ async function compileLauncher({ admitted, session, env, signal }) {
   mkdir(plan.build); for (const name of ['classes', 'tmp', 'home']) mkdir(join(plan.build, name));
   write(plan.source, original.value); write(join(plan.build, 'sandbox.sb'), plan.profile);
   const sandbox = { executable: SANDBOX, profile: join(plan.build, 'sandbox.sb'), profileSha256: hash(plan.profile) };
-  const receipt = await runRuntimeProcess({ executable: admitted.java, args: plan.args, cwd: plan.build,
+  const receipt = await runProcess({ executable: admitted.java, args: plan.args, cwd: plan.build,
     env: { ...env, HOME: join(plan.build, 'home'), TMPDIR: join(plan.build, 'tmp') },
     base: join(plan.build, 'compile'), timeoutMs: 120_000, sandbox, signal });
   assert.equal(receipt.passed, true, 'workshop launcher compile failed');
@@ -164,7 +167,7 @@ async function waitHttp({ origin, credentials, signal, exited }) {
   throw new Error('authenticated readside readiness deadline');
 }
 
-async function runtimeBoundary({ session, round, ports, immutable, env, signal }) {
+async function runtimeBoundary({ session, round, ports, immutable, env, signal, runProcess = runRuntimeProcess }) {
   const directory = join(session, 'boundary'); mkdir(directory);
   const profile = join(directory, 'runtime-sandbox.sb'), probe = join(directory, 'runtime-probe.py'), canary = join(session, 'canary');
   write(canary, 'unchanged\n');
@@ -177,7 +180,7 @@ async function runtimeBoundary({ session, round, ports, immutable, env, signal }
   validateRuntimeSandboxPaths(options);
   const before = snapshots([profile, probe, canary]);
   const sandbox = { executable: SANDBOX, profile, profileSha256: capture(profile).sha256 };
-  const receipt = await runRuntimeProcess({ executable: '/usr/bin/python3', args: ['-I', '-S', probe], cwd: directory,
+  const receipt = await runProcess({ executable: '/usr/bin/python3', args: ['-I', '-S', probe], cwd: directory,
     env, base: join(directory, 'probe'), timeoutMs: 30_000, sandbox, signal });
   assert.equal(receipt.passed, true, 'runtime sandbox syscall probe failed');
   const text = captureRuntimeFile(join(directory, 'probe.stdout.log')).value.toString('utf8');
@@ -328,12 +331,23 @@ async function waitMarker(file, child, signal, timeoutMs = 90_000) {
 export async function sessionStart({ buildEvidence, acceptedReceipt, session, lease }, overrides = {}) {
   const ops = { root: ROOT, accept: acceptedWorkshopRun, admit: admitRuntimeBuild, acquire: acquireRuntimeLease,
     compile: compileLauncher, boundary: runtimeBoundary, databases: options => new OwnedRuntimeDatabases(options), launch: launchServer,
-    processIdentity: sessionProcessIdentity, listener: verifyListener, http: waitHttp, seal: checkSeal,
+    processIdentity: sessionProcessIdentity, listener: verifyListener, http: waitHttp, seal: checkSeal, runProcess: runRuntimeProcess,
     platform: () => assert.ok(process.platform === 'darwin' && process.arch === 'x64', 'native Darwin x64 sandbox required'),
     ready: value => process.stdout.write(JSON.stringify(value) + '\n'), ...overrides };
   const executionKind = Object.keys(overrides).length ? 'test-double' : 'real';
   let phase = 'admission', held, databases, child, birth, record, created = false, ready = false, stoppedByUser = false;
   let processReceipt, databaseReceipt, baseSeal, seal, recheckBuild, requestMonitor, failure = null, released = false;
+  let helperProcessesExited = true, activeHelpers = 0;
+  const runHelper = async options => {
+    activeHelpers++;
+    try {
+      const receipt = await ops.runProcess(options);
+      if (receipt.groupAliveAfter !== false || receipt.directChildClosed !== true || receipt.directChildReaped !== true || receipt.barrier?.settled !== true)
+        helperProcessesExited = false;
+      return receipt;
+    } catch (error) { helperProcessesExited = false; throw error; }
+    finally { activeHelpers--; }
+  };
   const cancellation = new AbortController(), cancelled = new Error('session stop requested');
   const cancel = () => { stoppedByUser = true; cancellation.abort(cancelled); };
   // The existing bounded helpers may wrap an AbortError or return a failed receipt.
@@ -391,7 +405,7 @@ export async function sessionStart({ buildEvidence, acceptedReceipt, session, le
       catch { failure ??= { code: 'SESSION_CONTROL_CHANGED', phase: 'stop-control', message: 'Foreign stop request; owner investigation required.' }; cancellation.abort(); }
     }, 250);
     phase = 'launcher-compile';
-    const launcher = await interruptible(() => ops.compile({ admitted, session, env, signal: cancellation.signal }));
+    const launcher = await interruptible(() => ops.compile({ admitted, session, env, signal: cancellation.signal, runProcess: runHelper }));
     await admitted.assertUnchanged(); cancellation.signal.throwIfAborted();
     seal = { ...baseSeal, launcher };
     save(join(session, 'seal.json'), seal);
@@ -422,7 +436,7 @@ export async function sessionStart({ buildEvidence, acceptedReceipt, session, le
       customer: credentials.customer, operator: credentials.operator });
     phase = 'sandbox';
     const immutable = [join(session, 'private'), join(session, 'build'), join(session, 'run/identity.json'), taConfig, ...databases.readOnlyPaths];
-    const sandbox = await interruptible(() => ops.boundary({ session, round, ports: record.ports, immutable, env, signal: cancellation.signal }));
+    const sandbox = await interruptible(() => ops.boundary({ session, round, ports: record.ports, immutable, env, signal: cancellation.signal, runProcess: runHelper }));
     await checkInputs(); cancellation.signal.throwIfAborted();
     if (checkRequest()) { cancel(); cancellation.signal.throwIfAborted(); }
     const childEnv = { ...env, BANK_RUNTIME_TA_CONFIG: taConfig, BANK_RUNTIME_TA_CONFIG_SHA256: capture(taConfig).sha256 };
@@ -501,7 +515,8 @@ export async function sessionStart({ buildEvidence, acceptedReceipt, session, le
     try {
       if (databases) { databaseReceipt = await databases.stop(); assert.equal(databaseReceipt.stopped, true); }
     } catch { failure ??= { code: 'SESSION_DATABASE_CLOSE_FAILED', phase: 'database-close', message: 'Owned database closure was not verified. Retain the owner lease and data.' }; }
-    checks.resourcesExited = (!child || processReceipt?.exited === true && checks.workerClosed) && (!databases || databaseReceipt?.stopped === true);
+    checks.resourcesExited = helperProcessesExited && activeHelpers === 0 &&
+      (!child || processReceipt?.exited === true && checks.workerClosed) && (!databases || databaseReceipt?.stopped === true);
     try {
       if (recheckBuild) await recheckBuild();
       if (seal) ops.seal(seal, session);

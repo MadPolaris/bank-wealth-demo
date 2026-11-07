@@ -4,8 +4,7 @@ import { closeSync, fstatSync, fsyncSync, lstatSync, mkdirSync, openSync, unlink
 import { createServer } from 'node:net';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { captureRuntimeFile } from './truthsrc-runtime-admission.mjs';
-import { safePath } from './verify-truthsrc-build.mjs';
+import { captureRuntimeFile, safePath } from './truthsrc-evidence.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SCHEMA = 'bank.truthsrc-runtime-lease/v1';

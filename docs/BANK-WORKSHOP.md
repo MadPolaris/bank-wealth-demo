@@ -83,9 +83,7 @@ node "$BANK/tools/bank-workshop.mjs" verify --through code \
 
 ## 4. 完整服务：第三份同源构建与新的 owner
 
-当前资源只读更新（2026-11-06）：已见Docker daemon 20.10.21、两个固定数据库镜像，
-共享`metarch-mongo`运行中且不操作。**完整service窗口和人工会话仍未执行**；资源
-可见不是独占租约或服务通过，旧验收中的环境状态不回写。
+当前验收状态：service02使用P23制品，代码、固定24恢复窗及数据库initial/restart/refund已执行通过；全新SQL读库replay未在90秒内caught-up，**完整service仍失败，人工会话未执行**。本轮运行资源已归还，旧数据和失败回执保留，详见[V1-RETIREMENT](V1-RETIREMENT.md)。历史机器环境或镜像可见性不是今天的租约，不据此启动或操作共享服务。
 
 先按当前协调约定预约独占端口，选未使用的 owner。租约 JSON 在数据根之外，只有
 以下字段；将路径和端口替换成自己的实际值。

@@ -1,6 +1,6 @@
 # 当前命令、读写与历史入口边界
 
-日期：2026-11-06。作者权威合同见[TRUTH](../TRUTH.md)，操作教程见[TRUTH-TUTORIAL](TRUTH-TUTORIAL.md)，分层执行见[BANK-WORKSHOP](BANK-WORKSHOP.md)。本页不是运行回执；本次路径迁移的新验收待主集成写入`docs/V1-RETIREMENT.md`。
+作者权威合同见[TRUTH](../TRUTH.md)，操作教程见[TRUTH-TUTORIAL](TRUTH-TUTORIAL.md)，分层执行见[BANK-WORKSHOP](BANK-WORKSHOP.md)，内容来源和构建顺序见[BUILD-RECIPE](BUILD-RECIPE.md)。本页不是运行回执；路径迁移验收和service02未通过的replay见[V1-RETIREMENT](V1-RETIREMENT.md)。
 
 ## 1. 当前命令
 
@@ -69,6 +69,7 @@ node tools/truthsrc-project.mjs query --out "$OUT" --knowledge ReserveFunds
 | `npm test` | `unified-truth`＋`historical-source`的显式Node合同；不是全应用验收 |
 | `npm run test:current` | 当前source/14产品合同；完整变更集成另显式启用 |
 | `BANK_TRUTHSRC_INTEGRATION=1 node --test --test-concurrency=1 test/unified-truth.test.mjs` | 自有作者/输出副本中验证生成、查询与update；不改当前作者树，不启服务 |
+| `npm run test:public-tools` | 公共文件/工作线程/手写来源机制的银行适配、fresh-import依赖闭包及完整工具归属清单；只跑指定Node合同，不启动真实银行服务 |
 | `npm run test:build-verifier` / `test:actor-verifier` / `test:readside-verifier` / `test:runtime-verifier` / `test:workshop` | 各自Node合同与自有临时测试数据；名字含runtime/workshop不代表执行真实JVM/数据库 |
 | `node tools/verify-truthsrc-build.mjs …` | 显式候选、归档与新evidence；各隔离模式的确切参数及读写见[TRUTH-BUILD](TRUTH-BUILD.md)、[actor准入](TRUTH-RUNTIME-ACCEPTANCE.md)、[读侧准入](TRUTH-COMPATIBLE-COMPOSITION.md) |
 | build的`--compile-runtime-tests` | 只编译/封存五份固定main＋六份生成测试及实际classpath，不运行测试或服务 |

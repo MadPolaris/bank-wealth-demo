@@ -1,0 +1,519 @@
+{
+  "schemaVersion": "truthsrc.tooling-ownership/v1",
+  "toolRoots": ["tools"],
+  "scope": "P1 source inventory: 62 original tracked tools plus truthsrc-evidence.mjs and truthsrc-worker-evidence.mjs = 64 files (60 mjs, 3 Python, 1 Scala). Excludes untracked __pycache__ and local outputs. All are engineering-authored, not generated from current bank truth. Consumers are selected, manually checked literal import/CLI/reference evidence, NOT exhaustive parsed import closure or proof of invocation. Public targets may resolve through a named bank adapter; partial never means all responsibilities migrated. No runtime output reads or tool execution are required to check this manifest. Historical paths and paused qualification are preserved; P3 physical convergence is not performed.",
+  "entries": [
+    {
+      "file": "tools/bank-workshop.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Workshop CLI introduced in bank commit 4515b6b; maintained as source, not generated."},
+      "responsibility": {"summary": "Dispatch workshop doctor/verify/report/view and session commands.", "owners": ["bank workshop maintainers"], "nature": "policy", "mechanism": "Command parsing and delegation to bank workshop modules.", "policy": "Bank stage names, arguments, presentation and completion boundaries."},
+      "lifecycle": "current",
+      "consumers": [{"file": "package.json", "kind": "entry", "evidence": "node tools/bank-workshop.mjs", "note": "Explicit workshop package command; not an execution receipt."}],
+      "publicMechanism": {"status": "consumer-policy", "targets": [], "note": "CLI policy remains bank-owned; downstream adapters use public mechanisms. No generic workshop orchestrator is claimed."}
+    },
+    {
+      "file": "tools/bank-workshop-session.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-maintained manual-session controller."},
+      "responsibility": {"summary": "Start, inspect and stop an owned manual bank session after service acceptance.", "owners": ["bank workshop maintainers"], "nature": "mixed", "mechanism": "Use file, process and worker evidence adapters; compile a separate launcher.", "policy": "Accepted-run prerequisite, owner identity, launcher, credentials and resource lifetime remain bank-specific."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop.mjs", "kind": "import", "evidence": "await import('./bank-workshop-session.mjs')", "note": "Lazy CLI session dispatch."}],
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/process.mjs", "consumer": "tools/truthsrc-runtime-process.mjs", "specifier": "../../metarch-truthsrc/lib/verification/process.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/worker-evidence.mjs", "consumer": "tools/truthsrc-worker-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/worker-evidence.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "Public mechanisms via the three named bank adapters; session orchestration and admission are not extracted."}
+    },
+    {
+      "file": "tools/bank-workshop-supply.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-maintained workshop supply and source preflight."},
+      "responsibility": {"summary": "Check workshop prerequisites and capture selected source/supply references.", "owners": ["bank workshop maintainers"], "nature": "mixed", "mechanism": "Public bounded file capture and bank path adapter.", "policy": "Frozen archive, stages, source snapshots, support inventory and delivery readiness remain bank policy."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop.mjs", "kind": "import", "evidence": "from './bank-workshop-supply.mjs'", "note": "Doctor and requested-stage selection."}],
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/bank-workshop-supply.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "File capture is directly public; bank inventory selection and snapshot guard policies remain here."}
+    },
+    {
+      "file": "tools/bank-workshop-verification.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-maintained source-bound stage runner and report inspector."},
+      "responsibility": {"summary": "Sequence fresh candidates and inspect source/anchors/code/service evidence.", "owners": ["bank workshop maintainers"], "nature": "mixed", "mechanism": "Public project generation/verification and adapter-backed static file/process/worker capture.", "policy": "Required slices, actor/readside/runtime stages, snapshots and fullPipelinePassed criteria remain bank-specific."},
+      "lifecycle": "current",
+      "consumers": [{"file": "test/bank-workshop.test.mjs", "kind": "test", "evidence": "from '../tools/bank-workshop-verification.mjs'", "note": "Explicit workshop contract tests; not bank service execution."}],
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/process.mjs", "consumer": "tools/truthsrc-runtime-process.mjs", "specifier": "../../metarch-truthsrc/lib/verification/process.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/worker-evidence.mjs", "consumer": "tools/truthsrc-worker-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/worker-evidence.mjs"}], "note": "Evidence capture uses public adapters; generic build-report logic and orchestration remain unextracted. Historical crash report policy is still imported."}
+    },
+    {
+      "file": "tools/bank-workshop-view.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-maintained bank evidence-card adapter."},
+      "responsibility": {"summary": "Attach verified bank evidence cards to the public knowledge view.", "owners": ["bank workshop maintainers"], "nature": "adapter", "mechanism": "Delegate project view and HTML rendering to public modules.", "policy": "Bank tour, evidence labels and stage claims remain local."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop.mjs", "kind": "import", "evidence": "await import('./bank-workshop-view.mjs')", "note": "Lazy view command dispatch."}],
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/project/view.mjs", "consumer": "tools/bank-workshop-view.mjs", "specifier": "../../metarch-truthsrc/lib/project/view.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/workshop/render.mjs", "consumer": "tools/bank-workshop-view.mjs", "specifier": "../../metarch-truthsrc/lib/workshop/render.mjs"}], "note": "Rendering is public; bank report admission and evidence-card policy are not generalized."}
+    },
+    {
+      "file": "tools/truthsrc-project.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Current project wrapper introduced in bank commit 675a936."},
+      "responsibility": {"summary": "Expose the single current bank project through public CLI APIs.", "owners": ["bank authoring maintainers"], "nature": "adapter", "mechanism": "Delegate compilation/generation, queries, validation and roundtrip.", "policy": "Select root truthsrc.project.json; no historical fallback or second compiler."},
+      "lifecycle": "current",
+      "consumers": [{"file": "package.json", "kind": "entry", "evidence": "node tools/truthsrc-project.mjs validate", "note": "Current validation package command."}],
+      "publicMechanism": {"status": "migrated", "targets": [{"sourceRoot": "truthsrc", "file": "lib/project/cli.mjs", "consumer": "tools/truthsrc-project.mjs", "specifier": "../../metarch-truthsrc/lib/project/cli.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/project/query.mjs", "consumer": "tools/truthsrc-project.mjs", "specifier": "../../metarch-truthsrc/lib/project/query.mjs"}], "note": "Public project mechanism is consumed; bank wrapper and project selection remain authored policy."}
+    },
+    {
+      "file": "tools/prepare-truthsrc-runtime.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored frozen dependency preparation CLI."},
+      "responsibility": {"summary": "Validate clean1134 and prepare three frozen JAR/POM pairs.", "owners": ["bank supply maintainers"], "nature": "mixed", "mechanism": "Archive/member validation and exclusive local extraction.", "policy": "Bank archive hash, six selected members and local runtime repository."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop-verification.mjs", "kind": "entry", "evidence": "script: 'prepare-truthsrc-runtime.mjs'", "note": "Selected only for stages needing frozen supply; source does not prepare it."}],
+      "publicMechanism": {"status": "deferred", "targets": [], "note": "Frozen supply preparation remains bank-local; no public download or generic archive extractor is claimed."}
+    },
+    {
+      "file": "tools/verify-handwritten-map.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Public provenance consumption recorded in bank commit 207093e."},
+      "responsibility": {"summary": "Check current handwritten source relationships against captured project documents.", "owners": ["bank architecture maintainers"], "nature": "adapter", "mechanism": "Public source inventory and explicit handwritten provenance verification.", "policy": "Bank snapshot, 35 files, 54 references and allowed relations remain local declarations."},
+      "lifecycle": "current",
+      "consumers": [{"file": "test/public-handwritten-provenance.test.mjs", "kind": "test", "evidence": "from '../tools/verify-handwritten-map.mjs'", "note": "Bank adapter contracts."}],
+      "publicMechanism": {"status": "migrated", "targets": [{"sourceRoot": "truthsrc", "file": "lib/handwritten-provenance.mjs", "consumer": "tools/verify-handwritten-map.mjs", "specifier": "../../metarch-truthsrc/lib/handwritten-provenance.mjs"}], "note": "Public relation/file/pointer verification replaces the old release helper path; not semantic or symbol/span certification."}
+    },
+    {
+      "file": "tools/verify-truthsrc-build.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Current isolated build verifier maintained independently of generated bank source."},
+      "responsibility": {"summary": "Admit fresh generated candidates and run explicitly selected isolated build modes.", "owners": ["bank build maintainers"], "nature": "mixed", "mechanism": "Public-backed path checks; local archive, sandbox, process, staging and log verification.", "policy": "Frozen supply, exact sources/tasks, suite manifests, guard snapshots and admission remain bank-owned."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop-verification.mjs", "kind": "entry", "evidence": "script: 'verify-truthsrc-build.mjs'", "note": "Fresh actor/readside/runtime build stages."}],
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "safePath delegates through truthsrc-evidence; this does not claim all hashing, build process supervision, reports or snapshot policies have migrated."}
+    },
+    {
+      "file": "tools/truthsrc-actor-tests.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored fixed actor suite manifest and TA lifecycle inspection."},
+      "responsibility": {"summary": "Admit eight fixed actor suites and validate their TA worker evidence.", "owners": ["bank test maintainers"], "nature": "mixed", "mechanism": "Direct public worker transcript/lifecycle validation and adapter-backed file capture.", "policy": "41 business assertions plus 23 generated units, fixture, journals and expected worker identity remain bank policy."},
+      "lifecycle": "current",
+      "consumers": [{"file": "test/truthsrc-actor-tests.test.mjs", "kind": "test", "evidence": "from '../tools/truthsrc-actor-tests.mjs'", "note": "Fixed-manifest and worker evidence contracts."}],
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/worker-evidence.mjs", "consumer": "tools/truthsrc-actor-tests.mjs", "specifier": "../../metarch-truthsrc/lib/verification/worker-evidence.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "Public worker checks are actually imported here; financial oracle and fixed suite policies were not moved upstream."}
+    },
+    {
+      "file": "tools/truthsrc-readside-tests.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored SHA-pinned readside suite manifest and log checks."},
+      "responsibility": {"summary": "Select five fixed readside suites and verify source/test observations.", "owners": ["bank test maintainers"], "nature": "policy", "mechanism": "Local manifest composition and source/log comparisons.", "policy": "24 fixed assertions plus 23 generated units, H2 version and readside scope."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop-verification.mjs", "kind": "import", "evidence": "await import('./truthsrc-readside-tests.mjs')", "note": "Readside build report policy."}],
+      "publicMechanism": {"status": "consumer-policy", "targets": [], "note": "Fixed business suites remain bank-owned; no generic suite/report extraction claimed."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-tests.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored compile-only runtime manifest and classpath evidence."},
+      "responsibility": {"summary": "Compile five fixed runtime mains and seal actual ordered classpath/source inventory.", "owners": ["bank build maintainers"], "nature": "mixed", "mechanism": "Local compile-log and classpath inventory checks.", "policy": "Fixed main names, hashes, dependencies, paths and successful build handoff."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop-session.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-tests.mjs'", "note": "Session classpath inspection; inventory checking does not execute it."}],
+      "publicMechanism": {"status": "deferred", "targets": [], "note": "Generic classpath/build-report mechanisms remain local; compile-only never implies service execution."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-admission.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored current runtime build admission."},
+      "responsibility": {"summary": "Admit source-bound runtime builds and their actual staging/classpath receipts.", "owners": ["bank runtime maintainers"], "nature": "mixed", "mechanism": "Use public-backed captured files through the bank evidence adapter.", "policy": "Bank schemas, exact build provenance, support files, classpath and frozen supply guards remain local."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop-session.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-admission.mjs'", "note": "Session admission; runtime controller also consumes it."}],
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "captureRuntimeFile/safePath use the public file adapter; bank admission and guard snapshots are not public defaults."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-jars.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored implicit JAR manifest reference checks."},
+      "responsibility": {"summary": "Inspect and compare explicit/implicit runtime JAR references.", "owners": ["bank build maintainers"], "nature": "mixed", "mechanism": "Emit bounded Python probe and validate its manifest observations.", "policy": "Admitted classpath, fixed absent references and source/supply containment."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/truthsrc-runtime-admission.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-jars.mjs'", "note": "Runtime admission checks implicit classpath references."}],
+      "publicMechanism": {"status": "deferred", "targets": [], "note": "Still bank-local; this inventory checker reads its source, never launches the probe or opens JARs."}
+    },
+    {
+      "file": "tools/verify-truthsrc-runtime.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Current runtime controller introduced in bank commit f796362."},
+      "responsibility": {"summary": "Run authorized recovery, database, HTTP and browser windows on an admitted build.", "owners": ["bank runtime maintainers"], "nature": "mixed", "mechanism": "Public-backed process and worker adapters plus bank resource modules.", "policy": "Fixed 24 recovery cases, stage checks, financial assertions, source guards and owner cleanup."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop-verification.mjs", "kind": "entry", "evidence": "script: 'verify-truthsrc-runtime.mjs'", "note": "Service-stage CLI selection, not proof this run succeeded."}],
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/process.mjs", "consumer": "tools/truthsrc-runtime-process.mjs", "specifier": "../../metarch-truthsrc/lib/verification/process.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/worker-evidence.mjs", "consumer": "tools/truthsrc-worker-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/worker-evidence.mjs"}], "note": "Lifecycle evidence is public-backed; bank orchestration, resource adapters and fixed acceptance policy remain local."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-process.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "P1 thin adapter replacing the local runtime process mechanism."},
+      "responsibility": {"summary": "Preserve the bank runtime process API and receipt schema.", "owners": ["bank runtime maintainers", "truthsrc verification maintainers"], "nature": "adapter", "mechanism": "Direct public bounded process supervisor and static receipt inspector.", "policy": "bank.truthsrc-runtime-process/v1 schema; callers still supply bank sandbox/resource policy."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop-session.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-process.mjs'", "note": "Session calls the runtime process adapter."}],
+      "publicMechanism": {"status": "migrated", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/process.mjs", "consumer": "tools/truthsrc-runtime-process.mjs", "specifier": "../../metarch-truthsrc/lib/verification/process.mjs"}], "note": "Direct public runVerifiedProcess/inspectProcessEvidence delegation; not extraction of all bank build runners."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-lease.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Bank-owned cooperative lease implementation retained during P1."},
+      "responsibility": {"summary": "Validate/acquire/release the current owner lease and check reserved ports.", "owners": ["bank runtime maintainers"], "nature": "mixed", "mechanism": "Local exclusive lease/port operations; direct import of the public-backed file adapter.", "policy": "Bank owner identity, run/TA roots, port policy and no unknown-resource takeover."},
+      "lifecycle": "current",
+      "consumers": [{"file": "test/truthsrc-runtime-lease.test.mjs", "kind": "test", "evidence": "from '../tools/truthsrc-runtime-lease.mjs'", "note": "Explicit lease contracts; not executed by inventory validation."}],
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "Lease directly imports truthsrc-evidence for file/path policy; lease acquisition, release and port mechanisms remain bank implementation, not migrated."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-sandbox.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored bank runtime Seatbelt policy and probes."},
+      "responsibility": {"summary": "Construct bank recovery/service sandbox profiles and boundary probes.", "owners": ["bank runtime maintainers"], "nature": "mixed", "mechanism": "Local profile generation and executable probe source.", "policy": "Deny-all recovery versus host-local reserved-port service scope and bank write roots."},
+      "lifecycle": "current",
+      "consumers": [{"file": "test/truthsrc-runtime-sandbox.test.mjs", "kind": "test", "evidence": "from '../tools/truthsrc-runtime-sandbox.mjs'", "note": "Profile contract tests."}],
+      "publicMechanism": {"status": "deferred", "targets": [], "note": "Bank policy/probes remain local; public process supervision does not make this a generic or exact-IP isolation policy."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-config.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored production runtime configuration adapter."},
+      "responsibility": {"summary": "Issue fresh credentials and construct production bank configuration.", "owners": ["bank runtime maintainers"], "nature": "policy", "mechanism": "Local credential/config materialization.", "policy": "Bank principals, roles, driver settings, endpoints and owned secrets."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/verify-truthsrc-runtime.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-config.mjs'", "note": "Controller configuration, not inventory-time credential access."}],
+      "publicMechanism": {"status": "consumer-policy", "targets": [], "note": "Credentials and bank production configuration stay with the consumer."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-databases.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored owned Docker database lifecycle adapter."},
+      "responsibility": {"summary": "Manage new owner-labelled Mongo/MySQL resources and shutdown evidence.", "owners": ["bank runtime maintainers"], "nature": "mixed", "mechanism": "Local container/network/database lifecycle and relay integration.", "policy": "Pinned images, owner labels, ports, fresh stores and retain-failure-data policy."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/verify-truthsrc-runtime.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-databases.mjs'", "note": "Authorized controller resource adapter."}],
+      "publicMechanism": {"status": "deferred", "targets": [], "note": "Docker resource adapter is not extracted; Docker is not required by source-only CLI or this checker."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-db-relay.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored local database relay."},
+      "responsibility": {"summary": "Relay reserved local database connections to owned container execution.", "owners": ["bank runtime maintainers"], "nature": "mixed", "mechanism": "Local socket relay and bounded shutdown.", "policy": "Owned database endpoints and reserved listener restrictions."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/truthsrc-runtime-databases.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-db-relay.mjs'", "note": "Database adapter creates its relay."}],
+      "publicMechanism": {"status": "deferred", "targets": [], "note": "No public relay mechanism is claimed; no listeners are started by inventory checks."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-db-exec.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored Docker exec transport."},
+      "responsibility": {"summary": "Decode Docker frames and open owned database exec transport.", "owners": ["bank runtime maintainers"], "nature": "mixed", "mechanism": "Local Docker HTTP/exec protocol and frame reader.", "policy": "Allowed database commands and owned container endpoints."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/truthsrc-runtime-db-relay.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-db-exec.mjs'", "note": "Relay transport dependency."}],
+      "publicMechanism": {"status": "deferred", "targets": [], "note": "Transport reuse requires a separate extraction; current implementation stays bank-local."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-http.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored production HTTP acceptance client."},
+      "responsibility": {"summary": "Exercise bank production flows and transport authorization assertions.", "owners": ["bank test maintainers"], "nature": "policy", "mechanism": "Local HTTP request/assertion helpers.", "policy": "Bank routes, financial oracle, principal permissions and read-only observation requirements."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/verify-truthsrc-runtime.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-http.mjs'", "note": "Service-stage HTTP assertions."}],
+      "publicMechanism": {"status": "consumer-policy", "targets": [], "note": "Business HTTP expectations are not public verification defaults."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-browser.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored current browser configuration/entry adapter."},
+      "responsibility": {"summary": "Run the configured browser checks for the current admitted bank runtime.", "owners": ["bank test maintainers"], "nature": "adapter", "mechanism": "Invoke retained v1-browser-funds browser implementation.", "policy": "Current browser config, explicit module/executable and bank UI assertions."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/verify-truthsrc-runtime.mjs", "kind": "entry", "evidence": "args: [join(ROOT, 'tools/truthsrc-runtime-browser.mjs')", "note": "Explicit browser subprocess selection."}],
+      "publicMechanism": {"status": "deferred", "targets": [], "note": "Still imports v1-browser-funds, which imports v1-browser-check; historical reuse is not public browser extraction."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-crash.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored current recovery controller with P1 worker adapter integration."},
+      "responsibility": {"summary": "Execute fixed current recovery cases and inspect their worker/child evidence.", "owners": ["bank runtime maintainers", "bank test maintainers"], "nature": "mixed", "mechanism": "Use public-backed worker adapter while retaining historical crash oracle helpers.", "policy": "The 24-case bank recovery matrix and financial/recovery comparisons stay local."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/verify-truthsrc-runtime.mjs", "kind": "import", "evidence": "from './truthsrc-runtime-crash.mjs'", "note": "Current controller selects recovery runner."}],
+      "publicMechanism": {"status": "partial", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/worker-evidence.mjs", "consumer": "tools/truthsrc-worker-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/worker-evidence.mjs"}], "note": "Worker evidence is public-backed; v1-crash-recovery case/report/comparison imports remain. Its transitive old build verifier is loaded, not called by this runner."}
+    },
+    {
+      "file": "tools/truthsrc-runtime-ta-worker.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored current runtime TA worker configuration adapter."},
+      "responsibility": {"summary": "Run the explicitly configured TA simulation worker for runtime cases.", "owners": ["bank simulator maintainers"], "nature": "policy", "mechanism": "Reuse the current configured actor worker implementation.", "policy": "Closed bank crash-case names, TA config, journal root and receipt identity."},
+      "lifecycle": "current",
+      "consumers": [{"file": "test/truthsrc-runtime-ta.test.mjs", "kind": "test", "evidence": "from '../tools/truthsrc-runtime-ta-worker.mjs'", "note": "Explicit runtime TA contracts, not a worker launch by this checker."}],
+      "publicMechanism": {"status": "consumer-policy", "targets": [], "note": "TA behavior/config remains bank-specific; public lifecycle validation is in consumers, not this worker entry."}
+    },
+    {
+      "file": "tools/truthsrc-actor-ta-worker.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Hand-authored pinned-fixture TA worker."},
+      "responsibility": {"summary": "Validate pinned TA configuration and serve the configured simulation protocol.", "owners": ["bank simulator maintainers"], "nature": "mixed", "mechanism": "Local worker loop and pinned-file admission; uses shared strict JSON utility.", "policy": "Bank fixture schema, finance simulation, journal roots and emitted lifecycle records."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/truthsrc-runtime-ta-worker.mjs", "kind": "import", "evidence": "from './truthsrc-actor-ta-worker.mjs'", "note": "Runtime worker reuses configured actor worker."}],
+      "publicMechanism": {"status": "consumer-policy", "targets": [], "note": "Worker execution and TA simulation stay in bank; actor-tests and worker-evidence validate lifecycle with public APIs."}
+    },
+    {
+      "file": "tools/scala/BankWorkshopMain.scala",
+      "provenance": {"kind": "engineering-authored", "basis": "Independent handwritten workshop launcher, not one of the 31 frozen Scala tests."},
+      "responsibility": {"summary": "Launch and close a manual bank service session with its own evidence.", "owners": ["bank workshop maintainers"], "nature": "adapter", "mechanism": "Wire admitted application classes into a long-lived session launcher.", "policy": "Bank readiness, resource shutdown and manual-session contract."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/bank-workshop-session.mjs", "kind": "reference", "evidence": "const SOURCE = join(ROOT, 'tools/scala/BankWorkshopMain.scala');", "note": "Explicit separately compiled source; manifest checking never invokes scalac/JVM."}],
+      "publicMechanism": {"status": "consumer-policy", "targets": [], "note": "Application launcher remains bank-specific, separate from generated source and frozen integration mains."}
+    },
+    {
+      "file": "tools/historical-source.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical two-tree reader maintained for exact preservation comparisons."},
+      "responsibility": {"summary": "Read frozen legacy tree Git objects and reconstruct comparison snapshots.", "owners": ["bank history maintainers"], "nature": "mixed", "mechanism": "Local revision-bound Git reader with public snapshot utilities.", "policy": "675a9366cf270995ef714e505e42c19652f0e4f0 and exact historical inventory; no current fallback or fetch."},
+      "lifecycle": "shared-historical",
+      "consumers": [{"file": "test/unified-truth.test.mjs", "kind": "test", "evidence": "from '../tools/historical-source.mjs'", "note": "Current source-preservation tests read history; current generation does not use it as author input."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Retained historical reader, not current truth generation; this checker only captures reader source, never calls Git through it."}
+    },
+    {
+      "file": "tools/historical-assets.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical asset reader added for bounded V1 retirement."},
+      "responsibility": {"summary": "Read retired contracts and formal inputs from the exact preserved Git revision.", "owners": ["bank history maintainers"], "nature": "mixed", "mechanism": "Local Git asset access and captured request validation.", "policy": "4515b6b97d91714116b451b4e930dc81e112e528, declared retired inventory and explicit historical request admission."},
+      "lifecycle": "shared-historical",
+      "consumers": [{"file": "test/historical-assets.test.mjs", "kind": "test", "evidence": "from '../tools/historical-assets.mjs'", "note": "Preservation tests, not a current bank runtime dependency claim."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Historical policy remains local even though shared JSON/product utilities are used."}
+    },
+    {
+      "file": "tools/truth-source.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Legacy bank source/binding loading and protection helpers."},
+      "responsibility": {"summary": "Support historical declaration, binding and snapshot checks.", "owners": ["bank history maintainers"], "nature": "mixed", "mechanism": "Legacy loader, fingerprints and protection comparisons.", "policy": "Old tree/bindings and historical protection sets; not root truthsrc.project.json authority."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "test/cash-contract.test.mjs", "kind": "test", "evidence": "from '../tools/truth-source.mjs'", "note": "Legacy contract preservation tests."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Preserve history; current source loading uses truthsrc-project and public project APIs."}
+    },
+    {
+      "file": "tools/artifacts.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Legacy declaration and document projection implementation."},
+      "responsibility": {"summary": "Extract/check historical artifacts and render old document projections.", "owners": ["bank history maintainers"], "nature": "mixed", "mechanism": "Local extraction and document rendering.", "policy": "Historical bank categories and declarations, not current JDBC generation."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "test/cash-contract.test.mjs", "kind": "test", "evidence": "from '../tools/artifacts.mjs'", "note": "Historical artifact contract tests."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Not a current semantic product producer or the public artifact catalog."}
+    },
+    {
+      "file": "tools/cash-contract.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Legacy cash contract validator and result-kind declarations."},
+      "responsibility": {"summary": "Check the preserved cash contract and its declared result kinds.", "owners": ["bank history maintainers"], "nature": "policy", "mechanism": "Local contract assertions.", "policy": "Historical cash model requirements and financial result distinctions."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "test/cash-contract.test.mjs", "kind": "test", "evidence": "from '../tools/cash-contract.mjs'", "note": "Independent historical contract tests."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Bank financial policy is not extracted as a generic mechanism."}
+    },
+    {
+      "file": "tools/formal-contract-inputs.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Legacy formal request preparation and protection checks."},
+      "responsibility": {"summary": "Prepare/check historical formal contract transport inputs.", "owners": ["bank history maintainers"], "nature": "mixed", "mechanism": "Local request capture, source probes and fingerprint checks.", "policy": "Old transport templates and explicitly historical requests; no current manual request stage."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "test/formal-contract-inputs.test.mjs", "kind": "test", "evidence": "from '../tools/formal-contract-inputs.mjs'", "note": "Preserved formal-input contracts."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Current project compilation derives requests from current tree and eight bindings instead."}
+    },
+    {
+      "file": "tools/mock-ta.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Legacy standalone simulator CLI."},
+      "responsibility": {"summary": "Expose the historical mock-TA command interface.", "owners": ["bank simulator maintainers"], "nature": "adapter", "mechanism": "Local simulator dispatch.", "policy": "Historical TA input/scenario contract; no real fund-company integration."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "test/mock-ta.test.mjs", "kind": "test", "evidence": "from '../tools/mock-ta.mjs'", "note": "Simulator CLI contract tests."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Retained legacy CLI; current actor/runtime workers use explicit pinned configuration."}
+    },
+    {
+      "file": "tools/project.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Legacy bank documentation projection CLI."},
+      "responsibility": {"summary": "Check/render historical document projections.", "owners": ["bank history maintainers"], "nature": "policy", "mechanism": "Local projection comparison/write command.", "policy": "Explicit --historical and old projections; not current project generation or SQL readside."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "package.json", "kind": "entry", "evidence": "node tools/project.mjs --historical --check", "note": "Explicit history-only package command."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Current project entry is truthsrc-project, not this older similarly named tool."}
+    },
+    {
+      "file": "tools/validate.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Legacy validation CLI retained for history."},
+      "responsibility": {"summary": "Run historical source/declaration/projection checks.", "owners": ["bank history maintainers"], "nature": "policy", "mechanism": "Compose legacy validators.", "policy": "Explicit --historical; never the current validation authority."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "package.json", "kind": "entry", "evidence": "node tools/validate.mjs --historical", "note": "History command, not the default validate script."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Preserved historical entry, not moved or deleted by P1."}
+    },
+    {
+      "file": "tools/qualify-domain.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical domain qualification runner retained under the paused protection contract."},
+      "responsibility": {"summary": "Preserve the paused domain qualification implementation.", "owners": ["bank history maintainers"], "nature": "mixed", "mechanism": "Historical generation/build/test qualification machinery.", "policy": "PAUSED: neither this runner nor domain-runner tests may be invoked by this workstream."},
+      "lifecycle": "paused",
+      "consumers": [{"file": "test/domain-runner.test.mjs", "kind": "test", "evidence": "from '../tools/qualify-domain.mjs'", "note": "Source-only reference to a PAUSED test; inventory capture does not import or run either file."}],
+      "publicMechanism": {"status": "paused", "targets": [], "note": "Preserve original paths/bytes and paused drafts; inventory membership is not execution authorization."}
+    },
+    {
+      "file": "tools/v1-inputs.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical V1 domain/application request builder."},
+      "responsibility": {"summary": "Construct explicitly historical V1 domain/application inputs.", "owners": ["bank history maintainers"], "nature": "mixed", "mechanism": "Legacy request assembly.", "policy": "V1 frozen layout, exact types and old bindings; no current input fallback."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "test/v1-inputs.test.mjs", "kind": "test", "evidence": "from '../tools/v1-inputs.mjs'", "note": "Historical request tests."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Current request assembly is public project compilation; this builder is preserved history."}
+    },
+    {
+      "file": "tools/v1-service-inputs.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical V1 service request/options builder."},
+      "responsibility": {"summary": "Construct historical complete service inputs.", "owners": ["bank history maintainers"], "nature": "mixed", "mechanism": "Legacy service request composition.", "policy": "Frozen V1 service profile and historical:true input requirement."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-stage.mjs", "kind": "import", "evidence": "await import('./v1-service-inputs.mjs')", "note": "Old release-stage input assembly."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Not a required authoring stage for current bank generation."}
+    },
+    {
+      "file": "tools/v1-joint.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical dual-chain joint verification driver."},
+      "responsibility": {"summary": "Plan/check historical V1 joint generation and test targets.", "owners": ["bank history maintainers"], "nature": "mixed", "mechanism": "Legacy target/fingerprint/test orchestration.", "policy": "Old explicit targets and --historical admission; not the current workshop."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "package.json", "kind": "entry", "evidence": "node tools/v1-joint.mjs --historical --check", "note": "Retained historical check command."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "No migration of historical orchestration is claimed."}
+    },
+    {
+      "file": "tools/v1-mock-ta-worker.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical joint-worker entry retained with legacy client fallback references."},
+      "responsibility": {"summary": "Serve the legacy joint-test TA worker entry.", "owners": ["bank simulator maintainers"], "nature": "adapter", "mechanism": "Historical worker/simulator startup.", "policy": "Legacy joint root/config; current actor/runtime paths provide explicit replacement worker configuration."},
+      "lifecycle": "shared-historical",
+      "consumers": [{"file": "handwritten/scala/example/bankwealth/bindings/MockTAClient.scala", "kind": "reference", "evidence": "root.resolve(\"tools/v1-mock-ta-worker.mjs\")", "note": "Retained legacy fallback literal in current handwritten client, not proof the current configured runner invokes it."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Shared historical reference is visible; no source deletion or claim of current fallback execution."}
+    },
+    {
+      "file": "tools/v1-service-mock-ta-worker.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical V1 release service worker entry."},
+      "responsibility": {"summary": "Launch the historical service/recovery TA worker.", "owners": ["bank simulator maintainers"], "nature": "adapter", "mechanism": "Legacy simulator worker startup.", "policy": "Frozen release service paths and TA scenarios."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-stage.mjs", "kind": "entry", "evidence": "'bank.mock-ta.worker': join(support, 'bank/tools/v1-service-mock-ta-worker.mjs')", "note": "Worker property in old release test configuration."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Current runtime uses truthsrc-runtime-ta-worker, not this release entry."}
+    },
+    {
+      "file": "tools/v1-browser-check.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical browser actions/checker, still shared by funds browser helper."},
+      "responsibility": {"summary": "Define bank browser actions and legacy page checks.", "owners": ["bank test maintainers"], "nature": "policy", "mechanism": "Historical browser helper implementation.", "policy": "Bank UI actions and expected page behavior."},
+      "lifecycle": "shared-historical",
+      "consumers": [{"file": "tools/v1-browser-funds.mjs", "kind": "import", "evidence": "from './v1-browser-check.mjs'", "note": "BANK_ACTIONS is loaded through funds helper; this does not prove runBankBrowserCheck is invoked."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Transitive current browser dependency remains; not a migrated generic browser API."}
+    },
+    {
+      "file": "tools/v1-browser-funds.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical funds browser oracle reused by the current browser adapter."},
+      "responsibility": {"summary": "Exercise bank funds pages and their financial UI assertions.", "owners": ["bank test maintainers"], "nature": "mixed", "mechanism": "Shared browser automation implementation.", "policy": "Fixed bank flows, page fields and finance assertions."},
+      "lifecycle": "shared-historical",
+      "consumers": [{"file": "tools/truthsrc-runtime-browser.mjs", "kind": "import", "evidence": "from './v1-browser-funds.mjs'", "note": "Current browser adapter imports runBankBrowserFunds and its error type."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Actively reused historical helper; moving/renaming it is not part of P1."}
+    },
+    {
+      "file": "tools/v1-crash-recovery.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical recovery controller plus case/report/oracle helpers reused by current runtime."},
+      "responsibility": {"summary": "Retain historical recovery execution and shared fixed recovery expectations.", "owners": ["bank test maintainers"], "nature": "mixed", "mechanism": "Old controller and shared child-report/recovery comparisons.", "policy": "Bank crash/SIP/TA case matrix and financial recovery oracle."},
+      "lifecycle": "shared-historical",
+      "consumers": [{"file": "tools/truthsrc-runtime-crash.mjs", "kind": "import", "evidence": "from './v1-crash-recovery.mjs'", "note": "Current runner imports case lists and report/comparison helpers, not runBankCrashRecovery."}, {"file": "tools/bank-workshop-verification.mjs", "kind": "import", "evidence": "await import('./v1-crash-recovery.mjs')", "note": "Current static report inspection shares historical recovery expectations."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Historical policy remains shared; its verifyReleaseBuild import loads the old helper transitively without current runner invocation."}
+    },
+    {
+      "file": "tools/v1-http-acceptance.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical HTTP acceptance driver and report verifier."},
+      "responsibility": {"summary": "Execute/inspect the old release HTTP acceptance contract.", "owners": ["bank history maintainers"], "nature": "mixed", "mechanism": "Legacy HTTP runner and report checks.", "policy": "Frozen V1 release inputs and HTTP oracle."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-certify.mjs", "kind": "import", "evidence": "from './v1-http-acceptance.mjs'", "note": "Historical release certification reads HTTP reports."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Current HTTP path is truthsrc-runtime-http; historical certification is not rerun here."}
+    },
+    {
+      "file": "tools/v1-release.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical release manifest/CLI controller."},
+      "responsibility": {"summary": "Evaluate and dispatch the frozen release acceptance matrix.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy manifest validation and orchestration.", "policy": "Old release phases, required slots and report schema."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "test/v1-release.test.mjs", "kind": "test", "evidence": "from '../tools/v1-release.mjs'", "note": "Preserved release contract tests."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Frozen release acceptance is distinct from current source/workshop acceptance."}
+    },
+    {
+      "file": "tools/v1-release-orchestrate.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical release execution orchestrator."},
+      "responsibility": {"summary": "Check and invoke old release execution stages.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy stage subprocess orchestration.", "policy": "Release bundle, options, stages and evidence roots."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release.mjs", "kind": "import", "evidence": "await import('./v1-release-orchestrate.mjs')", "note": "Historical release CLI dispatch."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "No general runner migration or execution authorization from inventory membership."}
+    },
+    {
+      "file": "tools/v1-release-execute.py",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical Python release stage executor."},
+      "responsibility": {"summary": "Execute the original bounded release generation/build/runtime stages.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy Python execution and stage evidence handling.", "policy": "Frozen bundle paths, release commands and time budgets."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-orchestrate.mjs", "kind": "entry", "evidence": "join(ROOT, 'tools/v1-release-execute.py')", "note": "Explicit historical executor selection."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Preserved Python executor, not a required source-only dependency and never executed by this checker."}
+    },
+    {
+      "file": "tools/v1-release-runtime.py",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical Python release runtime operations."},
+      "responsibility": {"summary": "Support original release database/HTTP/browser runtime stages.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy Python runtime resource/control helpers.", "policy": "Frozen release containers, commands, credentials and evidence scope."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-execute.py", "kind": "import", "evidence": "Path(__file__).with_name('v1-release-runtime.py')", "note": "Literal Python module path used by the old executor."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Not imported or run by manifest validation; do not read old credentials to check ownership."}
+    },
+    {
+      "file": "tools/v1-release-stage.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical release stage CLI dispatcher."},
+      "responsibility": {"summary": "Dispatch old generation, provenance, build configuration and certification operations.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy per-stage JS dispatch.", "policy": "Frozen release stage names, test support and target layout."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-execute.py", "kind": "entry", "evidence": "bank/'tools/v1-release-stage.mjs'", "note": "Python executor names the historical stage CLI."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Historical stage graph is preserved rather than treated as current generation."}
+    },
+    {
+      "file": "tools/v1-release-generation.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical release generation and target admission helper."},
+      "responsibility": {"summary": "Validate old release inputs/targets and arrange BC/JS generation.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy target admission and generation task composition.", "policy": "Frozen release layout, runtime bindings and source inventory."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "test/v1-release-generation.test.mjs", "kind": "test", "evidence": "from '../tools/v1-release-generation.mjs'", "note": "Historical generation contract tests."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Current deterministic generation uses public project/product/writer APIs, not this release path."}
+    },
+    {
+      "file": "tools/v1-release-provenance.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Original release provenance implementation retained as history."},
+      "responsibility": {"summary": "Verify old generated/handwritten provenance and generation stability.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy inventory and relationship checks.", "policy": "Frozen release maps, relationships and output expectations."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-certify.mjs", "kind": "import", "evidence": "from './v1-release-provenance.mjs'", "note": "Old release certification dependency."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Current verify-handwritten-map uses public handwritten-provenance directly; this old implementation was not rewritten or declared migrated."}
+    },
+    {
+      "file": "tools/v1-release-build-evidence.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Old build inventory/verifier retained in the historical crash import chain."},
+      "responsibility": {"summary": "Inspect historical release build evidence and inventories.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy build inventory and receipt verification.", "policy": "Old release build schema, file set and expected outputs."},
+      "lifecycle": "shared-historical",
+      "consumers": [{"file": "tools/v1-crash-recovery.mjs", "kind": "import", "evidence": "from './v1-release-build-evidence.mjs'", "note": "Transitively loaded through the shared crash module; the current recovery runner does not call verifyReleaseBuild."}, {"file": "test/v1-release-build-evidence.test.mjs", "kind": "test", "evidence": "from '../tools/v1-release-build-evidence.mjs'", "note": "Historical build verifier contracts."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Module loading is not invocation. Current runtime admission checks a new truthsrc build, not the old release build verifier."}
+    },
+    {
+      "file": "tools/v1-release-cold.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical portable cold build implementation."},
+      "responsibility": {"summary": "Configure and verify the original cold release build/test support.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy repository/boot config, support checks and cold runner.", "policy": "Frozen bundle supply, compiler bridge and old mounted test inputs."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-stage.mjs", "kind": "import", "evidence": "await import('./v1-release-cold.mjs')", "note": "Old stage configuration helper."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Current verify-truthsrc-build is a separate path, not this cold release runner."}
+    },
+    {
+      "file": "tools/v1-release-certify.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical release certification policy."},
+      "responsibility": {"summary": "Check original release evidence and certify its bounded contract.", "owners": ["bank release history maintainers"], "nature": "policy", "mechanism": "Compose old build, provenance, recovery and HTTP evidence checks.", "policy": "Frozen release matrix and acceptance conditions; not a new approval."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-finalize.mjs", "kind": "import", "evidence": "from './v1-release-certify.mjs'", "note": "Historical finalization certification."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Do not re-sign old evidence or infer current service success."}
+    },
+    {
+      "file": "tools/v1-release-dist.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical distribution verification/promotion implementation."},
+      "responsibility": {"summary": "Check bundle/supply files and promote the original release distribution.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy bundle inventory and promotion.", "policy": "Frozen release file allowlists, licence records and certification."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-finalize.mjs", "kind": "import", "evidence": "from './v1-release-dist.mjs'", "note": "Original installed-release file checks."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "No distribution publication, recursive repackaging or output reads by this ownership check."}
+    },
+    {
+      "file": "tools/v1-release-finalize.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical installed-release final acceptance helper."},
+      "responsibility": {"summary": "Finalize the original installed release after its checks.", "owners": ["bank release history maintainers"], "nature": "policy", "mechanism": "Compose historical certification and bundle checks.", "policy": "Original release completion contract and evidence identity."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-stage.mjs", "kind": "import", "evidence": "await import('./v1-release-finalize.mjs')", "note": "Old finalization stage dispatch."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Original 1134 scope is preserved; this inventory is not release finalization."}
+    },
+    {
+      "file": "tools/v1-release-supply.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical frozen supply capture/discovery helper."},
+      "responsibility": {"summary": "Capture original release dependency supply and licence evidence.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy supply discovery, inventory and lock extraction.", "policy": "Frozen runtime pins, dependency files and original capture provenance."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "tools/v1-release-supply-analysis.mjs", "kind": "import", "evidence": "from './v1-release-supply.mjs'", "note": "Historical captured-supply analysis dependency."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Current prepare consumes clean1134; it does not authorize recapturing user caches with this historical helper."}
+    },
+    {
+      "file": "tools/v1-release-supply-analysis.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical captured-supply analysis/report implementation."},
+      "responsibility": {"summary": "Analyze dependency capture and its original release coverage.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy supply analysis/report helpers.", "policy": "Bank release supply expectations and retained evidence."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "test/v1-release-supply-analysis.test.mjs", "kind": "test", "evidence": "from '../tools/v1-release-supply-analysis.mjs'", "note": "Explicit old supply report tests."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Not a current supply download channel or public verifier migration."}
+    },
+    {
+      "file": "tools/v1-repair-driver.py",
+      "provenance": {"kind": "engineering-authored", "basis": "Historical bounded release repair driver retained with its tests."},
+      "responsibility": {"summary": "Preserve original release repair-stage implementation.", "owners": ["bank release history maintainers"], "nature": "mixed", "mechanism": "Legacy Python repair/execution driver.", "policy": "Old explicitly bounded repair plans and evidence, not authority to change frozen outputs today."},
+      "lifecycle": "historical",
+      "consumers": [{"file": "test/test_v1_repair_driver.py", "kind": "reference", "evidence": "DRIVER = BANK / 'tools/v1-repair-driver.py'", "note": "Historical Python test source reference; not executed in the Node-only inventory check."}],
+      "publicMechanism": {"status": "historical-local", "targets": [], "note": "Preserve history without launching repair, touching journals or rewriting receipts."}
+    },
+    {
+      "file": "tools/truthsrc-evidence.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "New P1 bank file/path evidence adapter; explicitly added to the 62-file baseline."},
+      "responsibility": {"summary": "Expose lightweight safePath/captureRuntimeFile bank-compatible APIs.", "owners": ["bank runtime maintainers", "truthsrc verification maintainers"], "nature": "adapter", "mechanism": "Direct public canonical path and same-buffer bounded evidence capture.", "policy": "Bank plain-POSIX/.scratch restrictions, strict JSON and exact system-Python hardlink exception remain local."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/truthsrc-runtime-lease.mjs", "kind": "import", "evidence": "from './truthsrc-evidence.mjs'", "note": "Lease directly uses the lightweight public-backed adapter."}, {"file": "tools/truthsrc-runtime-admission.mjs", "kind": "import", "evidence": "from './truthsrc-evidence.mjs'", "note": "Admission retains compatibility exports without owning the file mechanism."}],
+      "publicMechanism": {"status": "migrated", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "Public file/path mechanism is consumed; bank paths, snapshots, selection policy and JSON schema are not public defaults."}
+    },
+    {
+      "file": "tools/truthsrc-worker-evidence.mjs",
+      "provenance": {"kind": "engineering-authored", "basis": "New P1 bank worker-evidence adapter; explicitly added to the 62-file baseline."},
+      "responsibility": {"summary": "Inspect static TA worker evidence and preserve the separate live check API.", "owners": ["bank runtime maintainers", "truthsrc verification maintainers"], "nature": "adapter", "mechanism": "Direct public worker transcript/lifecycle validation plus public file capture.", "policy": "TA receipt schemas, paths, config/expected fields and live owned-worker checks remain bank-specific."},
+      "lifecycle": "current",
+      "consumers": [{"file": "tools/truthsrc-runtime-crash.mjs", "kind": "import", "evidence": "from './truthsrc-worker-evidence.mjs'", "note": "Current crash caller uses the adapter, not duplicate lifecycle parsing."}, {"file": "tools/bank-workshop-verification.mjs", "kind": "import", "evidence": "from './truthsrc-worker-evidence.mjs'", "note": "Static report inspection uses inspectRuntimeWorker; no historical PID probes."}],
+      "publicMechanism": {"status": "migrated", "targets": [{"sourceRoot": "truthsrc", "file": "lib/verification/worker-evidence.mjs", "consumer": "tools/truthsrc-worker-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/worker-evidence.mjs"}, {"sourceRoot": "truthsrc", "file": "lib/verification/files.mjs", "consumer": "tools/truthsrc-worker-evidence.mjs", "specifier": "../../metarch-truthsrc/lib/verification/files.mjs"}], "note": "Pure lifecycle validation is public; static inspection is separate from live PID/exit checks and bank financial acceptance."}
+    }
+  ]
+}

@@ -181,6 +181,29 @@ test('unverified database exit retains the lease rather than offering live ports
   h.held().release(h.owner); h.assertReleased();
 });
 
+test('unsettled process callback retains the lease even after direct child cleanup', async t => {
+  const h = harness(t);
+  h.deps.processRunner = async () => ({ groupAliveAfter: false, directChildClosed: true, directChildReaped: true,
+    barrier: { settled: false, status: 'aborted' } });
+  h.deps.runCrash = async context => { await context.runProcess({}); return { passed: false }; };
+  const result = await verifyRuntime(h.options, h.deps);
+  assert.equal(result.leaseRelease.released, false);
+  h.held().release(h.owner); h.assertReleased();
+});
+
+test('an outstanding nested invocation cannot disappear from lease accounting', async t => {
+  const h = harness(t); let finish;
+  const pending = new Promise(resolve => { finish = resolve; });
+  h.deps.processRunner = () => pending;
+  let invocation;
+  h.deps.runCrash = async context => { invocation = context.runProcess({}); return { passed: false }; };
+  const result = await verifyRuntime(h.options, h.deps);
+  assert.equal(result.leaseRelease.released, false);
+  finish({ groupAliveAfter: false, directChildClosed: true, directChildReaped: true, barrier: { settled: true } });
+  await invocation;
+  h.held().release(h.owner); h.assertReleased();
+});
+
 test('an unreaped process receipt retains the lease on failure', async t => {
   const h = harness(t);
   h.deps.processRunner = async () => ({ groupAliveAfter: true, directChildClosed: true, directChildReaped: true });

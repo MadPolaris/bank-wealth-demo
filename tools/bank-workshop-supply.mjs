@@ -4,6 +4,8 @@ import { spawn } from 'node:child_process';
 import { accessSync, constants, createReadStream, existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { basename, dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { captureEvidenceFile } from '../../metarch-truthsrc/lib/verification/files.mjs';
+import { safePath } from './truthsrc-evidence.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const TOOL = resolve(ROOT, '../metarch-truthsrc');
@@ -28,6 +30,7 @@ export function nodeSupported(version = process.versions.node) {
 // Match the bank build path contract, including aliases in existing ancestors.
 // Missing ancestors are allowed only for a planned path, never for an input.
 export function checkedPath(file, kind = 'file') {
+  if (kind !== 'planned') return safePath(file, kind);
   assert.ok(typeof file === 'string' && isAbsolute(file) && resolve(file) === file &&
     /^\/(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]+$/.test(file) && !file.split('/').includes('.scratch'), 'canonical plain absolute path required');
   let current = '/';
@@ -54,8 +57,8 @@ export function newRunPath(run, root = ROOT, existing = false) {
 
 export function readJson(file) {
   checkedPath(file);
-  assert.ok(lstatSync(file).size <= 32 * 1024 * 1024, 'JSON input too large');
-  return JSON.parse(readFileSync(file, 'utf8'));
+  return captureEvidenceFile(file, { limit: 32 * 1024 * 1024,
+    parse: bytes => JSON.parse(bytes.toString('utf8')) }).value;
 }
 
 export async function fileReference(file) {

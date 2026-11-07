@@ -3,7 +3,8 @@ import { createHash } from 'node:crypto';
 import { lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseStrictJson } from '../../metarch-truthsrc/lib/strict-json.mjs';
+import { parseWorkerTranscript, validateWorkerLifecycle } from '../../metarch-truthsrc/lib/verification/worker-evidence.mjs';
+import { captureRuntimeFile } from './truthsrc-evidence.mjs';
 import { canonicalJson, digest } from '../simulator/contract.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,10 +21,12 @@ export const ACTOR_SUITES = [
 export const ACTOR_WORKER = join(ROOT, 'tools/truthsrc-actor-ta-worker.mjs');
 export const ACTOR_FIXTURE = join(ROOT, 'test/fixtures/truthsrc-actor-ta.json');
 export const ACTOR_SUPPORT = [
-  'tools/truthsrc-actor-tests.mjs', 'tools/truthsrc-actor-ta-worker.mjs',
+  'tools/truthsrc-actor-tests.mjs', 'tools/truthsrc-actor-ta-worker.mjs', 'tools/truthsrc-evidence.mjs',
   'simulator/mock-ta-core.mjs', 'simulator/contract.mjs', 'simulator/journal.mjs',
   'test/fixtures/truthsrc-actor-ta.json',
-].map(file => join(ROOT, file)).concat(join(ROOT, '../metarch-truthsrc/lib/strict-json.mjs'));
+].map(file => join(ROOT, file)).concat([
+  'lib/strict-json.mjs', 'lib/immutable-data.mjs', 'lib/verification/files.mjs', 'lib/verification/worker-evidence.mjs',
+].map(file => join(ROOT, '../metarch-truthsrc', file)));
 export const ACTOR_READ_DENIALS = ['tree', 'v1/tree', '.scratch', 'dist/v1', 'tools/truth-source.mjs'].map(file => join(ROOT, file));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const refundPhases = ['prepare', 'collection-commit', 'investor-commit'];
@@ -87,16 +90,6 @@ print('TRUTHSRC-ACTOR-SANDBOX-OK')
 `;
 }
 
-function regular(file) {
-  const stat = lstatSync(file);
-  assert.ok(stat.isFile() && !stat.isSymbolicLink() && stat.nlink === 1 && realpathSync(file) === file, 'regular owned worker evidence required');
-  return readFileSync(file);
-}
-function records(file) {
-  const text = regular(file).toString('utf8');
-  assert.ok(text.length > 0 && text.endsWith('\n'), 'complete worker JSONL required');
-  return text.slice(0, -1).split('\n').map(line => parseStrictJson(line));
-}
 export function verifyActorWorkers(actor, alive = pid => {
   try { process.kill(pid, 0); return true; }
   catch (error) { if (error.code === 'ESRCH') return false; throw error; }
@@ -113,29 +106,26 @@ export function verifyActorWorkers(actor, alive = pid => {
     assert.ok(!entries.some(file => file.endsWith('.lock')), 'owned TA journal lock remains');
     assert.ok(entries.every(file => file === 'ta.jsonl' || /^worker(?:-reopened-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})?\.(?:jsonl|stderr\.log)$/.test(file) ||
       /^ta-worker-[0-9]+\.json$/.test(file)), 'unknown TA output file');
-    const receipts = entries.filter(file => /^ta-worker-[0-9]+\.json$/.test(file)).map(file => parseStrictJson(regular(join(root, file))));
+    const receipts = new Map(entries.filter(file => /^ta-worker-[0-9]+\.json$/.test(file))
+      .map(file => [file, captureRuntimeFile(join(root, file), { json: true }).value]));
     const transcripts = entries.filter(file => /^worker(?:-reopened-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})?\.jsonl$/.test(file));
     assert.ok(transcripts.includes('worker.jsonl'));
-    assert.equal(receipts.length, transcripts.length, 'worker lifecycle receipt missing');
+    assert.equal(receipts.size, transcripts.length, 'worker lifecycle receipt missing');
     for (const file of transcripts) {
-      const rows = records(join(root, file)), starts = rows.filter(row => row.kind === 'worker-started'), ends = rows.filter(row => row.kind === 'worker-exited');
-      assert.equal(starts.length, 1); assert.equal(ends.length, 1);
-      const pid = starts[0].pid, end = ends[0];
-      assert.ok(Number.isSafeInteger(pid) && pid > 0);
-      assert.equal(end.pid, pid); assert.equal(end.waited, true); assert.equal(end.exitCode, 0);
+      const rows = parseWorkerTranscript(captureRuntimeFile(join(root, file)).value);
+      const pid = rows[0].pid;
+      const { receipt } = validateWorkerLifecycle({ rows, receipt: receipts.get(`ta-worker-${pid}.json`),
+        expectedReceipt: { schemaVersion: 'bank.truthsrc-actor-ta-worker/v1', pid, closed: true,
+          journalPath: join(root, 'ta.jsonl'), ownedRoot: root, roundRoot: actor.ownedRoot,
+          configSha256: actor.configSha256, fixtureSha256: actor.fixtureSha256, configurationDigest: actor.configurationDigest },
+        requireSuccessfulCloseExchange: true });
       assert.equal(alive(pid), false, 'TA worker remains alive');
-      const receipt = receipts.find(row => row.pid === pid);
-      assert.equal(receipt?.schemaVersion, 'bank.truthsrc-actor-ta-worker/v1');
-      assert.equal(receipt.closed, true); assert.equal(receipt.journalPath, join(root, 'ta.jsonl'));
-      assert.equal(receipt.ownedRoot, root); assert.equal(receipt.roundRoot, actor.ownedRoot);
-      assert.equal(receipt.configSha256, actor.configSha256); assert.equal(receipt.fixtureSha256, actor.fixtureSha256);
-      assert.equal(receipt.configurationDigest, actor.configurationDigest);
-      assert.ok(rows.some(row => row.op === 'close') && rows.some(row => row.ok === true && row.result?.closed === true), 'worker graceful close exchange missing');
-      const stderr = regular(join(root, file.replace(/\.jsonl$/, '.stderr.log')));
-      assert.equal(stderr.length, 0, 'TA worker stderr must be empty');
+      const stderr = captureRuntimeFile(join(root, file.replace(/\.jsonl$/, '.stderr.log')));
+      assert.equal(stderr.bytes, 0, 'TA worker stderr must be empty');
       pids.push(pid); workers.push({ pid, transcript: join(root, file), receipt });
     }
-    const journal = join(root, 'ta.jsonl'), events = records(journal);
+    const journal = join(root, 'ta.jsonl'), capturedJournal = captureRuntimeFile(journal);
+    const events = parseWorkerTranscript(capturedJournal.value);
     let previousHash = null;
     const requests = new Set();
     for (const [index, row] of events.entries()) {
@@ -150,7 +140,7 @@ export function verifyActorWorkers(actor, alive = pid => {
       }
     }
     assert.equal(events[0].event.kind, 'Initialized');
-    journals.push({ file: journal, records: events.length, submissions: requests.size, sha256: hash(regular(journal)) });
+    journals.push({ file: journal, records: events.length, submissions: requests.size, sha256: capturedJournal.sha256 });
   }
   assert.equal(pids.length, 16, 'expected one additional worker reopen in delayed TA test');
   assert.equal(new Set(pids).size, pids.length, 'reused worker pid');

@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { closeSync, constants, fstatSync, lstatSync, openSync, readlinkSync, readSync, realpathSync } from 'node:fs';
+import { lstatSync, readlinkSync, realpathSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MAX_JSON_BYTES, parseStrictJson } from '../../metarch-truthsrc/lib/strict-json.mjs';
-import { admitCandidate, actualBuildSourceRoot, compareBuildSources, fileDigest, inventory, safePath, succeeded } from './verify-truthsrc-build.mjs';
+import { BUILD_SUPPORT, admitCandidate, actualBuildSourceRoot, compareBuildSources, fileDigest, inventory, succeeded } from './verify-truthsrc-build.mjs';
+import { captureRuntimeFile, safePath } from './truthsrc-evidence.mjs';
+
+export { captureRuntimeFile } from './truthsrc-evidence.mjs';
 import { RUNTIME_MANIFEST_FILE, RUNTIME_MAINS, completeRuntimeCompilation, inspectRuntimeCompilation, runtimeBuildTasks, runtimeClasspathInventory, runtimeTestManifest } from './truthsrc-runtime-tests.mjs';
 import { jarManifestProbeSource, validateJarReferences, assertJarReferencesUnchanged } from './truthsrc-runtime-jars.mjs';
 
@@ -22,29 +25,13 @@ const within = (root, file) => file.startsWith(root + '/');
 const equal = (actual, expected, label) => assert.deepEqual(actual, expected, label);
 const keys = (value, expected, label) => equal(Object.keys(value).sort(), [...expected].sort(), label);
 const freeze = value => { if (value && typeof value === 'object') { Object.values(value).forEach(freeze); Object.freeze(value); } return value; };
-const identity = stat => [stat.dev, stat.ino, stat.size, stat.mtimeMs, stat.ctimeMs, stat.nlink];
-
-// Hash and parse the SAME bounded buffer; reject links, aliases, short reads and replacement during capture.
-export function captureRuntimeFile(file, { json = false, limit = MAX_JSON_BYTES } = {}) {
-  safePath(file, 'file'); assert.equal(realpathSync(file), file);
-  const fd = openSync(file, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
-  try {
-    const stat = fstatSync(fd);
-    const systemPythonLauncher = file === '/usr/bin/python3' && stat.uid === 0 && (stat.mode & 0o022) === 0;
-    assert.ok(stat.isFile() && (stat.nlink === 1 || systemPythonLauncher) && stat.size <= limit, 'bounded regular non-hardlinked file required: ' + file);
-    const bytes = Buffer.alloc(stat.size); let offset = 0;
-    while (offset < bytes.length) { const n = readSync(fd, bytes, offset, bytes.length - offset, null); assert.ok(n > 0, 'short input'); offset += n; }
-    assert.equal(readSync(fd, Buffer.alloc(1), 0, 1, null), 0, 'input grew');
-    equal(identity(fstatSync(fd)), identity(stat), 'input changed during read');
-    safePath(file, 'file'); equal(identity(lstatSync(file)), identity(stat), 'input path replaced');
-    return { bytes: bytes.length, sha256: hash(bytes), value: json ? parseStrictJson(bytes) : bytes };
-  } finally { closeSync(fd); }
-}
 const fingerprint = ({ bytes, sha256 }) => ({ bytes, sha256 });
 const snapshot = files => Object.fromEntries(files.map(file => [file, fingerprint(captureRuntimeFile(file, { limit: 512 * 1024 * 1024 }))]));
 const RUNTIME_SUPPORT = [RUNTIME_MANIFEST_FILE, join(ROOT, 'tools/truthsrc-runtime-jars.mjs')];
 const SUPPORT = [fileURLToPath(import.meta.url), VERIFIER, ...RUNTIME_SUPPORT, join(ROOT, 'tools/truthsrc-actor-tests.mjs'),
-  join(TOOL, 'lib/strict-json.mjs'), join(TOOL, 'lib/products/request.mjs'), join(TOOL, 'bin/truthsrc.js'), join(TOOL, 'package.json')];
+  join(ROOT, 'tools/truthsrc-evidence.mjs'),
+  ...['strict-json', 'immutable-data', 'verification/files', 'verification/worker-evidence', 'products/request']
+    .map(name => join(TOOL, 'lib', name + '.mjs')), join(TOOL, 'bin/truthsrc.js'), join(TOOL, 'package.json')];
 const loadedSupport = snapshot(SUPPORT);
 
 function checkProcess(receipt) {
@@ -194,6 +181,7 @@ export async function admitRuntimeBuild(buildEvidence) {
   for (const root of [output, actualRoot, javaHome, TOOL, HAND, LOCAL]) { safePath(root); assert.equal(realpathSync(root), root); }
   const toolchain = [java, join(javaHome, 'bin/javac'), join(javaHome, 'release'), '/usr/bin/python3', '/usr/bin/sandbox-exec'];
   keys(input.toolchain, toolchain); equal(input.verifier, { file: VERIFIER, sha256: loadedSupport[VERIFIER].sha256 });
+  equal(input.verifierSupport, snapshot(BUILD_SUPPORT), 'build file-evidence helpers changed');
   const node = safePath(realpathSync(process.execPath), 'file'), tools = snapshot([...toolchain, node]);
   for (const file of toolchain) assert.equal(tools[file].sha256, input.toolchain[file], 'build toolchain changed: ' + file);
   const release = read(join(javaHome, 'release'), false).toString('utf8');

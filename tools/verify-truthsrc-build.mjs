@@ -8,6 +8,9 @@ import {
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
+import { safePath } from './truthsrc-evidence.mjs';
+
+export { safePath } from './truthsrc-evidence.mjs';
 import {
   ACTOR_FIXTURE, ACTOR_READ_DENIALS, ACTOR_SUPPORT, ACTOR_WORKER, actorOwnedRoot, actorReadProbeSource,
   actorSuiteNames, actorTestManifest, combineActorManifest, verifyActorWorkers,
@@ -70,6 +73,9 @@ network resolution, runtime rebuild/publish, or historical acceptance runner.`;
 
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const READSIDE_HELPER_SHA256 = fileDigest(READSIDE_MANIFEST_FILE);
+export const BUILD_SUPPORT = Object.freeze([join(ROOT, 'tools/truthsrc-evidence.mjs'),
+  ...['verification/files', 'immutable-data', 'strict-json'].map(name => join(TOOL, 'lib', name + '.mjs'))]);
+const loadedBuildSupport = snapshotFiles(BUILD_SUPPORT);
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const save = (file, value) => writeFileSync(file, json(value), { flag: 'wx', mode: 0o600 });
 const write = (file, text) => writeFileSync(file, text, { flag: 'wx', mode: 0o600 });
@@ -256,28 +262,6 @@ export function isMainModule(argv, moduleUrl) {
   if (!argv) return false;
   try { return pathToFileURL(realpathSync(argv)).href === pathToFileURL(realpathSync(fileURLToPath(moduleUrl))).href; }
   catch { return pathToFileURL(resolve(argv)).href === moduleUrl; }
-}
-
-export function safePath(file, kind = 'directory') {
-  assert.ok(typeof file === 'string' && isAbsolute(file) && resolve(file) === file &&
-    /^\/(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]+$/.test(file), 'canonical plain absolute path required: ' + file);
-  assert.ok(!file.split('/').some(part => ['.', '..', '.scratch'].includes(part)), 'forbidden path component: ' + file);
-  let current = '/';
-  const parts = file.slice(1).split('/');
-  for (const [i, part] of parts.entries()) {
-    const matches = readdirSync(current).filter(name => fold(name) === fold(part));
-    const leaf = i === parts.length - 1;
-    if (leaf && kind === 'new') {
-      assert.equal(matches.length, 0, 'destination already exists or aliases another path: ' + file);
-      return file;
-    }
-    assert.deepEqual(matches, [part], 'missing path or filesystem alias: ' + join(current, part));
-    current = join(current, part);
-    const stat = lstatSync(current);
-    assert.ok(!stat.isSymbolicLink(), 'symlink path forbidden: ' + current);
-    assert.ok(leaf && kind === 'file' ? stat.isFile() : stat.isDirectory(), 'unexpected path type: ' + current);
-  }
-  return file;
 }
 
 export function fileDigest(file) {
@@ -859,6 +843,7 @@ async function verify(options) {
   const phases = result.phases;
   try {
     verifierBefore = { file: fileURLToPath(import.meta.url), sha256: fileDigest(fileURLToPath(import.meta.url)) };
+    assert.deepEqual(snapshotFiles(BUILD_SUPPORT), loadedBuildSupport, 'loaded file-evidence helpers changed');
     for (const name of CACHE_DIRS) mkdirSync(join(evidence, name), { mode: 0o700 });
     cachesBefore = Object.fromEntries(CACHE_DIRS.map(name => [name, inventory(join(evidence, name))]));
     const initiallyEmpty = Object.fromEntries(CACHE_DIRS.map(name => [name, Object.keys(cachesBefore[name]).length === 0]));
@@ -898,6 +883,7 @@ async function verify(options) {
       generator: admitted.generator, sources: admitted.captured.sources, archiveSha256: ARCHIVE_SHA,
       toolchain: Object.fromEntries([java, javac, join(javaHome, 'release'), PYTHON, SANDBOX].map(file => [file, fileDigest(file)])),
       initiallyEmpty, compilerBridgePrefill: false, inheritedEnvironment: false, env, verifier: verifierBefore,
+      verifierSupport: loadedBuildSupport,
       testFiles: compileTests ? admitted.testFiles : [], testManifest: runTests ? executionManifest : null,
       runtimeManifest: runtimeManifest ?? null,
       ...(runReadside ? { readsideManifest, readsideInputs: readsideBefore } : {}),
@@ -1105,6 +1091,7 @@ async function verify(options) {
     }
     try {
       assert.ok(verifierBefore, 'verifier baseline unavailable');
+      assert.deepEqual(snapshotFiles(BUILD_SUPPORT), loadedBuildSupport, 'file-evidence helpers changed during execution');
       result.checks.verifierUnchanged = fileDigest(verifierBefore.file) === verifierBefore.sha256;
       assert.ok(result.checks.verifierUnchanged, 'verifier changed during execution');
     } catch (error) { result.checks.verifierUnchanged = false; result.errors.push(error.message); }

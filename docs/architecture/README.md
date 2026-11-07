@@ -4,6 +4,8 @@
 
 ## 从作者到运行
 
+内容来源、所有一级目录与实际构建顺序见[构建配方](../BUILD-RECIPE.md)；全部工具逐文件职责与公共机制消费见[TOOLING-OWNERSHIP.json](TOOLING-OWNERSHIP.json)。该清单是显式工程声明，不是另一棵业务真源，也不认证任意动态调用或完整银行服务。
+
 ```text
 truthsrc.project.json + truth/bank-wealth/ + bindings/implementation/
   → 公共编译 / 14语义产品 / 知识图导出AST

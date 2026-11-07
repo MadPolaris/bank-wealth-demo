@@ -6,6 +6,9 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { RUNTIME_NETWORK_SCOPE, RUNTIME_NETWORK_LIMITATION, runtimeProbeSource, runtimeSandboxText, validateRuntimeSandboxPaths } from '../tools/truthsrc-runtime-sandbox.mjs';
+import { processEvidencePaths, runRuntimeProcess } from '../tools/truthsrc-runtime-process.mjs';
+import { sessionCompilePlan } from '../tools/bank-workshop-session.mjs';
+import { createHash } from 'node:crypto';
 
 const BANK = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const TEMP = realpathSync(tmpdir());
@@ -27,6 +30,30 @@ function fixture() {
   return { round, profile, probe, config, credentials, compiled, canary,
     spec: { evidence, taRoot, readOnlyFiles: [config, credentials, profile, probe, compiled], httpPort: 19481, databasePorts: [29481, 29482] } };
 }
+
+test('runtime and launcher policies deny child writes to reserved process evidence', { skip: !sandboxAvailable, timeout: 15000 }, async t => {
+  const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+  const check = async (cwd, profile, policy, base) => {
+    write(profile, policy);
+    const files = Object.values(processEvidencePaths(base));
+    const source = `const fs = require('fs'); for (const file of JSON.parse(process.env.EVIDENCE_FILES)) {
+      let denied = false;
+      try { fs.appendFileSync(file, 'untrusted-write'); } catch (error) { denied = ['EPERM', 'EACCES'].includes(error.code); }
+      if (!denied) throw new Error('supervisor evidence was writable');
+    } process.stdout.write('EVIDENCE-WRITES-DENIED\\n');`;
+    const receipt = await runRuntimeProcess({ executable: realpathSync(process.execPath), args: ['-e', source], cwd,
+      env: { HOME: cwd, TMPDIR: cwd, PATH: '/usr/bin:/bin', EVIDENCE_FILES: JSON.stringify(files) }, base, timeoutMs: 3000,
+      sandbox: { executable: '/usr/bin/sandbox-exec', profile, profileSha256: hash(policy) }, signal: t.signal });
+    assert.equal(receipt.passed, true); assert.equal(readFileSync(receipt.paths.stdout, 'utf8'), 'EVIDENCE-WRITES-DENIED\n');
+  };
+  const f = fixture(), base = join(f.spec.evidence, 'process');
+  const spec = { ...f.spec, readOnlyFiles: [...f.spec.readOnlyFiles, ...Object.values(processEvidencePaths(base))] };
+  await check(f.spec.evidence, f.profile, runtimeSandboxText(spec), base);
+  const session = mkdtempSync(join(TEMP, 'session-evidence-policy-'));
+  const plan = sessionCompilePlan({ admitted: { buildEvidence: '/synthetic/build', classpath: ['/synthetic/classes'] }, session, sourceSha256: 'a'.repeat(64) });
+  mkdirSync(plan.build); write(plan.source, 'synthetic Scala source, not executed');
+  await check(plan.build, join(plan.build, 'sandbox.sb'), plan.profile, join(plan.build, 'compile'));
+});
 
 test('pure rendering is deterministic, does not mutate input or create output', () => {
   const spec = options(), before = structuredClone(spec), files = readdirSync(TEMP);

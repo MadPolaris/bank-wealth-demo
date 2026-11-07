@@ -220,6 +220,19 @@ test('unverified worker or database shutdown retains the owner lease and all fai
   h.held().assertHeld(); h.held().release(h.owner); h.assertReleased();
 });
 
+test('unreaped launcher helper retains the owner lease before any foreground server exists', async t => {
+  const h = harness(t);
+  h.ops.runProcess = async () => ({ passed: false, groupAliveAfter: true, directChildClosed: false,
+    directChildReaped: false, barrier: { settled: true } });
+  h.ops.compile = async ({ runProcess }) => {
+    const receipt = await runProcess({}); assert.equal(receipt.passed, true);
+  };
+  const result = await h.start();
+  assert.equal(result.status, 'blocked'); assert.equal(result.checks.resourcesExited, false);
+  assert.equal(result.leaseReleased, false); assert.equal(h.calls.includes('launch'), false);
+  h.held().release(h.owner); h.assertReleased();
+});
+
 test('no resume and no accepted-run owner reuse', async t => {
   const h = harness(t);
   mkdirSync(h.session, { mode: 0o700 });

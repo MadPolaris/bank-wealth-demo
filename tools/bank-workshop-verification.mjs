@@ -7,6 +7,9 @@ import {
   ROOT, TOOL, STAGES, DEFAULT_JAVA_HOME, ARCHIVE_SHA256, captureCurrent, captureSupply, checkedPath,
   doctor, fileReference, jsonText, leaseMetadata, newRunPath, readJson, requestedStages, sha256, within,
 } from './bank-workshop-supply.mjs';
+import { captureRuntimeFile } from './truthsrc-evidence.mjs';
+import { inspectRuntimeWorker } from './truthsrc-worker-evidence.mjs';
+import { inspectRuntimeProcessEvidence } from './truthsrc-runtime-process.mjs';
 
 export const CONTRACT = 'bank.workshop-verification/v1';
 // These are selectors, not copies of financial rules/oracles. Qualified identities
@@ -100,6 +103,7 @@ export async function inspectBuild({ mode, output, evidence, source }) {
   same(Object.keys(input.toolchain).sort(), toolchain.sort());
   for (const file of toolchain) { b.safePath(file, 'file'); assert.equal(b.fileDigest(file), input.toolchain[file], 'build toolchain changed'); }
   same(input.verifier, { file: join(ROOT, 'tools/verify-truthsrc-build.mjs'), sha256: b.fileDigest(join(ROOT, 'tools/verify-truthsrc-build.mjs')) });
+  same(input.verifierSupport, b.snapshotFiles(b.BUILD_SUPPORT), 'build file-evidence helpers changed');
   requirePassed(actual.passed); b.succeeded(process); same(result.phases.build, process);
   assert.equal(sha256(stdout), process.stdoutSha256);
   assert.equal(sha256(readFileSync(join(evidence, 'build.stderr.log'))), process.stderrSha256);
@@ -178,13 +182,16 @@ export async function inspectService({ evidence, buildEvidence, lease, round }) 
   assert.equal(result.leaseRelease.reusable, false);
   for (const key of ['runtimeRebuilt', 'runtimePublished', 'release1134Resigned']) assert.equal(result[key], false);
   const refs = new Map();
-  const reference = async file => {
-    const ref = await fileReference(file);
-    if (refs.has(file)) same(ref, refs.get(file), 'evidence changed during inspection');
-    refs.set(file, ref); return ref;
+  const retainReference = ref => {
+    if (refs.has(ref.file)) same(ref, refs.get(ref.file), 'evidence changed during inspection');
+    refs.set(ref.file, ref); return ref;
   };
-  const { parseStrictJson } = await import('../../metarch-truthsrc/lib/strict-json.mjs');
-  const rawJson = async file => { await reference(file); return parseStrictJson(readFileSync(file)); };
+  const reference = async file => retainReference(await fileReference(file));
+  const rawJson = async file => {
+    const captured = captureRuntimeFile(file, { json: true, limit: 32 * 1024 * 1024 });
+    retainReference({ file, bytes: captured.bytes, sha256: captured.sha256 });
+    return captured.value;
+  };
   const configFile = join(round, 'runtime-ta.json'), fixtureFile = join(ROOT, 'test/fixtures/truthsrc-actor-ta.json');
   const config = await rawJson(configFile), configRef = refs.get(configFile), fixtureRef = await reference(fixtureFile);
   same(config, { schemaVersion: 'bank.truthsrc-runtime-ta/v1', ownedRoot: round,
@@ -192,55 +199,16 @@ export async function inspectService({ evidence, buildEvidence, lease, round }) 
   for (const ref of [configRef, fixtureRef, await reference(lease)]) {
     same(inputs.runtime[ref.file], { bytes: ref.bytes, sha256: ref.sha256 }, 'required runtime input is not sealed');
   }
-  const validPid = pid => assert.ok(Number.isSafeInteger(pid) && pid > 1, 'recorded child PID required');
-  // Static attestation only. Never call checkRuntimeWorker: a historical PID may
-  // now belong to an unrelated process, and report must not probe or wait for it.
   const workerEvidence = async (root, invocation, embedded, crash = false) => {
-    const transcript = join(invocation, 'worker.jsonl'), ref = await reference(transcript);
-    const bytes = readFileSync(transcript, 'utf8');
-    assert.ok(bytes.endsWith('\n'), 'complete worker transcript required');
-    const rows = bytes.trimEnd().split('\n').map(line => parseStrictJson(line));
-    const starts = rows.filter(row => row.kind === 'worker-started'), exits = rows.filter(row => row.kind === 'worker-exited');
-    assert.equal(starts.length, 1); const pid = starts[0].pid; validPid(pid);
-    assert.equal(existsSync(join(root, 'ta.jsonl.lock')), false, 'worker lock remains; never remove it');
-    const receipt = await rawJson(join(root, `ta-worker-${pid}.json`));
-    same([receipt.schemaVersion, receipt.pid, receipt.closed, receipt.journalPath, receipt.roundRoot, receipt.ownedRoot,
-      receipt.configSha256, receipt.fixtureSha256],
-    ['bank.truthsrc-runtime-ta-worker/v1', pid, true, join(root, 'ta.jsonl'), round, root, configRef.sha256, fixtureRef.sha256]);
-    assert.match(receipt.configurationDigest, /^[a-f0-9]{64}$/);
-    if (crash) assert.equal(exits.length, 0, 'killed JVM cannot attest worker wait');
-    else {
-      assert.equal(exits.length, 1);
-      same([exits[0].pid, exits[0].exitCode, exits[0].waited], [pid, 0, true]);
-      assert.ok(rows.some(row => row.op === 'close') && rows.some(row => row.result?.closed === true));
-    }
-    assert.equal((await reference(join(invocation, 'worker.stderr.log'))).bytes, 0, 'worker stderr must be empty');
-    same(embedded, { pid, absent: true, cleanCloseReceipt: receipt, jvmWaited: !crash, transcriptSha256: ref.sha256 },
-      'embedded worker differs from its transcript/close receipt');
-    return pid;
+    const inspected = inspectRuntimeWorker({ root, transcript: join(invocation, 'worker.jsonl'), round,
+      configSha256: configRef.sha256, fixtureSha256: fixtureRef.sha256, crash, embedded });
+    inspected.references.forEach(retainReference);
+    return inspected.worker.pid;
   };
   const processEvidence = async (base, embedded, expectedSignal = null) => {
-    const receipt = await rawJson(base + '.json');
-    if (embedded) same(receipt, embedded, 'embedded process differs from its exclusive receipt');
-    assert.equal(receipt.schemaVersion, 'bank.truthsrc-runtime-process/v1'); requirePassed(receipt.passed); validPid(receipt.pid);
-    same([receipt.status, receipt.code, receipt.signal, receipt.expectedSignal, receipt.expectedTermination],
-      ['passed', expectedSignal ? null : 0, expectedSignal, expectedSignal, true]);
-    same([receipt.launchError, receipt.timedOut, receipt.cancelled, receipt.leftoverGroup, receipt.terminationErrors,
-      receipt.outputLimitExceeded, receipt.outputError], [null, false, null, false, [], false, false]);
-    requirePassed(receipt.barrier?.settled);
-    assert.ok(['passed', 'not-requested'].includes(receipt.barrier.status));
-    if (expectedSignal) {
-      assert.equal(receipt.barrier.status, 'passed');
-      assert.ok(receipt.mainSignals.some(row => row.sent && row.signal === expectedSignal));
-    }
-    same(receipt.paths, { stdout: base + '.stdout.log', stderr: base + '.stderr.log', receipt: base + '.json' });
-    requirePassed(receipt.directChildClosed); requirePassed(receipt.directChildReaped); assert.equal(receipt.groupAliveAfter, false);
-    requirePassed(receipt.sandboxProfileUnchanged);
-    assert.equal((await reference(receipt.sandboxProfile)).sha256, receipt.sandboxProfileSha256);
-    for (const [suffix, key] of [['stdout.log', 'stdoutSha256'], ['stderr.log', 'stderrSha256']]) {
-      assert.equal((await reference(base + '.' + suffix)).sha256, receipt[key]);
-    }
-    return receipt;
+    const inspected = inspectRuntimeProcessEvidence(base, { expectedSignal, ...(embedded === undefined ? {} : { embedded }) });
+    inspected.references.forEach(retainReference);
+    return inspected.receipt;
   };
   const { RUNTIME_NETWORK_SCOPE, RUNTIME_NETWORK_LIMITATION } = await import('./truthsrc-runtime-sandbox.mjs');
   const boundaryEvidence = async (directory, networkScope, required = []) => {

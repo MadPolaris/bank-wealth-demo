@@ -2,49 +2,14 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { setTimeout as delay } from 'node:timers/promises';
 import { parseStrictJson } from '../../metarch-truthsrc/lib/strict-json.mjs';
+import { checkRuntimeWorker } from './truthsrc-worker-evidence.mjs';
+export { checkRuntimeWorker } from './truthsrc-worker-evidence.mjs';
 import { crashCases, sipCrashCases, validateChildReport, compareRecoveryEvidence } from './v1-crash-recovery.mjs';
 
 export const CRASH_CASES = crashCases;
 const save = (file, value) => writeFileSync(file, JSON.stringify(value, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
 const json = file => parseStrictJson(readFileSync(file));
-const sha = file => createHash('sha256').update(readFileSync(file)).digest('hex');
-const alive = pid => {
-  try { process.kill(pid, 0); return true; }
-  catch (error) { if (error.code === 'ESRCH') return false; throw error; }
-};
-
-export async function checkRuntimeWorker({ root, transcript, round, configSha256, fixtureSha256, crash = false }) {
-  const bytes = readFileSync(transcript, 'utf8');
-  assert.ok(bytes.endsWith('\n'), 'complete worker transcript required');
-  const rows = bytes.trimEnd().split('\n').map(row => parseStrictJson(row));
-  const starts = rows.filter(row => row.kind === 'worker-started'), exits = rows.filter(row => row.kind === 'worker-exited');
-  assert.equal(starts.length, 1);
-  const pid = starts[0].pid;
-  assert.ok(Number.isSafeInteger(pid) && pid > 1);
-  const deadline = Date.now() + 10_000;
-  while (alive(pid) && Date.now() < deadline) await delay(100);
-  assert.equal(alive(pid), false, 'TA worker remains alive; successor forbidden');
-  assert.equal(existsSync(join(root, 'ta.jsonl.lock')), false, 'TA worker retained its lock; no forced removal');
-  const receipt = json(join(root, `ta-worker-${pid}.json`));
-  assert.equal(receipt.schemaVersion, 'bank.truthsrc-runtime-ta-worker/v1');
-  assert.equal(receipt.closed, true);
-  assert.equal(receipt.pid, pid);
-  assert.equal(receipt.journalPath, join(root, 'ta.jsonl'));
-  assert.equal(receipt.roundRoot, round);
-  assert.equal(receipt.ownedRoot, root);
-  assert.equal(receipt.configSha256, configSha256);
-  assert.equal(receipt.fixtureSha256, fixtureSha256);
-  if (!crash) {
-    assert.equal(exits.length, 1); assert.equal(exits[0].pid, pid);
-    assert.equal(exits[0].exitCode, 0); assert.equal(exits[0].waited, true);
-    assert.ok(rows.some(row => row.op === 'close') && rows.some(row => row.result?.closed === true));
-  } else assert.equal(exits.length, 0, 'killed JVM cannot report waiting for its worker');
-  const stderr = transcript.replace(/\.jsonl$/, '.stderr.log');
-  assert.equal(readFileSync(stderr).length, 0, 'worker stderr must be empty');
-  return { pid, absent: true, cleanCloseReceipt: receipt, jvmWaited: !crash, transcriptSha256: sha(transcript) };
-}
 
 export async function runRuntimeCrashCases({ admitted, evidence, round, node, worker, taConfig, taConfigSha256,
   fixtureSha256, env, sandbox, runProcess, recheck }) {

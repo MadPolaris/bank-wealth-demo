@@ -33,6 +33,7 @@ node tools/truthsrc-project.mjs compile
 
 接下来按目标选择：
 
+- **内容哪里来、先构建什么：**[构建配方](docs/BUILD-RECIPE.md)，区分业务输入、手写实现、公共加工、全部一级目录和工具归属。
 - **从零学工具：**[Counter教程](../metarch-truthsrc/TUTORIAL.md)，在独立小项目练习，不改银行金融规则。
 - **看懂业务与代码：**[银行真源教程](docs/TRUTH-TUTORIAL.md)，生成、离线图、精确区间反查与安全更新。
 - **逐层核验：**[银行工作坊](docs/BANK-WORKSHOP.md)，source / anchors / code / service分别报告。

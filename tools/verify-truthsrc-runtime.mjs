@@ -9,8 +9,9 @@ import { admitRuntimeBuild } from './truthsrc-runtime-admission.mjs';
 import { acquireRuntimeLease, assertRuntimePortFree as freePort } from './truthsrc-runtime-lease.mjs';
 import { fileDigest, inventory, isMainModule, safePath, snapshotFiles } from './verify-truthsrc-build.mjs';
 import { runtimeSandboxText, runtimeProbeSource, validateRuntimeSandboxPaths, RUNTIME_NETWORK_SCOPE, RUNTIME_NETWORK_LIMITATION } from './truthsrc-runtime-sandbox.mjs';
-import { runRuntimeProcess } from './truthsrc-runtime-process.mjs';
-import { runRuntimeCrashCases, checkRuntimeWorker } from './truthsrc-runtime-crash.mjs';
+import { processEvidencePaths, runRuntimeProcess } from './truthsrc-runtime-process.mjs';
+import { CRASH_CASES, runRuntimeCrashCases } from './truthsrc-runtime-crash.mjs';
+import { checkRuntimeWorker } from './truthsrc-worker-evidence.mjs';
 import { OwnedRuntimeDatabases } from './truthsrc-runtime-databases.mjs';
 import { issueRuntimeCredentials, productionConfiguration } from './truthsrc-runtime-config.mjs';
 import { exerciseProductionHttp, exerciseTransportAuth } from './truthsrc-runtime-http.mjs';
@@ -59,15 +60,18 @@ function baseEnvironment(evidence, javaHome) {
     PATH: join(javaHome, 'bin') + ':/usr/bin:/bin', LANG: 'en_US.UTF-8', NODE_V8_COVERAGE: '' };
 }
 
-async function boundary({ root, writeRoot, round, httpPort, immutable, readOnlyRoots = [], env, network = false, databases = [], processRunner = runRuntimeProcess }) {
+async function boundary({ root, writeRoot, round, httpPort, immutable, readOnlyRoots = [], protectedEvidence = [], env, network = false, databases = [], processRunner = runRuntimeProcess }) {
   mkdirSync(root, { mode: 0o700 });
   const profile = join(root, 'runtime-sandbox.sb'), probe = join(root, 'runtime-probe.py');
   const canaryRoot = mkdtempSync(join(ROOT, 'target/truthsrc-runtime-canary-')), canary = join(canaryRoot, 'unchanged');
   write(canary, 'owned immutable outside canary\n');
   const options = { evidence: writeRoot ?? root, taRoot: round, httpPort, databasePorts: databases,
-    readOnlyFiles: [...immutable, ...readOnlyRoots, profile, probe], networkScope: network ? RUNTIME_NETWORK_SCOPE : 'deny-all' };
+    readOnlyFiles: [...immutable, ...readOnlyRoots, ...protectedEvidence, ...Object.values(processEvidencePaths(join(root, 'probe'))), profile, probe],
+    networkScope: network ? RUNTIME_NETWORK_SCOPE : 'deny-all' };
   write(profile, runtimeSandboxText(options));
-  write(probe, runtimeProbeSource({ ...options, canary, positiveNetwork: network, probeName: 'runtime-probe-' + basename(root) }));
+  write(probe, runtimeProbeSource({ ...options,
+    readOnlyFiles: [...immutable, ...readOnlyRoots, profile, probe, ...Object.values(processEvidencePaths(join(root, 'probe')))],
+    canary, positiveNetwork: network, probeName: 'runtime-probe-' + basename(root) }));
   validateRuntimeSandboxPaths(options);
   const before = snapshotFiles([profile, probe, canary, ...immutable]);
   const sandbox = { executable: '/usr/bin/sandbox-exec', profile, profileSha256: fileDigest(profile) };
@@ -84,13 +88,15 @@ async function boundary({ root, writeRoot, round, httpPort, immutable, readOnlyR
 
 const runtimeFiles = [
   'tools/verify-truthsrc-runtime.mjs', 'tools/truthsrc-runtime-admission.mjs', 'tools/truthsrc-runtime-lease.mjs', 'tools/truthsrc-runtime-sandbox.mjs',
-  'tools/truthsrc-runtime-process.mjs', 'tools/truthsrc-runtime-crash.mjs', 'tools/truthsrc-runtime-databases.mjs', 'tools/truthsrc-runtime-db-relay.mjs', 'tools/truthsrc-runtime-db-exec.mjs',
+  'tools/truthsrc-runtime-process.mjs', 'tools/truthsrc-runtime-crash.mjs', 'tools/truthsrc-worker-evidence.mjs', 'tools/truthsrc-evidence.mjs',
+  'tools/truthsrc-runtime-databases.mjs', 'tools/truthsrc-runtime-db-relay.mjs', 'tools/truthsrc-runtime-db-exec.mjs',
   'tools/truthsrc-runtime-config.mjs', 'tools/truthsrc-runtime-http.mjs', 'tools/truthsrc-runtime-browser.mjs',
   'tools/truthsrc-runtime-ta-worker.mjs', 'tools/truthsrc-actor-ta-worker.mjs', 'simulator/mock-ta-core.mjs',
   'simulator/contract.mjs', 'simulator/journal.mjs', 'tools/v1-crash-recovery.mjs', 'tools/v1-release-build-evidence.mjs',
   'tools/v1-browser-funds.mjs', 'tools/v1-browser-check.mjs', 'test/fixtures/truthsrc-actor-ta.json',
   'tools/historical-assets.mjs', 'docs/V1-RETIREMENT-MANIFEST.json',
-].map(file => join(ROOT, file));
+].map(file => join(ROOT, file)).concat(['strict-json', 'immutable-data', 'verification/files', 'verification/worker-evidence', 'verification/process']
+  .map(name => join(ROOT, '../metarch-truthsrc/lib', name + '.mjs')));
 
 async function runDatabaseWindow({ admitted, evidence, round, owner, ports, taConfig, taConfigSha256, fixtureSha256, env, options, recheck, signal, runProcess }) {
   const { http: HTTP, mysql: MYSQL, mongo: MONGO } = ports;
@@ -121,7 +127,9 @@ async function runDatabaseWindow({ admitted, evidence, round, owner, ports, taCo
       save(browserConfig, { synthetic: true, baseURL: value.origin, mode: mode === 'restart' ? 'replay' : mode, credentials });
       const runEvidence = join(root, mode);
       const b = await boundary({ root: runEvidence, writeRoot: evidence, round, httpPort: HTTP, immutable: [config, logback, browserConfig, taConfig],
-        readOnlyRoots: databases.readOnlyPaths, env, network: true, databases: [MYSQL, MONGO], processRunner: runProcess });
+        readOnlyRoots: databases.readOnlyPaths,
+        protectedEvidence: ['server', 'browser'].flatMap(name => Object.values(processEvidencePaths(join(runEvidence, name)))),
+        env, network: true, databases: [MYSQL, MONGO], processRunner: runProcess });
       let observation, browser, beforeGet, afterGet, negatives, listener, callbackFailure;
       let runtimePhase = 'server-start';
       const childEnv = { ...env, BANK_RUNTIME_TA_CONFIG: taConfig, BANK_RUNTIME_TA_CONFIG_SHA256: taConfigSha256 };
@@ -197,7 +205,8 @@ async function runDatabaseWindow({ admitted, evidence, round, owner, ports, taCo
     const neg = join(root, 'mysql-negative'); mkdirSync(neg, { mode: 0o700 });
     const negativePolicy = join(neg, 'sandbox.sb'), negativeLogback = join(neg, 'logback.xml');
     write(negativeLogback, '<configuration><appender name="console" class="ch.qos.logback.core.ConsoleAppender"><encoder><pattern>%level %logger - %msg%n</pattern></encoder></appender><root level="WARN"><appender-ref ref="console"/></root></configuration>\n');
-    const policy = { evidence, taRoot: round, readOnlyFiles: [...databases.readOnlyPaths, negativePolicy, negativeLogback],
+    const policy = { evidence, taRoot: round, readOnlyFiles: [...databases.readOnlyPaths, negativePolicy, negativeLogback,
+      ...Object.values(processEvidencePaths(join(neg, 'process')))],
       httpPort: HTTP, databasePorts: [MYSQL], networkScope: RUNTIME_NETWORK_SCOPE };
     write(negativePolicy, runtimeSandboxText(policy));
     const negative = await runProcess({ executable: admitted.java, args: ['-Xmx1G', '-XX:ActiveProcessorCount=2', '-XX:-UsePerfData', '-Djava.net.preferIPv4Stack=true',
@@ -236,13 +245,16 @@ export async function verifyRuntime(options, { admitBuild = admitRuntimeBuild, a
     evidence, round, window: options.window, checks: {}, errors: [], runtimeRebuilt: false, runtimePublished: false,
     release1134Resigned: false, runtimeRetryBackoffDeadline: 'OPEN' };
   let lease, admitted, evidenceCreated = false, before, config, env, browserInputs, databaseDispatched = false, processesStopped = true;
+  let activeProcesses = 0;
   const runProcess = async args => {
+    activeProcesses++;
     try {
       const receipt = await processRunner({ ...args, signal: args.signal ?? cancelled.signal });
-      if (receipt.groupAliveAfter !== false || receipt.directChildClosed !== true || receipt.directChildReaped !== true)
+      if (receipt.groupAliveAfter !== false || receipt.directChildClosed !== true || receipt.directChildReaped !== true || receipt.barrier?.settled !== true)
         processesStopped = false;
       return receipt;
     } catch (error) { processesStopped = false; throw error; }
+    finally { activeProcesses--; }
   };
   try {
     // No old reservation lookup and no candidate admission/launch before an
@@ -280,7 +292,9 @@ export async function verifyRuntime(options, { admitBuild = admitRuntimeBuild, a
     if (options.window !== 'database') {
       await recheck();
       const b = await checkBoundary({ root: join(evidence, 'crash-boundary'), writeRoot: evidence, round, httpPort: ports.http,
-        immutable: [config], env, processRunner: runProcess });
+        immutable: [config], protectedEvidence: CRASH_CASES.flatMap(caseName => ['crash', 'recover', 'verify']
+          .flatMap(mode => Object.values(processEvidencePaths(join(round, 'case-' + caseName, 'runs', mode, 'process'))))),
+        env, processRunner: runProcess });
       context.sandbox = b.sandbox;
       result.crash = await runCrash(context); b.recheck();
       result.checks.crashPassed = result.crash.passed;
@@ -311,7 +325,7 @@ export async function verifyRuntime(options, { admitBuild = admitRuntimeBuild, a
       result.cancelled = cancelled.signal.aborted;
       if (lease) {
         try {
-          assert.ok(processesStopped && (!databaseDispatched || result.database?.cleanup?.stopped === true),
+          assert.ok(processesStopped && activeProcesses === 0 && (!databaseDispatched || result.database?.cleanup?.stopped === true),
             'resource exit unverified; lease retained for acquiring owner investigation');
           result.leaseRelease = lease.release(result.owner);
         } catch (error) { result.leaseRelease = { owner: result.owner, released: false }; result.errors.push(error.message); }

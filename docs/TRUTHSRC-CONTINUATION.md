@@ -1,6 +1,6 @@
 # 真源工具链：当前续接状态
 
-日期：2026-11-06。本文只保留当前状态、剩余门与实质债务，不重启旧“首批入口”计划。原2026-11-04交接、现场HEAD及启动文本已固定在[历史索引](HISTORY.md#reading-archive)；它们不是今天的工作树状态。
+日期：2026-11-07。本文只保留当前状态、剩余门与实质债务，不重启旧“首批入口”计划。原2026-11-04交接、现场HEAD及启动文本已固定在[历史索引](HISTORY.md#reading-archive)；它们不是今天的工作树状态。
 
 ## 1. 已有入口与本次精简
 
@@ -56,13 +56,13 @@
 
 ### 后续归属与完成判据
 
-1. **公共机制回流（任务172，待实施）。** 优先评估进程生命周期、来源指纹、独占租约、构建/报告核验和工作坊编排中的通用部分；归公共工具的可选runner/verifier能力，不将Docker/JDK变为基础真源CLI的必选依赖。先拆出银行政策和平台adapter，再迁机制，不能把硬编码银行路径/固定24恢复场景的文件直接搬入公共仓。
+1. **公共机制回流（任务172，部分已实施，整体未完成）。** 已有显式手写来源及下述文件/进程/工作线程机制；其余独占租约、构建/报告核验和工作坊编排继续按公共机制与银行政策拆分，不将Docker/JDK变为基础真源CLI的必选依赖。不能把硬编码银行路径/固定24恢复场景的文件直接搬入公共仓。
 2. **银行专属输入保留。** 业务规则、技术选择、外部TA/页面/权限实现、模拟器、金融场景和独立oracle留银行；旧固定revision/发行读取按历史职责隔离。通用接口由公共工具定义，银行只提供配置、adapter与薄入口。
 3. **补齐可解释构建顺序。** 区分人/agent补充业务与技术决策、公共编译展开、图/AST和代码生成、开放端口实现、独立业务验收。新业务仓应能消费安装后的公共工具与显式输入，不复制整套银行`tools/`；不能声称仅凭`truth/`即可重建所有实现和测试。
 4. **建立版本化产物责任表。** 按BC的Scala及JS最终写者、当前strict Saga、Monarch新API共同归类；每项明确输入、producer、输出层/命名、手写/生成/runtime-library所有权、适用profile、回锚与验收。保持P23兼容和R2待接入状态分开；不因旧目录未列出就删新职责，也不把runtime的Coordinator复制生成为应用实现。
 5. **目录和命名服从上述归属。** 默认开发视图只暴露业务作者输入、项目配置、手写实现、独立测试、文档与按需生成输出；历史与执行证据不成为新人必经步骤。Scala类型使用UpperCamelCase、成员使用lowerCamelCase，包/SQL/PB/稳定ID分别有各自规则；在公共生成器中统一解析与碰撞校验，不能手改生成Scala或重命名冻结载体消红。
 
-此前兼容分层与指定测试成果保留，但不能代替上述产品结构和从零构建的可解释性。此次仅登记和评估；完整service重放阻断、材料分发、真人可用性及R2独立升级状态不变。
+此前兼容分层与指定测试成果保留，但不能代替上述产品结构和从零构建的可解释性。最初挂账只登记和评估；实际后续成果按下面各实施记录判断，完整service重放阻断、材料分发、真人可用性及R2独立升级状态不变。
 
 ### 2026-11-07：artifactType最高优先级实施
 
@@ -77,3 +77,33 @@
 P1首个公共回流为显式手写来源验证：`tools/verify-handwritten-map.mjs`直接调用公共`lib/handwritten-provenance.mjs`，不再经旧发行helper的历史import闭包。银行继续控制当前snapshot、35文件/54引用和关系政策，原映射JSON/手写字节未改；20个公共测试、6个适配测试和3个原来源测试通过。公共模块接受任意领域的明确关联，仅验证文件/指针，不声明语义、symbol/span或运行认证。其他58个mjs中的机制仍须按职责收敛，不能据本次一项回流关闭整个P1。
 
 本轮教学输出已经公共update同步233项，21源码加1输入证据发生写入；229源码/配置与两已验候选相同，repeat written=0。status current/synchronized，ReserveFunds到新Behaviors的精确span正反查通过。公共全量3121通过/15明确跳过/0失败；七参考与反例36通过、artifact28通过；安装后的公共来源API无需银行checkout。完整service重放、R2消费、其余目录/命名/公共工具和真人验收均未借此关闭。
+
+### 2026-11-07：公共验证机制与可解释构建配方
+
+本批起点为工具`3ed716b928b6`、银行`207093ec87df`，接续P1，不重复P0或聚合参考改造。新增[构建配方](BUILD-RECIPE.md)解释全部13个受跟踪一级目录、人工业务/技术信息、手写实现、独立测试、公共编译/生成和逐层验收；[工具归属清单](architecture/TOOLING-OWNERSHIP.json)逐文件覆盖原62份工程源码及两个新薄adapter，共64份。清单只验证明确库存及捕获到的字面引用，不声称证明任意动态调用、语义或运行通过。
+
+公共`lib/verification/`新增文件取证、受限进程/静态进程证据、纯工作线程证据、工具归属校验。银行现役build/admission/lease、actor/runtime、session及report实际消费；lease不再为路径/文件原语加载全套构建准入，session不再因worker检查提前加载旧crash/release-build。银行保留schema、路径/供给/TA/固定场景与金融oracle。现役crash/report和browser仍借用历史政策模块，未伪装成全部历史依赖已断开。
+
+独立审阅和反例补强了参数descriptor-first捕获、metadata/JSON边界、monotonic计时、逾期callback拒绝、清理超时后pipe写入撤销、日志流摘要与最终字节对账。银行profile明确拒绝子进程直接写监督器日志/回执；未结束的callback、nested invocation或session helper会阻断lease释放。纯内存process doubles验证reap耗尽/倒拨时钟，真实自有Node进程验证Seatbelt证据写拒绝；没有启动银行JVM、数据库容器或新的真实服务窗口。进程监督仅覆盖直接子进程及原进程组，callback须让出事件循环；不是敌意任意后代隔离或可抢占无限同步代码的保证。
+
+已执行结果：
+
+| 检查 | 本批结果 |
+|---|---|
+| 公共完整回归 | 3218项：3203通过、15明确跳过、0失败；1097源码/测试/package/catalog文件执行前后SHA一致 |
+| 公共机制 | 完整回归含82项新files/process/worker/ownership测试；最终process单suite31通过 |
+| 银行公共适配与工具库存 | 35通过，含7项库存/配方/链接、4项fresh-import集成；无跳过 |
+| 银行显式build/actor/readside/runtime/workshop Node合同 | 485项：484通过、1项旧端口18762 opt-in网络测试跳过；不是Scala actor64/readside47重跑 |
+| 原银行process兼容suite | 原测试源码未改，29通过 |
+| 当前作者入口 | source doctor通过，validate/roundtrip通过；默认source/historical-reader9项中8通过、1完整生成集成opt-in跳过 |
+| 离线安装 | tarball安装后移动prefix，非银行file/worker/process/ownership API及Counter生成/查询通过；不需要银行checkout或JDK/Docker |
+| artifact说明 | 定向28通过，8仓3170来源文件复核通过；125类别/284变体/39manifest未增减，BC/Play兼容副本检查通过 |
+| 保护面与生成比较 | 369份公共生成/schema/scaffold/core/reference及311份银行作者/绑定/Scala/历史/许可/草稿全部字节不变；当前229源码/配置与公共纯计划相同 |
+
+上述检查有重叠，不相加当作独立覆盖。Windows只有路径模型测试，本批未运行原生Windows或最低Node22.13；实际执行为Node22.23.4/Darwin。安装源码/机制测试不等材料已公开发布，更不关闭真人上手。
+
+本机证据在工具`.rounds/public-verification-p1-ty8yx0sb/`：`baseline.json`、`SCOPE.md`、`js-full-01.log`、`js-test-source-before.json`、`bank-contracts-01.log`、`process-04.log`、`bank-public-01.log`、`installed-02.log`、`catalog-cross-02.json`、`compat-bc-01.json`、`compat-play-01.json`、`protection-01.json`及`teaching-code-comparison.json`。失败反例、首次不完整fixture和中断日志保留，未作为新clone必备材料发布。代理额度失败不计审阅通过；中断实施由主集成补齐并实际回归。通信层曾报ENOSPC，但实际df约52GiB可用，未据此清理磁盘。
+
+**教学输出当前为工具指纹changed，不是synchronized。** 229源码/配置没有变化；本批没有apply、回签旧ledger/anchors或修改历史构建/服务回执。此前聚合批的current状态只适用于当时工具版本。后续受控更新与新构建必须使用新的对应证据。
+
+P1尚有完整lease/build-report/工作坊编排及资源adapter归属、剩余历史银行政策分拆；P2全量命名/多模块/新profile参考、P3物理目录收敛、P4 service02 replay/材料分发/真人上手、retry/backoff/deadline OPEN与R2下游任务保持未完成。上述实施验收捕获时尚未commit、push、tag或publish；后续本地提交状态以各仓Git历史为准，提交不代表推送或发布。

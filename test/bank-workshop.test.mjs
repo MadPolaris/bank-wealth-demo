@@ -276,10 +276,15 @@ async function serviceFixture(t) {
   const processReceipt = (base, stdout = '{}', crash = false) => {
     mkdirSync(dirname(base), { recursive: true });
     writeFileSync(base + '.stdout.log', stdout); writeFileSync(base + '.stderr.log', '');
+    const at = '2026-11-07T00:00:00.000Z';
+    const command = ['/usr/bin/sandbox-exec', '-p', readFileSync(sandbox, 'utf8'), '/synthetic/node'];
     const receipt = { schemaVersion: 'bank.truthsrc-runtime-process/v1', passed: true, status: 'passed', pid: nextPid++,
+      command, commandSha256: sha256(JSON.stringify(command)), cwd: dirname(base), envKeys: ['NODE_V8_COVERAGE'],
+      startedAt: at, endedAt: at, elapsedMs: 0, timeoutMs: 1000, graceMs: 15000, reapMs: 5000,
+      descendantExitGraceMs: 0, maxOutputBytes: 16 * 1024 * 1024, rawOutputBytes: Buffer.byteLength(stdout), groupSignals: [],
       code: crash ? null : 0, signal: crash ? 'SIGKILL' : null, expectedSignal: crash ? 'SIGKILL' : null, expectedTermination: true,
       launchError: null, timedOut: false, cancelled: null, leftoverGroup: false, terminationErrors: [], outputLimitExceeded: false, outputError: false,
-      barrier: { settled: true, status: crash ? 'passed' : 'not-requested' }, mainSignals: crash ? [{ signal: 'SIGKILL', sent: true }] : [],
+      barrier: { settled: true, status: crash ? 'passed' : 'not-requested', error: null }, mainSignals: crash ? [{ signal: 'SIGKILL', sent: true, at }] : [],
       directChildClosed: true, directChildReaped: true, groupAliveAfter: false, sandboxProfileUnchanged: true,
       sandboxProfile: sandbox, sandboxProfileSha256: sha256(readFileSync(sandbox)),
       paths: { stdout: base + '.stdout.log', stderr: base + '.stderr.log', receipt: base + '.json' }, stdoutSha256: sha256(stdout), stderrSha256: sha256('') };
@@ -306,6 +311,7 @@ async function serviceFixture(t) {
     }
     const receipt = processReceipt(join(directory, 'probe'));
     receipt.sandboxProfile = profile; receipt.sandboxProfileSha256 = sha256(readFileSync(profile));
+    receipt.command[2] = readFileSync(profile, 'utf8'); receipt.commandSha256 = sha256(JSON.stringify(receipt.command));
     writeFileSync(join(directory, 'probe.json'), JSON.stringify(receipt));
     const before = Object.fromEntries([profile, probe, canary, configFile, ...controls].map(file => {
       const bytes = readFileSync(file); return [file, { bytes: bytes.length, sha256: sha256(bytes) }];
@@ -362,7 +368,7 @@ async function serviceFixture(t) {
   return { ...f, evidence, round, file, result, options: { evidence, buildEvidence, round, lease: f.options.lease } };
 }
 
-test('real service inspector rechecks every schema process receipt and rejects browser/log/exit gaps', async t => {
+test('static service inspector rechecks every schema process receipt and rejects browser/log/exit gaps', async t => {
   const { evidence, file, result, options } = await serviceFixture(t);
   assert.equal((await inspectService(options)).passed, true);
   for (const alter of [
