@@ -1,6 +1,6 @@
 # 当前架构与手写边界
 
-日期：2026-11-06。这里解释当前职责，不是运行验收回执。唯一作者合同见[TRUTH](../../TRUTH.md)，旧合同固定在[历史索引](../HISTORY.md#architecture-contracts)。
+日期：2026-11-07。这里解释当前职责，不是运行验收回执。唯一作者合同见[TRUTH](../../TRUTH.md)，旧合同固定在[历史索引](../HISTORY.md#architecture-contracts)。通用产物说明已集中在公共JS工具的[Scala CQRS artifactType目录](../../../metarch-truthsrc/docs/artifacts/scala-cqrs/README.md)，含多模块port/binding、BC JS最终产物和Saga/Monarch版本；本目录只保留银行专属装配及手写边界，不维护另一份公共类别规范。
 
 ## 从作者到运行
 

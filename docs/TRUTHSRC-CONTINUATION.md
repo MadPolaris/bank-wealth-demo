@@ -40,3 +40,30 @@
 4. 覆盖暂时失败后成功、ACK丢失但已执行、预算耗尽、同ID重发及恢复中再次重启等反例，并对齐真源、生成端和冻结/新制品。
 
 0.2.0无消费者不要求为其兼容，但P23已签出制品仍冻结。若后续需要改runtime，使用新版本和新证据，不覆盖原制品、journal或1134记录；本次目录精简不承担这项实施。
+
+## 4. 用户新增的交付结构与工具归属挂账
+
+2026-11-06，用户指出目录精简后仍难以理解各类内容的来源、构建顺序、Scala产物分类及混合命名，并明确追加问题5：`tools/*.mjs`如何产生，可复用公共部分为什么没有归入`metarch-truthsrc`。本节是待办登记，不是新的跨仓迁移、R2实施或删除授权。
+
+### 已核事实
+
+- 银行当前有13个包含受跟踪文件的一级目录；本机另有`generated/`、`dist/`、`target/`三个非隐藏派生目录。`tools/`共62份受跟踪源码，其中58份`.mjs`、3份Python、1份Scala。文件数不是独立工具数，也不表示全部属于公共工具。
+- 这些工具是在各轮开发与验收中编写的工程源码，不是当前银行真源经公共生成器自动产生的产物。例如`tools/truthsrc-project.mjs`来自`675a936`，`tools/verify-truthsrc-runtime.mjs`来自`f796362`，`tools/bank-workshop.mjs`来自`4515b6b`。coding agent编写不等于可以由真源确定性再生。
+- 当前`truthsrc.project.json`明确选择作者树、8份技术binding、生成profile和外置手写根；`tools/truthsrc-project.mjs`只是公共API的本地包装。`handwritten/scala/`的35份实现和固定业务测试是独立维护输入；来源映射不等于其实现可自动生成。
+- 根`formal-inputs/`是旧三合同运输模板，不是当前项目编译的必要人工阶段；`projections/`是旧业务文档投影，不是当前JDBC投影实现。其旧说明和目录名仍可能误导读者。暂停的qualification、旧绑定、旧编译物和历史读取需按各自保护合同处置，不能为减少目录而盲删。
+- `playAkkaCQRS/knowledge_base/artifacts`是历史架构参照，不是完整现行目录。还需覆盖BC `tools/gen_pipeline.mjs`的JS最终写者，以及strict Saga和Monarch R1/R2的应用侧接线职责。语义产品、代码artifact类别、运行库内部类型和物理文件不是同一种计数。
+- 当前Scala命名存在实质生成策略缺口：`render-invocation-execution.mjs`以`id.replaceAll('-', '_')`拼接类型/成员名；`render-aggregate-layers.mjs`以`Ingest`拼接同类ID；公共`symbol()`只做合法标识符/关键字处理，不区分类型名与成员名。稳定知识ID、持久化身份、PB/wire名称不能通过全局改驼峰一起改变。
+
+### 后续归属与完成判据
+
+1. **公共机制回流（任务172，待实施）。** 优先评估进程生命周期、来源指纹、独占租约、构建/报告核验和工作坊编排中的通用部分；归公共工具的可选runner/verifier能力，不将Docker/JDK变为基础真源CLI的必选依赖。先拆出银行政策和平台adapter，再迁机制，不能把硬编码银行路径/固定24恢复场景的文件直接搬入公共仓。
+2. **银行专属输入保留。** 业务规则、技术选择、外部TA/页面/权限实现、模拟器、金融场景和独立oracle留银行；旧固定revision/发行读取按历史职责隔离。通用接口由公共工具定义，银行只提供配置、adapter与薄入口。
+3. **补齐可解释构建顺序。** 区分人/agent补充业务与技术决策、公共编译展开、图/AST和代码生成、开放端口实现、独立业务验收。新业务仓应能消费安装后的公共工具与显式输入，不复制整套银行`tools/`；不能声称仅凭`truth/`即可重建所有实现和测试。
+4. **建立版本化产物责任表。** 按BC的Scala及JS最终写者、当前strict Saga、Monarch新API共同归类；每项明确输入、producer、输出层/命名、手写/生成/runtime-library所有权、适用profile、回锚与验收。保持P23兼容和R2待接入状态分开；不因旧目录未列出就删新职责，也不把runtime的Coordinator复制生成为应用实现。
+5. **目录和命名服从上述归属。** 默认开发视图只暴露业务作者输入、项目配置、手写实现、独立测试、文档与按需生成输出；历史与执行证据不成为新人必经步骤。Scala类型使用UpperCamelCase、成员使用lowerCamelCase，包/SQL/PB/稳定ID分别有各自规则；在公共生成器中统一解析与碰撞校验，不能手改生成Scala或重命名冻结载体消红。
+
+此前兼容分层与指定测试成果保留，但不能代替上述产品结构和从零构建的可解释性。此次仅登记和评估；完整service重放阻断、材料分发、真人可用性及R2独立升级状态不变。
+
+### 2026-11-07：artifactType最高优先级实施
+
+用户批准先集中补齐artifactType说明，并追加`docs/artifacts/scala-cqrs/`层级。中央入口为[公共Scala CQRS目录](../../metarch-truthsrc/docs/artifacts/scala-cqrs/README.md)，[构建顺序](../../metarch-truthsrc/docs/artifacts/scala-cqrs/BUILD-ORDER.md)区分作者信息、公共加工及开放实现；BC/Play旧说明按中央目录派生，来源/覆盖和漂移单列。[P0验收记录](../../metarch-truthsrc/docs/artifacts/ACCEPTANCE.md)已记录125类别、8仓来源对账及冻结源码回归；这不是银行服务签收。当前仅实施说明及文档消费者，不改银行生成代码、金融规则、PB/PID、R2依赖或运行证据。P1公共工具归属、P2命名、P3银行目录及P4服务/人工验收仍按批准顺序独立进行。
