@@ -1,6 +1,6 @@
 # 真源工具链：当前续接状态
 
-日期：2026-11-07。本文只保留当前状态、剩余门与实质债务，不重启旧“首批入口”计划。原2026-11-04交接、现场HEAD及启动文本已固定在[历史索引](HISTORY.md#reading-archive)；它们不是今天的工作树状态。
+日期：2026-11-08。本文只保留当前状态、剩余门与实质债务，不重启旧“首批入口”计划。原2026-11-04交接、现场HEAD及启动文本已固定在[历史索引](HISTORY.md#reading-archive)；它们不是今天的工作树状态。
 
 ## 1. 已有入口与本次精简
 
@@ -12,6 +12,8 @@
 目录、历史读取、当前手写映射及作者证据定位已完成并通过定向验证，实际新候选与运行门见[V1-RETIREMENT.md](V1-RETIREMENT.md)。作者改动仅为逐项记录的证据定位，业务声明/固定oracle不变；原验收证据未重签。
 
 ## 2. 尚未完成的事实与继续工作的边界
+
+公共工具第三批新增显式[family1领域kernel](../../metarch-truthsrc/docs/artifacts/scala-cqrs/DOMAIN-KERNEL.md)，值／纯协议／State／RuleParams及必要真实PB转换已形成非银行candidate。逐门结果见[第三批验收](../../metarch-truthsrc/docs/artifacts/DOMAIN-KERNEL-ACCEPTANCE.md)；银行仍选原Play-service/P23入口，本轮只运行source doctor和validate/roundtrip，**未生成银行代码、未改carrier/PB/PID/codec或运行服务**。新参考和独立oracle不替代固定金融测试，完整modular应用与银行消费另列。
 
 1. **完整service仍失败，人工会话未执行。** service02使用旧P23制品，代码/24恢复窗及真实数据库initial/restart/refund通过；replay全新读库90秒未caught-up，完整结果false。两数据库/relay/lease已归还，失败数据保留；未增大超时或改oracle。用户提供的[Monarch R2候选已单独核验](MONARCH-R2-DOWNSTREAM.md)，下游尚未升级，不能将该失败归因R2或直接换JAR。
 2. **冻结供给的公开取得渠道未落实。** source首次doctor/validate/compile不需要JVM或归档；后续完整生成仍需六份冻结JAR/POM，现有prepare从clean1134提取。本地归档/CLI包存在不等于已发布、可自助下载或交付完成。
