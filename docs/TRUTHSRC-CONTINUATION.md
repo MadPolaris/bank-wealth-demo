@@ -67,3 +67,13 @@
 ### 2026-11-07：artifactType最高优先级实施
 
 用户批准先集中补齐artifactType说明，并追加`docs/artifacts/scala-cqrs/`层级。中央入口为[公共Scala CQRS目录](../../metarch-truthsrc/docs/artifacts/scala-cqrs/README.md)，[构建顺序](../../metarch-truthsrc/docs/artifacts/scala-cqrs/BUILD-ORDER.md)区分作者信息、公共加工及开放实现；BC/Play旧说明按中央目录派生，来源/覆盖和漂移单列。[P0验收记录](../../metarch-truthsrc/docs/artifacts/ACCEPTANCE.md)已记录125类别、8仓来源对账及冻结源码回归；这不是银行服务签收。当前仅实施说明及文档消费者，不改银行生成代码、金融规则、PB/PID、R2依赖或运行证据。P1公共工具归属、P2命名、P3银行目录及P4服务/人工验收仍按批准顺序独立进行。
+
+### 2026-11-07：工程范式与参考实现首批
+
+用户进一步明确：BC mjs产物结构未经打磨检验，不能当金样；对齐目的不止格式，而是让DDD、FP/OO、TDD、Akka/ES/CQRS和洋葱架构对人、agent、测试、治理、演进与追溯都容易落实。已授权继续主线并行推进，具体[参考开发与兼容合同](../../metarch-truthsrc/docs/artifacts/scala-cqrs/REFERENCE-DEVELOPMENT.md)在公共仓。
+
+公共聚合生成已经拆为不可变结构模型与逐职责模板，保留原公开载体/协议/PB/PID/金融规则。七份独立Warehouse参考是工程候选，不冒称用户已批准金样；两版独立Scala编译及各24项行为测试通过，未使用BC mjs输出当预期。银行实际输入的纯计划229项中21个聚合文件有结构/排版变化，其余产物字节不变。[本轮新候选验收](architecture/AGGREGATE-REFERENCE-ACCEPTANCE.md)记录Actor64/Readside47、15/14保护检查及两候选229项相同源码；不是继承旧回执，也不关闭完整服务replay失败。
+
+P1首个公共回流为显式手写来源验证：`tools/verify-handwritten-map.mjs`直接调用公共`lib/handwritten-provenance.mjs`，不再经旧发行helper的历史import闭包。银行继续控制当前snapshot、35文件/54引用和关系政策，原映射JSON/手写字节未改；20个公共测试、6个适配测试和3个原来源测试通过。公共模块接受任意领域的明确关联，仅验证文件/指针，不声明语义、symbol/span或运行认证。其他58个mjs中的机制仍须按职责收敛，不能据本次一项回流关闭整个P1。
+
+本轮教学输出已经公共update同步233项，21源码加1输入证据发生写入；229源码/配置与两已验候选相同，repeat written=0。status current/synchronized，ReserveFunds到新Behaviors的精确span正反查通过。公共全量3121通过/15明确跳过/0失败；七参考与反例36通过、artifact28通过；安装后的公共来源API无需银行checkout。完整service重放、R2消费、其余目录/命名/公共工具和真人验收均未借此关闭。

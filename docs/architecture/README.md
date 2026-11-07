@@ -22,6 +22,8 @@ truthsrc.project.json + truth/bank-wealth/ + bindings/implementation/
 
 本地Actor Repository不是cluster sharding。六份说明性read-model不是自动SQL DSL。生成代码由调用者指定目标承载，构建期ScalaPB managed sources与truthsrc直接生成库存也要区分。兼容接线及其原候选证据见[TRUTH-COMPATIBLE-COMPOSITION](../TRUTH-COMPATIBLE-COMPOSITION.md)，不自动认证目录迁移后的候选。
 
+2026-11-07的[聚合参考与工具回流验收](AGGREGATE-REFERENCE-ACCEPTANCE.md)记录独立参考、结构模型/模板、公共手写来源验证，以及新候选Actor64/Readside47结果。BC mjs仍不是设计金样；新参考是有明确兼容例外的工程候选，不是通过文档登记自动成为标准。
+
 ## 保持的分层与事务规则
 
 - **Onion：**内层不依赖外层；端口显式声明，银行装配调用实现。业务状态只经事件应用演进，手写adapter不能另建资金状态机。
