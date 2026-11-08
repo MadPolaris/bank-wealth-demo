@@ -15,6 +15,8 @@
 
 公共工具第三批新增显式[family1领域kernel](../../metarch-truthsrc/docs/artifacts/scala-cqrs/DOMAIN-KERNEL.md)，值／纯协议／State／RuleParams及必要真实PB转换已形成非银行candidate。逐门结果见[第三批验收](../../metarch-truthsrc/docs/artifacts/DOMAIN-KERNEL-ACCEPTANCE.md)；银行仍选原Play-service/P23入口，本轮只运行source doctor和validate/roundtrip，**未生成银行代码、未改carrier/PB/PID/codec或运行服务**。新参考和独立oracle不替代固定金融测试，完整modular应用与银行消费另列。
 
+第四批新增[family2纯决策／有限聚合合同](../../metarch-truthsrc/docs/artifacts/scala-cqrs/AGGREGATE-CORE.md)：纯decide、事件fold、CommandHelpers与独立glue Actor协议／工厂／本地Repository，显式no-external候选，尚不是完整四模块或银行迁移。当前主样例和Counter变体已有独立真实编译／行为结果，公共收尾回归和现役能力台账仍在完成，合同页不作为最终验收回执。2026-11-08本次银行source doctor通过，validate为0 hard、157原子roundtrip通过；只检查作者面，无JVM／容器／银行apply，不回签旧ledger、anchors或服务证据。
+
 1. **完整service仍失败，人工会话未执行。** service02使用旧P23制品，代码/24恢复窗及真实数据库initial/restart/refund通过；replay全新读库90秒未caught-up，完整结果false。两数据库/relay/lease已归还，失败数据保留；未增大超时或改oracle。用户提供的[Monarch R2候选已单独核验](MONARCH-R2-DOWNSTREAM.md)，下游尚未升级，不能将该失败归因R2或直接换JAR。
 2. **冻结供给的公开取得渠道未落实。** source首次doctor/validate/compile不需要JVM或归档；后续完整生成仍需六份冻结JAR/POM，现有prepare从clean1134提取。本地归档/CLI包存在不等于已发布、可自助下载或交付完成。
 3. **真人可用性未签收。** 自动化、代理或浏览器检查不能代替未参与实现读者的实际上手。
