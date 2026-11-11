@@ -39,3 +39,20 @@
 其余占用包含原始证据、历史完整发行及运行数据，不能仅凭大目录名确认无用，保留待逐项核定。清理账不是整`.scratch/.rounds`盲删许可。
 
 本轮service02运行输入前后保持一致，资源现已退出；本清理没有改其候选、数据或证据。目录职责精简已经退役的497份 `v1/` 文件有独立固定Git保存清单，见[V1-RETIREMENT.md](V1-RETIREMENT.md)，不算本清理账的缓存释放成果。
+
+## 第二批实际结果（2026-11-08）
+
+用户指定银行 `.scratch/p26-p32-bank-v1-59o__arv` 和 `.scratch/p24-p25-bank-joint-fkcd3jwe`，获知其中包含历史数据与证据后，明确选择**仅清重复缓存**，不整目录删除。
+
+本次删除69,796个SHA-256相同且保留至少一份对应原字节的文件：依赖/构建位置的JAR、POM、protoc，重复`bin/node`，以及`target`内重复`.class/.cache`。完整保留`release-final-1134/`和`supply-1068/`；源码、日志、JSON/JSONL回执与证据、许可、数据库、journal、凭据均未选入删除清单。当前`.local`、`.truthsrc`及service02/runtime/actor/readside封存构建树不在操作范围。
+
+| 指定目录 | 清理前分配占用 | 清理后分配占用 | 减少 |
+|---|---:|---:|---:|
+| `p26-p32-bank-v1-59o__arv` | 15.00GiB | 6.68GiB | 8.32GiB |
+| `p24-p25-bank-joint-fkcd3jwe` | 1.71GiB | 1.24GiB | 0.47GiB |
+
+删除文件逻辑大小9,295,577,651字节，分配占用9,433,055,232字节（8.79GiB）。apply前后文件系统空闲由56,573,157,376变为65,968,594,944字节，观测增加9,395,437,568字节（8.75GiB）；该快照差额受APFS与并行活动影响，不与分配占用混称。该apply快照在预检账生成之后取得；完整任务净收益还需考虑审计材料本身的磁盘占用，不直接等同于该apply阶段的空闲快照差额。
+
+审计目录为本机`target/disk-cleanup-20261108-01/`：`plan.json`与`deleted.jsonl`含每项删除路径、大小、SHA和保留路径，`inventory-before.json`保留未选文件metadata基线，`preflight.json`、`apply-preflight.json`、`result.json`记录检查与结果。删除前已写入`CACHE-PATH-RETIREMENT.md`：受影响的旧发行、relocation、测试构建目录不再能在原物理路径直接完整复演，须依清单从保留副本恢复到新授权位置；原回执不改签，历史失败状态不变。
+
+验证结果：删除前无当前用户可见的打开句柄或Java/MySQL/Mongo/Docker运行进程；Docker daemon不可连接，因此没有宣称核验了停止容器的mount配置。删除后87,470项未选文件/symlink的metadata全部保持一致，12,385份保留缓存的SHA复核一致；独立clean1134归档SHA仍为`95daa7b9d1d394aa647175fd1b6418fd9ddac943026302a4174697bffba2cade`。未读取数据库或凭据字节，也未把metadata核对称为这些文件的内容哈希核对。
