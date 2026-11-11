@@ -1,89 +1,234 @@
 # Bank Wealth Workshop
 
-## 一笔申购，看到每一步的来处
+## One purchase, every step’s origin — from a truth tree
 
-客户提交100元申购。钱扣了，投资就成功了吗？基金公司拒绝后，为什么还要另一笔退款？定投每一期怎样复用这些规则？
+A customer submits a 100-yuan fund purchase. The money is debited — does that
+mean the investment succeeded? When the fund company rejects it, why does a
+*separate* refund exist? How does every installment of a savings plan reuse the
+exact same rules?
 
-本例用 **业务真源 → 严格编译 → 本地知识图 → 生成代码 → 精确回锚 → 分层验收** 回答这些问题。它是本地教学 demo，不处理真实资金，不是生产银行系统或 Palantir 兼容实现。
+This repo answers those questions the way the [co-arising](https://co-arising.github.io)
+family answers everything: **author a truth tree → compile it strictly → build
+the local knowledge graph → generate code → anchor every line back → verify in
+layers.** The bank is the payload; the truth tree is the point.
 
-## 四条业务线
+> 中文版说明见[下方](#中文速览)。 This is a local teaching demo: no real money,
+> not a production banking system, not a Palantir-compatible implementation.
 
-| 业务线 | 做什么 | 不能混淆的结果 |
+| The loop | Command (from repo root) |
+|---|---|
+| 1 · Gate the tree | `node tools/truthsrc-project.mjs validate` — 0 hard, roundtrip byte-identical |
+| 2 · Compile | `node tools/truthsrc-project.mjs compile` |
+| 3 · Graph | `truthsrc graph --tree truth/bank-wealth --out <db>` — 389 nodes / 413 edges |
+| 4 · Generate | `npm run project` — 235-file Play/CQRS Scala project into `generated/current/` |
+| 5 · Build & test | `cd generated/current && sbt compile && sbt test` — 0 errors / 23 tests |
+| 6 · Prove lineage | `truthsrc verify-project` — 792 anchors re-verified against file bytes |
+
+Numbers verified 2026-11-11; re-verify with the commands — trust your terminal.
+Full walkthrough with Docker variants: [hands-on guide](https://co-arising.github.io/guide/).
+Explore the compiled graph in your browser: [the explorer](https://co-arising.github.io/explorer/).
+
+## Four business lines, four coordination shapes
+
+The teaching point: each line is a different *shape* of coordination, so each
+is declared as a different truth atom. **Sagas own transaction boundaries;
+pipelines own flow order. They are not interchangeable** — the tree refuses to
+blur them.
+
+| Line | The trap it defuses | Declared in truth as |
 |---|---|---|
-| 付款 | 现金申购入口持久化请求，Saga协调投资人账户、募集账户与订单 | 付款成功不等于投资成功 |
-| TA确认 | 向模拟基金公司/TA提交已付款订单，查询相关最终结果 | accepted不是份额确认；unknown不能直接判成功或失败 |
-| 独立退款 | TA拒绝后，以另一事务退回原本金 | 不是补偿已经Commit的付款；申请退款不等于已经到账 |
-| 有限定投 | 显式推进业务时钟，持久化期次，再复用现金申购流程 | 不另造资金链，不增加“三次失败自动暂停”政策 |
+| Cash purchase payment | Payment succeeded ≠ investment succeeded | `bank-cash-payment-v1` **saga**: investor debit → collection credit → order commit, one `Money`, pinned IDs |
+| Mock TA confirmation | TA accepted ≠ shares confirmed; unknown stays unknown | FundOrder slices + formal products: TA effect ports with explicit outcome mappings |
+| Independent refund | A refund is its own business fact, not a disguised compensation | `bank-independent-refund-v1` **saga** + pipeline |
+| Bounded installment plan (SIP) | Each installment reuses the cash rules — no new money path | `bank-sip-dispatch-v1` **pipeline** with explicit skip/terminal semantics |
 
-三个主要聚合是 `CreditBalance`、`FundOrder`、`SipPlan`。金额、NAV和份额采用精确表示；TA允许模拟，不连接真实金融机构。Saga负责跨聚合事务，Monarch/pipeline负责流程编排，二者不可互换。
+Three aggregates: `CreditBalance`, `FundOrder`, `SipPlan`. Money/NAV/shares use
+exact decimal types; the TA is a simulator — no real financial institution.
 
-## 第一次成功：只验真源
+## How the truth tree solves distributed transactions: sagas as knowledge
 
-需要 **Node ≥22.13.0**（已验22.13.0、22.23.4），以及**相邻、配套的完整 `metarch-truthsrc` 工具 checkout**。单独 clone 银行不会带来工具；不能假定两仓main包含配套功能。参阅[工具安装说明](../metarch-truthsrc/README.md#install-the-local-cli)。
+Cross-aggregate consistency is declared once, in the tree, as a saga atom —
+participants, TCC phases, command bindings and transaction identity. The
+compiler turns it into saga IR for
+[saga-core](https://github.com/MadPolaris/saga-core) (an Akka Typed,
+event-sourced TCC coordinator). From `truth/.../sagas/bank-independent-refund-v1.saga.yaml`:
 
-在**自己的银行 checkout 根目录**执行：
-
-```bash
-node tools/bank-workshop.mjs doctor --through source --format human
-node tools/truthsrc-project.mjs validate
-node tools/truthsrc-project.mjs compile
+```yaml
+kind: saga
+id: bank-independent-refund-v1
+payload:
+  {
+    "invariants": [
+      "Refund amount equals the original positive CNY principal; refund
+       never compensates an already-Commit-ed payment leg."
+    ],
+    "transactionIdType": "TxId",
+    "steps": [
+      {
+        "id": "debit-fund-collection",
+        "participant": "collectionCreditBalance",
+        "group": 1,
+        "phases": {
+          "prepare": {
+            "kind": "command",
+            "commandRef": { "aggregate": "CreditBalance", "name": "ReserveFunds" },
+            "bindings": [
+              "txid <- txid : TxId",
+              "resource <- \"args:fundCollectionAccountId\" : AccountId",
+              "amount <- \"args:amount\" : Money"
+            ]
+          }
+        }
+        # … confirm/cancel phases and further steps follow
+      }
+    ]
+  }
 ```
 
-成功时doctor报告source前置满足，validate无hard错误且roundtrip为true，compile严格产品编译成功。**这一步不需要JVM、Docker或1134归档，也不是Scala/银行服务验收。** 需要保存一轮独立source回执时，按[工作坊第2节](docs/BANK-WORKSHOP.md#2-第一次运行只验真源)准备父目录与全新run。
+Prepare binds `ReserveFunds` on the collection account; the coordinator drives
+Try/Confirm/Cancel across participants; crash recovery, retries and manual
+intervention live in the engine — but *what must hold* lives in the tree, where
+domain experts can read it and the compiler can check it.
 
-接下来按目标选择：
+## Flow orchestration as knowledge: pipelines for batch/stream steps
 
-- **内容哪里来、先构建什么：**[构建配方](docs/BUILD-RECIPE.md)，区分业务输入、手写实现、公共加工、全部一级目录和工具归属。
-- **从零学工具：**[Counter教程](../metarch-truthsrc/TUTORIAL.md)，在独立小项目练习，不改银行金融规则。
-- **看懂业务与代码：**[银行真源教程](docs/TRUTH-TUTORIAL.md)，生成、离线图、精确区间反查与安全更新。
-- **逐层核验：**[银行工作坊](docs/BANK-WORKSHOP.md)，source / anchors / code / service分别报告。
-- **查命令读写：**[入口表](docs/TRUTH-ENTRYPOINTS.md)；作者权威合同见 [TRUTH.md](TRUTH.md)。
+Sequencing — “this step, then that step, each executing a slice” — is likewise
+a first-class atom, compiled to a plan for
+[monarch-core](https://github.com/MadPolaris/monarch-core) (a recoverable
+stage-queue engine; journaling via
+[monarch-persistence](https://github.com/MadPolaris/monarch-persistence)).
+From `truth/.../pipelines/bank-cash-payment-v1.pipeline.yaml`:
 
-## 唯一作者入口与职责目录
+```yaml
+kind: pipeline
+id: bank-cash-payment-v1
+steps:
+  [
+    {
+      "id": "pay-cash-purchase",
+      "name": "Cash fund purchase: investor debit, collection credit, then order payment confirmation",
+      "execution": {
+        "invokeSaga": {
+          "ref": { "sagaId": "bank-cash-payment-v1", "version": "bank-v1-1" },
+          "transactionIdentity": {
+            "type": "TxId",
+            "derivation": "durable-source-stage",
+            "scope": "saga-version",
+            "conflict": "reject-different-args"
+          },
+          "start": "durable-intent-before-start",
+          "completionMode": "await-terminal"
+        }
+      }
+    }
+  ]
+```
 
-**只从根 `truthsrc.project.json` 进入 `truth/bank-wealth/`。** 业务在作者树维护，具名技术选择在 `bindings/implementation/`；不手改canonical、完整request、SQLite、ledger、anchors或生成代码。
+Note what the truth layer adds over a raw orchestration graph: the pipeline
+step *invokes the saga with a durable identity* — replaying the step can never
+accidentally start a second transaction (`reject-different-args`), and the
+intent is journaled before start. Batch/stream flows become auditable
+knowledge, not opaque runtime configuration.
 
-| 位置 | 职责 |
-|---|---|
-| [`truth/bank-wealth/`](truth/bank-wealth/) | 系统/context声明、四流知识、结构共享、故事与来源 |
-| [`truthsrc.project.json`](truthsrc.project.json)、[`bindings/implementation/`](bindings/implementation/) | 项目配置与显式技术选择 |
-| [`handwritten/scala/`](handwritten/scala/) | 银行端口、owner/DTO、TA/退款/定投适配、页面与运行装配 |
-| [`test/scala/`](test/scala/) | 固定业务/读侧/HTTP/恢复预期，只按显式manifest运行 |
-| [`third-party/`](third-party/) | 必须保留的许可和来源材料 |
-| [`docs/architecture/`](docs/architecture/) | 当前生成/手写职责、手写来源映射与历史合同入口 |
-| `generated/<owned>/`、`.truthsrc/` | 自有生成工程与派生知识/来源证据，不是第二作者面 |
-| [`tools/`](tools/)、[`test/`](test/) | 编排工具与显式Node/Python合同测试；没有`npm start` |
-| `target/`、`.local/`、`dist/` | 本机候选、供给与执行数据；新clone不自带，不清理或整包转交 |
+## What you get out: code with receipts, and a queryable domain
 
-35份手写、31份固定测试和14份许可已逐字节核等迁移；497份旧`v1/`材料由完整固定Git对象保存后退出工作树。**目录、来源与Node合同门已过，新候选运行门另行验收**，见[本批结果](docs/V1-RETIREMENT.md)及[退役manifest](docs/V1-RETIREMENT-MANIFEST.json)。旧两树、原README、1134签收与交接均从[历史索引](docs/HISTORY.md)读取，不恢复第二份作者树，也不把`/api/v1`等业务/协议版本改成V2。
+- **A compiling Play/CQRS project** — 235 generated files (aggregates,
+  commands, events, guards compiled from 149 named `@rule` invariants, proto
+  schemas, ports), `sbt compile` clean across 534 sources, 23/23 tests green.
+- **A handwritten zone that generation never touches** — 35 complete
+  implementation files (TA client, refund application, recovery loops, HTTP
+  pages) mounted via `unmanagedSourceDirectories`. No `BEGIN MANUAL` markers;
+  the filesystem is the boundary. The generated code must satisfy the
+  handwritten tests — never the reverse.
+- **A knowledge graph you can interrogate** — every compile produces a SQLite
+  graph store: `blast_radius` (what does an installment failure touch? 55
+  nodes), `lineage` (which event field feeds this displayed number?),
+  `orphans` (which concepts have no origin?), via CLI, MCP, or
+  [in your browser](https://co-arising.github.io/explorer/).
+- **Seven design projections** — journeys, screen flow, context map, event
+  flow, cash experience/lifecycle, story map: derived, regenerable design
+  views ([projections/](projections/)).
 
-## 分层验收与真实限制
+Application scenarios this enables: compliance-grade lineage (“where did this
+number come from” as a query, not archaeology); agent-assisted change planning
+(blast radius before any code is written — [the MCP exercise](https://co-arising.github.io/guide/#l3));
+and onboarding that reads the domain instead of grepping the codebase.
 
-| 层 | 额外前提 | 不能替代什么 |
+## Layered acceptance & honest limits
+
+**First success verifies the truth source only.** Requires Node ≥ 22.13.0 and
+an adjacent, paired `metarch-truthsrc` checkout ([tool install](../metarch-truthsrc/README.md#install)).
+Cloning this repo alone does not bring the tool; do not assume both repos’
+`main` are the paired state. No JVM, Docker or the 1134 archive is needed for
+the truth layers.
+
+| Layer | Extra prerequisites | Does not substitute for |
 |---|---|---|
-| source | 上述Node与两份配套源码 | 不证明生成应用可运行 |
-| anchors | 六份冻结JAR/POM；现有prepare从干净1134归档校验提取，不运行JVM | 文件/区间关联不是金融语义证明 |
-| code | 固定构建供给、原生Darwin x64、JDK11、Python与macOS受限执行工具 | actor/readside测试不等HTTP或真实数据库验收 |
-| service | 新owner租约、独占端口/存储、Docker、固定Mongo/MySQL镜像及浏览器材料 | 指定窗口不等任意故障恢复或生产认证 |
+| source | Node + paired tool checkout | does not prove the generated app runs |
+| anchors | six frozen JAR/POMs; prepare verifies extraction, runs no JVM | file/span linkage is not financial-semantic proof |
+| code | frozen build supply, native Darwin x64, JDK 11, Python, macOS sandbox tooling | actor/readside tests ≠ HTTP or real-DB acceptance |
+| service | fresh owner lease, exclusive ports/storage, Docker, pinned Mongo/MySQL images | the acceptance window ≠ arbitrary failure recovery or production certification |
 
-**完整生成仍依赖冻结供给，材料的真实公开获取渠道尚未落实。** 不虚构Release/npm下载地址，不从已运行的`dist/v1`拼包。当前运行平台和Mongo 4.4 EOL等限制见[工作坊](docs/BANK-WORKSHOP.md)与[历史发行边界](docs/HISTORY.md#release-1134)。
+**The full generation still depends on frozen artifacts whose public
+distribution channel is not yet established** — no fabricated Release/npm
+links, no repacking from a previously-run `dist/v1`. Current runtime limits
+(Mongo 4.4 EOL, platform) are in [BANK-WORKSHOP.md](docs/BANK-WORKSHOP.md) and
+[history](docs/HISTORY.md#release-1134).
 
-已有证据按候选和时点阅读：
+Existing evidence, read by candidate and timestamp:
 
-- [兼容迁移验收](docs/TRUTH-COMPATIBLE-COMPOSITION.md)：生成Repository和JDBC读侧**已被实际消费**；银行owner/查询DTO仍手写。actor64与readside47共享23项生成测试，不能相加冒独立覆盖。
-- [11月6日新人验收原回执](docs/ONBOARDING-ACCEPTANCE.md)：代码、图与固定恢复有实测，不是完整服务签收。回执中的环境状态保留原时点。
-- **最新运行（2026-11-06）：**service02已完成新代码/运行编译、24恢复窗及真实数据库initial/restart/refund，replay新读库未在90秒内追平，完整服务仍未通过；资源已归还，共享`metarch-mongo`未操作。它消费旧P23，**不是[Monarch R2下游验收](docs/MONARCH-R2-DOWNSTREAM.md)**。
-- [目录精简验收](docs/V1-RETIREMENT.md)：迁移后的新候选与各层实际结果；不继承原1134或前序代码窗口的通过。
+- [Compat-migration acceptance](docs/TRUTH-COMPATIBLE-COMPOSITION.md): generated Repository and JDBC read-side **actually consumed**; bank owner/query DTOs still handwritten. actor64 and readside47 share 23 generated tests — they do not add up to independent coverage.
+- [Nov-6 newcomer acceptance receipt](docs/ONBOARDING-ACCEPTANCE.md): code, graph and fixed recovery measured; not a full-service sign-off.
+- **Latest run (2026-11-06):** service02 completed new code/runtime compilation, the 24 recovery windows and real-DB initial/restart/refund, **but a fresh read-side replay missed the 90-second caught-up gate — the full service remains failed**; resources were returned. It consumed the older P23 artifacts — it is **not** the [Monarch R2 downstream acceptance](docs/MONARCH-R2-DOWNSTREAM.md). (`sbt run` + HTTP smoke has likewise not been executed — [DEF-07](https://co-arising.github.io/status/#DEF-07).)
+- [Directory-slimming acceptance](docs/V1-RETIREMENT.md): the migrated candidate and per-layer results; it does not inherit passes from the original 1134 or earlier code windows.
 
-根`npm test`只是明确列出的source/14产品与历史读取合同。禁止全仓测试发现、暂停的qualification/domain-runner、复用旧凭据、清除journal或改回执消红。**retry/backoff/deadline仍为实质OPEN债务，不是已接受的profile豁免**，见[当前续接状态](docs/TRUTHSRC-CONTINUATION.md)。材料分发和真人可用性也尚未完成。
+Root `npm test` covers only the explicitly listed source/14-product and
+history-read contracts. No repo-wide test discovery, no paused
+qualification/domain-runner, no credential reuse, no journal wipes, no
+receipt-editing to clear reds. **retry/backoff/deadline remains a real OPEN
+debt** — see [continuation status](docs/TRUTHSRC-CONTINUATION.md).
 
-## 继续读架构与扩展工具
+## The only author surface & the directory contract
 
-- **作者语法和项目：**[SCHEMA](../metarch-truthsrc/SCHEMA.md)、[AUTHORING](../metarch-truthsrc/AUTHORING.md)、[PROJECT](../metarch-truthsrc/PROJECT.md)。
-- **普通外部generator：**[模板](../metarch-truthsrc/generators/_template/)；`init-generator`创建确定性条目生产器，统一交给[公共writer](../metarch-truthsrc/src/core/generate.mjs)，不要自行写应用文件。
-- **正式语义产品扩展：**[产品注册表](../metarch-truthsrc/lib/products/registry.mjs)、[schema](../metarch-truthsrc/schema/)、[生成准入](../metarch-truthsrc/lib/products/generate-cli.mjs)、[产品计划](../metarch-truthsrc/src/core/product-plan.mjs)。银行`generate-project`使用已登记shipped producer，不是任意目录自动发现。
-- **银行服务生成来源：**[generator.json](../metarch-truthsrc/generators/scala-cqrs-play-service/generator.json)、[generate.mjs](../metarch-truthsrc/generators/scala-cqrs-play-service/generate.mjs)、[模板对照](../metarch-truthsrc/TEMPLATE-PARITY.md)；14项语义产品不等于14个文件。
-- **查询与协作：**[公共查询](../metarch-truthsrc/lib/query.mjs)、[文件锚核验](../metarch-truthsrc/lib/anchor-query.mjs)、[只读MCP入口](../metarch-truthsrc/mcp/server.mjs)和[银行AGENTS](AGENTS.md)。MCP不是基础使用前提；多人按独占手写模块协作，共享接口与生成apply由主集成负责。
-- **BC与金样：**[ArchitectMetadata.scala](../backkend-codegen/src/main/scala/net/imadz/meta/ArchitectMetadata.scala)、[正式产品生成入口](../backkend-codegen/src/main/scala/net/imadz/codegen/SemanticProductsGenerationPlan.scala)、[BC金样](../backkend-codegen/reference_project/app/)、[JS服务测试](../metarch-truthsrc/test/service-application-generation.test.mjs)。没有一个golden目录能替全部业务与运行验收。
+**Enter only via root `truthsrc.project.json` into `truth/bank-wealth/`.**
+Business lives in the author tree; named technical choices in
+`bindings/implementation/`. Never hand-edit canonical, complete requests,
+SQLite stores, ledgers, anchors or generated code.
 
-以上工具链接要求相邻仓库；它们不是材料已发布的承诺。完整旧说明和命令表有[固定Git入口](docs/HISTORY.md)，无需先通读历史再开始学习。
+| Location | Responsibility |
+|---|---|
+| [`truth/bank-wealth/`](truth/bank-wealth/) | system/context declarations, four-flow knowledge, structure sharing, stories & provenance |
+| [`truthsrc.project.json`](truthsrc.project.json) · [`bindings/implementation/`](bindings/implementation/) | project config & explicit technical choices |
+| [`handwritten/scala/`](handwritten/scala/) | bank ports, owner/DTOs, TA/refund/SIP adapters, pages, runtime assembly |
+| [`test/scala/`](test/scala/) | fixed business/readside/HTTP/recovery expectations, run only by explicit manifest |
+| [`third-party/`](third-party/) | licenses and provenance materials that must stay |
+| `generated/<owned>/` · `.truthsrc/` | owned generated project & derived knowledge/evidence — not a second author surface |
+| [`tools/`](tools/) · [`test/`](test/) | orchestration tooling & explicit Node/Python contract tests; no `npm start` |
+| `target/` · `.local/` · `dist/` | local candidates, supplies, run data; not in a fresh clone; do not clean or hand off wholesale |
+
+35 handwritten files, 31 fixed tests and 14 licenses migrated byte-identical;
+the old 497-file `v1/` material is preserved as fixed Git objects, retired
+from the working tree ([V1 retirement](docs/V1-RETIREMENT.md)). Old trees,
+the original README and the 1134 handover are read via the
+[history index](docs/HISTORY.md) — no second author tree is restored, and
+`/api/v1`-style business/protocol versions are not renamed to V2.
+
+## 中文速览
+
+本仓以**真源动作**为主线：`validate`（0 hard + roundtrip 字节等价）→ `compile` →
+`graph`（389 节点/413 边）→ `generate`（235 文件 Play/CQRS 工程）→ `sbt compile/test`
+（0 错误/23 通过）→ `verify-project`（792 锚）。四条业务线各对应一种协作形状：付款与
+独立退款是 **saga**（跨聚合 TCC 事务，参与者/相位/绑定都在真源声明）；定投调度是
+**pipeline**（步骤编排，显式调用 saga 并绑定持久事务身份）；TA 确认是外部系统观测。
+完整中文文档与命令表：[TRUTH.md](TRUTH.md)、[银行工作坊](docs/BANK-WORKSHOP.md)、
+[真源教程](docs/TRUTH-TUTORIAL.md)。分层验收与真实限制见上节，**完整服务尚未通过**。
+
+## Keep reading
+
+- **What came from where, what to build first:** [BUILD-RECIPE.md](docs/BUILD-RECIPE.md)
+- **Learn the tool from zero:** the [Counter tutorial](../metarch-truthsrc/TUTORIAL.md) in an isolated project
+- **Business + code in depth:** [TRUTH-TUTORIAL.md](docs/TRUTH-TUTORIAL.md) — generation, offline graph, span-exact reverse lookup, safe updates
+- **Layer-by-layer verification:** [BANK-WORKSHOP.md](docs/BANK-WORKSHOP.md) — source / anchors / code / service reported separately
+- **Command read/write surface:** [TRUTH-ENTRYPOINTS.md](docs/TRUTH-ENTRYPOINTS.md); the author contract: [TRUTH.md](TRUTH.md)
+- **Tooling & extension points** (generator templates, product registry, query/MCP) start from the [truthsrc README](../metarch-truthsrc/README.md); adjacent checkouts required for those links.
+- **The org site:** [co-arising.github.io](https://co-arising.github.io) — philosophy, the language spec, the live graph explorer, and the honest [status ledger](https://co-arising.github.io/status/).
