@@ -285,9 +285,9 @@
     ],
     "verificationCases": [],
     "runtimeArtifact": {
-      "coordinate": "net.imadz:saga-core_2.13:0.2.1-p23.20261027.1",
-      "sha256": "f20ad61eba670d2766cd39a1f75bd236351d0069b0480bb85d7335ffff93f8cf",
-      "repository": "./.local/truthsrc-runtime/maven",
+      "coordinate": "net.imadz:saga-core_2.13:0.3.0",
+      "sha256": "550fbd5cdb18a50d71a62f8f743d59f24ac1daa03f0aeb07c23c8355c2c0d862",
+      "repository": "./.local/truthsrc-runtime-0.3.0/maven",
       "symbolicTarget": "net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT"
     },
     "service": {
