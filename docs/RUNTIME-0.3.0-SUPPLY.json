@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "bank.runtime-supply-lock/v1",
+  "version": "0.3.0",
+  "source": "maven-central",
+  "archive": {
+    "sha256": "95daa7b9d1d394aa647175fd1b6418fd9ddac943026302a4174697bffba2cade",
+    "bytes": 454794971,
+    "membersValidated": 4137,
+    "counts": { "maven": 1048, "ivy": 16, "launcher": 1 },
+    "inventorySha256": "0ece2c6fe99156216d08fa8b3e1eaae90a11c004193b4e91116959304464c1eb",
+    "inventoryEncoding": "UTF-8 JSON.stringify(sorted [path,bytes,sha256] rows), no newline"
+  },
+  "artifacts": [
+    {
+      "groupId": "net.imadz",
+      "artifactId": "saga-core_2.13",
+      "version": "0.3.0",
+      "packaging": "jar",
+      "jar": {
+        "path": "maven/net/imadz/saga-core_2.13/0.3.0/saga-core_2.13-0.3.0.jar",
+        "bytes": 1766108,
+        "sha256": "550fbd5cdb18a50d71a62f8f743d59f24ac1daa03f0aeb07c23c8355c2c0d862"
+      },
+      "pom": {
+        "path": "maven/net/imadz/saga-core_2.13/0.3.0/saga-core_2.13-0.3.0.pom",
+        "bytes": 4369,
+        "sha256": "105f2c4d0aab1ca5df41f07933ec417438acb4ba9ddd9f3af4a9d89bb83ea923"
+      },
+      "dependencies": [
+        { "coordinate": "org.scala-lang:scala-library:2.13.14", "scope": "compile" },
+        { "coordinate": "com.thesamet.scalapb:scalapb-runtime_2.13:0.11.14", "scope": "compile" },
+        { "coordinate": "net.imadz:common-core_2.13:0.2", "scope": "compile" },
+        { "coordinate": "com.typesafe.akka:akka-actor-typed_2.13:2.6.20", "scope": "compile" },
+        { "coordinate": "com.typesafe.akka:akka-persistence-typed_2.13:2.6.20", "scope": "compile" },
+        { "coordinate": "com.typesafe.akka:akka-cluster-sharding-typed_2.13:2.6.20", "scope": "compile" },
+        { "coordinate": "com.typesafe.akka:akka-actor-testkit-typed_2.13:2.6.20", "scope": "test" },
+        { "coordinate": "com.typesafe.akka:akka-persistence-testkit_2.13:2.6.20", "scope": "test" },
+        { "coordinate": "com.typesafe.akka:akka-serialization-jackson_2.13:2.6.20", "scope": "test" },
+        { "coordinate": "org.scalatest:scalatest_2.13:3.2.15", "scope": "test" },
+        { "coordinate": "ch.qos.logback:logback-classic:1.4.5", "scope": "test" },
+        { "coordinate": "com.google.protobuf:protobuf-java:3.15.6", "scope": "compile" },
+        { "coordinate": "com.typesafe.play:play-json_2.13:2.9.3", "scope": "compile" },
+        { "coordinate": "javax.inject:javax.inject:1", "scope": "compile" },
+        { "coordinate": "com.google.inject:guice:5.1.0", "scope": "compile" }
+      ]
+    },
+    {
+      "groupId": "net.imadz",
+      "artifactId": "monarch-core_2.13",
+      "version": "0.3.0",
+      "packaging": "jar",
+      "jar": {
+        "path": "maven/net/imadz/monarch-core_2.13/0.3.0/monarch-core_2.13-0.3.0.jar",
+        "bytes": 63800,
+        "sha256": "0c7a25eecae28d6f4b14a36c887511ffca5d2a755a5a618b281a271a66310b3b"
+      },
+      "pom": {
+        "path": "maven/net/imadz/monarch-core_2.13/0.3.0/monarch-core_2.13-0.3.0.pom",
+        "bytes": 1832,
+        "sha256": "b0c9c4ce03c5904730a87866862483bc6172049b15e1ba72c37047381192e844"
+      },
+      "dependencies": [
+        { "coordinate": "org.scala-lang:scala-library:2.13.14", "scope": "compile" },
+        { "coordinate": "org.scalatest:scalatest_2.13:3.2.15", "scope": "test" }
+      ]
+    },
+    {
+      "groupId": "net.imadz",
+      "artifactId": "monarch-persistence_2.13",
+      "version": "0.3.0",
+      "packaging": "jar",
+      "jar": {
+        "path": "maven/net/imadz/monarch-persistence_2.13/0.3.0/monarch-persistence_2.13-0.3.0.jar",
+        "bytes": 4284007,
+        "sha256": "f42f1b9946be8f5a659ef067a731eee093e81b7c2df9b3e1ad8abefef4971c55"
+      },
+      "pom": {
+        "path": "maven/net/imadz/monarch-persistence_2.13/0.3.0/monarch-persistence_2.13-0.3.0.pom",
+        "bytes": 3695,
+        "sha256": "7692d1f5681f305646ce04fcb438e67240be5a6282132287ecb3f9fadabb1f98"
+      },
+      "dependencies": [
+        { "coordinate": "org.scala-lang:scala-library:2.13.14", "scope": "compile" },
+        { "coordinate": "com.thesamet.scalapb:scalapb-runtime_2.13:0.11.14", "scope": "compile" },
+        { "coordinate": "net.imadz:monarch-core_2.13:0.3.0", "scope": "compile" },
+        { "coordinate": "com.typesafe.akka:akka-actor-typed_2.13:2.6.20", "scope": "compile" },
+        { "coordinate": "com.typesafe.akka:akka-persistence-typed_2.13:2.6.20", "scope": "compile" },
+        { "coordinate": "com.typesafe.akka:akka-serialization-jackson_2.13:2.6.20", "scope": "compile" },
+        { "coordinate": "com.typesafe.akka:akka-cluster-sharding-typed_2.13:2.6.20", "scope": "compile" },
+        { "coordinate": "com.typesafe.akka:akka-actor-testkit-typed_2.13:2.6.20", "scope": "test" },
+        { "coordinate": "com.typesafe.akka:akka-persistence-testkit_2.13:2.6.20", "scope": "test" },
+        { "coordinate": "org.scalatest:scalatest_2.13:3.2.18", "scope": "test" },
+        { "coordinate": "ch.qos.logback:logback-classic:1.2.13", "scope": "test" }
+      ]
+    }
+  ]
+}

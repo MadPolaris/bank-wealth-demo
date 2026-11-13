@@ -11,15 +11,20 @@
 | `--through` | 必需材料 | 真正证明的范围 |
 |---|---|---|
 | `source` | 当前银行源码、完整相邻配套工具源码、Node ≥22.13.0（已验22.13.0、22.23.4） | validate、原文 roundtrip、严格产品编译；不是 Scala 执行 |
-| `anchors` | 再加实际 clean1134 归档 | 现有 prepare 验六个固定 JAR/POM；公共生成和只读图/回锚验收 |
+| `anchors` | 再加实际 clean1134 归档及显式 `--runtime-supply` 指向的已准备 0.3.0 目录 | 只读核验六个固定 JAR/POM、POM 依赖和项目选择；公共生成和只读图/回锚验收 |
 | `code` | 再加原生 Darwin x64、已安装 x64 JDK11、sandbox-exec/Python | 两个独立 fresh 输出，固定 actor 与 readside 测试及实际 staging 来源核验 |
 | `service` | 再加显式新租约、可用 Docker/socket、固定 Mongo/MySQL 镜像、显式 Playwright module 与 `chrome-headless-shell` | 第三个 fresh runtime 构建，全部恢复/数据库/HTTP窗口、浏览器和资源退出 |
 
 归档必须是实际取得的文件，SHA256 为
 `95daa7b9d1d394aa647175fd1b6418fd9ddac943026302a4174697bffba2cade`。
 不寻找旧运行目录、不借用户缓存、不下载、不递归打包 `dist/v1`，也不重建/发布
-runtime。材料的真实公开获取渠道尚未落实，因此入口始终单列
-`deliveryReady:false`，不以“请找维护者”冒称完成交付。
+runtime。已准备的0.3.0供给必须恰好包含三组JAR/POM和一份receipt，核验独立锁
+`docs/RUNTIME-0.3.0-SUPPLY.json`，不以receipt自报SHA自证正确。原归档1065成员
+保持历史事实；新构建供给排除36个P23引擎成员、叠加六个0.3.0成员，得到1035文件，
+实际解析的三引擎坐标/JAR字节另行核验。不能用旧1065计数给新组合签收。
+
+材料的真实公开获取渠道尚未落实，因此入口始终单列`deliveryReady:false`，
+不以“请找维护者”冒称完成交付。
 
 首版银行构建目标是原生 Darwin x64/JDK11。工具已在Node22.13.0和22.23.4实测安装与Counter/回锚/图闭环；其它平台及真人上手仍单独验收。下面命令不构成抢占共享服务或绕过资源预约的授权。
 
@@ -57,22 +62,27 @@ source阶段使用公共串行验证运行器，在`attempts/0001/source-verific
 
 ```bash
 ARCHIVE="/absolute/path/to/bank-wealth-v1-darwin-x64-1134.tar.gz"
+RUNTIME_SUPPLY="$BANK/.local/truthsrc-runtime-0.3.0"
 JAVA_HOME_BANK="/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home"
 node "$BANK/tools/bank-workshop.mjs" doctor --through code \
-  --archive "$ARCHIVE" --java-home "$JAVA_HOME_BANK" --format human
+  --archive "$ARCHIVE" --runtime-supply "$RUNTIME_SUPPLY" \
+  --java-home "$JAVA_HOME_BANK" --format human
 node "$BANK/tools/bank-workshop.mjs" verify --through code \
   --run "$BANK/target/workshop-code-01" \
-  --archive "$ARCHIVE" --java-home "$JAVA_HOME_BANK" --format human
+  --archive "$ARCHIVE" --runtime-supply "$RUNTIME_SUPPLY" \
+  --java-home "$JAVA_HOME_BANK" --format human
 ```
 
-只学习回锚时用 `--through anchors`，无需 JDK 参数。入口按请求范围先检查全部材料；
-缺材料会留下失败 run/attempt，但不会先生成候选再自动降级。
+只学习回锚时用 `--through anchors`，同样传入归档和运行供给，无需 JDK 参数。
+`source`拒绝无关供给参数；anchors/code/service缺少必需flag会在创建run前拒绝。
+材料不可读或内容不合格时保留已创建的失败run/attempt，不会先生成候选再自动降级。
 
 实际编排如下，不用旧 receipt 填空，也不手抄生成代码。
 
-1. 公共 `compile-project` 捕获 validate、roundtrip 和 strict compilation。
-2. 现有 `prepare-truthsrc-runtime.mjs --archive ...` 校验归档并准备六个固定成员。
-   已存在的本地供给只接受原 prepare 的完整核验，不能覆盖改坏的供给。
+1. 只读捕获原归档及显式0.3.0供给，核项目repository、完整成员集、独立JAR/POM锁。
+   **不执行 `prepare-truthsrc-runtime.mjs --archive ...`**；当前prepare是另一条可能下载的
+   材料准备入口，不是验收步骤。
+2. 公共 `compile-project` 捕获 validate、roundtrip 和 strict compilation。
 3. 公共 `generate-project` 生成 fresh `actor-output`；`verifyProject` 校验图、代码、
    回锚及具名必需切片：ReserveFunds、LEDGER_POSITIVE、reservedAmount fold。
 4. 现有 build verifier 执行 `--run-actor-tests`，复核实际 staging、固定测试和输入。
@@ -85,7 +95,13 @@ node "$BANK/tools/bank-workshop.mjs" verify --through code \
 
 ## 4. 完整服务：第三份同源构建与新的 owner
 
-当前验收状态：service02使用P23制品，代码、固定24恢复窗及数据库initial/restart/refund已执行通过；全新SQL读库replay未在90秒内caught-up，**完整service仍失败，人工会话未执行**。本轮运行资源已归还，旧数据和失败回执保留，详见[V1-RETIREMENT](V1-RETIREMENT.md)。历史机器环境或镜像可见性不是今天的租约，不据此启动或操作共享服务。
+历史service02使用P23制品，代码、固定24恢复窗及数据库initial/restart/refund通过；
+新SQL读库replay未在90秒内caught-up，原完整service失败回执保持。2026-11-12独立
+P23新窗口已在34.598秒追平并通过四数据库阶段、浏览器及MySQL负例，见
+[重放诊断](REPLAY-DIAGNOSIS-20261111.md)；这不把service02改绿，也不是0.3.0验收。
+当前新交付目标为正式0.3.0，完整结果以新owner的新report为准；不能由旧P23结果或
+单独compile/test/anchors推断通过。人工会话仍须独立验证。历史环境或镜像可见性不是
+今天的租约，不据此操作共享服务。
 
 先按当前协调约定预约独占端口，选未使用的 owner。租约 JSON 在数据根之外，只有
 以下字段；将路径和端口替换成自己的实际值。
@@ -112,12 +128,14 @@ LEASE="/absolute/path/to/new-lease.json"
 BROWSER_MODULE="/absolute/path/to/playwright/index.mjs"
 BROWSER_EXECUTABLE="/absolute/path/to/chrome-headless-shell"
 node "$BANK/tools/bank-workshop.mjs" doctor --through service \
-  --archive "$ARCHIVE" --java-home "$JAVA_HOME_BANK" --lease "$LEASE" \
+  --archive "$ARCHIVE" --runtime-supply "$RUNTIME_SUPPLY" \
+  --java-home "$JAVA_HOME_BANK" --lease "$LEASE" \
   --browser-module "$BROWSER_MODULE" --browser-executable "$BROWSER_EXECUTABLE" \
   --probe-resources --format human
 node "$BANK/tools/bank-workshop.mjs" verify --through service \
   --run "$BANK/target/workshop-service-01" \
-  --archive "$ARCHIVE" --java-home "$JAVA_HOME_BANK" --lease "$LEASE" \
+  --archive "$ARCHIVE" --runtime-supply "$RUNTIME_SUPPLY" \
+  --java-home "$JAVA_HOME_BANK" --lease "$LEASE" \
   --browser-module "$BROWSER_MODULE" --browser-executable "$BROWSER_EXECUTABLE" \
   --format human
 ```

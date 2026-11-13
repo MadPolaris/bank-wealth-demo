@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { randomBytes, createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
+import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseStrictJson } from '../../metarch-truthsrc/lib/strict-json.mjs';
@@ -38,6 +39,96 @@ export function runtimeArgs(args) {
   assert.equal(values.has('--browser-module'), values.has('--browser-executable'), usage);
   return { lease: values.get('--lease'), buildEvidence: values.get('--build-evidence'), evidence: values.get('--evidence'), round: values.get('--round'),
     window: values.get('--window'), browserModule: values.get('--browser-module') ?? null, browserExecutable: values.get('--browser-executable') ?? null };
+}
+
+// Readiness is diagnostic only; the frozen business oracle runs separately.
+// Native fetch/reader cancellation is trusted to settle after abort. This is not
+// a watchdog for arbitrary dependency code that blocks or ignores its signal.
+export async function waitForReadside({ origin, token, secrets = [], signal, exited = () => false },
+  { fetchImpl = fetch, clock = () => performance.now(), sleep = (ms, options) => delay(ms, undefined, options) } = {}) {
+  const deadlineMs = 90_000, requestTimeoutMs = 5000, intervalMs = 300, maxBodyBytes = 256 * 1024;
+  const started = clock(), elapsed = () => Math.max(0, clock() - started);
+  const report = { schemaVersion: 'bank.truthsrc-readiness/v1', passed: false, deadlineMs, requestTimeoutMs, intervalMs,
+    maxBodyBytes, elapsedMs: 0, samples: [] };
+  const privateValues = [token, ...secrets].filter(value => typeof value === 'string' && value.length > 0);
+  const publicText = value => typeof value === 'string' && !privateValues.some(secret => value.includes(secret));
+  const disposition = value => publicText(value) && ['caught-up', 'catching-up', 'unknown', 'not-found'].includes(value) ? value : null;
+  const persistenceId = value => publicText(value) && /^[A-Za-z0-9][A-Za-z0-9_.:|/-]{0,255}$/.test(value) ? value : null;
+  const sequence = value => Number.isSafeInteger(value) && value >= 0 ? value : null;
+  const failure = message => {
+    report.elapsedMs = Math.floor(elapsed());
+    return Object.assign(new Error(message), { report });
+  };
+  // At most 300 attempts in the fixed window, even with an injected clock/sleep.
+  while (elapsed() < deadlineMs && report.samples.length < Math.ceil(deadlineMs / intervalMs)) {
+    if (signal?.aborted) throw failure('production readiness cancelled');
+    if (exited()) throw failure('production server exited before readiness');
+    const requestStarted = elapsed(), requestLimit = Math.min(requestTimeoutMs, deadlineMs - requestStarted);
+    if (requestLimit <= 0) break;
+    const sample = { startedMs: Math.floor(requestStarted), endedMs: null, status: null, disposition: null,
+      accountPresent: false, watermarks: [], watermarksOmitted: 0, failure: null };
+    const request = new AbortController();
+    const requestSignal = signal ? AbortSignal.any([signal, request.signal]) : request.signal;
+    const timer = setTimeout(() => request.abort(), Math.max(1, Math.floor(requestLimit)));
+    let reader, bodyDone = false;
+    try {
+      const response = await fetchImpl(origin + '/api/v1/accounts/me', { headers: { Authorization: 'Bearer ' + token },
+        redirect: 'error', signal: requestSignal });
+      sample.status = Number.isSafeInteger(response.status) ? response.status : null;
+      reader = response.body?.getReader();
+      if (response.status !== 200) sample.failure = 'http-status';
+      else {
+        const chunks = []; let size = 0;
+        for (;;) {
+          const chunk = reader ? await reader.read() : { done: true };
+          if (chunk.done) { bodyDone = true; break; }
+          size += chunk.value.byteLength;
+          if (size > maxBodyBytes) { sample.failure = 'response-too-large'; break; }
+          chunks.push(chunk.value);
+        }
+        if (!sample.failure) {
+          let view;
+          // TextDecoder matches Response.json(): UTF-8 replacement decoding and
+          // a leading BOM removed, unlike Buffer.toString followed by JSON.parse.
+          try { view = JSON.parse(new TextDecoder().decode(Buffer.concat(chunks))); }
+          catch { sample.failure = 'invalid-json'; }
+          if (!sample.failure) {
+            sample.disposition = disposition(view?.metadata?.disposition);
+            sample.accountPresent = !!view?.account;
+            const marks = Array.isArray(view?.metadata?.watermarks) ? view.metadata.watermarks : [];
+            sample.watermarks = marks.slice(0, 16).map(row => ({ persistenceId: persistenceId(row?.persistenceId),
+              lastSequence: sequence(row?.lastSequence), observedSequence: sequence(row?.observedSequence),
+              disposition: disposition(row?.disposition) }));
+            sample.watermarksOmitted = Math.max(0, marks.length - sample.watermarks.length);
+          }
+        }
+      }
+    } catch {
+      sample.failure = requestSignal.aborted ? 'request-aborted' : 'request-or-body-error';
+    } finally {
+      if (!sample.failure && requestSignal.aborted) sample.failure = 'request-aborted';
+      if (!bodyDone) {
+        request.abort();
+        try { await reader?.cancel(); } catch { /* no exception/body text retained */ }
+      }
+      reader?.releaseLock();
+      clearTimeout(timer);
+    }
+    const ended = elapsed(); sample.endedMs = Math.floor(ended);
+    // Timers cannot preempt synchronous work: also reject a late completed read.
+    if (!sample.failure && ended - requestStarted >= requestLimit) sample.failure = 'request-aborted';
+    report.samples.push(sample); report.elapsedMs = Math.floor(ended);
+    if (signal?.aborted) throw failure('production readiness cancelled');
+    if (exited()) throw failure('production server exited before readiness');
+    if (ended < deadlineMs && !sample.failure && sample.status === 200 && sample.disposition === 'caught-up' && sample.accountPresent) {
+      report.passed = true; return report;
+    }
+    const remaining = deadlineMs - elapsed();
+    if (remaining <= 0) break;
+    try { await sleep(Math.min(intervalMs, remaining), { signal }); }
+    catch { throw failure(signal?.aborted ? 'production readiness cancelled' : 'production readiness wait failed'); }
+  }
+  throw failure(signal?.aborted ? 'production readiness cancelled' : 'production readiness deadline');
 }
 
 async function verifyListener(pid, port) {
@@ -95,8 +186,11 @@ const runtimeFiles = [
   'simulator/contract.mjs', 'simulator/journal.mjs', 'tools/v1-crash-recovery.mjs', 'tools/v1-release-build-evidence.mjs',
   'tools/v1-browser-funds.mjs', 'tools/v1-browser-check.mjs', 'test/fixtures/truthsrc-actor-ta.json',
   'tools/historical-assets.mjs', 'docs/V1-RETIREMENT-MANIFEST.json',
+  'tools/truthsrc-acceptance-supply.mjs', 'docs/RUNTIME-0.3.0-SUPPLY.json',
 ].map(file => join(ROOT, file)).concat(['strict-json', 'immutable-data', 'verification/files', 'verification/inventory', 'verification/outcome', 'verification/lease', 'verification/callbacks', 'verification/worker-evidence', 'verification/process']
   .map(name => join(ROOT, '../metarch-truthsrc/lib', name + '.mjs')));
+const loadedRuntimeFiles = snapshotFiles(runtimeFiles);
+const checkLoadedRuntime = () => assert.deepEqual(snapshotFiles(runtimeFiles), loadedRuntimeFiles, 'loaded runtime controller/helper changed');
 
 async function runDatabaseWindow({ admitted, evidence, round, owner, ports, taConfig, taConfigSha256, fixtureSha256, env, options, recheck, signal, runProcess }) {
   const { http: HTTP, mysql: MYSQL, mongo: MONGO } = ports;
@@ -128,7 +222,8 @@ async function runDatabaseWindow({ admitted, evidence, round, owner, ports, taCo
       const runEvidence = join(root, mode);
       const b = await boundary({ root: runEvidence, writeRoot: evidence, round, httpPort: HTTP, immutable: [config, logback, browserConfig, taConfig],
         readOnlyRoots: databases.readOnlyPaths,
-        protectedEvidence: ['server', 'browser'].flatMap(name => Object.values(processEvidencePaths(join(runEvidence, name)))),
+        protectedEvidence: ['server', 'browser'].flatMap(name => Object.values(processEvidencePaths(join(runEvidence, name))))
+          .concat(join(runEvidence, 'readiness.json')),
         env, network: true, databases: [MYSQL, MONGO], processRunner: runProcess });
       let observation, browser, beforeGet, afterGet, negatives, listener, callbackFailure;
       let runtimePhase = 'server-start';
@@ -146,16 +241,13 @@ async function runDatabaseWindow({ admitted, evidence, round, owner, ports, taCo
           runtimePhase = 'listener-verification';
           listener = await verifyListener(child.pid, HTTP);
           runtimePhase = 'readside-ready';
-          const deadline = Date.now() + 90_000;
-          for (;;) {
-            child.signal.throwIfAborted();
-            try {
-              const response = await fetch(value.origin + '/api/v1/accounts/me', { headers: { Authorization: 'Bearer ' + credentials.customer.token },
-                redirect: 'error', signal: AbortSignal.timeout(5000) });
-              const view = await response.json();
-              if (response.status === 200 && view.metadata?.disposition === 'caught-up' && view.account) break;
-            } catch { /* startup may precede read-side readiness */ }
-            assert.ok(Date.now() < deadline && !child.exited(), 'production readiness deadline'); await delay(300);
+          try {
+            const readiness = await waitForReadside({ origin: value.origin, token: credentials.customer.token,
+              secrets, signal: child.signal, exited: () => child.exited() });
+            save(join(runEvidence, 'readiness.json'), readiness);
+          } catch (error) {
+            if (error.report) save(join(runEvidence, 'readiness.json'), error.report);
+            throw error;
           }
           if (mode === 'initial') {
             runtimePhase = 'mongo-before-auth';
@@ -242,7 +334,8 @@ export async function verifyRuntime(options, { admitBuild = admitRuntimeBuild, a
   const onInt = () => cancelled.abort('SIGINT'), onTerm = () => cancelled.abort('SIGTERM');
   process.on('SIGINT', onInt); process.on('SIGTERM', onTerm);
   const result = { schemaVersion: 'bank.truthsrc-runtime/v1', status: 'blocked', owner: null, buildEvidence: options.buildEvidence,
-    evidence, round, window: options.window, checks: {}, errors: [], runtimeRebuilt: false, runtimePublished: false,
+    evidence, round, window: options.window, runtimeVersion: null, preparedRuntime: null,
+    checks: {}, errors: [], runtimeRebuilt: false, runtimePublished: false,
     release1134Resigned: false, runtimeRetryBackoffDeadline: 'OPEN' };
   let lease, admitted, evidenceCreated = false, before, config, env, browserInputs, databaseDispatched = false, processesStopped = true;
   let activeProcesses = 0;
@@ -257,6 +350,7 @@ export async function verifyRuntime(options, { admitBuild = admitRuntimeBuild, a
     finally { activeProcesses--; }
   };
   try {
+    checkLoadedRuntime();
     // No old reservation lookup and no candidate admission/launch before an
     // explicit new lease has passed file exclusivity and actual port preflight.
     lease = await acquireLease(options);
@@ -264,6 +358,11 @@ export async function verifyRuntime(options, { admitBuild = admitRuntimeBuild, a
     result.owner = owner; result.lease = lease.record;
     cancelled.signal.throwIfAborted(); lease.assertHeld();
     admitted = await admitBuild(options.buildEvidence);
+    checkLoadedRuntime();
+    // Admission owns supply validation. Legacy admissions need not carry this
+    // descriptor; never infer a version from an output path or a saved summary.
+    result.preparedRuntime = admitted.preparedRuntime ?? null;
+    result.runtimeVersion = result.preparedRuntime?.version ?? null;
     cancelled.signal.throwIfAborted(); lease.assertHeld();
     safePath(evidence, 'new'); safePath(round, 'new');
     mkdirSync(evidence, { mode: 0o700 }); evidenceCreated = true;
@@ -279,7 +378,9 @@ export async function verifyRuntime(options, { admitBuild = admitRuntimeBuild, a
     const fixtureSha256 = fileDigest(FIXTURE);
     save(config, { schemaVersion: 'bank.truthsrc-runtime-ta/v1', ownedRoot: round, fixture: { file: FIXTURE, sha256: fixtureSha256 } });
     before = snapshotFiles([...runtimeFiles, options.lease, config, ...(options.browserModule ? [options.browserModule, options.browserExecutable] : [])]);
+    assert.deepEqual(Object.fromEntries(runtimeFiles.map(file => [file, before[file]])), loadedRuntimeFiles, 'loaded runtime controller/helper changed');
     save(join(evidence, 'inputs.json'), { owner, build: admitted.before, runtime: before, browserInputs: browserInputs ?? null, options,
+      runtimeVersion: result.runtimeVersion, preparedRuntime: result.preparedRuntime,
       lease: lease.record, networkScope: options.window === 'crash' ? 'deny-all' : RUNTIME_NETWORK_SCOPE, networkLimitation: RUNTIME_NETWORK_LIMITATION });
     const recheck = async () => {
       cancelled.signal.throwIfAborted(); lease.assertHeld();
@@ -316,6 +417,7 @@ export async function verifyRuntime(options, { admitBuild = admitRuntimeBuild, a
   finally {
     try {
       try {
+        checkLoadedRuntime();
         if (before) assert.deepEqual(snapshotFiles(Object.keys(before)), before);
         if (browserInputs) for (const [root, expected] of Object.entries(browserInputs)) assert.deepEqual(inventory(root), expected);
         if (admitted) { await admitted.assertUnchanged(); result.checks.inputsUnchanged = true; }

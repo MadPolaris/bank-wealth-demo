@@ -130,12 +130,34 @@ object BankWorkshopMain {
           "applicationLoadStarted" -> applicationLoadStarted)))
       }
     }
+    var publishedStop = Option.empty[(Vector[Any], Vector[Any], String)]
     def requested(): Boolean = {
-      if (!Files.exists(owned.resolve("stop.json"), LinkOption.NOFOLLOW_LINKS)) false
-      else {
+      val data = owned.resolve("stop.json")
+      val marker = owned.resolve("stop.json.ready")
+      if (!Files.exists(marker, LinkOption.NOFOLLOW_LINKS)) {
+        require(publishedStop.isEmpty, "published stop marker disappeared")
+        false
+      } else {
         val previous = diagnostic.phase
         diagnostic.phase = "stop-control"
-        require(read(owned.resolve("stop.json")) == identity)
+        def control(file: Path, limit: Long): Vector[Any] = {
+          require(Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS) && file.toRealPath() == file)
+          require(Files.getOwner(file) == Files.getOwner(owned))
+          require(Files.getPosixFilePermissions(file) == PosixFilePermissions.fromString("rw-------"))
+          require(Files.getAttribute(file, "unix:nlink", LinkOption.NOFOLLOW_LINKS) == Integer.valueOf(1))
+          require(Files.size(file) <= limit)
+          Vector("dev", "ino", "mode", "uid", "gid", "nlink", "size", "lastModifiedTime", "ctime")
+            .map(name => Files.getAttribute(file, "unix:" + name, LinkOption.NOFOLLOW_LINKS))
+        }
+        val markerBefore = control(marker, 0)
+        val dataBefore = control(data, 16384)
+        val bytes = Files.readAllBytes(data)
+        require(Json.parse(bytes).as[JsObject] == identity)
+        require(control(marker, 0) == markerBefore && control(data, 16384) == dataBefore)
+        val fingerprint = MessageDigest.getInstance("SHA-256").digest(bytes).map(b => f"${b & 0xff}%02x").mkString
+        val captured = (markerBefore, dataBefore, fingerprint)
+        publishedStop.foreach(previous => require(previous == captured, "published stop control changed"))
+        publishedStop = Some(captured)
         diagnostic.phase = previous
         true
       }

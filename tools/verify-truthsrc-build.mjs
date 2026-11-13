@@ -12,6 +12,8 @@ import { safePath } from './truthsrc-evidence.mjs';
 import { fingerprintEvidenceFile } from '../../metarch-truthsrc/lib/verification/files.mjs';
 import { compareEvidenceInventories, inventoryEvidence, snapshotEvidenceFiles } from '../../metarch-truthsrc/lib/verification/inventory.mjs';
 import { verificationOutcome } from '../../metarch-truthsrc/lib/verification/outcome.mjs';
+import { SUPPLY_SUPPORT, LEGACY_ENGINE_FILES, capturePreparedRuntime, validateComposedSupply,
+  engineClasspathTasks, inspectEngineClasspath } from './truthsrc-acceptance-supply.mjs';
 
 export { safePath } from './truthsrc-evidence.mjs';
 import {
@@ -54,7 +56,8 @@ const UNIT_CONFIGURATION = 'UNIT-CONFIGURATION-OK journal=testkit snapshot=testk
 const SUITES_MARKER = 'TRUTHSRC-GENERATED-SUITES=';
 const usage = `Usage: node tools/verify-truthsrc-build.mjs \\
   --project-output <absolute-fresh-generated-root> \\
-  --archive <absolute-clean-1134.tar.gz> --evidence <absolute-new-evidence-root> \\
+  --archive <absolute-clean-1134.tar.gz> --runtime-supply <absolute-prepared-0.3.0-root> \\
+  --evidence <absolute-new-evidence-root> \\
   [--java-home <absolute-JDK11-home>] [--compile-generated-tests]
   [--run-generated-tests | --run-actor-tests | --run-readside-tests | --compile-runtime-tests]
 
@@ -77,7 +80,7 @@ network resolution, runtime rebuild/publish, or historical acceptance runner.`;
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const READSIDE_HELPER_SHA256 = fileDigest(READSIDE_MANIFEST_FILE);
 export const BUILD_SUPPORT = Object.freeze([join(ROOT, 'tools/truthsrc-evidence.mjs'),
-  ...['verification/files', 'verification/inventory', 'verification/outcome', 'immutable-data', 'strict-json'].map(name => join(TOOL, 'lib', name + '.mjs'))]);
+  ...['verification/files', 'verification/inventory', 'verification/outcome', 'immutable-data', 'strict-json'].map(name => join(TOOL, 'lib', name + '.mjs')), ...SUPPLY_SUPPORT]);
 const loadedBuildSupport = snapshotFiles(BUILD_SUPPORT);
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const save = (file, value) => writeFileSync(file, json(value), { flag: 'wx', mode: 0o600 });
@@ -99,16 +102,16 @@ export function parseArgs(args) {
     const flag = args[i];
     assert.ok(!flags.has(flag), usage);
     if (['--compile-generated-tests', '--run-generated-tests', '--run-actor-tests', '--run-readside-tests', '--compile-runtime-tests'].includes(flag)) { flags.set(flag, true); continue; }
-    assert.ok(['--project-output', '--archive', '--evidence', '--java-home'].includes(flag) &&
+    assert.ok(['--project-output', '--archive', '--runtime-supply', '--evidence', '--java-home'].includes(flag) &&
       args[i + 1] && !args[i + 1].startsWith('--'), usage);
     flags.set(flag, args[++i]);
   }
-  for (const flag of ['--project-output', '--archive', '--evidence']) assert.ok(flags.has(flag), usage);
+  for (const flag of ['--project-output', '--archive', '--runtime-supply', '--evidence']) assert.ok(flags.has(flag), usage);
   const runActors = flags.has('--run-actor-tests'), runReadside = flags.has('--run-readside-tests');
   const compileRuntimeTests = flags.has('--compile-runtime-tests');
   assert.ok([runActors, runReadside, flags.has('--run-generated-tests'), compileRuntimeTests].filter(Boolean).length <= 1, 'choose one explicit execution mode');
   const runTests = runActors || runReadside || flags.has('--run-generated-tests');
-  return { output: flags.get('--project-output'), archive: flags.get('--archive'),
+  return { output: flags.get('--project-output'), archive: flags.get('--archive'), runtimeSupply: flags.get('--runtime-supply'),
     evidence: flags.get('--evidence'), javaHome: flags.get('--java-home') ?? DEFAULT_JAVA_HOME,
     compileTests: runTests || compileRuntimeTests || flags.has('--compile-generated-tests'), runTests, runActors, runReadside, compileRuntimeTests };
 }
@@ -358,7 +361,9 @@ export async function admitCandidate(output, options, { afterBuild = false } = {
   safePath(TOOL);
   safePath(PROJECT, 'file');
   safePath(HANDWRITTEN);
-  safePath(RUNTIME);
+  const preparedRuntime = options.runtimeSupply ? capturePreparedRuntime(options.runtimeSupply) : null;
+  const runtimeRoot = preparedRuntime?.root ?? RUNTIME;
+  safePath(runtimeRoot);
   const { captureProject, projectPlan, assertUnchanged } = await import(pathToFileURL(join(TOOL, 'lib/project/cli.mjs')));
   const { parseStrictJson } = await import(pathToFileURL(join(TOOL, 'lib/strict-json.mjs')));
   const { readAnchorsIndex } = await import(pathToFileURL(join(TOOL, 'src/core/anchors.mjs')));
@@ -370,8 +375,8 @@ export async function admitCandidate(output, options, { afterBuild = false } = {
   assert.equal(captured.config.canonicalId, 'bank-v1');
   assert.equal(captured.config.options.service.artifact, 'bank-service');
   assert.deepEqual(captured.config.options.service.externalSourceRoots, [HANDWRITTEN]);
-  assert.equal(captured.config.options.runtimeArtifact.repository, pathToFileURL(join(RUNTIME, 'maven')).href + '/');
-  assert.ok(!overlap(output, HANDWRITTEN) && !overlap(output, TOOL) && !overlap(output, RUNTIME));
+  assert.equal(captured.config.options.runtimeArtifact.repository, pathToFileURL(join(runtimeRoot, 'maven')).href + '/');
+  assert.ok(!overlap(output, HANDWRITTEN) && !overlap(output, TOOL) && !overlap(output, runtimeRoot));
   const inputs = parseStrictJson(readFileSync(join(output, '.truthsrc/inputs.json')));
   let graphAst;
   if (inputs.graph) {
@@ -446,10 +451,10 @@ export async function admitCandidate(output, options, { afterBuild = false } = {
     assert.ok(testFiles.includes(file), 'current service unit support missing');
   assert.ok(build.includes('.service.UnitTestMain'), 'unexpected generated test runner');
   const testManifest = generatedTestManifest(plan.entries, options);
-  const handwritten = inventory(HANDWRITTEN), runtime = inventory(RUNTIME);
+  const handwritten = inventory(HANDWRITTEN), runtime = inventory(runtimeRoot);
   assert.ok(Object.keys(handwritten).some(file => file.endsWith('.scala')), 'empty handwritten Scala tree');
   assertUnchanged(captured);
-  return { before, handwritten, runtime, captured, assertUnchanged, testFiles, testManifest, generator: plan.generator };
+  return { before, handwritten, runtime, runtimeRoot, preparedRuntime, captured, assertUnchanged, testFiles, testManifest, generator: plan.generator };
 }
 
 // tarfile is used ONLY as a reader, never extract()/extractall(). Validate the
@@ -521,6 +526,120 @@ with open(archive, 'rb') as raw:
     require(digest(raw) == expected, 'archive SHA256 changed after extraction')
     require(identity(os.stat(archive, follow_symlinks=False)) == identity(original), 'archive path replaced')
 print(json.dumps({'archiveSha256': expected, 'membersValidated': len(members), 'counts': counts, 'files': files}, sort_keys=True))
+`;
+
+// Current acceptance composes a fresh repository; the original archive is never changed.
+const extractCurrentSource = String.raw`import hashlib, json, os, pathlib, stat, sys, tarfile, unicodedata
+archive, destination, expected, selection_file, selection_sha = sys.argv[1:]
+def require(ok, message):
+    if not ok: raise ValueError(message)
+def identity(s): return (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns, s.st_ctime_ns)
+def digest(stream):
+    stream.seek(0)
+    h = hashlib.sha256()
+    for chunk in iter(lambda: stream.read(1024 * 1024), b''): h.update(chunk)
+    stream.seek(0)
+    return h.hexdigest()
+def plain_file(path):
+    require(os.path.realpath(path) == path, 'input alias or symlink')
+    s = os.stat(path, follow_symlinks=False)
+    require(stat.S_ISREG(s.st_mode) and s.st_nlink == 1, 'single-linked regular input required')
+    return s
+selection_stat = plain_file(selection_file)
+with open(selection_file, 'rb') as stream: selection_bytes = stream.read()
+require(hashlib.sha256(selection_bytes).hexdigest() == selection_sha, 'selection digest differs')
+selection = json.loads(selection_bytes)
+require(set(selection) == {'schemaVersion', 'preparedRuntime', 'excludedPaths'}, 'unknown selection field')
+require(selection['schemaVersion'] == 'bank.supply-selection/v1', 'unknown selection')
+prepared = selection['preparedRuntime']
+require(prepared['schemaVersion'] == 'bank.prepared-runtime/v3' and prepared['version'] == '0.3.0', 'current runtime required')
+excluded = set(selection['excludedPaths'])
+require(len(excluded) == len(selection['excludedPaths']) == 36, 'exact engine exclusion set required')
+require(not os.path.lexists(destination), 'supply destination must be new')
+archive_files, excluded_files, files, overlays = {}, {}, {}, {}
+with open(archive, 'rb') as raw:
+    original = os.fstat(raw.fileno())
+    require(stat.S_ISREG(original.st_mode), 'regular archive required')
+    require(digest(raw) == expected, 'archive digest differs before extraction')
+    with tarfile.open(fileobj=raw, mode='r:gz') as tar:
+        members = tar.getmembers()
+        require(len(members) <= 100000, 'too many archive members')
+        seen, aliases, kinds, selected = set(), {}, {}, []
+        counts = {'maven': 0, 'ivy': 0, 'launcher': 0}
+        for member in members:
+            require(member.type in (tarfile.REGTYPE, tarfile.AREGTYPE, tarfile.DIRTYPE), 'unsupported member type')
+            require(not member.linkname and not member.sparse, 'archive links/sparse members forbidden')
+            require(set(member.pax_headers).issubset({'path', 'size', 'mtime', 'atime', 'ctime'}), 'unknown pax metadata')
+            require(member.pax_headers.get('path', member.name) == member.name, 'pax path differs')
+            name = member.name[:-1] if member.isdir() and member.name.endswith('/') else member.name
+            require(name and not name.startswith('/') and chr(92) not in name and ':' not in name, 'unsafe archive name')
+            require(all(ord(c) >= 32 and ord(c) != 127 for c in name), 'control character in archive name')
+            parts = name.split('/')
+            require(parts[0] == 'bank-wealth-v1' and all(p not in ('', '.', '..') for p in parts), 'archive namespace escape')
+            require(name not in seen, 'duplicate archive member')
+            seen.add(name)
+            for i in range(1, len(parts) + 1):
+                prefix = '/'.join(parts[:i]); alias = unicodedata.normalize('NFC', prefix).casefold()
+                require(alias not in aliases or aliases[alias] == prefix, 'archive case/unicode alias')
+                aliases[alias] = prefix
+                kind = 'directory' if i < len(parts) or member.isdir() else 'file'
+                require(prefix not in kinds or kinds[prefix] == kind, 'archive file/directory collision')
+                kinds[prefix] = kind
+            require(member.size >= 0, 'negative member size')
+            if len(parts) >= 4 and parts[1] == 'supply' and parts[2] in counts and member.isfile():
+                require(member.size <= 256 * 1024 * 1024, 'oversized supply member')
+                selected.append((member, '/'.join(parts[2:]))); counts[parts[2]] += 1
+        require(counts == {'maven': 1048, 'ivy': 16, 'launcher': 1}, 'pinned archive inventory differs')
+        require(sum(m.size for m, _ in selected) <= 1024 * 1024 * 1024, 'oversized supply')
+        require([p for _, p in selected if p.startswith('launcher/')] == ['launcher/sbt-launch.jar'], 'unexpected launcher')
+        require(excluded.issubset({name for _, name in selected}), 'missing archived engine member')
+        os.mkdir(destination, 0o700)
+        for member, name in selected:
+            h, size = hashlib.sha256(), 0
+            target = pathlib.Path(destination).joinpath(*name.split('/'))
+            out = None
+            try:
+                if name not in excluded:
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    out = open(target, 'xb')
+                with tar.extractfile(member) as source:
+                    for chunk in iter(lambda: source.read(1024 * 1024), b''):
+                        if out is not None: out.write(chunk)
+                        h.update(chunk); size += len(chunk)
+            finally:
+                if out is not None: out.close()
+            require(size == member.size, 'short archive supply member')
+            stamp = {'bytes': size, 'sha256': h.hexdigest()}; archive_files[name] = stamp
+            if name in excluded: excluded_files[name] = stamp
+            else:
+                os.chmod(target, 0o755 if name.endswith('.exe') else 0o644)
+                files[name] = stamp
+    require(identity(os.fstat(raw.fileno())) == identity(original), 'archive identity changed')
+    require(digest(raw) == expected, 'archive digest changed after extraction')
+    require(identity(os.stat(archive, follow_symlinks=False)) == identity(original), 'archive path replaced')
+require(len(prepared['files']) == 6, 'six released members required')
+for row in prepared['files']:
+    name = row['path']; parts = name.split('/')
+    require(parts[0] == 'maven' and all(p not in ('', '.', '..') for p in parts) and chr(92) not in name, 'invalid runtime path')
+    require(name not in files and name not in overlays and name not in archive_files, 'runtime supply collision')
+    source_path = str(pathlib.Path(prepared['root']).joinpath(*parts))
+    before = plain_file(source_path)
+    target = pathlib.Path(destination).joinpath(*parts); target.parent.mkdir(parents=True, exist_ok=True)
+    h, size = hashlib.sha256(), 0
+    with open(source_path, 'rb') as source, open(target, 'xb') as out:
+        require(identity(os.fstat(source.fileno())) == identity(before), 'runtime file replaced before read')
+        for chunk in iter(lambda: source.read(1024 * 1024), b''):
+            out.write(chunk); h.update(chunk); size += len(chunk)
+        require(identity(os.fstat(source.fileno())) == identity(before), 'runtime file changed during read')
+    require(identity(plain_file(source_path)) == identity(before), 'runtime path changed')
+    require(size == row['bytes'] and h.hexdigest() == row['sha256'], 'runtime bytes differ from independent pin')
+    os.chmod(target, 0o644)
+    overlays[name] = files[name] = {'bytes': size, 'sha256': h.hexdigest()}
+require(identity(plain_file(selection_file)) == identity(selection_stat), 'selection changed')
+with open(selection_file, 'rb') as stream: require(hashlib.sha256(stream.read()).hexdigest() == selection_sha, 'selection bytes changed')
+effective_counts = {key: sum(name.startswith(key + '/') for name in files) for key in counts}
+require(effective_counts == {'maven': 1018, 'ivy': 16, 'launcher': 1}, 'composed inventory differs')
+print(json.dumps({'schemaVersion': 'bank.composed-supply/v3', 'archiveSha256': expected, 'membersValidated': len(members), 'archiveCounts': counts, 'counts': effective_counts, 'archiveFiles': archive_files, 'excludedFiles': excluded_files, 'overlays': overlays, 'preparedRuntime': prepared, 'files': files}, sort_keys=True))
 `;
 
 // These probes make real syscalls, never permission-method-only assertions.
@@ -785,13 +904,16 @@ export function succeeded(receipt) {
 }
 
 async function verify(options) {
-  const { output, archive, evidence, javaHome, compileTests, runTests, runActors, runReadside, compileRuntimeTests } = options;
+  const { output, archive, runtimeSupply, evidence, javaHome, compileTests, runTests, runActors, runReadside, compileRuntimeTests } = options;
+  assert.ok(runtimeSupply, 'explicit --runtime-supply is required for current 0.3.0 acceptance');
+  const preparedRuntime = capturePreparedRuntime(runtimeSupply);
   assert.equal(process.platform, 'darwin', 'this captured toolchain is for Darwin, not a portable supply');
   safePath(output); safePath(archive, 'file'); safePath(evidence, 'new'); safePath(javaHome);
   assert.ok([join(ROOT, 'generated'), join(ROOT, 'target')].some(root => within(root, output) && output !== join(ROOT, 'target')),
     'generated output must be inside this bank generated/ or target/');
   assert.ok(within(join(ROOT, 'target'), evidence) && evidence !== join(ROOT, 'target'), 'new evidence must be under bank target/');
-  assert.ok(!overlap(output, evidence) && !overlap(archive, evidence) && !overlap(output, archive), 'input/evidence paths overlap');
+  assert.ok(!overlap(output, evidence) && !overlap(archive, evidence) && !overlap(output, archive) &&
+    !overlap(runtimeSupply, evidence) && !overlap(runtimeSupply, output) && !overlap(runtimeSupply, archive), 'input/evidence paths overlap');
   assertFreshOutput(output);
   const java = safePath(join(javaHome, 'bin/java'), 'file'), javac = safePath(join(javaHome, 'bin/javac'), 'file');
   safePath(PYTHON, 'file'); safePath(SANDBOX, 'file'); safePath(join(javaHome, 'release'), 'file');
@@ -799,7 +921,7 @@ async function verify(options) {
   assert.match(release, /^JAVA_VERSION="11(?:\.|\")/m, 'explicit JDK11 required');
   assert.match(release, /^OS_ARCH="(?:x86_64|amd64)"/m, 'clean archive contains Darwin x86_64 protoc; x64 JDK/Rosetta required');
   mkdirSync(evidence, { mode: 0o700 }); // exclusive: no recursive parent creation or reuse
-  const result = { schemaVersion: 'bank.truthsrc-build/v1', status: 'blocked', output, evidence,
+  const result = { schemaVersion: 'bank.truthsrc-build/v2', status: 'blocked', output, evidence, preparedRuntime,
     archive: { file: archive, expectedSha256: ARCHIVE_SHA }, javaHome, compileGeneratedTests: compileTests,
     runGeneratedTests: runTests && !runActors && !runReadside, runActorTests: runActors, runReadsideTests: runReadside, compileRuntimeTests, testsExecuted: false,
     runtimeCompilation: { requested: !!compileRuntimeTests, passed: false },
@@ -824,6 +946,8 @@ async function verify(options) {
     const initiallyEmpty = Object.fromEntries(CACHE_DIRS.map(name => [name, Object.keys(cachesBefore[name]).length === 0]));
     save(join(evidence, 'cache-before.json'), cachesBefore);
     admitted = await admitCandidate(output, options);
+    assert.deepEqual(admitted.preparedRuntime, preparedRuntime, 'prepared runtime changed during admission');
+    result.checks.runtimeSupplyVerified = true;
     if (compileRuntimeTests) {
       runtimeManifest = runtimeTestManifest();
       runtimeBefore = snapshotFiles([...runtimeManifest.sources.map(row => row.file), RUNTIME_MANIFEST_FILE, join(ROOT, 'tools/truthsrc-runtime-jars.mjs')]);
@@ -855,7 +979,7 @@ async function verify(options) {
     const supply = join(evidence, 'supply'), repositories = repositoryText(supply);
     env.COURSIER_REPOSITORIES = repositories.maven + '|ivy:' + repositories.ivy + repositories.pattern;
     save(join(evidence, 'input.json'), { ...options, project: PROJECT, handwrittenRoot: HANDWRITTEN, toolRoot: TOOL,
-      generator: admitted.generator, sources: admitted.captured.sources, archiveSha256: ARCHIVE_SHA,
+      generator: admitted.generator, sources: admitted.captured.sources, archiveSha256: ARCHIVE_SHA, preparedRuntime,
       toolchain: Object.fromEntries([java, javac, join(javaHome, 'release'), PYTHON, SANDBOX].map(file => [file, fileDigest(file)])),
       initiallyEmpty, compilerBridgePrefill: false, inheritedEnvironment: false, env, verifier: verifierBefore,
       verifierSupport: loadedBuildSupport,
@@ -875,15 +999,16 @@ async function verify(options) {
       assert.ok(readFileSync(join(evidence, 'actor-sandbox-check.stdout.log'), 'utf8').includes('TRUTHSRC-ACTOR-SANDBOX-OK'));
       result.checks.actorBoundaryEnforced = true;
     }
-    write(join(evidence, 'extract-supply.py'), extractSource);
-    phases.extract = await command(PYTHON, ['-I', '-S', join(evidence, 'extract-supply.py'), archive, supply, ARCHIVE_SHA],
-      evidence, env, join(evidence, 'extract'), 480_000, sandbox);
+    const selection = join(evidence, 'supply-selection.json');
+    save(selection, { schemaVersion: 'bank.supply-selection/v1', preparedRuntime, excludedPaths: LEGACY_ENGINE_FILES });
+    write(join(evidence, 'extract-supply.py'), extractCurrentSource);
+    phases.extract = await command(PYTHON, ['-I', '-S', join(evidence, 'extract-supply.py'), archive, supply, ARCHIVE_SHA,
+      selection, fileDigest(selection)], evidence, env, join(evidence, 'extract'), 480_000, sandbox);
     succeeded(phases.extract);
     const extracted = JSON.parse(readFileSync(join(evidence, 'extract.stdout.log'), 'utf8'));
-    assert.equal(extracted.archiveSha256, ARCHIVE_SHA);
-    assert.deepEqual(extracted.counts, { maven: 1048, ivy: 16, launcher: 1 });
     supplyBefore = inventory(supply);
-    assert.deepEqual(supplyBefore, extracted.files);
+    validateComposedSupply(extracted, preparedRuntime, supplyBefore);
+    assert.deepEqual(capturePreparedRuntime(runtimeSupply), preparedRuntime, 'prepared runtime changed during extraction');
     save(join(evidence, 'supply-before.json'), extracted);
     write(join(evidence, 'repositories'), repositories.text);
     write(join(evidence, 'sbt.boot.properties'), bootText(repositories.text));
@@ -904,8 +1029,8 @@ async function verify(options) {
     // Cache/config hints only; confinement is inherited OS state, not removable
     // JAVA_TOOL_OPTIONS or Test / javaOptions. No Test runner/guard override.
     const buildEnv = { ...env, JAVA_TOOL_OPTIONS: javaOptions.join(' ') };
-    const tasks = compileRuntimeTests ? runtimeBuildTasks(admitted.testFiles, runtimeManifest)
-      : buildTasks(admitted.testFiles, options, executionManifest, actor);
+    const tasks = (compileRuntimeTests ? runtimeBuildTasks(admitted.testFiles, runtimeManifest)
+      : buildTasks(admitted.testFiles, options, executionManifest, actor)).concat(engineClasspathTasks());
     save(join(evidence, 'build-plan.json'), { javaOptions, tasks, env: buildEnv,
       sandbox: { profile: sandbox.profile, sha256: sandbox.profileSha256, subpaths: sandbox.subpaths, literals: sandbox.literals },
       allowedAppArtifactDirectories: ARTIFACT_DIRS, historicalTestSourcesAppended: !!actor || !!runtimeManifest || !!readsideManifest,
@@ -918,7 +1043,8 @@ async function verify(options) {
     admitted.assertUnchanged(admitted.captured);
     assert.deepEqual(inventory(output), admitted.before, 'candidate changed before build');
     assert.deepEqual(inventory(HANDWRITTEN), admitted.handwritten, 'handwritten input changed before build');
-    assert.deepEqual(inventory(RUNTIME), admitted.runtime, 'local runtime changed before build');
+    assert.deepEqual(inventory(admitted.runtimeRoot), admitted.runtime, 'local runtime changed before build');
+    assert.deepEqual(capturePreparedRuntime(runtimeSupply), preparedRuntime, 'prepared runtime changed before build');
     if (actor) assert.deepEqual(snapshotFiles(Object.keys(actor.before)), actor.before, 'actor inputs changed before build');
     if (runtimeBefore) assert.deepEqual(snapshotFiles(Object.keys(runtimeBefore)), runtimeBefore, 'runtime sources changed before build');
     if (readsideBefore) {
@@ -941,6 +1067,9 @@ async function verify(options) {
       output, buildEnv, join(evidence, 'build'), 480_000, sandbox);
     const stdout = readFileSync(join(evidence, 'build.stdout.log'));
     assert.equal(hash(stdout), phases.build.stdoutSha256, 'build log changed before result verification');
+    result.resolvedDependencies = inspectEngineClasspath(stdout.toString('utf8'), evidence, preparedRuntime);
+    save(join(evidence, 'resolved-dependencies.json'), result.resolvedDependencies);
+    result.checks.runtimeClasspathEnginesVerified = true;
     if (runTests) {
       try {
         testObservation = inspectGeneratedTests(stdout.toString('utf8'), executionManifest, phases.build.pid);
@@ -979,7 +1108,10 @@ async function verify(options) {
       const jarRecords = JSON.parse(readFileSync(join(evidence, 'runtime-jars-probe.stdout.log'), 'utf8'));
       const jarReferences = validateJarReferences(closure.classpath, jarRecords, { safePath, fileDigest });
       save(join(evidence, 'runtime-jars.json'), jarReferences);
-      runtimeObservation = { schemaVersion: 'bank.truthsrc-runtime-build/v1', output, buildEvidence: evidence,
+      for (const engine of result.resolvedDependencies.engines)
+        assert.equal(closure.classpath.filter(file => file === engine.file).length, 1, 'resolved engine missing from runtime classpath');
+      runtimeObservation = { schemaVersion: 'bank.truthsrc-runtime-build/v2', output, buildEvidence: evidence,
+        preparedRuntime, resolvedDependencies: result.resolvedDependencies,
         actualRoot, sources: closure.sources, manifest: runtimeManifest, classpath: closure.classpath, classpathInventory, jarReferences,
         buildStdoutSha256: phases.build.stdoutSha256, testsExecuted: false, servicesStarted: false };
       result.checks.actualRuntimeTestSourcesVerified = true;
@@ -998,7 +1130,7 @@ async function verify(options) {
       const after = {};
       for (const [name, root, before, opts] of [
         ['output', output, admitted.before, { afterBuild: true }],
-        ['handwritten', HANDWRITTEN, admitted.handwritten, {}], ['localRuntime', RUNTIME, admitted.runtime, {}],
+        ['handwritten', HANDWRITTEN, admitted.handwritten, {}], ['localRuntime', admitted.runtimeRoot, admitted.runtime, {}],
         ...(supplyBefore ? [['supply', join(evidence, 'supply'), supplyBefore, {}]] : []),
       ]) {
         try {
@@ -1065,6 +1197,10 @@ async function verify(options) {
       } catch (error) { result.checks.ownedCachesInventoried = false; result.errors.push(error.message); }
     }
     try {
+      assert.deepEqual(capturePreparedRuntime(runtimeSupply), preparedRuntime, 'prepared runtime changed before sealing');
+      result.checks.runtimeSupplyVerified = true;
+    } catch (error) { result.checks.runtimeSupplyVerified = false; result.errors.push(error.message); }
+    try {
       assert.ok(verifierBefore, 'verifier baseline unavailable');
       assert.deepEqual(snapshotFiles(BUILD_SUPPORT), loadedBuildSupport, 'file-evidence helpers changed during execution');
       result.checks.verifierUnchanged = fileDigest(verifierBefore.file) === verifierBefore.sha256;
@@ -1092,7 +1228,7 @@ async function verify(options) {
     }
     const executionPassed = runReadside ? result.readsideTests.passed : (!runTests || result[runActors ? 'actorTests' : 'generatedTests'].passed);
     result.status = result.errors.length === 0 && result.checks.osSandboxEnforced && phases.build?.code === 0 &&
-      executionPassed ? 'passed' : 'blocked';
+      result.checks.runtimeSupplyVerified && result.checks.runtimeClasspathEnginesVerified && executionPassed ? 'passed' : 'blocked';
     save(join(evidence, 'result.json'), result);
   }
   console.log(json({ status: result.status, evidence, receipt: join(evidence, 'result.json'), testsExecuted: result.testsExecuted,

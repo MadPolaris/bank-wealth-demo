@@ -4,12 +4,103 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpath
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runtimeArgs, verifyRuntime } from '../tools/verify-truthsrc-runtime.mjs';
+import { runtimeArgs, verifyRuntime, waitForReadside } from '../tools/verify-truthsrc-runtime.mjs';
 import { acquireRuntimeLease } from '../tools/truthsrc-runtime-lease.mjs';
 import { CRASH_CASES } from '../tools/truthsrc-runtime-crash.mjs';
 import { RUNTIME_TA_CRASH_CASES } from '../tools/truthsrc-runtime-ta-worker.mjs';
 
 const base = ['--lease', '/owned/lease.json', '--build-evidence', '/owned/build', '--evidence', '/owned/run', '--round', '/owned/ta', '--window', 'crash'];
+
+function readinessFixture() {
+  let time = 0;
+  const controller = new AbortController();
+  return {
+    options: { origin: 'http://127.0.0.1:28761', token: 'readiness-secret', secrets: ['readiness-secret'], signal: controller.signal, exited: () => false },
+    controller,
+    deps: { clock: () => time, sleep: async ms => { time += ms; } },
+    advance: ms => { time += ms; },
+  };
+}
+const readinessView = (disposition, account = {}) => ({ metadata: { disposition, watermarks: [
+  { persistenceId: 'namespace|account|customer', lastSequence: 12, observedSequence: disposition === 'caught-up' ? 12 : null, disposition },
+] }, account });
+
+test('readiness records bounded watermarks and requires all original three conditions', async () => {
+  const h = readinessFixture(), responses = [
+    new Response(JSON.stringify(readinessView('caught-up')), { status: 503 }),
+    new Response(JSON.stringify(readinessView('unknown'))),
+    new Response(JSON.stringify(readinessView('caught-up', null))),
+    new Response(JSON.stringify(readinessView('caught-up'))),
+  ];
+  const result = await waitForReadside(h.options, { ...h.deps, fetchImpl: async () => responses.shift() });
+  assert.equal(result.passed, true); assert.equal(result.deadlineMs, 90000); assert.equal(result.samples.length, 4);
+  assert.deepEqual(result.samples.map(row => [row.status, row.disposition, row.accountPresent]),
+    [[503, null, false], [200, 'unknown', true], [200, 'caught-up', false], [200, 'caught-up', true]]);
+  assert.deepEqual(result.samples[3].watermarks, [{ persistenceId: 'namespace|account|customer', lastSequence: 12, observedSequence: 12, disposition: 'caught-up' }]);
+  assert.equal(JSON.stringify(result).includes('readiness-secret'), false);
+});
+
+test('readiness retains HTTP and parse failures without exception, body or credential text', async () => {
+  const h = readinessFixture(); let calls = 0;
+  await assert.rejects(waitForReadside(h.options, { ...h.deps, fetchImpl: async () => {
+    h.advance(30000); calls++;
+    if (calls === 1) throw new Error(h.options.token);
+    if (calls === 2) return new Response(h.options.token, { status: 200 });
+    return new Response(h.options.token, { status: 503 });
+  } }), error => {
+    assert.equal(error.report.passed, false); assert.equal(error.report.samples.length, 3);
+    assert.deepEqual(error.report.samples.map(row => row.failure), ['request-or-body-error', 'invalid-json', 'http-status']);
+    assert.ok(!JSON.stringify(error).includes(h.options.token)); assert.ok(!error.message.includes(h.options.token));
+    return true;
+  });
+});
+
+test('readiness preserves Response.json UTF-8 decoding and does not round large watermarks into evidence', async () => {
+  const h = readinessFixture(), view = readinessView('caught-up');
+  view.metadata.watermarks[0].lastSequence = Number.MAX_SAFE_INTEGER + 1;
+  const bytes = Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from(JSON.stringify(view))]);
+  assert.deepEqual(await new Response(bytes).json(), view);
+  const result = await waitForReadside(h.options, { ...h.deps, fetchImpl: async () => new Response(bytes) });
+  assert.equal(result.passed, true); assert.equal(result.samples[0].watermarks[0].lastSequence, null);
+});
+
+test('late caught-up response cannot extend the fixed readiness deadline', async () => {
+  const h = readinessFixture();
+  await assert.rejects(waitForReadside(h.options, { ...h.deps, fetchImpl: async () => {
+    h.advance(90001); return new Response(JSON.stringify(readinessView('caught-up')));
+  } }), error => error.report.passed === false && error.report.deadlineMs === 90000 && error.report.samples[0].disposition === 'caught-up');
+});
+
+test('readiness sample history is finite and preserves the last failed watermark', async () => {
+  const h = readinessFixture();
+  await assert.rejects(waitForReadside(h.options, { ...h.deps, fetchImpl: async () => new Response(JSON.stringify(readinessView('unknown'))) }), error => {
+    assert.equal(error.report.elapsedMs, 90000); assert.equal(error.report.samples.length, 300);
+    assert.equal(error.report.samples.at(-1).watermarks[0].observedSequence, null); return true;
+  });
+});
+
+test('readiness redacts untrusted metadata and caps retained watermark rows', async () => {
+  const h = readinessFixture(), view = readinessView('caught-up');
+  view.metadata.watermarks = Array.from({ length: 20 }, () => ({ persistenceId: h.options.token, lastSequence: h.options.token,
+    observedSequence: 'not-a-sequence', disposition: h.options.token }));
+  const result = await waitForReadside(h.options, { ...h.deps, fetchImpl: async () => new Response(JSON.stringify(view)) });
+  assert.equal(result.samples[0].watermarks.length, 16); assert.equal(result.samples[0].watermarksOmitted, 4);
+  assert.equal(JSON.stringify(result).includes(h.options.token), false);
+  assert.deepEqual(result.samples[0].watermarks[0], { persistenceId: null, lastSequence: null, observedSequence: null, disposition: null });
+});
+
+test('readiness rejects oversized bodies and cancels only its current request', async () => {
+  const h = readinessFixture();
+  await assert.rejects(waitForReadside(h.options, { ...h.deps, fetchImpl: async () => {
+    h.advance(90000); return new Response('x'.repeat(262145));
+  } }), error => error.report.samples[0].failure === 'response-too-large');
+  const aborted = readinessFixture();
+  await assert.rejects(waitForReadside(aborted.options, { ...aborted.deps, fetchImpl: async (_, options) => {
+    const pending = new Promise((_, reject) => options.signal.addEventListener('abort', () => reject(new Error(aborted.options.token)), { once: true }));
+    aborted.controller.abort(); return pending;
+  } }), error => error.message === 'production readiness cancelled' && error.report.samples[0].failure === 'request-aborted');
+});
+
 
 test('runtime controller needs explicit immutable build, fresh outputs and fixed window', () => {
   assert.equal(runtimeArgs(['--help']), null);
@@ -38,6 +129,8 @@ test('new controller uses current admission, independent boundary and no histori
   assert.ok(!source.includes('runBankCrashRecovery('));
   assert.ok(!/rmSync|unlinkSync|pkill|docker.*rm|runBankRelease/.test(source));
   assert.ok(source.includes("runtimeRetryBackoffDeadline: 'OPEN'"));
+  assert.ok(source.includes(".concat(join(runEvidence, 'readiness.json'))"));
+  assert.ok(source.includes("'verification/callbacks'"));
 });
 
 // Only Node fixtures/doubles. No JVM, sandbox-exec, Docker, worker or application
