@@ -39,10 +39,10 @@ const SUPPORT = [fileURLToPath(import.meta.url), SOURCE, WORKER, FIXTURE,
   ...['truthsrc-runtime-admission', 'truthsrc-runtime-lease', 'truthsrc-runtime-config', 'truthsrc-runtime-databases',
     'truthsrc-runtime-db-relay', 'truthsrc-runtime-db-exec', 'truthsrc-runtime-process', 'truthsrc-runtime-sandbox',
     'truthsrc-runtime-tests', 'truthsrc-actor-ta-worker', 'truthsrc-worker-evidence', 'truthsrc-evidence',
-    'truthsrc-runtime-jars', 'verify-truthsrc-build'].map(name => join(ROOT, 'tools', name + '.mjs')),
+    'truthsrc-runtime-jars', 'verify-truthsrc-build', 'truthsrc-acceptance-supply'].map(name => join(ROOT, 'tools', name + '.mjs')),
   ...['strict-json', 'immutable-data', 'verification/files', 'verification/inventory', 'verification/outcome', 'verification/lease', 'verification/callbacks', 'verification/worker-evidence', 'verification/process']
     .map(name => join(ROOT, '../metarch-truthsrc/lib', name + '.mjs')),
-  join(ROOT, 'tools/historical-assets.mjs'), join(ROOT, 'docs/V1-RETIREMENT-MANIFEST.json'),
+  join(ROOT, 'tools/historical-assets.mjs'), join(ROOT, 'docs/V1-RETIREMENT-MANIFEST.json'), join(ROOT, 'docs/RUNTIME-0.3.0-SUPPLY.json'),
   ...['contract', 'journal', 'mock-ta-core'].map(name => join(ROOT, 'simulator', name + '.mjs'))];
 const loadedSupport = snapshots(SUPPORT);
 const now = () => new Date().toISOString();
@@ -82,7 +82,8 @@ export async function acceptedWorkshopRun(run) {
   const candidate = candidates[0]; assert.equal(candidate.built, true);
   same([candidate.snapshot, candidate.codeDigest], [result.snapshot, result.codeDigest]);
   assert.match(result.codeDigest, /^sha256:[a-f0-9]{64}$/);
-  const service = read(join(index.runtime.evidence, 'result.json'));
+  const service = JSON.parse(captureRuntimeFile(join(index.runtime.evidence, 'result.json'),
+    { json: false, limit: 32 * 1024 * 1024 }).value.toString('utf8'));
   assert.equal(service.buildEvidence, candidate.evidence);
   assert.equal(typeof service.owner, 'string');
   return { run, fullPipelinePassed: true, snapshot: result.snapshot, codeDigest: result.codeDigest,
@@ -278,6 +279,41 @@ function verifySessionLease(record, root, active) {
 function requestValue(record) {
   return { schemaVersion: SCHEMA, owner: record.owner, identity: record.identity, controller: record.controller };
 }
+
+// JSON is visible before writeFileSync finishes. Only the exclusive empty marker
+// publishes a complete stop control; neither reader repairs another writer's data.
+function stopControlIdentity(file) {
+  privateOwned(file);
+  const stat = lstatSync(file);
+  return ['dev', 'ino', 'mode', 'uid', 'gid', 'nlink', 'size', 'mtimeMs', 'ctimeMs'].map(key => stat[key]);
+}
+
+function readStopControl(file, expected) {
+  const marker = file + '.ready';
+  if (!lstatSync(marker, { throwIfNoEntry: false })) return null;
+  const markerIdentity = stopControlIdentity(marker), dataIdentity = stopControlIdentity(file);
+  const published = captureRuntimeFile(marker, { limit: 0 });
+  const data = captureRuntimeFile(file, { json: true, limit: 16384 });
+  same(data.value, expected, 'foreign stop control');
+  same(stopControlIdentity(marker), markerIdentity); same(stopControlIdentity(file), dataIdentity);
+  same(stamp(captureRuntimeFile(marker, { limit: 0 })), stamp(published));
+  same(stamp(captureRuntimeFile(file, { limit: 16384 })), stamp(data));
+  return { data: stamp(data), marker: stamp(published), dataIdentity, markerIdentity };
+}
+
+function publishStopControl(file, expected) {
+  const published = readStopControl(file, expected);
+  if (published) return published;
+  try { save(file, expected); }
+  catch (error) {
+    if (error.code !== 'EEXIST') throw error;
+    return readStopControl(file, expected);
+  }
+  privateOwned(file); same(read(file), expected, 'stop control changed before publication');
+  write(file + '.ready', '');
+  return readStopControl(file, expected);
+}
+
 function instanceValue(record) {
   return { schemaVersion: 'bank.workshop-instance/v1', owner: record.owner, identity: record.identity,
     classpathSha256: record.classpathSha256, launcherSha256: record.launcherSha256 };
@@ -393,11 +429,12 @@ export async function sessionStart({ buildEvidence, acceptedReceipt, session, le
       previouslyServiceTested: false, networkLimitation: RUNTIME_NETWORK_LIMITATION };
     assert.equal(record.controller?.pid, process.pid); assert.equal(record.controller.uid, process.getuid());
     save(join(session, 'preparing.json'), record);
+    let publishedRequest;
     const checkRequest = () => {
-      const file = join(session, 'stop-request.json');
-      if (!existsSync(file)) return false;
-      privateOwned(file); same(read(file), requestValue(record), 'foreign stop request');
-      return true;
+      const current = readStopControl(join(session, 'stop-request.json'), requestValue(record));
+      if (publishedRequest) same(current, publishedRequest, 'published stop request changed');
+      if (current) publishedRequest = current;
+      return current !== null;
     };
     // stop also works while compiling, creating databases or waiting for ready.
     requestMonitor = setInterval(() => {
@@ -487,8 +524,9 @@ export async function sessionStart({ buildEvidence, acceptedReceipt, session, le
     // this controller owns the in-memory database handle and direct child.
     try {
       if (child && record) {
-        try { save(join(session, 'run/stop.json'), instanceValue(record)); }
-        catch { same(read(join(session, 'run/stop.json')), instanceValue(record)); }
+        try { assert.ok(publishStopControl(join(session, 'run/stop.json'), instanceValue(record)), 'unpublished JVM stop control'); }
+        catch { failure ??= { code: 'SESSION_STOP_CONTROL_REJECTED', phase: 'stop-control',
+          message: 'The owned stop control could not be published. Retain its files; only the recorded JVM will receive shutdown fallback.' }; }
         processReceipt = await child.stop(birth);
         collectJvmFailure();
         checks.serverClosed = processReceipt.clean === true;
@@ -593,7 +631,7 @@ export async function sessionStatus({ session }, { root = ROOT, processIdentity 
     assert.equal(child.process.pgid, child.process.pid);
     same(lifetime(await processIdentity(child.process.pid)), child.process, 'starting JVM missing/replaced');
   }
-  return { schemaVersion: SCHEMA, status: existsSync(join(session, 'stop-request.json')) ? 'stopping' : existsSync(join(session, 'ready.json')) ? 'ready' : 'starting',
+  return { schemaVersion: SCHEMA, status: readStopControl(join(session, 'stop-request.json'), requestValue(record)) ? 'stopping' : existsSync(join(session, 'ready.json')) ? 'ready' : 'starting',
     session, owner: record.owner, identity: record.identity, executionKind: record.executionKind, exitCode: 0,
     url: record.origin + '/bank/v1', loginFile: record.loginFile, fullPipelinePassed: false, dataPreserved: true };
 }
@@ -602,13 +640,22 @@ export async function sessionStop({ session }, dependencies = {}) {
   const status = await sessionStatus({ session }, dependencies);
   if (['closed', 'cancelled', 'blocked'].includes(status.status)) return status;
   const record = sessionRecord(session), request = requestValue(record), file = join(session, 'stop-request.json');
-  // No signal is sent by this command. A replacement between the status check and
-  // this write can at worst leave a retained request, never kill an unrelated PID.
-  try { save(file, request); } catch (error) { if (error.code !== 'EEXIST') throw error; privateOwned(file); same(read(file), request); }
   const until = Date.now() + 180_000;
-  while (!existsSync(join(session, 'closed.json')) && Date.now() < until) await delay(250);
-  if (!existsSync(join(session, 'closed.json'))) return { ...status, status: 'stopping', exitCode: 2,
-    message: 'Closure deadline exceeded. Data and lease remain; no takeover or force kill was attempted.' };
+  // No signal is sent here. A duplicate unpublished writer is awaited, not read
+  // mid-write or completed on its behalf; publication and closure share one budget.
+  let published = publishStopControl(file, request);
+  const pendingIdentity = privateOwned(file);
+  while (!published && Date.now() < until) {
+    same(privateOwned(file), pendingIdentity, 'pending stop request replaced');
+    await delay(250); published = readStopControl(file, request);
+  }
+  while (published && !existsSync(join(session, 'closed.json')) && Date.now() < until) {
+    same(readStopControl(file, request), published, 'published stop request changed');
+    await delay(250);
+  }
+  if (!published || !existsSync(join(session, 'closed.json'))) return { ...status, status: 'stopping', exitCode: 2,
+    message: 'Publication or closure deadline exceeded. Data and lease remain; no takeover or force kill was attempted.' };
+  same(readStopControl(file, request), published, 'published stop request changed');
   return sessionStatus({ session }, dependencies);
 }
 

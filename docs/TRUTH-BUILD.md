@@ -1,5 +1,17 @@
 # 当前真源服务的离线编译与生成单元测试
 
+## 2026-11-12 当前入口：已发布 0.3.0 的显式供给
+
+当前 `verify-truthsrc-build.mjs` 必须同时传入 `--archive` 和
+`--runtime-supply "$PWD/.local/truthsrc-runtime-0.3.0"`。后者是已取得的
+`receipt.json`＋六个 0.3.0 JAR/POM；必须与根项目选择一致。验收不调用 prepare、
+不下载、不回退 P23。原 clean1134 归档保持原字节，只在新独占供给中排除36个旧引擎
+成员，再加入六个新制品；有效供给1035文件，实际 sbt classpath 另核三引擎坐标与SHA。
+当前回执为 `bank.truthsrc-build/v2`／`bank.truthsrc-runtime-build/v2`。
+
+当前手写源码为 `handwritten/scala/`。完整操作使用[银行工作坊](BANK-WORKSHOP.md)；
+下文11月5–6日的数量、路径和成功/失败记录保留原时点，不是0.3.0完整服务签收。
+
 ## 2026-11-06 兼容分层与生成读侧
 
 用户选择任务108兼容迁移后，候选03通过534份main/11份Test编译、47测试/10Suite；
@@ -40,6 +52,7 @@ classpath目录的文件和空子目录均封存。Python在OS沙箱下逐个解
 node tools/verify-truthsrc-build.mjs \
   --project-output "$PWD/target/truthsrc-runtime-candidate-<new-id>" \
   --archive "$PWD/dist/bank-wealth-v1-darwin-x64-1134.tar.gz" \
+  --runtime-supply "$PWD/.local/truthsrc-runtime-0.3.0" \
   --evidence "$PWD/target/truthsrc-runtime-build-<new-id>" \
   --compile-runtime-tests
 npm run test:runtime-verifier

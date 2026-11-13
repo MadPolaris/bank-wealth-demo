@@ -1,6 +1,12 @@
 # 当前真源候选的运行验收边界
 
-日期：2026-11-05。本文针对统一作者入口后的候选，不是1134复演许可或新发行签出。当前结果见 [TRUTH-VALIDATION.md](TRUTH-VALIDATION.md)；生成单元测试的执行合同见 [TRUTH-BUILD.md](TRUTH-BUILD.md)。
+原记录日期：2026-11-05。本文针对统一作者入口后的候选，不是1134复演许可或新发行签出。历史结果见 [TRUTH-VALIDATION.md](TRUTH-VALIDATION.md)；生成单元测试的执行合同见 [TRUTH-BUILD.md](TRUTH-BUILD.md)。
+
+2026-11-12入口更新：当前目标为正式0.3.0。构建须同时提供原clean1134归档和
+`--runtime-supply "$PWD/.local/truthsrc-runtime-0.3.0"`，只读验六个新制品并从实际
+classpath核对，不调用可能下载的prepare。手写/冻结测试现役目录为
+`handwritten/scala/`和`test/scala/`。下文旧候选的通过、失败及数量保持其原时点，
+不转签为0.3.0通过；完整当前命令见[银行工作坊](BANK-WORKSHOP.md)。
 
 ## 相互独立的剩余门
 
@@ -77,6 +83,7 @@ node tools/truthsrc-project.mjs generate --out "$PWD/target/truthsrc-actor-candi
 node tools/verify-truthsrc-build.mjs \
   --project-output "$PWD/target/truthsrc-actor-candidate-<new-id>" \
   --archive "$PWD/dist/bank-wealth-v1-darwin-x64-1134.tar.gz" \
+  --runtime-supply "$PWD/.local/truthsrc-runtime-0.3.0" \
   --evidence "$PWD/target/truthsrc-actor-<new-id>" \
   --run-actor-tests
 npm run test:actor-verifier

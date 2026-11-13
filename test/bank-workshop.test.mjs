@@ -1,24 +1,65 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync, symlinkSync, unlinkSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseWorkshopArgs, humanResult, workshopCli } from '../tools/bank-workshop.mjs';
 import { ARCHIVE_SHA256, ROOT, doctor, fileReference, leaseMetadata, newRunPath, nodeSupported, sha256 } from '../tools/bank-workshop-supply.mjs';
-import { inspectService, reportWorkshop, REQUIRED, verifyWorkshop } from '../tools/bank-workshop-verification.mjs';
+import { reportWorkshop, REQUIRED, verifyWorkshop } from '../tools/bank-workshop-verification.mjs';
 import { crashCases as CRASH_CASES, sipCrashCases, taCrashCases, validateChildReport } from '../tools/v1-crash-recovery.mjs';
 import { RUNTIME_NETWORK_SCOPE, RUNTIME_NETWORK_LIMITATION } from '../tools/truthsrc-runtime-sandbox.mjs';
 
+const TEST_ROOT = realpathSync(dirname(fileURLToPath(import.meta.url)));
 const save = (file, value) => writeFileSync(file, JSON.stringify(value), { flag: 'wx' });
+const fingerprint = file => { const bytes = readFileSync(file); return { bytes: bytes.length, sha256: sha256(bytes) }; };
+const fixtureReference = file => ({ file, ...fingerprint(file) });
 function fixture(t) {
-  const root = mkdtempSync(join(realpathSync(tmpdir()), 'bank-workshop-test-'));
+  const root = mkdtempSync(join(TEST_ROOT, 'bank-workshop-test-'));
   t.after(() => rmSync(root, { recursive: true, force: true })); // Only this test's temporary root.
+  save(join(root, 'test-fixture.json'), { schemaVersion: 'bank.workshop-test-fixture/v1', executionKind: 'test-double' });
   mkdirSync(join(root, 'target')); mkdirSync(join(root, '.local/mock-ta'), { recursive: true });
   const archive = join(root, 'archive.tar.gz'); writeFileSync(archive, 'not a release; test double only');
+  // Only the existing archive assertion seam supplies the contract's fixed pin.
+  // fixtureSha256 records the real fake-archive hash; this is NOT publication proof.
+  const archiveDouble = { ...fixtureReference(archive), sha256: ARCHIVE_SHA256,
+    testDouble: true, fixtureSha256: fingerprint(archive).sha256 };
+  const runtimeSupply = join(root, 'synthetic-runtime'), repository = pathToFileURL(join(runtimeSupply, 'maven')).href + '/';
+  const runtimeFiles = ['saga-core_2.13', 'monarch-core_2.13', 'monarch-persistence_2.13'].flatMap(artifactId =>
+    ['jar', 'pom'].map(extension => {
+      const path = `maven/net/imadz/${artifactId}/0.3.0/${artifactId}-0.3.0.${extension}`, file = join(runtimeSupply, path);
+      mkdirSync(dirname(file), { recursive: true });
+      writeFileSync(file, `TEST DOUBLE ONLY: ${path}; not executable or published material\n`);
+      return { path, coordinate: `net.imadz:${artifactId}:0.3.0`, extension, ...fingerprint(file) };
+    }));
+  const receiptFile = join(runtimeSupply, 'receipt.json'), lockFile = join(root, 'docs/RUNTIME-0.3.0-SUPPLY.json');
+  // Metadata dialect only, never sent through real archive/prepared-runtime admission.
+  save(receiptFile, { schemaVersion: 'bank.truthsrc-runtime/v2', source: 'maven-central', version: '0.3.0',
+    runtimeRebuilt: false, files: runtimeFiles.map(row => ({ file: row.path, sha256: row.sha256 })) });
+  mkdirSync(dirname(lockFile));
+  save(lockFile, { schemaVersion: 'bank.runtime-supply-lock/v1', version: '0.3.0', testDouble: true,
+    artifacts: ['saga-core_2.13', 'monarch-core_2.13', 'monarch-persistence_2.13'].map(artifactId => ({ artifactId,
+      jar: runtimeFiles.find(row => row.coordinate === `net.imadz:${artifactId}:0.3.0` && row.extension === 'jar') })) });
+  const preparedRuntime = { schemaVersion: 'bank.prepared-runtime/v3', version: '0.3.0', root: runtimeSupply, repository,
+    receipt: fixtureReference(receiptFile), lock: fixtureReference(lockFile), files: runtimeFiles,
+    inventory: { 'receipt.json': fingerprint(receiptFile),
+      ...Object.fromEntries(runtimeFiles.map(({ path, bytes, sha256 }) => [path, { bytes, sha256 }])) } };
+  const supply = { schemaVersion: 'bank.acceptance-supply/v3', archive: archiveDouble, runtime: preparedRuntime };
+  // Owned metadata stand-ins make doctor's project/supply checks meaningful. None
+  // of these stubs is imported; no JVM, toolchain, real JAR or service is prepared.
+  for (const directory of ['truth/example', 'lib/project', 'src', 'generators', 'schema', 'scaffold', 'tools'])
+    mkdirSync(join(root, directory), { recursive: true });
+  writeFileSync(join(root, 'truth/example/system.yaml'), 'id: example\n');
+  save(join(root, 'package.json'), { private: true, testDouble: true });
+  for (const name of ['lib/project/cli.mjs', 'lib/project/verify.mjs', 'tools/truthsrc-acceptance-supply.mjs'])
+    writeFileSync(join(root, name), 'throw new Error("metadata-only test stub must never execute");\n');
+  save(join(root, 'truthsrc.project.json'), { schemaVersion: 'truthsrc.project/v1', tree: 'truth/example',
+    options: { runtimeArtifact: { coordinate: runtimeFiles[0].coordinate, sha256: runtimeFiles[0].sha256, repository,
+      symbolicTarget: 'net.imadz:saga-core:strict-runtime-binding-v1-SNAPSHOT' } } });
   const lease = join(root, 'lease.json');
   save(lease, { schemaVersion: 'bank.truthsrc-runtime-lease/v1', owner: 'workshop-test', host: '127.0.0.1',
     ports: { http: 19761, mysql: 19762, mongo: 19763 }, runRoot: join(root, 'target/truthsrc-runtime-workshop-test') });
-  const options = { through: 'service', run: join(root, 'target/run-one'), archive, lease,
+  const options = { through: 'service', run: join(root, 'target/run-one'), archive, runtimeSupply, lease,
     javaHome: '/no-jvm-is-used', browserModule: '/mock/browser.mjs', browserExecutable: '/mock/chrome-headless-shell' };
   const calls = [], digest = 'sha256:' + 'a'.repeat(64), snapshot = 'source-snapshot';
   const files = [{ file: 'app/Example.scala', bytes: 10, sha256: 'b'.repeat(64) }];
@@ -26,8 +67,11 @@ function fixture(t) {
   const source = { passed: true, snapshot, sources: [current], validation: { hard: [] }, roundtrip: { ok: true }, strictCompile: { passed: true } };
   const overrides = {
     root, doctor: async () => ({ passed: true }), current: async () => structuredClone(current), source: async () => { calls.push('source'); return source; },
-    archive: async file => ({ file, bytes: 1, sha256: ARCHIVE_SHA256 }),
-    supply: async file => ({ archive: { file, bytes: 1, sha256: ARCHIVE_SHA256 }, files: [] }),
+    archive: async file => { assert.equal(file, archive); return structuredClone(archiveDouble); },
+    supply: async (file, directory, context) => {
+      assert.equal(file, archive); assert.equal(directory, runtimeSupply); assert.equal(context.root, root);
+      return structuredClone(supply);
+    },
     generate: async (_project, out) => { calls.push('generate:' + basename(out)); mkdirSync(out); return { applied: true }; },
     anchors: async (_project, out) => ({ passed: true, snapshot, graph: { snapshot: 'graph', generation: basename(out) },
       codeDigest: digest, files, checks: { mockedPublicVerifier: true }, diagnostics: [], counts: { files: 1 } }),
@@ -41,7 +85,41 @@ function fixture(t) {
     build: async ({ evidence }) => ({ passed: true, refs: [await fileReference(join(evidence, 'result.json'))] }),
     service: async ({ evidence }) => ({ passed: true, refs: [await fileReference(join(evidence, 'result.json'))] }),
   };
-  return { root, options, overrides, calls, current, source };
+  return { root, options, overrides, calls, current, source, preparedRuntime };
+}
+
+// The child returns only a labelled test envelope. Harness/import failures are
+// NOT inspector rejections, so negative cases cannot pass on a broken loader.
+async function inspectFixtureService(root, admissionFile, options) {
+  const child = spawnSync(process.execPath, [join(TEST_ROOT, 'bank-workshop-inspector-child.mjs'), root, admissionFile], {
+    input: JSON.stringify(options), encoding: 'utf8', timeout: 120_000, maxBuffer: 8 * 1024 * 1024,
+    cwd: root, env: { PATH: '/usr/bin:/bin', NODE_V8_COVERAGE: '' },
+  });
+  assert.ifError(child.error); assert.equal(child.signal, null);
+  assert.equal(child.status, 0, child.stderr);
+  const response = JSON.parse(child.stdout);
+  assert.equal(response.schemaVersion, 'bank.workshop-inspector-test-double/v1');
+  assert.equal(response.executionKind, 'test-double'); assert.equal(response.fullPipelinePassed, false);
+  assert.equal(typeof response.accepted, 'boolean');
+  if (!response.accepted) {
+    assert.equal(response.error.name, 'AssertionError');
+    throw Object.assign(new Error(response.error.message), response.error, {
+      inspectorRejection: true, admissionCalls: response.admission.calls,
+    });
+  }
+  assert.deepEqual(response.admission, { calls: 1, unchangedChecks: 1 });
+  return { ...response.inspection, executionKind: response.executionKind, fullPipelinePassed: false };
+}
+const rejectsInspection = (promise, message) => assert.rejects(promise, { inspectorRejection: true }, message);
+
+function serviceAdmission(f) {
+  const buildEvidence = join(f.root, 'target/synthetic-build'); mkdirSync(buildEvidence);
+  const marker = join(buildEvidence, 'test-build.txt'); writeFileSync(marker, 'synthetic build binding; no compiler or runtime');
+  const admission = { schemaVersion: 'bank.workshop-test-admission/v1', executionKind: 'test-double', buildEvidence,
+    before: { testDouble: true, receipts: { [marker]: fingerprint(marker) } }, preparedRuntime: f.preparedRuntime };
+  const admissionFile = join(buildEvidence, 'test-admission.json'); save(admissionFile, admission);
+  return { buildEvidence, admission, admissionFile,
+    inspect: options => inspectFixtureService(f.root, admissionFile, options) };
 }
 
 test('strict CLI syntax and shared scope/format vocabulary', () => {
@@ -72,6 +150,8 @@ test('doctor is metadata-only by default, missing materials do not dispatch prob
   const report = await doctor({ ...options, archive: undefined }, { root, tool: root, probePorts: () => { probes++; }, probeImages: () => { probes++; } });
   assert.equal(report.passed, false); assert.equal(report.metadataOnly, true); assert.equal(probes, 0);
   assert.equal(report.checks.find(row => row.id === 'archive').status, 'blocked');
+  for (const id of ['project', 'runtime-supply', 'public-verifier'])
+    assert.equal(report.checks.find(row => row.id === id).status, 'passed', id + ' uses owned metadata');
   assert.equal(report.checks.find(row => row.id === 'resources').status, 'not-run');
   assert.deepEqual(readdirSync(root), before);
   const explicit = await doctor({ ...options, probeResources: true }, { root, tool: root, probePorts: () => { probes++; }, probeImages: () => { probes++; } });
@@ -97,6 +177,8 @@ test('source double requires no archive or runner, retains exclusive attempts an
   const result = await verifyWorkshop(options, f.overrides);
   assert.equal(result.requestedScopePassed, true); assert.equal(result.fullPipelinePassed, false);
   assert.equal(result.executionKind, 'test-double'); assert.equal(result.onboardingComplete, false);
+  assert.equal(result.verificationContract, 'bank.workshop-verification/v2');
+  assert.equal(result.runtimeVersion, null); assert.equal(result.runtimeSupply, null); assert.equal(result.preparedRuntime, null);
   assert.ok(readdirSync(join(options.run, 'attempts/0001')).includes('completed.json'));
   assert.ok(readdirSync(options.run).includes('results.json'));
   assert.deepEqual(JSON.parse(readFileSync(join(options.run, 'report.json'))), result);
@@ -131,6 +213,7 @@ test('code double generates TWO fresh outputs and invokes both explicit fixed-te
   assert.equal(builds.length, 2); assert.ok(builds[0].args.includes('--run-actor-tests')); assert.ok(builds[1].args.includes('--run-readside-tests'));
   assert.notEqual(builds[0].args[1], builds[1].args[1]);
   for (const build of builds) {
+    assert.equal(build.args[build.args.indexOf('--runtime-supply') + 1], f.options.runtimeSupply);
     const evidence = build.args[build.args.indexOf('--evidence') + 1];
     assert.equal(dirname(evidence), join(f.root, 'target'), 'unchanged actor helper requires direct target child');
     assert.ok(basename(evidence).startsWith(basename(f.options.run) + '-'), 'TA round must be unique to the run');
@@ -140,6 +223,9 @@ test('code double generates TWO fresh outputs and invokes both explicit fixed-te
 test('service double uses THIRD fresh runtime build, all window, explicit lease AND browser', async t => {
   const f = fixture(t), result = await verifyWorkshop(f.options, f.overrides);
   assert.equal(result.requestedScopePassed, true); assert.equal(result.fullPipelinePassed, false, 'mock execution never certifies real engineering');
+  assert.equal(result.verificationContract, 'bank.workshop-verification/v2');
+  assert.equal(result.runtimeVersion, '0.3.0'); assert.equal(result.runtimeSupply, f.options.runtimeSupply);
+  assert.deepEqual(result.preparedRuntime, f.preparedRuntime);
   const build = f.calls.filter(row => row.script === 'verify-truthsrc-build.mjs');
   assert.equal(build.length, 3); assert.ok(build[2].args.includes('--compile-runtime-tests'));
   const runtime = f.calls.find(row => row.script === 'verify-truthsrc-runtime.mjs');
@@ -194,6 +280,24 @@ test('report is read-only, invalidates changed refs, current support/handwritten
   }
 });
 
+test('current workshop rechecks every synthetic prepared reference using its actual bytes', async t => {
+  const f = fixture(t);
+  const result = await verifyWorkshop({ ...f.options, through: 'code' }, f.overrides);
+  assert.equal(result.requestedScopePassed, true);
+  const index = JSON.parse(readFileSync(join(f.options.run, 'results.json')));
+  const refs = [f.preparedRuntime.receipt, f.preparedRuntime.lock,
+    ...f.preparedRuntime.files.map(({ path, bytes, sha256 }) => ({ file: join(f.options.runtimeSupply, path), bytes, sha256 }))];
+  for (const ref of refs) {
+    assert.deepEqual(fixtureReference(ref.file), ref);
+    assert.ok(index.refs.some(row => row.file === ref.file && row.sha256 === ref.sha256 && row.bytes === ref.bytes));
+    const bytes = readFileSync(ref.file);
+    writeFileSync(ref.file, 'tampered test-only supply');
+    assert.equal((await reportWorkshop({ run: f.options.run }, f.overrides)).requestedScopePassed, false);
+    writeFileSync(ref.file, bytes);
+  }
+  assert.equal((await reportWorkshop({ run: f.options.run }, f.overrides)).requestedScopePassed, true);
+});
+
 test('interrupted run without sealed results never passes; symlink targets are rejected', async t => {
   const f = fixture(t);
   mkdirSync(f.options.run);
@@ -206,11 +310,12 @@ test('interrupted run without sealed results never passes; symlink targets are r
 
 test('real service receipt gate rejects aggregate success with missing browser/cleanup/stages', async t => {
   const f = fixture(t), evidence = join(f.root, 'target/runtime-evidence'); mkdirSync(evidence);
+  const { buildEvidence, inspect } = serviceAdmission(f), round = join(f.root, '.local/mock-ta/synthetic-round');
   const result = { schemaVersion: 'bank.truthsrc-runtime/v1', status: 'passed', errors: [], cancelled: false,
-    window: 'database', evidence, buildEvidence: '/build', round: '/round', checks: { sourceBound: true, inputsUnchanged: true },
+    window: 'database', evidence, buildEvidence, round, checks: { sourceBound: true, inputsUnchanged: true },
     database: { passed: true, browserVerified: false } };
   save(join(evidence, 'result.json'), result);
-  await assert.rejects(inspectService({ evidence, buildEvidence: '/build', round: '/round', lease: f.options.lease }));
+  await rejectsInspection(inspect({ evidence, buildEvidence, round, lease: f.options.lease }));
 });
 
 // Authored schema fixtures, never copied from private runtime evidence. The
@@ -270,8 +375,8 @@ function childReport(caseName, namespace, mode, pid, nodePid) {
 }
 
 async function serviceFixture(t) {
-  const f = fixture(t), spec = JSON.parse(readFileSync(f.options.lease));
-  const evidence = spec.runRoot, round = join(f.root, '.local/mock-ta', basename(evidence)), buildEvidence = '/build';
+  const f = fixture(t), spec = JSON.parse(readFileSync(f.options.lease)), admission = serviceAdmission(f);
+  const evidence = spec.runRoot, round = join(f.root, '.local/mock-ta', basename(evidence)), { buildEvidence } = admission;
   mkdirSync(evidence); mkdirSync(round);
   const sandbox = join(evidence, 'sandbox.sb'); writeFileSync(sandbox, 'schema fixture profile, never executed');
   const fixtureFile = join(ROOT, 'test/fixtures/truthsrc-actor-ta.json'), fixtureRef = await fileReference(fixtureFile);
@@ -363,20 +468,27 @@ async function serviceFixture(t) {
   save(join(evidence, 'database/result.json'), database);
   const leaseRef = await fileReference(f.options.lease);
   const browserRoot = join(f.root, 'schema-browser'); mkdirSync(browserRoot); writeFileSync(join(browserRoot, 'index.mjs'), 'fixture only');
-  save(join(evidence, 'inputs.json'), { options: { window: 'all', buildEvidence, browserModule: '/mock', browserExecutable: '/mock' },
+  const inputsFile = join(evidence, 'inputs.json');
+  const inputs = { options: { window: 'all', buildEvidence, browserModule: '/mock', browserExecutable: '/mock' },
+    build: admission.admission.before, runtimeVersion: '0.3.0', preparedRuntime: f.preparedRuntime,
     runtime: Object.fromEntries([leaseRef, configRef, fixtureRef].map(ref => [ref.file, { bytes: ref.bytes, sha256: ref.sha256 }])),
-    browserInputs: { [browserRoot]: { 'index.mjs': { bytes: 12, sha256: sha256('fixture only') } } } });
+    browserInputs: { [browserRoot]: { 'index.mjs': fingerprint(join(browserRoot, 'index.mjs')) } } };
+  save(inputsFile, inputs);
   const result = { schemaVersion: 'bank.truthsrc-runtime/v1', status: 'passed', errors: [], cancelled: false, window: 'all', evidence, buildEvidence, round,
+    runtimeVersion: '0.3.0', preparedRuntime: f.preparedRuntime,
     owner: spec.owner, lease: { ...spec, input: leaseRef }, leaseRelease: { owner: spec.owner, released: true, dataPreserved: true, reusable: false },
     checks: { sourceBound: true, inputsUnchanged: true, crashPassed: true, databasePassed: true },
     runtimeRebuilt: false, runtimePublished: false, release1134Resigned: false, crash: { passed: true, count: cases.length, jvms: cases.length * 3, cases }, database };
   const file = join(evidence, 'result.json'); save(file, result);
-  return { ...f, evidence, round, file, result, options: { evidence, buildEvidence, round, lease: f.options.lease } };
+  return { ...f, ...admission, evidence, round, file, result, inputsFile, inputs,
+    options: { evidence, buildEvidence, round, lease: f.options.lease,
+      runtimeVersion: '0.3.0', runtimeSupply: f.options.runtimeSupply, preparedRuntime: f.preparedRuntime } };
 }
 
 test('static service inspector rechecks every schema process receipt and rejects browser/log/exit gaps', async t => {
-  const { evidence, file, result, options } = await serviceFixture(t);
-  assert.equal((await inspectService(options)).passed, true);
+  const { evidence, file, result, options, inspect } = await serviceFixture(t);
+  const first = await inspect(options);
+  assert.equal(first.passed, true); assert.equal(first.executionKind, 'test-double'); assert.equal(first.fullPipelinePassed, false);
   for (const alter of [
     value => { value.leaseRelease.released = false; },
     value => { value.checks.inputsUnchanged = false; },
@@ -385,16 +497,16 @@ test('static service inspector rechecks every schema process receipt and rejects
     value => { value.database.cleanup.stopped = false; },
   ]) {
     const changed = structuredClone(result); alter(changed); writeFileSync(file, JSON.stringify(changed));
-    await assert.rejects(inspectService(options));
+    await rejectsInspection(inspect(options));
   }
   writeFileSync(file, JSON.stringify(result));
   writeFileSync(join(evidence, 'database/replay/browser.stdout.log'), '{"completed":false}');
-  await assert.rejects(inspectService(options), 'tampered nested browser log must fail even if root says passed');
+  await rejectsInspection(inspect(options), 'tampered nested browser log must fail even if root says passed');
 });
 
 test('service inspector seals boundary controls and the original database stop receipt', async t => {
-  const { evidence, options } = await serviceFixture(t);
-  const first = await inspectService(options), references = new Set(first.refs.map(row => row.file));
+  const { evidence, options, inspect } = await serviceFixture(t);
+  const first = await inspect(options), references = new Set(first.refs.map(row => row.file));
   const paths = ['crash-boundary', ...['initial', 'restart', 'refund', 'replay'].map(mode => 'database/' + mode)];
   for (const directory of paths) {
     for (const name of ['boundary.json', 'runtime-probe.py']) assert.ok(references.has(join(evidence, directory, name)));
@@ -404,12 +516,95 @@ test('service inspector seals boundary controls and the original database stop r
   for (const file of files) {
     assert.ok(references.has(file)); const bytes = readFileSync(file);
     writeFileSync(file, file.endsWith('.json') ? '{"stopped":false}' : 'changed control');
-    await assert.rejects(inspectService(options));
+    await rejectsInspection(inspect(options));
     writeFileSync(file, bytes); unlinkSync(file);
-    await assert.rejects(inspectService(options));
+    await rejectsInspection(inspect(options));
     writeFileSync(file, bytes, { flag: 'wx' });
   }
-  assert.equal((await inspectService(options)).passed, true);
+  assert.equal((await inspect(options)).passed, true);
+});
+
+test('current service identity is required in BOTH result and inputs and binds the admitted build', async t => {
+  const f = await serviceFixture(t);
+  assert.equal((await f.inspect(f.options)).passed, true);
+  const reject = message => assert.rejects(f.inspect(f.options), { inspectorRejection: true, admissionCalls: 1, message });
+  for (const [file, original] of [[f.file, f.result], [f.inputsFile, f.inputs]]) {
+    for (const [alter, message] of [
+      [value => { delete value.runtimeVersion; }, /runtime receipt version differs/],
+      [value => { value.runtimeVersion = '0.2.1-p23.20261027.1'; }, /runtime receipt version differs/],
+      [value => { delete value.preparedRuntime; }, /runtime receipt supply differs/],
+      [value => { value.preparedRuntime = null; }, /runtime receipt supply differs/],
+      [value => { value.preparedRuntime.root = join(f.root, 'other-synthetic-runtime'); }, /runtime receipt supply differs/],
+      [value => { value.preparedRuntime.files[0].sha256 = '0'.repeat(64); }, /runtime receipt supply differs/],
+    ]) {
+      const changed = structuredClone(original); alter(changed); writeFileSync(file, JSON.stringify(changed));
+      await reject(message);
+      writeFileSync(file, JSON.stringify(original));
+    }
+  }
+  writeFileSync(f.inputsFile, JSON.stringify({ ...f.inputs, build: { testDouble: true, receipts: {} } }));
+  await reject(/runtime admission differs from selected build/);
+  writeFileSync(f.inputsFile, JSON.stringify(f.inputs));
+  // Matching each other is insufficient: both must match the selected admission.
+  for (const [file, original] of [[f.file, f.result], [f.inputsFile, f.inputs]])
+    writeFileSync(file, JSON.stringify({ ...original, runtimeVersion: '0.2.1-p23.20261027.1' }));
+  await reject(/runtime receipt version differs/);
+  writeFileSync(f.file, JSON.stringify(f.result)); writeFileSync(f.inputsFile, JSON.stringify(f.inputs));
+  assert.equal((await f.inspect(f.options)).passed, true);
+});
+
+test('current service cannot fall back when runtime selection or admitted supply is missing', async t => {
+  const f = await serviceFixture(t);
+  assert.equal((await f.inspect(f.options)).passed, true);
+  for (const key of ['runtimeVersion', 'runtimeSupply', 'preparedRuntime']) {
+    const options = { ...f.options }; delete options[key];
+    await assert.rejects(f.inspect(options), { inspectorRejection: true, admissionCalls: 1 });
+  }
+  const oldAdmission = structuredClone(f.admission); delete oldAdmission.preparedRuntime;
+  writeFileSync(f.admissionFile, JSON.stringify(oldAdmission));
+  await assert.rejects(f.inspect(f.options), { inspectorRejection: true, admissionCalls: 1,
+    message: /selected service runtime differs from admitted build/ });
+  writeFileSync(f.admissionFile, JSON.stringify(f.admission));
+  assert.equal((await f.inspect(f.options)).passed, true);
+});
+
+test('explicit legacy service accepts matched empty or double-null identity, never mixed/current identity', async t => {
+  const f = await serviceFixture(t);
+  const { evidence, buildEvidence, round, lease } = f.options;
+  const options = { evidence, buildEvidence, round, lease, legacy: true };
+  const oldAdmission = structuredClone(f.admission); delete oldAdmission.preparedRuntime;
+  writeFileSync(f.admissionFile, JSON.stringify(oldAdmission));
+  const withoutIdentity = record => {
+    const value = structuredClone(record); delete value.runtimeVersion; delete value.preparedRuntime; return value;
+  };
+  const result = withoutIdentity(f.result), inputs = withoutIdentity(f.inputs);
+  const write = (resultIdentity, inputIdentity) => {
+    writeFileSync(f.file, JSON.stringify({ ...result, ...resultIdentity }));
+    writeFileSync(f.inputsFile, JSON.stringify({ ...inputs, ...inputIdentity }));
+  };
+  const empty = {}, nulls = { runtimeVersion: null, preparedRuntime: null };
+  for (const identity of [empty, nulls]) {
+    write(identity, identity);
+    assert.equal((await f.inspect(options)).passed, true, 'explicit matching legacy dialect remains supported');
+    await assert.rejects(f.inspect(f.options), { inspectorRejection: true, admissionCalls: 1,
+      message: /selected service runtime differs from admitted build/ });
+  }
+  for (const [left, right, message] of [
+    [empty, nulls, /legacy runtime identities differ/], [nulls, empty, /legacy runtime identities differ/],
+    [{ runtimeVersion: null }, { runtimeVersion: null }, /partial legacy runtime identity/],
+    [{ preparedRuntime: null }, { preparedRuntime: null }, /partial legacy runtime identity/],
+    [{ runtimeVersion: '0.3.0', preparedRuntime: f.preparedRuntime },
+      { runtimeVersion: '0.3.0', preparedRuntime: f.preparedRuntime }, /legacy service cannot carry current runtime/],
+  ]) {
+    write(left, right);
+    await assert.rejects(f.inspect(options), { inspectorRejection: true, admissionCalls: 1, message });
+  }
+  write(empty, empty);
+  writeFileSync(f.admissionFile, JSON.stringify(f.admission));
+  await assert.rejects(f.inspect(options), { inspectorRejection: true, admissionCalls: 1,
+    message: /legacy service cannot select current runtime/ });
+  writeFileSync(f.admissionFile, JSON.stringify(oldAdmission));
+  assert.equal((await f.inspect(options)).passed, true);
 });
 
 test('file references detect byte changes without exposing contents', async t => {

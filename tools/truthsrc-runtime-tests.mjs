@@ -116,7 +116,8 @@ export function completeRuntimeCompilation(observation, checks, processPassed, e
   const required = ['osSandboxEnforced', 'outputUnchanged', 'handwrittenUnchanged', 'localRuntimeUnchanged',
     'supplyUnchanged', 'currentInputsUnchanged', 'sandboxControlsAndCanariesUnchanged', 'ownedCachesInventoried',
     'verifierUnchanged', 'actualBuildSourcesVerified', 'runtimeTestInputsUnchanged', 'actualRuntimeTestSourcesVerified',
-    'runtimeClasspathVerified'];
+    'runtimeClasspathVerified', ...(observation?.schemaVersion === 'bank.truthsrc-runtime-build/v2'
+      ? ['runtimeSupplyVerified', 'runtimeClasspathEnginesVerified'] : [])];
   const outcome = verificationOutcome({ observationPassed: !!observation, processPassed, requiredChecks: required,
     checks: Object.fromEntries(required.map(name => [name, Object.hasOwn(checks, name) && checks[name] === true])), errors });
   return { ...observation, processPassed: outcome.processPassed, sourceBound: outcome.sourceBound,

@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, closeSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync, writeSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
+import { setImmediate as nextTurn } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 import { sessionArgs, sessionCli, sessionCompilePlan, sessionStart, sessionStatus, sessionStop } from '../tools/bank-workshop-session.mjs';
 import { acquireRuntimeLease } from '../tools/truthsrc-runtime-lease.mjs';
@@ -97,9 +98,10 @@ function harness(t) {
       calls.push('launch'); instance = options.identity;
       assert.equal(options.env.BANK_RUNTIME_TA_CONFIG, join(root, '.local/mock-ta/truthsrc-runtime-' + owner, 'runtime-ta.json'));
       save(join(session, 'run/ready.json'), { ...instance, pid: processRecord.pid, origin: 'http://127.0.0.1:' + ports.http, bound: true });
-      return { pid: processRecord.pid, exited: () => launchExited,
+      return { pid: processRecord.pid, exited: () => { calls.push('jvm-check'); return launchExited; },
         async stop(birth) {
           calls.push('jvm-stop'); if (birth) assert.deepEqual(birth, processRecord);
+          assert.equal(readFileSync(join(session, 'run/stop.json.ready')).length, 0);
           assert.deepEqual(json(join(session, 'run/stop.json')), instance);
           save(join(session, 'run/closed.json'), { ...instance, pid: processRecord.pid, closed: true });
           return { pid: processRecord.pid, exited: true, clean: true, directChildClosed: true, directChildReaped: true, groupAliveAfter: false };
@@ -132,6 +134,8 @@ test('foreground start stays pending after ready, safe status/stop closes owned 
   const [result, stopped] = await Promise.all([pending, stop]);
   assert.equal(result.status, 'closed'); assert.equal(result.passed, false, 'Node doubles never certify a real session');
   assert.equal(result.exitCode, 0); assert.equal(stopped.status, 'closed');
+  for (const file of ['stop-request.json.ready', 'run/stop.json.ready'])
+    assert.equal(readFileSync(join(h.session, file)).length, 0);
   assert.ok(result.checks.workerClosed && result.checks.resourcesExited && result.leaseReleased);
   assert.ok(h.calls.indexOf('compile') < h.calls.indexOf('db-start'));
   assert.ok(h.calls.indexOf('boundary') < h.calls.indexOf('launch'));
@@ -142,6 +146,107 @@ test('foreground start stays pending after ready, safe status/stop closes owned 
   assert.equal((await sessionStop({ session: h.session }, h.stateDeps())).status, 'closed');
   h.assertReleased();
 });
+
+function requestFor(session) {
+  const { schemaVersion, owner, identity, controller } = json(join(session, 'session.json'));
+  return { schemaVersion, owner, identity, controller };
+}
+
+async function bounded(promise) {
+  let timer;
+  try {
+    return await Promise.race([promise, new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error('Node session fixture did not settle within 5s')), 5_000);
+    })]);
+  } finally { clearTimeout(timer); }
+}
+
+for (const state of ['half-written', 'complete']) test('unpublished ' + state + ' request waits for its original writer', async t => {
+  const h = harness(t), file = join(h.session, 'stop-request.json');
+  let clock = Date.now(), writer, complete, initial, settled = false, stopping, stopSettled = false;
+  // Only the deadline clock is virtual; polling still uses the ordinary event loop.
+  // Cleanup can expire a broken stop waiter without leaving a 180s background task.
+  t.mock.method(Date, 'now', () => clock);
+  const announceReady = h.ops.ready;
+  h.ops.ready = value => {
+    complete = JSON.stringify(requestFor(h.session));
+    initial = state === 'half-written' ? complete.slice(0, Math.floor(complete.length / 2)) : complete;
+    writer = openSync(file, 'wx', 0o600); writeSync(writer, initial);
+    announceReady(value);
+  };
+  const finishData = () => {
+    if (writer === undefined) return;
+    try { writeSync(writer, complete.slice(initial.length)); }
+    finally { closeSync(writer); writer = undefined; }
+  };
+  const pending = h.start().then(result => { settled = true; return result; });
+  try {
+    await bounded(h.ready);
+    // ready() seeds the file before the controller's first foreground read. The
+    // subsequent JVM check proves that read did not parse/fail on unpublished data.
+    assert.ok(h.calls.lastIndexOf('jvm-check') > h.calls.indexOf('ready'));
+    assert.equal((await sessionStatus({ session: h.session }, h.stateDeps())).status, 'ready');
+    const before = stamp(file);
+    stopping = sessionStop({ session: h.session }, h.stateDeps())
+      .then(value => ({ value }), error => ({ error }))
+      .then(outcome => { stopSettled = true; return outcome; });
+    // Flush async status validation so stop reaches the existing-writer wait;
+    // this is an event-loop barrier, not a guessed sleep or a publication timer.
+    await nextTurn();
+    assert.equal(settled, false); assert.equal(stopSettled, false);
+    assert.deepEqual(stamp(file), before);
+    assert.equal(existsSync(file + '.ready'), false);
+    assert.equal(existsSync(join(h.session, 'run/stop.json.ready')), false);
+    assert.equal(h.calls.includes('jvm-stop'), false);
+    assert.equal((await sessionStatus({ session: h.session }, h.stateDeps())).status, 'ready');
+    finishData(); write(file + '.ready', '');
+    const [result, stopped] = await bounded(Promise.all([pending, stopping]));
+    assert.ifError(stopped.error);
+    assert.equal(result.status, 'closed'); assert.equal(result.exitCode, 0);
+    assert.equal(result.failure, null); assert.equal(result.stoppedByUser, true);
+    assert.equal(stopped.value.status, 'closed'); assert.equal(stopped.value.exitCode, 0);
+    assert.deepEqual(json(file), requestFor(h.session));
+    for (const marker of [file + '.ready', join(h.session, 'run/stop.json.ready')])
+      assert.equal(readFileSync(marker).length, 0);
+    h.assertReleased();
+  } finally {
+    finishData();
+    if (complete && !existsSync(file + '.ready')) write(file + '.ready', '');
+    if (!settled) process.emit('SIGINT');
+    clock += 180_001;
+    await bounded(Promise.all([pending, stopping]));
+  }
+});
+
+for (const problem of ['nonempty-marker', 'invalid-json', 'foreign-identity'])
+  test('published stop request rejects ' + problem + ' without rewriting or republishing it', async t => {
+    const h = harness(t); let settled = false;
+    const pending = h.start().then(result => { settled = true; return result; });
+    try {
+      await bounded(h.ready);
+      const file = join(h.session, 'stop-request.json'), request = requestFor(h.session);
+      write(file, problem === 'invalid-json' ? '{' : JSON.stringify(problem === 'foreign-identity'
+        ? { ...request, identity: request.identity.slice(0, -1) + (request.identity.endsWith('0') ? '1' : '0') } : request));
+      write(file + '.ready', problem === 'nonempty-marker' ? 'x' : '');
+      const dataBefore = stamp(file), markerBefore = stamp(file + '.ready');
+      await assert.rejects(sessionStatus({ session: h.session }, h.stateDeps()));
+      await assert.rejects(sessionStop({ session: h.session }, h.stateDeps()));
+      assert.deepEqual(stamp(file), dataBefore); assert.deepEqual(stamp(file + '.ready'), markerBefore);
+      assert.equal(existsSync(join(h.session, 'run/stop.json')), false);
+      assert.equal(existsSync(join(h.session, 'run/stop.json.ready')), false);
+      assert.equal(h.calls.includes('jvm-stop'), false);
+      // The already-published bad marker is retained, not repaired. The controller
+      // independently rejects it and still closes its own fake JVM/databases.
+      const result = await bounded(pending);
+      assert.equal(result.status, 'blocked'); assert.equal(result.passed, false); assert.ok(result.failure);
+      assert.ok(result.checks.resourcesExited && result.leaseReleased);
+      assert.deepEqual(stamp(file), dataBefore); assert.deepEqual(stamp(file + '.ready'), markerBefore);
+      h.assertReleased();
+    } finally {
+      if (!settled) process.emit('SIGINT');
+      await bounded(pending);
+    }
+  });
 
 for (const signal of ['SIGINT', 'SIGTERM']) test(signal + ' closes the foreground session gracefully, not the bounded acceptance main', async t => {
   const h = harness(t), pending = h.start(); await h.ready;
@@ -188,8 +293,10 @@ for (const problem of ['replaced-jvm', 'replaced-controller', 'foreign-owner', '
     } else {
       const bytes = readFileSync(h.lease); writeFileSync(h.lease, '{}'); restore = () => writeFileSync(h.lease, bytes);
     }
+    await assert.rejects(sessionStatus({ session: h.session }, h.stateDeps()));
     await assert.rejects(sessionStop({ session: h.session }, h.stateDeps()));
-    assert.equal(existsSync(join(h.session, 'stop-request.json')), false);
+    for (const file of ['stop-request.json', 'stop-request.json.ready', 'run/stop.json', 'run/stop.json.ready'])
+      assert.equal(existsSync(join(h.session, file)), false);
     assert.equal(h.calls.includes('jvm-stop'), false);
     restore(); process.emit('SIGINT'); const result = await pending; assert.equal(result.status, 'closed'); h.assertReleased();
   });
@@ -247,6 +354,12 @@ test('static Scala main uses real Loader/lifecycle with no acceptance timer; con
   assert.match(scala, /while \(!stopRequested\.get\(\)\)/);
   assert.match(scala, /lifecycle\.stop\(\)/); assert.match(scala, /actorSystem\.terminate\(\)/);
   assert.match(scala, /addShutdownHook/); assert.match(scala, /java\.class\.path/);
+  const requested = scala.slice(scala.indexOf('def requested(): Boolean = {'), scala.indexOf('val hook = new Thread'));
+  assert.match(requested, /val marker = owned\.resolve\("stop\.json\.ready"\)/);
+  assert.match(requested, /if \(!Files\.exists\(marker, LinkOption\.NOFOLLOW_LINKS\)\) \{\s+require\(publishedStop\.isEmpty, "published stop marker disappeared"\)\s+false\s+\} else \{/);
+  assert.match(requested, /val markerBefore = control\(marker, 0\)[\s\S]*?val dataBefore = control\(data, 16384\)[\s\S]*?val bytes = Files\.readAllBytes\(data\)/);
+  assert.match(requested, /Json\.parse\(bytes\)\.as\[JsObject\] == identity/);
+  assert.match(requested, /publishedStop\.foreach\(previous => require\(previous == captured, "published stop control changed"\)\)/);
   assert.equal(/240\.seconds|BankProductionHttpMain|Await\.result\([^\n]*Duration\.Inf|\?\?\?/.test(scala), false);
   const node = readFileSync(join(ROOT, 'tools/bank-workshop-session.mjs'), 'utf8');
   assert.match(node, /spawn\(SANDBOX,/); assert.match(node, /stdio: 'ignore'/);

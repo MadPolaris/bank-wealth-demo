@@ -7,6 +7,8 @@ import { MAX_JSON_BYTES, parseStrictJson } from '../../metarch-truthsrc/lib/stri
 import { BUILD_SUPPORT, admitCandidate, actualBuildSourceRoot, compareBuildSources, fileDigest, inventory, succeeded } from './verify-truthsrc-build.mjs';
 import { captureRuntimeFile, safePath } from './truthsrc-evidence.mjs';
 import { createEvidenceReferences } from '../../metarch-truthsrc/lib/verification/inventory.mjs';
+import { SUPPLY_SUPPORT, LEGACY_ENGINE_FILES, capturePreparedRuntime, validateComposedSupply,
+  engineClasspathTasks, inspectEngineClasspath } from './truthsrc-acceptance-supply.mjs';
 
 export { captureRuntimeFile } from './truthsrc-evidence.mjs';
 import { RUNTIME_MANIFEST_FILE, RUNTIME_MAINS, completeRuntimeCompilation, inspectRuntimeCompilation, runtimeBuildTasks, runtimeClasspathInventory, runtimeTestManifest } from './truthsrc-runtime-tests.mjs';
@@ -32,7 +34,7 @@ const RUNTIME_SUPPORT = [RUNTIME_MANIFEST_FILE, join(ROOT, 'tools/truthsrc-runti
 const SUPPORT = [fileURLToPath(import.meta.url), VERIFIER, ...RUNTIME_SUPPORT, join(ROOT, 'tools/truthsrc-actor-tests.mjs'),
   join(ROOT, 'tools/truthsrc-evidence.mjs'),
   ...['strict-json', 'immutable-data', 'verification/files', 'verification/inventory', 'verification/outcome', 'verification/worker-evidence', 'products/request']
-    .map(name => join(TOOL, 'lib', name + '.mjs')), join(TOOL, 'bin/truthsrc.js'), join(TOOL, 'package.json')];
+    .map(name => join(TOOL, 'lib', name + '.mjs')), join(TOOL, 'bin/truthsrc.js'), join(TOOL, 'package.json'), ...SUPPLY_SUPPORT];
 const loadedSupport = snapshot(SUPPORT);
 
 function checkProcess(receipt) {
@@ -96,7 +98,21 @@ export function captureRuntimeSourceInventory(output, files, capture = captureRu
 
 // Pure receipt gate, separately testable without generating/admitting an application or launching a JVM.
 export function validateRuntimeReceipts({ evidence, input, result, runtime, build, actual, before, after, runtimeBefore, runtimeAfter, plan, stdout, stderr }) {
-  assert.equal(result.schemaVersion, 'bank.truthsrc-build/v1'); assert.equal(runtime.schemaVersion, 'bank.truthsrc-runtime-build/v1');
+  assert.ok(['bank.truthsrc-build/v1', 'bank.truthsrc-build/v2'].includes(result.schemaVersion), 'unknown build receipt schema');
+  const current = result.schemaVersion === 'bank.truthsrc-build/v2';
+  assert.equal(runtime.schemaVersion, current ? 'bank.truthsrc-runtime-build/v2' : 'bank.truthsrc-runtime-build/v1');
+  if (current) {
+    assert.equal(input.preparedRuntime?.schemaVersion, 'bank.prepared-runtime/v3');
+    assert.equal(input.preparedRuntime.version, '0.3.0');
+    assert.equal(input.runtimeSupply, input.preparedRuntime.root);
+    equal(result.preparedRuntime, input.preparedRuntime);
+    equal(runtime.preparedRuntime, input.preparedRuntime);
+    equal(runtime.resolvedDependencies, result.resolvedDependencies);
+    equal(inspectEngineClasspath(stdout.toString('utf8'), evidence, input.preparedRuntime), result.resolvedDependencies);
+  } else {
+    assert.equal(input.runtimeSupply, undefined, 'legacy receipt cannot select a new runtime');
+    assert.equal(input.preparedRuntime, undefined, 'legacy receipt cannot carry current supply');
+  }
   assert.equal(result.status, 'passed'); equal(result.errors, []); assert.equal(result.cancelled, null);
   for (const key of ['compileRuntimeTests', 'compileGeneratedTests']) assert.equal(result[key], true, key);
   for (const key of ['runGeneratedTests', 'runActorTests', 'testsExecuted', 'servicesStarted', 'runtimeRebuilt', 'runtimePublished', 'release1134Resigned']) assert.equal(result[key], false, key);
@@ -117,7 +133,8 @@ export function validateRuntimeReceipts({ evidence, input, result, runtime, buil
   equal(input.generator, { id: 'scala-cqrs-play-service', version: '1' });
   equal(result.archive, { file: input.archive, expectedSha256: ARCHIVE_SHA, sha256: ARCHIVE_SHA }); assert.equal(input.archiveSha256, ARCHIVE_SHA);
   keys(input.initiallyEmpty, CACHES); assert.ok(Object.values(input.initiallyEmpty).every(value => value === true));
-  keys(result.checks, CHECKS); for (const key of CHECKS) assert.equal(result.checks[key], true, key);
+  const requiredChecks = [...CHECKS, ...(current ? ['runtimeSupplyVerified', 'runtimeClasspathEnginesVerified'] : [])];
+  keys(result.checks, requiredChecks); for (const key of requiredChecks) assert.equal(result.checks[key], true, key);
   for (const key of ['passed', 'sourceBound', 'processPassed']) assert.equal(runtime[key], true, key);
   for (const key of ['testsExecuted', 'servicesStarted']) assert.equal(runtime[key], false, key);
   equal(runtime.errors, []); equal(result.runtimeCompilation, runtime);
@@ -128,7 +145,7 @@ export function validateRuntimeReceipts({ evidence, input, result, runtime, buil
   equal(input.testFiles, GENERATED); assert.equal(input.runtimeManifest.sourceCount, 5);
   assert.equal(input.runtimeManifest.schemaVersion, 'bank.truthsrc-runtime-tests/v1');
   equal(input.runtimeManifest.sources.map(row => row.name), RUNTIME_MAINS); equal(runtime.manifest, input.runtimeManifest);
-  equal(plan.tasks, runtimeBuildTasks(GENERATED, runtime.manifest)); equal(plan.javaOptions, javaOptions(evidence));
+  equal(plan.tasks, runtimeBuildTasks(GENERATED, runtime.manifest).concat(current ? engineClasspathTasks() : [])); equal(plan.javaOptions, javaOptions(evidence));
   equal(build.command, ['/usr/bin/sandbox-exec', '-f', join(evidence, 'sandbox.sb'), java, '-Xmx2G', '-XX:ActiveProcessorCount=2',
     ...plan.javaOptions, '-cp', join(evidence, 'supply/launcher/sbt-launch.jar'), 'xsbt.boot.Boot', ...plan.tasks]);
   equal(plan.allowedAppArtifactDirectories, ['target', 'project/target', 'project/project/target']);
@@ -149,7 +166,7 @@ export function validateRuntimeReceipts({ evidence, input, result, runtime, buil
   assert.equal(actual.files, sourceFiles, 'actual source count differs from complete build inventory');
   keys(before, ['output', 'handwritten', 'localRuntime']); keys(after, [...Object.keys(before), 'supply']);
   for (const key of Object.keys(before)) { assert.ok(Object.keys(before[key]).length > 0, 'empty source inventory'); equal(after[key], before[key]); }
-  assert.equal(Object.keys(after.supply).length, 1065);
+  assert.equal(Object.keys(after.supply).length, current ? 1035 : 1065);
   equal(runtimeAfter, runtimeBefore); keys(runtimeBefore, [...runtime.manifest.sources.map(row => row.file), ...RUNTIME_SUPPORT]);
   for (const row of runtime.manifest.sources) assert.equal(runtimeBefore[row.file].sha256, row.sha256);
   assert.ok(!/(?:TRUTHSRC-(?:ACTOR-SOURCES|GENERATED-SUITES)=|UNIT-JVM-PID=|Run starting\. Expected test count)/.test(stdout.toString('utf8')), 'execution marker in compile-only log');
@@ -157,7 +174,10 @@ export function validateRuntimeReceipts({ evidence, input, result, runtime, buil
   assert.equal(closure.sources.length, 11); equal(runtime.sources, closure.sources); equal(runtime.classpath, closure.classpath);
   keys(runtime.classpathInventory, closure.classpath); assert.equal(runtime.jarReferences.schemaVersion, 'bank.truthsrc-runtime-jars/v1');
   equal(runtime.jarReferences.jars.map(row => row.file), closure.classpath.filter(file => file.endsWith('.jar'))); assert.ok(Array.isArray(runtime.jarReferences.references));
-  return { output, actualRoot, classpath: closure.classpath, javaHome, java };
+  if (current) for (const engine of result.resolvedDependencies.engines)
+    assert.equal(closure.classpath.filter(file => file === engine.file).length, 1, 'resolved engine missing from runtime classpath');
+  return { output, actualRoot, classpath: closure.classpath, javaHome, java,
+    ...(current ? { preparedRuntime: input.preparedRuntime, resolvedDependencies: result.resolvedDependencies } : {}) };
 }
 
 export async function admitRuntimeBuild(buildEvidence) {
@@ -178,9 +198,11 @@ export async function admitRuntimeBuild(buildEvidence) {
   const stdout = read(join(buildEvidence, 'build.stdout.log'), false), stderr = read(join(buildEvidence, 'build.stderr.log'), false);
   const descriptor = validateRuntimeReceipts({ ...records, evidence: buildEvidence, stdout, stderr });
   const { output, actualRoot, classpath, javaHome, java } = descriptor, { input, runtime, before, after, result, plan } = records;
+  const current = result.schemaVersion === 'bank.truthsrc-build/v2', localRoot = current ? input.runtimeSupply : LOCAL;
+  if (current) equal(capturePreparedRuntime(localRoot), input.preparedRuntime, 'prepared runtime changed since build');
   const sourceCount = captureRuntimeSourceInventory(output, before.output, capture);
   assert.equal(sourceCount, records.actual.files, 'actual sources differ from source-bound plan');
-  for (const root of [output, actualRoot, javaHome, TOOL, HAND, LOCAL]) { safePath(root); assert.equal(realpathSync(root), root); }
+  for (const root of [output, actualRoot, javaHome, TOOL, HAND, localRoot]) { safePath(root); assert.equal(realpathSync(root), root); }
   const toolchain = [java, join(javaHome, 'bin/javac'), join(javaHome, 'release'), '/usr/bin/python3', '/usr/bin/sandbox-exec'];
   keys(input.toolchain, toolchain); equal(input.verifier, { file: VERIFIER, sha256: loadedSupport[VERIFIER].sha256 });
   equal(input.verifierSupport, snapshot(BUILD_SUPPORT), 'build file-evidence helpers changed');
@@ -193,7 +215,7 @@ export async function admitRuntimeBuild(buildEvidence) {
   const runtimeInputs = snapshot([...manifest.sources.map(row => row.file), ...RUNTIME_SUPPORT]);
   equal(runtimeInputs, records.runtimeBefore, 'runtime inputs/helper changed since compile');
   for (const row of manifest.sources) assert.equal(receipts[row.file].sha256, runtimeInputs[row.file].sha256);
-  const admitted = await admitCandidate(output, { runTests: false }, { afterBuild: true });
+  const admitted = await admitCandidate(output, { runTests: false, ...(current ? { runtimeSupply: localRoot } : {}) }, { afterBuild: true });
   equal(input.sources, admitted.captured.sources, 'current project/tool sources differ'); equal(input.generator, admitted.generator);
   equal(admitted.testFiles, GENERATED); equal({ output: admitted.before, handwritten: admitted.handwritten, localRuntime: admitted.runtime }, before);
   const sourceFiles = snapshot(admitted.captured.sources.filter(row => row.file).map(row => row.file));
@@ -203,7 +225,12 @@ export async function admitRuntimeBuild(buildEvidence) {
   const toolBefore = toolTree(), helpers = { safePath, inventory, fileDigest };
   equal(runtimeClasspathInventory(classpath, actualRoot, buildEvidence, helpers), runtime.classpathInventory, 'compiled classpath changed');
   const supply = read(join(buildEvidence, 'supply-before.json'));
-  equal(supply.counts, { maven: 1048, ivy: 16, launcher: 1 }); assert.equal(supply.archiveSha256, ARCHIVE_SHA); equal(supply.files, after.supply);
+  if (current) {
+    validateComposedSupply(supply, input.preparedRuntime, after.supply);
+    equal(read(join(buildEvidence, 'resolved-dependencies.json')), result.resolvedDependencies);
+  } else {
+    equal(supply.counts, { maven: 1048, ivy: 16, launcher: 1 }); assert.equal(supply.archiveSha256, ARCHIVE_SHA); equal(supply.files, after.supply);
+  }
   const cacheBefore = read(join(buildEvidence, 'cache-before.json')), cacheAfter = read(join(buildEvidence, 'cache-after.json'));
   keys(cacheBefore, CACHES); keys(cacheAfter, CACHES); for (const name of CACHES) equal(cacheBefore[name], {});
   const sandbox = read(join(buildEvidence, 'sandbox-before.json')), sandboxAfter = read(join(buildEvidence, 'sandbox-after.json'));
@@ -226,10 +253,17 @@ export async function admitRuntimeBuild(buildEvidence) {
   const controls = snapshot(Object.keys(sandbox.controlsBefore));
   for (const [file, digest] of Object.entries(sandbox.controlsBefore)) assert.equal(controls[file].sha256, digest);
   const boundary = join(buildEvidence, 'boundary'), py = '/usr/bin/python3', e = buildEvidence, phaseLogs = {};
+  const selectionPath = join(e, 'supply-selection.json');
+  let selectionDigest;
+  if (current) {
+    const selection = read(selectionPath, false); selectionDigest = hash(selection);
+    equal(parseStrictJson(selection), { schemaVersion: 'bank.supply-selection/v1', preparedRuntime: input.preparedRuntime, excludedPaths: LEGACY_ENGINE_FILES });
+  }
   const phases = [
     ['javac', 'javac', e, 45000, join(javaHome, 'bin/javac'), ['-J-XX:-UsePerfData', '-J-Duser.home=' + input.env.HOME, '-J-Djava.io.tmpdir=' + input.env.TMPDIR, '-proc:none', '-classpath', boundary, '-d', boundary, join(boundary, 'TruthsrcSandboxProbe.java')]],
     ['sandboxProbe', 'sandbox-check', output, 30000, java, ['-XX:-UsePerfData', '-Duser.home=' + input.env.HOME, '-Djava.io.tmpdir=' + input.env.TMPDIR, '-cp', boundary, 'TruthsrcSandboxProbe', e, sandbox.canaries, sandbox.escape, py, join(boundary, 'probe.py')]],
-    ['extract', 'extract', e, 480000, py, ['-I', '-S', join(e, 'extract-supply.py'), input.archive, join(e, 'supply'), ARCHIVE_SHA]],
+    ['extract', 'extract', e, 480000, py, ['-I', '-S', join(e, 'extract-supply.py'), input.archive, join(e, 'supply'), ARCHIVE_SHA,
+      ...(current ? [selectionPath, selectionDigest] : [])]],
     ['runtimeJars', 'runtime-jars-probe', e, 30000, py, ['-I', '-S', join(e, 'runtime-jars.py'), join(e, 'runtime-jars-input.json')]],
   ];
   keys(result.phases, ['build', ...phases.map(row => row[0])]);
@@ -245,7 +279,7 @@ export async function admitRuntimeBuild(buildEvidence) {
   const jarReferences = validateJarReferences(classpath, parseStrictJson(phaseLogs.runtimeJars), helpers);
   equal(read(join(e, 'runtime-jars.json')), jarReferences); equal(runtime.jarReferences, jarReferences);
   const verifierText = read(VERIFIER, false).toString('utf8');
-  for (const [name, file] of [['extractSource', 'extract-supply.py'], ['sandboxPythonSource', 'boundary/probe.py'], ['sandboxJavaSource', 'boundary/TruthsrcSandboxProbe.java']]) {
+  for (const [name, file] of [[current ? 'extractCurrentSource' : 'extractSource', 'extract-supply.py'], ['sandboxPythonSource', 'boundary/probe.py'], ['sandboxJavaSource', 'boundary/TruthsrcSandboxProbe.java']]) {
     const match = verifierText.match(new RegExp('const ' + name + ' = String\\.raw`([\\s\\S]*?)`;')); assert.ok(match, 'verifier control source unavailable'); assert.equal(read(join(e, file), false).toString('utf8'), match[1]);
   }
   for (const file of ['repositories', 'sbt.boot.properties']) read(join(e, file), false);
@@ -258,7 +292,11 @@ export async function admitRuntimeBuild(buildEvidence) {
     equal(snapshot(SUPPORT), loadedSupport); equal(snapshot(Object.keys(tools)), tools); equal(snapshot(Object.keys(controls)), controls);
     checkCanaries(); equal(inventory(output), artifactsBefore, 'build artifacts changed'); assertJarReferencesUnchanged(jarReferences, helpers);
     admitted.assertUnchanged(admitted.captured); equal(snapshot(Object.keys(sourceFiles)), sourceFiles); equal(toolTree(), toolBefore);
-    for (const [key, root, opts] of [['output', output, { afterBuild: true }], ['handwritten', HAND, {}], ['localRuntime', LOCAL, {}], ['supply', join(buildEvidence, 'supply'), {}]]) equal(inventory(root, opts), after[key], key + ' changed');
+    for (const [key, root, opts] of [['output', output, { afterBuild: true }], ['handwritten', HAND, {}], ['localRuntime', localRoot, {}], ['supply', join(buildEvidence, 'supply'), {}]]) equal(inventory(root, opts), after[key], key + ' changed');
+    if (current) {
+      equal(capturePreparedRuntime(localRoot), input.preparedRuntime, 'prepared runtime changed');
+      equal(inspectEngineClasspath(stdout.toString('utf8'), buildEvidence, input.preparedRuntime), result.resolvedDependencies);
+    }
     assert.equal(compareBuildSources(before.output, inventory(actualRoot, { afterBuild: true })).files, sourceCount);
     equal(snapshot(Object.keys(runtimeInputs)), runtimeInputs); equal(runtimeTestManifest(file => captureRuntimeFile(file).value.toString('utf8')), manifest);
     equal(runtimeClasspathInventory(classpath, actualRoot, buildEvidence, helpers), runtime.classpathInventory, 'runtime classpath changed');
@@ -266,6 +304,6 @@ export async function admitRuntimeBuild(buildEvidence) {
   };
   await assertUnchanged();
   return freeze({ ...descriptor, node, buildEvidence, manifest, mains: [...RUNTIME_MAINS], jarReferences,
-    before: { sourceFiles: sourceCount, runtimeSources: 5, generatedTestSources: 6, checks: CHECKS.length, receipts: structuredClone(receipts),
+    before: { sourceFiles: sourceCount, runtimeSources: 5, generatedTestSources: 6, checks: CHECKS.length + (current ? 2 : 0), receipts: structuredClone(receipts),
       classpathInventory: structuredClone(runtime.classpathInventory), toolchain: structuredClone(tools), runtimeInputs: structuredClone(runtimeInputs) }, assertUnchanged });
 }

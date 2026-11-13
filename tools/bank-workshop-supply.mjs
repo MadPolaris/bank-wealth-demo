@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { accessSync, constants, existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { basename, dirname, isAbsolute, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { captureEvidenceFile, fingerprintEvidenceFile } from '../../metarch-truthsrc/lib/verification/files.mjs';
 import { safePath } from './truthsrc-evidence.mjs';
 
@@ -20,6 +20,22 @@ export const requestedStages = through => {
   assert.ok(STAGES.includes(through), 'through must be source, anchors, code or service');
   return STAGES.slice(0, STAGES.indexOf(through) + 1);
 };
+
+// Argument-only validation: source never opens an unused archive/runtime directory.
+// Doctor can describe missing materials; verify must reject missing flags before writes.
+export function validateSupplyOptions(options, { required = true } = {}) {
+  requestedStages(options.through);
+  const fail = code => { throw Object.assign(new Error(code), { code }); };
+  if (options.through === 'source') {
+    if (options.archive !== undefined || options.runtimeSupply !== undefined) fail('WORKSHOP_SOURCE_SUPPLY_UNUSED');
+    return;
+  }
+  if (!required) return;
+  if (typeof options.archive !== 'string' || !options.archive) fail('WORKSHOP_ARCHIVE_REQUIRED');
+  if (typeof options.runtimeSupply !== 'string' || !options.runtimeSupply) fail('WORKSHOP_RUNTIME_SUPPLY_REQUIRED');
+  for (const file of [options.archive, options.runtimeSupply])
+    if (!isAbsolute(file) || resolve(file) !== file) fail('WORKSHOP_SUPPLY_PATH_INVALID');
+}
 
 // Kept independent of SQLite imports: doctor must diagnose an old Node first.
 export function nodeSupported(version = process.versions.node) {
@@ -80,23 +96,30 @@ function sourceFiles(root, filter = () => true) {
 
 // Fingerprint only declared source/support trees, never .local secrets, old runs,
 // host caches or process environments. Public toolEvidence remains authoritative.
-export async function captureCurrent({ root = ROOT, tool = TOOL } = {}) {
+export async function captureCurrent({ root = ROOT, tool = TOOL, legacy = false } = {}) {
   assert.ok(nodeSupported(), 'Node >=22.13 required');
   const { treeEvidence, toolEvidence, localPath } = await import(new URL('file://' + tool + '/lib/project/cli.mjs'));
   const project = join(root, 'truthsrc.project.json'), config = readJson(project);
   const tree = localPath(root, config.tree);
   assert.ok(within(join(root, 'truth'), tree), 'current author tree must be within bank truth/');
   const inputs = [project, ...(config.documents ?? []).map(row => localPath(root, row.file))];
-  const support = sourceFiles(join(root, 'tools'), file => /\.(mjs|py|scala)$/.test(file))
+  // The adapter is automatically in tools/. The technical lock is explicit source
+  // support, not a read of the prepared artifacts. Old v1 uses its original set;
+  // all retained signatures still have to match (never re-sign old evidence).
+  const support = sourceFiles(join(root, 'tools'), file => /\.(mjs|py|scala)$/.test(file) &&
+      (!legacy || file !== join(root, 'tools/truthsrc-acceptance-supply.mjs')))
     .concat(sourceFiles(join(root, 'simulator'), file => /\.mjs$/.test(file)),
       sourceFiles(join(root, 'test/scala')), sourceFiles(join(root, 'test/fixtures')),
       join(root, 'docs/V1-RETIREMENT-MANIFEST.json'), join(root, 'docs/V1-REFERENCE-RELOCATIONS.json'),
-      join(root, 'docs/architecture/HANDWRITTEN-SOURCE-MAP.json'));
+      join(root, 'docs/architecture/HANDWRITTEN-SOURCE-MAP.json'),
+      ...(legacy ? [] : [join(root, 'docs/RUNTIME-0.3.0-SUPPLY.json')]));
   const references = async files => Promise.all(files.sort().map(fileReference));
   return { project, tree, inputs: await references(inputs), author: treeEvidence(tree), tool: toolEvidence(),
     handwritten: await references(sourceFiles(join(root, 'handwritten/scala'))), support: await references(support) };
 }
 
+// Historical v1/P23 reader only. No current verification dispatches preparation
+// or silently selects this fixed directory when explicit 0.3.0 supply is absent.
 export async function captureSupply(archive, root = ROOT) {
   const input = await fileReference(archive);
   assert.equal(input.sha256, ARCHIVE_SHA256, 'clean1134 archive SHA differs');
@@ -115,6 +138,34 @@ export async function captureSupply(archive, root = ROOT) {
     assert.equal(files.find(entry => entry.file === file)?.sha256, row.sha256, 'prepared member changed');
   }
   return { archive: input, files };
+}
+
+// Lazy import keeps source/doctor independent of artifact capture and of any
+// adapter module initialization. This only reads an already prepared supply.
+export async function captureWorkshopSupply(archive, directory, { root = ROOT } = {}) {
+  assert.ok(typeof directory === 'string' && directory.length > 0, 'explicit runtime supply required');
+  const { captureAcceptanceSupply } = await import('./truthsrc-acceptance-supply.mjs');
+  return captureAcceptanceSupply(archive, directory, { root });
+}
+
+function runtimeSupplyMetadata(directory, root) {
+  checkedPath(directory, 'directory'); checkedPath(join(directory, 'maven'), 'directory');
+  checkedPath(join(root, 'tools/truthsrc-acceptance-supply.mjs'));
+  const receipt = readJson(join(directory, 'receipt.json'));
+  assert.equal(receipt.schemaVersion, 'bank.truthsrc-runtime/v2');
+  assert.equal(receipt.version, '0.3.0'); assert.equal(receipt.source, 'maven-central');
+  assert.equal(receipt.runtimeRebuilt, false); assert.equal(receipt.files?.length, 6);
+  const lock = readJson(join(root, 'docs/RUNTIME-0.3.0-SUPPLY.json'));
+  assert.equal(lock.schemaVersion, 'bank.runtime-supply-lock/v1'); assert.equal(lock.version, '0.3.0');
+  const selected = readJson(join(root, 'truthsrc.project.json')).options?.runtimeArtifact;
+  assert.equal(selected?.coordinate, 'net.imadz:saga-core_2.13:0.3.0');
+  assert.equal(selected.sha256, lock.artifacts?.find(row => row.artifactId === 'saga-core_2.13')?.jar?.sha256);
+  const repository = selected.repository;
+  assert.ok(typeof repository === 'string' && repository.length > 0);
+  // Compare local repository identity without traversing, hashing or resolving
+  // the JAR/POM members. The acceptance adapter does those checks in verify.
+  const selectedPath = repository.startsWith('file:') ? fileURLToPath(repository) : resolve(root, repository);
+  assert.equal(pathToFileURL(selectedPath).href.replace(/\/$/, ''), pathToFileURL(join(directory, 'maven')).href);
 }
 
 export function leaseMetadata(file, { root = ROOT, run } = {}) {
@@ -157,6 +208,7 @@ async function probeDocker() {
 }
 
 export async function doctor(options, { root = ROOT, tool = TOOL, probePorts, probeImages = probeDocker } = {}) {
+  validateSupplyOptions(options, { required: false });
   const stages = requestedStages(options.through), checks = [];
   const check = async (id, kind, detail, action) => {
     try { await action(); checks.push({ id, kind, status: 'passed', detail }); }
@@ -177,6 +229,11 @@ export async function doctor(options, { root = ROOT, tool = TOOL, probePorts, pr
     await check('archive', 'metadata', 'Explicit regular clean1134 archive required. Metadata only; SHA is checked by verify, not doctor.', () => {
       checkedPath(options.archive); assert.ok(lstatSync(options.archive).size > 0);
       if (options.run) assert.ok(!overlap(options.run, options.archive));
+    });
+    await check('runtime-supply', 'metadata', 'Explicit existing 0.3.0 receipt/maven directory matching the project required. No artifact hashes, preparation or downloads; verify checks the full supply.', () => {
+      runtimeSupplyMetadata(options.runtimeSupply, root);
+      if (options.run) assert.ok(!overlap(options.run, options.runtimeSupply));
+      if (options.archive) assert.ok(!overlap(options.archive, options.runtimeSupply));
     });
     await check('public-verifier', 'metadata', 'Sibling lib/project/verify.mjs required; no bank-only anchor verifier fallback.', () => checkedPath(join(tool, 'lib/project/verify.mjs')));
   }

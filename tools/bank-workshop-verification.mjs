@@ -4,8 +4,8 @@ import { closeSync, existsSync, mkdirSync, openSync, readFileSync, writeFileSync
 import { basename, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  ROOT, TOOL, STAGES, DEFAULT_JAVA_HOME, ARCHIVE_SHA256, captureCurrent, captureSupply, checkedPath,
-  doctor, fileReference, jsonText, leaseMetadata, newRunPath, readJson, requestedStages, sha256, within,
+  ROOT, TOOL, STAGES, DEFAULT_JAVA_HOME, ARCHIVE_SHA256, captureCurrent, captureSupply, captureWorkshopSupply, checkedPath,
+  doctor, fileReference, jsonText, leaseMetadata, newRunPath, overlap, readJson, requestedStages, sha256, validateSupplyOptions,
 } from './bank-workshop-supply.mjs';
 import { captureRuntimeFile } from './truthsrc-evidence.mjs';
 import { inspectRuntimeWorker } from './truthsrc-worker-evidence.mjs';
@@ -14,7 +14,8 @@ import { createEvidenceReferences } from '../../metarch-truthsrc/lib/verificatio
 import { summarizeVerificationStages } from '../../metarch-truthsrc/lib/verification/outcome.mjs';
 import { inspectVerificationRun, runVerification } from '../../metarch-truthsrc/lib/verification/runner.mjs';
 
-export const CONTRACT = 'bank.workshop-verification/v1';
+export const CONTRACT = 'bank.workshop-verification/v2';
+export const LEGACY_CONTRACT = 'bank.workshop-verification/v1';
 // These are selectors, not copies of financial rules/oracles. Qualified identities
 // retain the distinction between a command, its guard and the event member fold.
 export const REQUIRED = Object.freeze([
@@ -106,27 +107,50 @@ async function verifyAnchors(project, out) {
 const COMMON_CHECKS = ['osSandboxEnforced', 'outputUnchanged', 'handwrittenUnchanged', 'localRuntimeUnchanged',
   'supplyUnchanged', 'currentInputsUnchanged', 'sandboxControlsAndCanariesUnchanged', 'ownedCachesInventoried',
   'verifierUnchanged', 'actualBuildSourcesVerified'];
+const CURRENT_SUPPLY_CHECKS = ['runtimeSupplyVerified', 'runtimeClasspathEnginesVerified'];
+// Exact historical helper set; new helpers are not retroactively signed by v1.
+const LEGACY_BUILD_SUPPORT = [join(ROOT, 'tools/truthsrc-evidence.mjs'),
+  ...['verification/files', 'verification/inventory', 'verification/outcome', 'immutable-data', 'strict-json'].map(name => join(TOOL, 'lib', name + '.mjs'))];
 
 // Reuse the existing inspectors and pinned test manifests. This is receipt
-// composition, not another build runner or test oracle.
-export async function inspectBuild({ mode, output, evidence, source }) {
+// composition, not another build runner or test oracle. Only explicit legacy
+// readers admit v1; a current workshop cannot downgrade when supply is missing.
+export async function inspectBuild({ mode, output, evidence, source, runtimeSupply, preparedRuntime, legacy = false }) {
   const b = await import('./verify-truthsrc-build.mjs');
   const input = readJson(join(evidence, 'input.json')), result = readJson(join(evidence, 'result.json'));
   const actual = readJson(join(evidence, 'actual-build-sources.json'));
   const before = readJson(join(evidence, 'sources-before.json')), after = readJson(join(evidence, 'sources-after.json'));
   const process = readJson(join(evidence, 'build.json'));
   const stdout = readFileSync(join(evidence, 'build.stdout.log'), 'utf8');
-  assert.equal(result.schemaVersion, 'bank.truthsrc-build/v1'); assert.equal(result.status, 'passed');
+  assert.equal(result.schemaVersion, legacy ? 'bank.truthsrc-build/v1' : 'bank.truthsrc-build/v2');
+  assert.equal(result.status, 'passed');
   same(result.errors, []); assert.equal(result.cancelled, null); requirePassed(allTrue(result.checks));
-  for (const name of COMMON_CHECKS) requirePassed(result.checks[name]);
+  for (const name of [...COMMON_CHECKS, ...(legacy ? [] : CURRENT_SUPPLY_CHECKS)]) requirePassed(result.checks[name]);
   same([input.output, result.output, actual.admittedOutput], [output, output, output]);
   same([input.evidence, result.evidence], [evidence, evidence]); same(input.sources, source.sources, 'build came from different source/tool inputs');
   assert.equal(result.archive?.sha256, ARCHIVE_SHA256); assert.equal(input.archiveSha256, ARCHIVE_SHA256);
+  let prepared, supplyAdapter;
+  if (legacy) {
+    for (const record of [input, result])
+      for (const key of ['runtimeSupply', 'preparedRuntime', 'resolvedDependencies']) assert.ok(!Object.hasOwn(record, key), 'mixed legacy/current build evidence');
+    assert.equal(runtimeSupply, undefined); assert.equal(preparedRuntime, undefined);
+  } else {
+    supplyAdapter = await import('./truthsrc-acceptance-supply.mjs');
+    assert.equal(input.project, join(ROOT, 'truthsrc.project.json'));
+    checkedPath(input.runtimeSupply, 'directory');
+    prepared = supplyAdapter.capturePreparedRuntime(input.runtimeSupply, { projectFile: input.project });
+    assert.equal(prepared.schemaVersion, 'bank.prepared-runtime/v3'); assert.equal(prepared.version, '0.3.0');
+    same(input.preparedRuntime, prepared, 'prepared runtime input changed');
+    same(result.preparedRuntime, prepared, 'build result does not bind prepared runtime');
+    if (runtimeSupply !== undefined) same(input.runtimeSupply, runtimeSupply, 'build runtime differs from workshop selection');
+    if (preparedRuntime !== undefined) same(prepared, preparedRuntime, 'build runtime differs from sealed workshop capture');
+  }
   const toolchain = [join(input.javaHome, 'bin/java'), join(input.javaHome, 'bin/javac'), join(input.javaHome, 'release'), '/usr/bin/python3', '/usr/bin/sandbox-exec'];
   same(Object.keys(input.toolchain).sort(), toolchain.sort());
   for (const file of toolchain) { b.safePath(file, 'file'); assert.equal(b.fileDigest(file), input.toolchain[file], 'build toolchain changed'); }
   same(input.verifier, { file: join(ROOT, 'tools/verify-truthsrc-build.mjs'), sha256: b.fileDigest(join(ROOT, 'tools/verify-truthsrc-build.mjs')) });
-  same(input.verifierSupport, b.snapshotFiles(b.BUILD_SUPPORT), 'build file-evidence helpers changed');
+  same(input.verifierSupport, b.snapshotFiles(legacy ? LEGACY_BUILD_SUPPORT : b.BUILD_SUPPORT), 'build file-evidence helpers changed');
+  if (!legacy) for (const file of supplyAdapter.SUPPLY_SUPPORT) assert.ok(Object.hasOwn(input.verifierSupport, file), 'acceptance supply support is not sealed');
   requirePassed(actual.passed); b.succeeded(process); same(result.phases.build, process);
   assert.equal(sha256(stdout), process.stdoutSha256);
   assert.equal(sha256(readFileSync(join(evidence, 'build.stderr.log'))), process.stderrSha256);
@@ -138,15 +162,25 @@ export async function inspectBuild({ mode, output, evidence, source }) {
   assert.equal(actual.files, Object.keys(before.output).length);
   for (const name of ['output', 'handwritten', 'localRuntime']) same(before[name], after[name]);
   same(b.inventory(join(ROOT, 'handwritten/scala')), before.handwritten);
-  same(b.inventory(join(ROOT, '.local/truthsrc-runtime')), before.localRuntime);
-  same(b.inventory(join(evidence, 'supply')), after.supply);
+  same(b.inventory(legacy ? join(ROOT, '.local/truthsrc-runtime') : prepared.root), before.localRuntime);
+  const actualInventory = b.inventory(join(evidence, 'supply'));
+  same(actualInventory, after.supply);
+  if (!legacy) {
+    same(before.localRuntime, prepared.inventory, 'prepared runtime inventory differs from build sources');
+    supplyAdapter.validateComposedSupply(readJson(join(evidence, 'supply-before.json')), prepared, actualInventory);
+    same(result.resolvedDependencies, supplyAdapter.inspectEngineClasspath(stdout, evidence, prepared), 'resolved engine classpath differs');
+    same(readJson(join(evidence, 'resolved-dependencies.json')), result.resolvedDependencies, 'resolved dependency receipt differs');
+  }
   for (const key of ['runtimeRebuilt', 'runtimePublished', 'release1134Resigned', 'servicesStarted']) assert.equal(result[key], false);
   const names = ['input.json', 'result.json', 'actual-build-sources.json', 'sources-before.json', 'sources-after.json',
-    'build.json', 'build.stdout.log', 'build.stderr.log', 'build-plan.json', 'supply-before.json'];
+    'build.json', 'build.stdout.log', 'build.stderr.log', 'build-plan.json', 'supply-before.json',
+    ...(legacy ? [] : ['resolved-dependencies.json'])];
   let tests = null;
   if (mode === 'runtime') {
     requirePassed(result.compileRuntimeTests);
     for (const key of ['actualRuntimeTestSourcesVerified', 'runtimeClasspathVerified', 'runtimeTestInputsUnchanged', 'runtimeCompilationPassed']) requirePassed(result.checks[key]);
+    assert.equal(readJson(join(evidence, 'runtime-build.json')).schemaVersion,
+      legacy ? 'bank.truthsrc-runtime-build/v1' : 'bank.truthsrc-runtime-build/v2');
     const { admitRuntimeBuild } = await import('./truthsrc-runtime-admission.mjs');
     const admitted = await admitRuntimeBuild(evidence); await admitted.assertUnchanged();
     names.push('runtime-build.json', 'runtime-inputs-before.json', 'runtime-inputs-after.json');
@@ -174,21 +208,61 @@ export async function inspectBuild({ mode, output, evidence, source }) {
       names.push('readside-tests.json', 'readside-sources-before.json', 'readside-sources-after.json');
     }
   }
+  const refs = await Promise.all(names.map(name => fileReference(join(evidence, name))));
+  if (!legacy) {
+    refs.push(...preparedReferences(prepared));
+    const references = createEvidenceReferences(); refs.forEach(ref => references.retain(ref)); references.assertUnchanged();
+    same(supplyAdapter.capturePreparedRuntime(input.runtimeSupply, { projectFile: input.project }), prepared, 'runtime changed during build inspection');
+    same(b.inventory(join(evidence, 'supply')), actualInventory, 'composed supply changed during build inspection');
+  }
   return { passed: true, actualRoot: actual.root, checks: result.checks,
-    tests: tests ? { totals: tests.totals, sourceBound: tests.sourceBound } : null,
-    refs: await Promise.all(names.map(name => fileReference(join(evidence, name)))) };
+    ...(legacy ? {} : { preparedRuntime: prepared, resolvedDependencies: result.resolvedDependencies }),
+    tests: tests ? { totals: tests.totals, sourceBound: tests.sourceBound } : null, refs };
 }
 
-export async function inspectService({ evidence, buildEvidence, lease, round }) {
-  const result = readJson(join(evidence, 'result.json'));
+export async function inspectService({ evidence, buildEvidence, lease, round, runtimeVersion, runtimeSupply, preparedRuntime, legacy = false }) {
+  assert.equal(typeof legacy, 'boolean');
+  const refs = new Map(), capturedReferences = createEvidenceReferences();
+  const retainReference = ref => {
+    capturedReferences.retain(ref);
+    refs.set(ref.file, ref); return ref;
+  };
+  const reference = async file => retainReference(await fileReference(file));
+  const rawJson = async (file, { envelope = false } = {}) => {
+    const captured = captureRuntimeFile(file, { json: !envelope, limit: 32 * 1024 * 1024 });
+    retainReference({ file, bytes: captured.bytes, sha256: captured.sha256 });
+    return envelope ? JSON.parse(captured.value.toString('utf8')) : captured.value;
+  };
+  const result = await rawJson(join(evidence, 'result.json'), { envelope: true });
   assert.equal(result.schemaVersion, 'bank.truthsrc-runtime/v1'); assert.equal(result.status, 'passed');
   same(result.errors, []); assert.equal(result.cancelled, false); assert.equal(result.window, 'all');
   same([result.evidence, result.buildEvidence, result.round], [evidence, buildEvidence, round]);
   same(result.lease?.input?.file, lease);
   const spec = readJson(lease);
   assert.equal(spec.schemaVersion, 'bank.truthsrc-runtime-lease/v1'); assert.equal(spec.runRoot, evidence);
-  const inputs = readJson(join(evidence, 'inputs.json'));
+  const inputs = await rawJson(join(evidence, 'inputs.json'), { envelope: true });
   same(inputs.options.window, 'all'); same(inputs.options.buildEvidence, buildEvidence);
+  const { admitRuntimeBuild } = await import('./truthsrc-runtime-admission.mjs');
+  const admitted = await admitRuntimeBuild(buildEvidence);
+  same(inputs.build, admitted.before, 'runtime admission differs from selected build');
+  if (legacy) {
+    same([runtimeVersion, runtimeSupply, preparedRuntime, admitted.preparedRuntime], [undefined, undefined, undefined, undefined], 'legacy service cannot select current runtime');
+    const fields = record => ['runtimeVersion', 'preparedRuntime'].filter(key => Object.hasOwn(record, key));
+    const present = fields(result); same(fields(inputs), present, 'legacy runtime identities differ');
+    assert.ok(present.length === 0 || present.length === 2, 'partial legacy runtime identity');
+    if (present.length) for (const record of [result, inputs])
+      same([record.runtimeVersion, record.preparedRuntime], [null, null], 'legacy service cannot carry current runtime');
+  } else {
+    assert.equal(runtimeVersion, '0.3.0', 'selected service runtime version differs');
+    assert.equal(preparedRuntime?.schemaVersion, 'bank.prepared-runtime/v3');
+    assert.equal(preparedRuntime.version, runtimeVersion);
+    assert.equal(preparedRuntime.root, runtimeSupply, 'selected service runtime supply differs');
+    same(admitted.preparedRuntime, preparedRuntime, 'selected service runtime differs from admitted build');
+    for (const record of [result, inputs]) {
+      assert.equal(record.runtimeVersion, runtimeVersion, 'runtime receipt version differs from selected runtime');
+      same(record.preparedRuntime, preparedRuntime, 'runtime receipt supply differs from selected runtime');
+    }
+  }
   assert.ok(inputs.options.browserModule && inputs.options.browserExecutable && inputs.browserInputs && Object.keys(inputs.browserInputs).length > 0);
   const { inventory, fileDigest, safePath } = await import('./verify-truthsrc-build.mjs');
   for (const [file, expected] of Object.entries(inputs.runtime)) {
@@ -204,17 +278,6 @@ export async function inspectService({ evidence, buildEvidence, lease, round }) 
   assert.equal(result.leaseRelease.owner, spec.owner); requirePassed(result.leaseRelease.dataPreserved);
   assert.equal(result.leaseRelease.reusable, false);
   for (const key of ['runtimeRebuilt', 'runtimePublished', 'release1134Resigned']) assert.equal(result[key], false);
-  const refs = new Map(), capturedReferences = createEvidenceReferences();
-  const retainReference = ref => {
-    capturedReferences.retain(ref);
-    refs.set(ref.file, ref); return ref;
-  };
-  const reference = async file => retainReference(await fileReference(file));
-  const rawJson = async file => {
-    const captured = captureRuntimeFile(file, { json: true, limit: 32 * 1024 * 1024 });
-    retainReference({ file, bytes: captured.bytes, sha256: captured.sha256 });
-    return captured.value;
-  };
   const configFile = join(round, 'runtime-ta.json'), fixtureFile = join(ROOT, 'test/fixtures/truthsrc-actor-ta.json');
   const config = await rawJson(configFile), configRef = refs.get(configFile), fixtureRef = await reference(fixtureFile);
   same(config, { schemaVersion: 'bank.truthsrc-runtime-ta/v1', ownedRoot: round,
@@ -311,7 +374,7 @@ export async function inspectService({ evidence, buildEvidence, lease, round }) 
   assert.ok(database.mysqlNegative.scenarios.every(row => row.status === 'passed'));
   await processEvidence(join(evidence, 'database/mysql-negative/process'));
   same(await rawJson(join(evidence, 'database/mysql-negative/result.json')), database.mysqlNegative);
-  await reference(join(evidence, 'result.json')); await reference(join(evidence, 'inputs.json'));
+  await admitted.assertUnchanged();
   capturedReferences.assertUnchanged();
   return { passed: true, owner: spec.owner, browserVerified: true, resourcesExited: true,
     inspection: 'static-sealed-evidence', liveResourcesProbed: false, refs: [...refs.values()] };
@@ -323,7 +386,23 @@ async function checkArchive(file) {
   return ref;
 }
 const defaults = { current: captureCurrent, doctor, source: compileSource, generate, anchors: verifyAnchors,
-  runner: runTool, archive: checkArchive, supply: captureSupply, build: inspectBuild, service: inspectService };
+  runner: runTool, archive: checkArchive, supply: captureWorkshopSupply, legacySupply: captureSupply, build: inspectBuild, service: inspectService };
+
+function checkSupplyResult(supply, archive, runtimeSupply) {
+  assert.equal(supply.schemaVersion, 'bank.acceptance-supply/v3');
+  assert.equal(supply.archive.file, archive); assert.equal(supply.archive.sha256, ARCHIVE_SHA256);
+  const prepared = supply.runtime;
+  assert.equal(prepared.schemaVersion, 'bank.prepared-runtime/v3'); assert.equal(prepared.version, '0.3.0');
+  assert.equal(prepared.root, runtimeSupply);
+  assert.equal(prepared.repository, pathToFileURL(join(runtimeSupply, 'maven')).href + '/');
+  return prepared;
+}
+
+function preparedReferences(prepared) {
+  const reference = ({ file, bytes, sha256 }) => ({ file, bytes, sha256 });
+  return [reference(prepared.receipt), reference(prepared.lock),
+    ...prepared.files.map(({ path, bytes, sha256 }) => ({ file: join(prepared.root, path), bytes, sha256 }))];
+}
 
 function checkAnchorResult(result) {
   requirePassed(result.passed); requirePassed(allTrue(result.checks));
@@ -334,31 +413,42 @@ function checkAnchorResult(result) {
 function summary(index, checks, diagnostics) {
   const { requestedScopePassed, stages } = summarizeVerificationStages({ stageIds: STAGES,
     requiredStages: requestedStages(index.through), stages: index.stages, checks, diagnostics });
+  const legacy = index.schemaVersion === LEGACY_CONTRACT;
+  // Keep the report/view/session display contract stable. A v1 receipt retains
+  // its full old signature checks and its historical scope, never a 0.3.0 claim.
   return { schemaVersion: 'bank.workshop-report/v1', run: index.run, through: index.through, executionKind: index.executionKind,
+    verificationContract: index.schemaVersion, legacy,
+    runtimeVersion: legacy ? null : index.preparedRuntime?.version ?? null,
+    runtimeSupply: legacy ? null : index.preparedRuntime?.root ?? null,
+    preparedRuntime: legacy ? null : index.preparedRuntime ?? null,
     checkedAt: now(), staticSnapshot: true, requestedScopePassed, fullPipelinePassed: requestedScopePassed && index.through === 'service' && index.executionKind === 'real',
     deliveryReady: false, usabilityAccepted: false, onboardingComplete: false,
     snapshot: index.snapshot ?? null, codeDigest: index.codeDigest ?? null,
     stages, diagnostics,
     runtimeRetryBackoffDeadline: 'OPEN',
-    limitations: ['Partial scope is not full bank acceptance.', 'Local hashes are not third-party signatures or hostile-host isolation.',
+    limitations: [...(legacy ? ['Historical v1/P23 verification is not current 0.3.0 acceptance.'] : []),
+      'Partial scope is not full bank acceptance.', 'Local hashes are not third-party signatures or hostile-host isolation.',
       'Delivery channel, platform minimum and independent newcomer usability are separate unaccepted gates.'] };
 }
 
 // Internal dependency seams are Node-test-only. There is no CLI runner override;
 // any overridden execution is labelled test-double and can never be full-pipeline.
 export async function verifyWorkshop(options, overrides = {}) {
+  validateSupplyOptions(options); // Reject missing/unused flags before claiming a run or generating anything.
   const ops = { ...defaults, ...overrides }, root = overrides.root ?? ROOT;
   const run = newRunPath(options.run, root), through = options.through;
   const stages = requestedStages(through), project = join(root, 'truthsrc.project.json');
   const controller = new AbortController();
   const cancel = () => controller.abort();
   const index = { schemaVersion: CONTRACT, run, through, project, executionKind: Object.keys(overrides).length ? 'test-double' : 'real',
+    runtimeSupply: options.runtimeSupply ?? null, runtimeVersion: stages.includes('anchors') ? '0.3.0' : null,
     startedAt: now(), stages: Object.fromEntries(STAGES.map(id => [id, { status: 'skipped' }])), refs: [], candidates: [], diagnostics: [] };
   let active = 'source', current, supply, source, sequence = 0;
   mkdirSync(run, { mode: 0o700 });
   const attempts = join(run, 'attempts'), attempt = join(attempts, '0001'), results = join(attempt, 'results');
   mkdirSync(attempts, { mode: 0o700 }); mkdirSync(attempt, { mode: 0o700 }); mkdirSync(results, { mode: 0o700 });
-  save(join(run, 'run.json'), { schemaVersion: CONTRACT, run, through, project, attempt: '0001', executionKind: index.executionKind, startedAt: index.startedAt });
+  save(join(run, 'run.json'), { schemaVersion: CONTRACT, run, through, project, runtimeSupply: index.runtimeSupply,
+    runtimeVersion: index.runtimeVersion, attempt: '0001', executionKind: index.executionKind, startedAt: index.startedAt });
   const record = async (name, value) => {
     const file = join(results, name + '.json'); save(file, value);
     const reference = await fileReference(file); index.refs.push(reference); return reference;
@@ -388,10 +478,11 @@ export async function verifyWorkshop(options, overrides = {}) {
   const build = async row => {
     await unchanged();
     await operation(row.mode + '-execute', base => ops.runner({ script: 'verify-truthsrc-build.mjs', base, signal: controller.signal,
-      args: ['--project-output', row.output, '--archive', options.archive, '--evidence', row.evidence,
+      args: ['--project-output', row.output, '--archive', supply.archive.file, '--runtime-supply', supply.runtime.root, '--evidence', row.evidence,
         '--java-home', options.javaHome ?? DEFAULT_JAVA_HOME,
         row.mode === 'runtime' ? '--compile-runtime-tests' : row.mode === 'actor' ? '--run-actor-tests' : '--run-readside-tests'] }));
-    const checked = await operation(row.mode + '-build', () => ops.build({ ...row, source }));
+    const checked = await operation(row.mode + '-build', () => ops.build({ ...row, source,
+      runtimeSupply: supply.runtime.root, preparedRuntime: supply.runtime }));
     requirePassed(checked.passed); row.built = true; index.refs.push(...checked.refs);
     const post = await operation(row.mode + '-anchors-after', () => ops.anchors(project, row.output)); checkAnchorResult(post);
     same(post.codeDigest, index.codeDigest); same(post.files, row.files); await unchanged();
@@ -404,7 +495,7 @@ export async function verifyWorkshop(options, overrides = {}) {
     await record('preflight', preflight);
     if (!preflight.passed) {
       const blocked = preflight.checks?.find(row => row.status === 'blocked')?.id;
-      active = ['archive', 'public-verifier'].includes(blocked) ? 'anchors'
+      active = ['archive', 'runtime-supply', 'public-verifier'].includes(blocked) ? 'anchors'
         : ['platform', 'jdk11', 'sandbox-python'].includes(blocked) ? 'code'
         : ['lease', 'browser', 'docker', 'ports-free-now', 'pinned-images'].includes(blocked) ? 'service' : 'source';
     }
@@ -420,13 +511,27 @@ export async function verifyWorkshop(options, overrides = {}) {
       }
     }
     if (stages.includes('anchors')) {
-      await ops.archive(options.archive);
-      assert.ok(!within(run, options.archive), 'archive cannot be inside the new run');
+      active = 'anchors';
+      assert.ok(!overlap(run, options.archive) && !overlap(run, options.runtimeSupply) && !overlap(options.archive, options.runtimeSupply),
+        'archive, prepared supply and new run must be disjoint');
+      const archive = await ops.archive(options.archive);
+      // Capture and validate existing material before source compilation or any
+      // candidate write. prepare now downloads and must never be dispatched here.
+      supply = await operation('supply', () => ops.supply(options.archive, options.runtimeSupply, { root }));
+      index.preparedRuntime = checkSupplyResult(supply, options.archive, options.runtimeSupply);
+      same(supply.archive, archive, 'archive changed during supply capture');
+      index.supply = index.refs.at(-1);
+      index.refs.push(...preparedReferences(supply.runtime));
     }
     if (through === 'service') {
+      active = 'service';
       const metadata = leaseMetadata(options.lease, { root, run });
-      index.runtime = { evidence: metadata.spec.runRoot, round: metadata.round, lease: options.lease };
+      for (const directory of [metadata.spec.runRoot, metadata.round])
+        assert.ok(!overlap(directory, supply.runtime.root) && !overlap(directory, supply.archive.file), 'runtime roots overlap sealed supply');
+      index.runtime = { evidence: metadata.spec.runRoot, round: metadata.round, lease: options.lease,
+        runtimeVersion: supply.runtime.version, runtimeSupply: supply.runtime.root, preparedRuntime: supply.runtime };
     }
+    active = 'source';
     current = await ops.current(); index.current = await record('current-inputs', current);
     source = await operation('source', async () => {
       const directory = join(attempt, 'source-verification'), plan = sourceVerificationPlan(index.current.file);
@@ -448,8 +553,6 @@ export async function verifyWorkshop(options, overrides = {}) {
     index.source = index.refs.at(-1); await unchanged(); index.stages.source.status = 'passed';
     if (stages.includes('anchors')) {
       active = 'anchors';
-      await operation('prepare', base => ops.runner({ script: 'prepare-truthsrc-runtime.mjs', args: ['--archive', options.archive], base, signal: controller.signal }));
-      supply = await ops.supply(options.archive); index.supply = await record('supply', supply);
       const first = await candidate(stages.includes('code') ? 'actor' : 'anchors');
       index.stages.anchors.status = 'passed';
       if (stages.includes('code')) {
@@ -466,7 +569,7 @@ export async function verifyWorkshop(options, overrides = {}) {
         const checked = await operation('service', () => ops.service({ ...index.runtime, buildEvidence: runtime.evidence }));
         requirePassed(checked.passed); index.refs.push(...checked.refs); index.stages.service.status = 'passed';
       }
-      same(await ops.supply(options.archive), supply, 'frozen supply changed during verification');
+      same(await ops.supply(supply.archive.file, supply.runtime.root, { root }), supply, 'acceptance supply changed during verification');
     }
     await unchanged();
   } catch (error) {
@@ -507,19 +610,35 @@ export async function verifyWorkshop(options, overrides = {}) {
   return report;
 }
 
-export async function reportWorkshop({ run }, overrides = {}) {
-  const ops = { ...defaults, ...overrides }, root = overrides.root ?? ROOT;
+export async function reportWorkshop(options, overrides = {}) {
+  same(Object.keys(options), ['run'], 'report only accepts a sealed run, not a supply override');
+  const { run } = options, ops = { ...defaults, ...overrides }, root = overrides.root ?? ROOT;
   newRunPath(run, root, true);
   const start = readJson(join(run, 'run.json'));
-  same(start.schemaVersion, CONTRACT); same(start.run, run);
+  assert.ok([CONTRACT, LEGACY_CONTRACT].includes(start.schemaVersion), 'unknown workshop contract'); same(start.run, run);
+  const legacy = start.schemaVersion === LEGACY_CONTRACT;
+  if (legacy && !overrides.current) ops.current = () => captureCurrent({ legacy: true });
   const missing = !existsSync(join(run, 'results.json'));
   const index = missing ? { ...start, stages: {}, refs: [], diagnostics: [{ code: 'WORKSHOP_INCOMPLETE', message: 'No sealed results. Attempt records are retained; no automatic resume.' }] } : readJson(join(run, 'results.json'));
   same([index.schemaVersion, index.run, index.through, index.project, index.executionKind],
-    [CONTRACT, run, start.through, start.project, start.executionKind]);
+    [start.schemaVersion, run, start.through, start.project, start.executionKind]);
   requestedStages(index.through);
   const checks = {}, diagnostics = [...index.diagnostics];
   try {
     assert.ok(!missing);
+    if (legacy) {
+      for (const record of [start, index, index.runtime ?? {}])
+        for (const key of ['runtimeSupply', 'runtimeVersion', 'preparedRuntime']) assert.ok(!Object.hasOwn(record, key), 'mixed legacy/current workshop identity');
+    } else {
+      same([index.runtimeSupply, index.runtimeVersion], [start.runtimeSupply, start.runtimeVersion], 'runtime selection differs from sealed run');
+      if (index.through === 'source') {
+        same([index.runtimeSupply, index.runtimeVersion], [null, null]);
+        assert.ok(!index.supply && !index.preparedRuntime && !index.runtime, 'source-only run cannot claim runtime verification');
+      } else {
+        assert.equal(index.runtimeVersion, '0.3.0');
+        assert.ok(typeof index.runtimeSupply === 'string' && index.runtimeSupply.length > 0);
+      }
+    }
     assert.ok(Array.isArray(index.refs) && index.refs.length > 0);
     const references = createEvidenceReferences();
     for (const ref of index.refs) { checkedPath(ref.file); references.retain(ref); }
@@ -536,7 +655,18 @@ export async function reportWorkshop({ run }, overrides = {}) {
     const required = requestedStages(index.through);
     if (required.includes('anchors')) {
       const supply = readJson(index.supply.file);
-      same(await ops.supply(supply.archive.file), supply, 'current frozen dependencies changed');
+      let selection = {};
+      if (legacy) {
+        assert.ok(!Object.hasOwn(supply, 'schemaVersion') && !Object.hasOwn(supply, 'runtime'), 'current supply cannot be read as legacy');
+        // Preserve the original archive + root signature, including its fixed
+        // seven-member P23 directory. Missing history is not a current fallback.
+        same(await ops.legacySupply(supply.archive.file, root), supply, 'legacy frozen dependencies changed');
+      } else {
+        const prepared = checkSupplyResult(supply, supply.archive.file, index.runtimeSupply);
+        same(index.preparedRuntime, prepared, 'workshop runtime identity differs from sealed supply');
+        same(await ops.supply(supply.archive.file, supply.runtime.root, { root }), supply, 'current acceptance supply changed');
+        selection = { runtimeSupply: supply.runtime.root, preparedRuntime: prepared };
+      }
       const modes = index.through === 'anchors' ? ['anchors'] : index.through === 'code' ? ['actor', 'readside'] : ['actor', 'readside', 'runtime'];
       same(index.candidates.map(row => row.mode), modes, 'missing/foreign candidate stage');
       for (const row of index.candidates) {
@@ -545,7 +675,7 @@ export async function reportWorkshop({ run }, overrides = {}) {
         const verified = await ops.anchors(index.project, row.output); checkAnchorResult(verified);
         same([verified.snapshot, verified.codeDigest, verified.files], [index.snapshot, index.codeDigest, row.files]);
         same(verified.graph, row.graph);
-        if (row.mode !== 'anchors') { requirePassed(row.built); requirePassed((await ops.build({ ...row, source })).passed); }
+        if (row.mode !== 'anchors') { requirePassed(row.built); requirePassed((await ops.build({ ...row, source, ...selection, legacy })).passed); }
       }
       checks.anchors = true;
       if (required.includes('code')) checks.code = true;
@@ -553,9 +683,12 @@ export async function reportWorkshop({ run }, overrides = {}) {
         const lease = readJson(index.runtime.lease);
         assert.equal(index.runtime.evidence, join(root, 'target', 'truthsrc-runtime-' + lease.owner));
         assert.equal(index.runtime.round, join(root, '.local/mock-ta', 'truthsrc-runtime-' + lease.owner));
-        requirePassed((await ops.service({ ...index.runtime, buildEvidence: index.candidates.find(row => row.mode === 'runtime').evidence })).passed);
+        if (!legacy) same([index.runtime.runtimeVersion, index.runtime.runtimeSupply, index.runtime.preparedRuntime],
+          ['0.3.0', supply.runtime.root, supply.runtime], 'service runtime identity differs from workshop supply');
+        requirePassed((await ops.service({ ...index.runtime, buildEvidence: index.candidates.find(row => row.mode === 'runtime').evidence, legacy })).passed);
         checks.service = true;
       }
+      if (!legacy) same(await ops.supply(supply.archive.file, supply.runtime.root, { root }), supply, 'supply changed during read-only inspection');
     }
     // Recheck after read-only validation too; parallel edits never become green.
     same(await ops.current(), current); references.assertUnchanged();

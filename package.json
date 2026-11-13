@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.13.0" },
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "test": "node --test test/unified-truth.test.mjs test/historical-source.test.mjs",
     "test:public-tools": "node --test --test-concurrency=1 test/public-handwritten-provenance.test.mjs test/public-file-evidence.test.mjs test/public-lease-evidence.test.mjs test/public-worker-evidence.test.mjs test/public-verification-integration.test.mjs test/tooling-ownership.test.mjs",
@@ -30,10 +32,11 @@
     "validate": "node tools/truthsrc-project.mjs validate",
     "verify": "node tools/truthsrc-project.mjs validate",
     "compile": "node tools/truthsrc-project.mjs compile",
-    "project": "node tools/truthsrc-project.mjs generate --out generated/current",
+    "project": "node tools/prepare-truthsrc-runtime.mjs && node tools/truthsrc-project.mjs generate --out generated/current",
     "project:check": "node tools/truthsrc-project.mjs generate --out generated/current --plan",
     "project:status": "node tools/truthsrc-project.mjs status --out generated/current",
     "history:validate": "node tools/validate.mjs --historical",
-    "history:project:check": "node tools/project.mjs --historical --check"
+    "history:project:check": "node tools/project.mjs --historical --check",
+    "runtime:prepare": "node tools/prepare-truthsrc-runtime.mjs"
   }
 }
